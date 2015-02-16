@@ -115,7 +115,7 @@ function CanvasDisplay(mainElement) {
 
     //noinspection JSUnresolvedFunction
     this.displayToggleFullscreen = function() {
-        if (Javatari.SCREEN_FULLSCREEN_DISABLED) return;
+        if (JavatariParameters.SCREEN_FULLSCREEN_DISABLED) return;
 
         if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
             if (fsElement.requestFullscreen)
@@ -208,7 +208,7 @@ function CanvasDisplay(mainElement) {
         borderElement.style.background = "black";
         borderElement.style.border = "0 solid black";
         borderElement.style.borderWidth = "" + borderTop + "px " + borderLateral + "px " + borderBottom + "px";
-        if (Javatari.SCREEN_CONTROL_BAR === 2) {
+        if (JavatariParameters.SCREEN_CONTROL_BAR === 2) {
             borderElement.style.borderImage = "url(room/screen/images/ScreenFrameBorder.png) " +
                 borderTop + " " + borderLateral + " " + borderBottom + " repeat stretch";
         }
@@ -248,10 +248,10 @@ function CanvasDisplay(mainElement) {
         buttonsBar.style.left = "0";
         buttonsBar.style.right = "0";
         buttonsBar.style.height = "29px";
-        if (Javatari.SCREEN_CONTROL_BAR === 2) {
+        if (JavatariParameters.SCREEN_CONTROL_BAR === 2) {
             buttonsBar.style.bottom = "0";
             // No background
-        } else if (Javatari.SCREEN_CONTROL_BAR === 1) {
+        } else if (JavatariParameters.SCREEN_CONTROL_BAR === 1) {
             buttonsBar.style.bottom = "-30px";
             buttonsBar.style.background = "rgba(47, 47, 43, .8)";
             buttonsBar.style.transition = "bottom 0.3s ease-in-out";
@@ -276,12 +276,12 @@ function CanvasDisplay(mainElement) {
         settingsButton  = addBarButton(-29, -26, 24, 22, -412, -209);
         screenControlButton(settingsButton, Monitor.Controls.FULLSCREEN);
         var fsGap = 23;
-        if (!Javatari.SCREEN_FULLSCREEN_DISABLED) {
+        if (!JavatariParameters.SCREEN_FULLSCREEN_DISABLED) {
             fullscreenButton = addBarButton(-53, -26, 24, 22, -387, -209);
             screenControlButton(fullscreenButton, Monitor.Controls.FULLSCREEN);
             fsGap = 0;
         }
-        if (!Javatari.SCREEN_RESIZE_DISABLED) {
+        if (!JavatariParameters.SCREEN_RESIZE_DISABLED) {
             scaleDownButton = addBarButton(-92 + fsGap, -26, 18, 22, -342, -209);
             screenControlButton(scaleDownButton, Monitor.Controls.SIZE_MINUS);
             scaleUpButton = addBarButton(-74 + fsGap, -26, 21, 22, -364, -209);
@@ -362,11 +362,11 @@ function CanvasDisplay(mainElement) {
     };
 
     var setupProperties = function() {
-        if (Javatari.SCREEN_CONTROL_BAR === 2) {            // Legacy
+        if (JavatariParameters.SCREEN_CONTROL_BAR === 2) {            // Legacy
             borderTop = 5;
             borderLateral = 5;
             borderBottom = 31;
-        } else if (Javatari.SCREEN_CONTROL_BAR === 1) {     // Hover
+        } else if (JavatariParameters.SCREEN_CONTROL_BAR === 1) {     // Hover
             borderTop = 1;
             borderLateral = 1;
             borderBottom = 1;
@@ -410,10 +410,10 @@ function CanvasDisplay(mainElement) {
     var borderLateral;
     var borderBottom;
 
-    var IMAGE_PATH = "room/screen/images/";
+    var IMAGE_PATH = JavatariParameters.IMAGES_PATH;
     var OSD_TIME = 2500;
     var DEFAULT_SCALE_ASPECT_X = 2;
-    var DEFAULT_OPENING_SCALE_X = (Javatari.SCREEN_OPENING_SIZE || 2) * 2;
+    var DEFAULT_OPENING_SCALE_X = (JavatariParameters.SCREEN_OPENING_SIZE || 2) * 2;
 
     init(this);
 

@@ -27,17 +27,6 @@ function Speaker() {
         audioContext = undefined;
     };
 
-    this.sampleRate = function() {
-        return audioContext.sampleRate;
-    };
-
-    this.nextSamples = function(buffer, samples) {
-        return 0;
-    };
-
-    this.synchOutput = function() {
-    };
-
     var onAudioProcess = function(event) {
         if (!audioSignal) return;
 

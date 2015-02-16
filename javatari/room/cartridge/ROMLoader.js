@@ -100,7 +100,7 @@ function ROMLoader() {
         event.stopPropagation();
         event.preventDefault();
 
-        if (Javatari.CARTRIDGE_CHANGE_DISABLED)
+        if (JavatariParameters.CARTRIDGE_CHANGE_DISABLED)
             event.dataTransfer.dropEffect = "none";
         else
             event.dataTransfer.dropEffect = "link";
@@ -113,7 +113,7 @@ function ROMLoader() {
 
         autoPower = event.altKey !== true;
 
-        if (Javatari.CARTRIDGE_CHANGE_DISABLED) return;
+        if (JavatariParameters.CARTRIDGE_CHANGE_DISABLED) return;
         if (!event.dataTransfer) return;
 
         // First try to get local file

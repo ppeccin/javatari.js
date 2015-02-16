@@ -152,24 +152,12 @@ function Tia(pCpu, pPia) {
         if (reg === 0x25) { observableChange(); player0VerticalDelay = (i & 0x01) !== 0; return; }
         if (reg === 0x26) { observableChange(); player1VerticalDelay = (i & 0x01) !== 0; return; }
         if (reg === 0x27) { observableChange(); ballVerticalDelay = (i & 0x01) !== 0; return; }
-        if (reg === 0x15) {
-            AUDC0 = i; audioSignal.getChannel0().setControl(i & 0x0f);
-            return; }
-        if (reg === 0x16) {
-            AUDC1 = i; audioSignal.getChannel1().setControl(i & 0x0f);
-            return; }
-        if (reg === 0x17) {
-            AUDF0 = i; audioSignal.getChannel0().setDivider((i & 0x1f) + 1);
-            return; }     // Bits 0-4, Divider from 1 to 32
-        if (reg === 0x18) {
-            AUDF1 = i; audioSignal.getChannel1().setDivider((i & 0x1f) + 1);
-            return; }     // Bits 0-4, Divider from 1 to 32
-        if (reg === 0x19) {
-            AUDV0 = i; audioSignal.getChannel0().setVolume(i & 0x0f);
-            return; }            // Bits 0-3, Volume from 0 to 15
-        if (reg === 0x1A) {
-            AUDV1 = i; audioSignal.getChannel1().setVolume(i & 0x0f);
-            return; }            // Bits 0-3, Volume from 0 to 15
+        if (reg === 0x15) { AUDC0 = i; audioSignal.getChannel0().setControl(i & 0x0f); return; }
+        if (reg === 0x16) { AUDC1 = i; audioSignal.getChannel1().setControl(i & 0x0f); return; }
+        if (reg === 0x17) { AUDF0 = i; audioSignal.getChannel0().setDivider((i & 0x1f) + 1); return; }     // Bits 0-4, Divider from 1 to 32
+        if (reg === 0x18) { AUDF1 = i; audioSignal.getChannel1().setDivider((i & 0x1f) + 1); return; }     // Bits 0-4, Divider from 1 to 32
+        if (reg === 0x19) { AUDV0 = i; audioSignal.getChannel0().setVolume(i & 0x0f); return; }            // Bits 0-3, Volume from 0 to 15
+        if (reg === 0x1A) { AUDV1 = i; audioSignal.getChannel1().setVolume(i & 0x0f); return; }            // Bits 0-3, Volume from 0 to 15
         if (reg === 0x28) { missile0SetResetToPlayer(i); return; }
         if (reg === 0x29) { missile1SetResetToPlayer(i); return; }
         if (reg === 0x01) { vBlankSet(i); return; }
@@ -1188,7 +1176,6 @@ function Tia(pCpu, pPia) {
 
     var VBLANK_COLOR = 0xff000000;		// Full transparency needed for CRT emulation modes
     var HBLANK_COLOR = 0xff000000;
-    var VSYNC_COLOR  = 0xffdddddd;
     var VSYNC_COLOR  = 0xffdddddd;
 
     var DEBUG_P0_COLOR     = 0xff0000ff;

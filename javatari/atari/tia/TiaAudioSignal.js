@@ -42,9 +42,6 @@ function TiaAudioSignal() {
         var missingSamples = samplesPerFrame - frameSamples;
         if (missingSamples > 0) generateNextSamples(missingSamples);
         frameSamples = 0;
-
-        // Synch with audio monitor as needed
-        if (SYNC_WITH_AUDIO_MONITOR && monitor) monitor.synchOutput();
     };
 
     this.retrieveSamples = function(quant) {
@@ -105,7 +102,6 @@ function TiaAudioSignal() {
     var SAMPLE_RATE = 31440;
     var MAX_SAMPLES = 8 * 1024;
     var MAX_AMPLITUDE = 0.5;
-    var SYNC_WITH_AUDIO_MONITOR = false;
 
 
     // Variables  -------------------------------------------------

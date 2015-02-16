@@ -261,7 +261,7 @@ function Monitor() {
     };
 
     var cartridgeChangeDisabledWarning = function() {
-        if (Javatari.CARTRIDGE_CHANGE_DISABLED) {
+        if (JavatariParameters.CARTRIDGE_CHANGE_DISABLED) {
             display.showOSD("Cartridge change is disabled", true);
             return true;
         }
@@ -382,7 +382,7 @@ function Monitor() {
 
     var debug = 0;
     var showStats = false;
-    var fixedSizeMode = Javatari.SCREEN_RESIZE_DISABLED;
+    var fixedSizeMode = JavatariParameters.SCREEN_RESIZE_DISABLED;
 
     var DEFAULT_ORIGIN_X = 68;
     var DEFAULT_ORIGIN_Y_PCT = 12.4;		// Percentage of height

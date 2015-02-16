@@ -80,7 +80,7 @@ function CanvasConsolePanel(mainElement) {
         cartChangeButton = addButton(143, 51 - 144, 184, 55, 0, 0, true);
         screenCartridgeControlButton(cartChangeButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
 
-        if (!Javatari.CARTRIDGE_CHANGE_DISABLED) {
+        if (!JavatariParameters.CARTRIDGE_CHANGE_DISABLED) {
             cartChangeFileButton = addButton(171, 51 - 86, 31, 30, 2, -188);
             screenCartridgeControlButton(cartChangeFileButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
             setVisibility(cartChangeFileButton, true);
@@ -164,11 +164,11 @@ function CanvasConsolePanel(mainElement) {
         cartLabel.style.height = "25px";
         cartLabel.style.padding = "0 2px";
         cartLabel.style.margin = "0";
-        cartLabel.style.border = "1px solid transparent";
         cartLabel.style.font = 'bold 14px/25px sans-serif';
         cartLabel.style.textAlign = "center";
         cartLabel.style.color = DEFAULT_CARTRIDGE_LABEL_COLOR;
         cartLabel.style.background = DEFAULT_CARTRIDGE_BACK_COLOR;
+        cartLabel.style.border = "1px solid " + DEFAULT_CARTRIDGE_BORDER_COLOR;
         cartLabel.style.opacity = "0";
         cartLabel.innerHTML = "";
         screenCartridgeControlButton(cartLabel, Monitor.Controls.LOAD_CARTRIDGE_FILE);
@@ -236,9 +236,10 @@ function CanvasConsolePanel(mainElement) {
     visibleControls[controls.DIFFICULTY1] = 1;
 
 
-    var IMAGE_PATH = "room/screen/images/";
-    var DEFAULT_CARTRIDGE_LABEL_COLOR = "#eb2820";
-    var	DEFAULT_CARTRIDGE_BACK_COLOR = "#141414";
+    var IMAGE_PATH = JavatariParameters.IMAGES_PATH;
+    var DEFAULT_CARTRIDGE_LABEL_COLOR =  "#eb2820";
+    var	DEFAULT_CARTRIDGE_BACK_COLOR =   "#141414";
+    var	DEFAULT_CARTRIDGE_BORDER_COLOR = "transparent";
 
     init();
 
