@@ -4,27 +4,34 @@
 
 function Speaker() {
 
-    function init() {
-        audioContext = new AudioContext();
-        console.log(">>> Speaker AudioContext created. Sample rate: " + audioContext.sampleRate);
-    }
-
     this.connect = function(pAudioSignal) {
         audioSignal = pAudioSignal;
         audioSignal.connectMonitor(this);
-        resamplingFactor = 31440 / 48000;
-        console.log(">>> Audio resampling factor: " + (1/resamplingFactor));
     };
 
     this.powerOn = function() {
-        processor = audioContext.createScriptProcessor(PROCESSOR_BUFFER_SIZE, 0, 1);
+        createAudioContext();
+        if (!audioContext) return;
+
+        processor = audioContext.createScriptProcessor(JavatariParameters.AUDIO_BUFFER_SIZE, 0, 1);
         processor.onaudioprocess = onAudioProcess;
         processor.connect(audioContext.destination);
     };
 
     this.powerOff = function() {
-        processor.disconnect();
+        if (processor) processor.disconnect();
         audioContext = undefined;
+    };
+
+    var createAudioContext = function() {
+        try {
+            audioContext = new AudioContext();
+            resamplingFactor = TiaAudioSignal.SAMPLE_RATE / audioContext.sampleRate;
+            console.log(">>> Speaker AudioContext created. Sample rate: " + audioContext.sampleRate);
+            console.log(">>> Audio resampling factor: " + (1/resamplingFactor));
+        } catch(e) {
+            console.log(">>> Could not create AudioContext. Sound disabled.");
+        }
     };
 
     var onAudioProcess = function(event) {
@@ -46,10 +53,5 @@ function Speaker() {
 
     var audioContext;
     var processor;
-
-    var PROCESSOR_BUFFER_SIZE = 1024 * 1;
-
-
-    init();
 
 }

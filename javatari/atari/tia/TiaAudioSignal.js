@@ -34,7 +34,7 @@ function TiaAudioSignal() {
     this.setFps = function(fps) {
         // Normal amount is 2 sample per scanline = 31440, 524 for NTSC(60Hz) and 624 for PAL(50hz)
         // Calculate total samples per frame based on fps
-        samplesPerFrame = Math.round(SAMPLE_RATE / fps);
+        samplesPerFrame = Math.round(TiaAudioSignal.SAMPLE_RATE / fps);
         if (samplesPerFrame > MAX_SAMPLES) samplesPerFrame = MAX_SAMPLES;
     };
 
@@ -99,8 +99,7 @@ function TiaAudioSignal() {
 
     // Constants  ------------------------------------------------
 
-    var SAMPLE_RATE = 31440;
-    var MAX_SAMPLES = 8 * 1024;
+    var MAX_SAMPLES = 4 * JavatariParameters.AUDIO_BUFFER_SIZE;
     var MAX_AMPLITUDE = 0.5;
 
 
@@ -116,9 +115,11 @@ function TiaAudioSignal() {
     var generatedSamples = 0;
     var retrievedSamples = 0;
 
-    var samplesPerFrame =  SAMPLE_RATE / 60;
+    var samplesPerFrame =  TiaAudioSignal.SAMPLE_RATE / VideoStandard.NTSC.fps;
     var frameSamples = 0;
 
     var lastSample = 0;
 
 }
+
+TiaAudioSignal.SAMPLE_RATE = 31440;

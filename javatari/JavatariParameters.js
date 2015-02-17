@@ -32,6 +32,9 @@ if (!JavatariParameters.SCREEN_OPENING_SIZE)
 if (!JavatariParameters.SCREEN_CONTROL_BAR)
     JavatariParameters.SCREEN_CONTROL_BAR =           0;             // 0 = Always, 1 = Hover, 2 = Legacy
 
+if (!JavatariParameters.AUDIO_BUFFER_SIZE)
+    JavatariParameters.AUDIO_BUFFER_SIZE =            1024;          // 256, 512, 1024, 2048, 4096, 8192
+
 if (!JavatariParameters.IMAGES_PATH)
     JavatariParameters.IMAGES_PATH =                  "javatari/room/screen/images/";
 
