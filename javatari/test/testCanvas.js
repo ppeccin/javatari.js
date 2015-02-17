@@ -8,8 +8,8 @@ function Test() {
     this.context = this.canvas.getContext("2d");
 
     this.offCanvas = document.createElement('canvas');
-    this.offCanvas.width = 100;
-    this.offCanvas.height = 100;
+    this.offCanvas.width = 160;
+    this.offCanvas.height = 213;
     this.offContext = this.offCanvas.getContext("2d");
     this.offImageData = this.context.createImageData(this.canvas.width, this.canvas.height);
     this.offData32 = new Uint32Array(this.offImageData.data.buffer);
@@ -24,7 +24,7 @@ function Test() {
 
     this.paint = function() {
         this.paintInitial();
-        this.context.drawImage(this.offCanvas, 0, 0, 400, 200);
+        this.context.drawImage(this.offCanvas, 0, 0, 160, 213);  // , 0, 0, 640, 426);
     };
 
     this.clear = function() {
@@ -43,15 +43,15 @@ function Test() {
         console.log("Done running " + frames + " frames in " + (end - start) + " ms.");
     };
 
-    document.addEventListener("keydown", function(event) {
-        console.log("keyCode: " + event.keyCode + "  keyIdentifier: " + event.keyIdentifier + "  which: " + event.which);
-        event.preventDefault();
-    });
-
-    document.addEventListener("keyup", function(event) {
-        console.log("UP>>>>>  keyCode: " + event.keyCode + "  keyIdentifier: " + event.keyIdentifier + "  which: " + event.which);
-        event.preventDefault();
-    });
+    //document.addEventListener("keydown", function(event) {
+    //    console.log("keyCode: " + event.keyCode + "  keyIdentifier: " + event.keyIdentifier + "  which: " + event.which);
+    //    event.preventDefault();
+    //});
+    //
+    //document.addEventListener("keyup", function(event) {
+    //    console.log("UP>>>>>  keyCode: " + event.keyCode + "  keyIdentifier: " + event.keyIdentifier + "  which: " + event.which);
+    //    event.preventDefault();
+    //});
 
 }
 

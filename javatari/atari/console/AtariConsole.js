@@ -33,6 +33,7 @@ function AtariConsole() {
 
         controlsSocket.clockPulse();
         tia.frame();
+        this.framesGenerated++;
     };
 
     this.getCartridgeSocket = function() {
@@ -57,6 +58,28 @@ function AtariConsole() {
 
     this.showOSD = function(message, overlap) {
         this.getVideoOutput().showOSD(message, overlap);
+    };
+
+
+    // Debug methods  ---------------------------------------
+
+    this.startProfiling = function() {
+        var lastFrameCount = this.framesGenerated;
+        setInterval(function() {
+            console.log(self.framesGenerated - lastFrameCount);
+            lastFrameCount = self.framesGenerated;
+        }, 1000);
+    };
+
+    this.runFramesAtTopSpeed = function(frames) {
+        pause();
+        var start = performance.now();
+        for (var i = 0; i < frames; i++)
+            self.clockPulse();
+        var duration = performance.now() - start;
+        console.log("Done running " + frames + " in " + duration + " ms");
+        console.log(frames / (duration/1000) + "frames/sec");
+        go();
     };
 
 
@@ -190,6 +213,8 @@ function AtariConsole() {
 
 
     this.powerIsOn = false;
+
+    this.framesGenerated = 0;
 
     var cpu;
     var pia;

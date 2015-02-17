@@ -248,8 +248,8 @@ function Monitor() {
 
     var prepareResources = function() {
         offCanvas = document.createElement('canvas');
-        offCanvas.setAttribute("width", VideoStandard.PAL.width);
-        offCanvas.setAttribute("height", VideoStandard.PAL.height);
+        offCanvas.width = VideoStandard.PAL.width;
+        offCanvas.height = VideoStandard.PAL.height;
         offContext = offCanvas.getContext("2d");
         offImageData = offContext.getImageData(0, 0, offCanvas.width, offCanvas.height);
         backBuffer = new Uint32Array(offImageData.data.buffer);
