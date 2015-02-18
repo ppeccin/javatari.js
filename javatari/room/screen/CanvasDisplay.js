@@ -410,10 +410,12 @@ function CanvasDisplay(mainElement) {
     var borderLateral;
     var borderBottom;
 
+
     var IMAGE_PATH = JavatariParameters.IMAGES_PATH;
     var OSD_TIME = 2500;
     var DEFAULT_SCALE_ASPECT_X = 2;
     var DEFAULT_OPENING_SCALE_X = (JavatariParameters.SCREEN_OPENING_SIZE || 2) * 2;
+
 
     init(this);
 

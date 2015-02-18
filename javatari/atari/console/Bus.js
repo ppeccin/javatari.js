@@ -99,6 +99,7 @@ function Bus(pCpu, pTia, pPia, pRam) {
 
     var data = 0;
 
+
     var CART_MASK = 0x1000;
     var CART_SELECT = 0x1000;
     var RAM_MASK = 0x1280;

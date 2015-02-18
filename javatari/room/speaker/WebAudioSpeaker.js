@@ -25,12 +25,12 @@ function Speaker() {
 
     var createAudioContext = function() {
         try {
-            audioContext = new AudioContext();
+            audioContext = new (window.AudioContext || window.WebkitAudioContext) ();
             resamplingFactor = TiaAudioSignal.SAMPLE_RATE / audioContext.sampleRate;
             console.log(">>> Speaker AudioContext created. Sample rate: " + audioContext.sampleRate);
             console.log(">>> Audio resampling factor: " + (1/resamplingFactor));
         } catch(e) {
-            console.log(">>> Could not create AudioContext. Sound disabled.");
+            console.log(">>> Could not create AudioContext. Sound disabled: \n" + e.message);
         }
     };
 

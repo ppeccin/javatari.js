@@ -97,6 +97,7 @@ function DOMMonitorControls(monitor) {
     var keyControlCodeMap = {};
     var keyControlAltCodeMap = {};
 
+
     var KEY_LEFT           = 37;        // VK_LEFT
     var KEY_UP             = 38;        // VK_UP
     var KEY_RIGHT          = 39;        // VK_RIGHT

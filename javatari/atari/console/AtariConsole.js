@@ -60,31 +60,6 @@ function AtariConsole() {
         this.getVideoOutput().showOSD(message, overlap);
     };
 
-
-    // Debug methods  ---------------------------------------
-
-    this.startProfiling = function() {
-        var lastFrameCount = this.framesGenerated;
-        setInterval(function() {
-            console.log(self.framesGenerated - lastFrameCount);
-            lastFrameCount = self.framesGenerated;
-        }, 1000);
-    };
-
-    this.runFramesAtTopSpeed = function(frames) {
-        pause();
-        var start = performance.now();
-        for (var i = 0; i < frames; i++)
-            self.clockPulse();
-        var duration = performance.now() - start;
-        console.log("Done running " + frames + " in " + duration + " ms");
-        console.log(frames / (duration/1000) + "frames/sec");
-        go();
-    };
-
-
-    // Private functions  ------------------------------------
-
     var go = function() {
         mainClock.go();
     };
@@ -94,6 +69,7 @@ function AtariConsole() {
     };
 
     var setCartridge = function(cartridge) {
+        JavatariCartridge = cartridge;
         controlsSocket.removeForwardedInput(getCartridge());
         bus.setCartridge(cartridge);
         cartridgeSocket.cartridgeInserted(cartridge);
@@ -203,7 +179,7 @@ function AtariConsole() {
     };
 
     var socketsCreate = function() {
-        controlsSocket = new ConsoleControlsSocket();
+        controlsSocket = new ControlsSocket();
         controlsSocket.addForwardedInput(self);
         controlsSocket.addForwardedInput(tia);
         controlsSocket.addForwardedInput(pia);
@@ -232,10 +208,11 @@ function AtariConsole() {
     var videoStandardAutoDetectionInProgress = false;
     var videoStandardAutoDetectionTries = 0;
 
+
     var VIDEO_STANDARD_AUTO_DETECTION_FRAMES = 90;
 
 
-    // ControlsSocket interface  ------------------------------------------------
+    // Controls interface  --------------------------------------------
 
     var controls = ConsoleControls;
 
@@ -315,7 +292,7 @@ function AtariConsole() {
     };
 
 
-    // CartridgeSocket interface  -----------------------------------------
+    // CartridgeSocket  -----------------------------------------
 
     function CartridgeSocket() {
 
@@ -363,8 +340,64 @@ function AtariConsole() {
 
     }
 
+    // ControlsSocket  -----------------------------------------
 
-    // SavestateSocket interface  -----------------------------------------
+    function ControlsSocket() {
+
+        this.connectControls = function(pControls) {
+            controls = pControls;
+        };
+
+        this.clockPulse = function() {
+            controls.clockPulse();
+        };
+
+        this.controlStateChanged = function(control, state) {
+            for (var i = 0; i < forwardedInputsCount; i++)
+                forwardedInputs[i].controlStateChanged(control, state);
+        };
+
+        this.controlValueChanged = function(control, position) {
+            for (var i = 0; i < forwardedInputsCount; i++)
+                forwardedInputs[i].controlValueChanged(control, position);
+        };
+
+        this.controlsStateReport = function(report) {
+            for (var i = 0; i < forwardedInputsCount; i++)
+                forwardedInputs[i].controlsStateReport(report);
+        };
+
+        this.addForwardedInput = function(input) {
+            forwardedInputs.push(input);
+            forwardedInputsCount = forwardedInputs.length;
+        };
+
+        this.removeForwardedInput = function(input) {
+            Util.arrayRemove(forwardedInputs, input);
+            forwardedInputsCount = forwardedInputs.length;
+        };
+
+        this.addRedefinitionListener = function(listener) {
+            if (redefinitionListeners.indexOf(listener) < 0) {
+                redefinitionListeners.push(listener);
+                listener.controlsStatesRedefined();		// Fire a redefinition event
+            }
+        };
+
+        this.controlsStatesRedefined = function() {
+            for (var i = 0; i < redefinitionListeners.length; i++)
+                redefinitionListeners[i].controlsStatesRedefined();
+        };
+
+        var controls;
+        var forwardedInputs = [];
+        var forwardedInputsCount = 0;
+        var redefinitionListeners = [];
+
+    }
+
+
+    // SavestateSocket  -----------------------------------------
 
     function SaveStateSocket() {
 
@@ -425,15 +458,23 @@ function AtariConsole() {
 
     // Debug methods  ------------------------------------------------------
 
-    //noinspection JSUnusedGlobalSymbols
-    this.runFrames = function(frames) {
-        //noinspection JSUnresolvedVariable
+    this.startProfiling = function() {
+        var lastFrameCount = this.framesGenerated;
+        setInterval(function() {
+            console.log(self.framesGenerated - lastFrameCount);
+            lastFrameCount = self.framesGenerated;
+        }, 1000);
+    };
+
+    this.runFramesAtTopSpeed = function(frames) {
+        pause();
         var start = performance.now();
         for (var i = 0; i < frames; i++)
-            this.clockPulse();
-        //noinspection JSUnresolvedVariable
-        var end = performance.now();
-        console.log("Done running " + frames + " frames in " + (end - start) + " ms.");
+            self.clockPulse();
+        var duration = performance.now() - start;
+        console.log("Done running " + frames + " in " + duration + " ms");
+        console.log(frames / (duration/1000) + "frames/sec");
+        go();
     };
 
 

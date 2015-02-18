@@ -140,6 +140,11 @@ function ROMLoader() {
             cart = CartridgeDatabase.createCartridgeFromRom(rom);
             if (cartridgeSocket) cartridgeSocket.insert(cart, autoPower);
         } catch(e) {
+            if (!e.javatari) {
+                console.log(e.stack);
+                throw e;
+            }
+
             // If it fails, try assuming its a compressed content (zip)
             try {
                 var zip = new JSZip(content);
@@ -161,7 +166,7 @@ function ROMLoader() {
                 }
                 showError("No valid ROM files inside zip file");
             } catch(ez) {
-                // Probably not a zip file. Leet the original message show
+                // Probably not a zip file. Let the original message show
                 showError(e.message);
             }
         }
@@ -177,6 +182,7 @@ function ROMLoader() {
     var fileInputElement;
 
     var autoPower = true;
+
 
     var ZIP_INNER_FILES_PATTERN = /^.*\.(bin|BIN|rom|ROM|a26|A26|jat|JAT)$/;
     var INPUT_ELEM_ACCEPT_PROP  = ".bin,.rom,.a26,.zip";

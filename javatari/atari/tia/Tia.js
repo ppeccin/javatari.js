@@ -167,9 +167,6 @@ function Tia(pCpu, pPia) {
         return 0;
     };
 
-
-    // Private functions  ------------------------------------
-
     var setPixelValue = function() {
         // No need to calculate all possibilities in vSync/vBlank. TODO No collisions will be detected
         if (vSyncOn) {
@@ -957,7 +954,7 @@ function Tia(pCpu, pPia) {
             case controls.FRAME:
                 debugPauseMoreFrames++; return;
             case controls.TRACE:
-                cpu.trace = cpu.trace; return;
+                cpu.trace = !cpu.trace; return;
         }
     };
 
@@ -1315,6 +1312,7 @@ function Tia(pCpu, pPia) {
     var palette;
 
     var audioSignal = new TiaAudioSignal();
+
 
     // Read registers -------------------------------------------
 

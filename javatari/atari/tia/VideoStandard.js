@@ -275,6 +275,9 @@
     }
     // ntscPalette[0] = ntscPalette[1] = palPalette[0] = palPalette[1] = 0;	// Full transparency for blacks. Needed for CRT emulation modes
 
+    // Clean up
+    ntscRGB = palRGB = undefined;
+
 
     // Set Global Constants --------------------------------------------
 

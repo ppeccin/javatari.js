@@ -4,7 +4,10 @@
 
 function Cartridge4K(rom, format) {
 
-    function init() {
+    function init(self) {
+        self.rom = rom;
+        self.format = format;
+
         // Always use a 4K ROM image, multiplying the ROM internally
         bytes = new Array(SIZE);
         var len = rom.content.length;
@@ -25,26 +28,34 @@ function Cartridge4K(rom, format) {
 
     this.saveState = function() {
         return {
-            format: format.name,
+            format: this.format.name,
+            rom: this.rom.saveState(),
             bytes: bytes
         };
     };
 
     this.loadState = function(state) {
+        this.format = CartridgeFormats[state.format];
+        this.rom = ROM.loadState(state.rom);
         bytes = state.bytes;
     };
 
 
-    this.format = format;
-
     var bytes;
+
 
     var ADDRESS_MASK = 0x0fff;
     var SIZE = 4096;
 
 
-    if (rom) init();
+    if (rom) init(this);
 
 }
 
 Cartridge4K.prototype = new Cartridge();
+
+Cartridge4K.createFromSaveState = function(state) {
+    var cart = new Cartridge4K();
+    cart.loadState(state);
+    return cart;
+};

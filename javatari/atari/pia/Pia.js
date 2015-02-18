@@ -49,9 +49,6 @@ function Pia() {
         return 0;
     };
 
-
-    // Private functions  -------------------------------------------
-
     var decrementTimer = function() {	// TODO There might be an accuracy problem here
         // Also check for overflow
         if (--INTIM < 0) {
@@ -178,7 +175,6 @@ function Pia() {
     var timerCount = 1024;				// Start with the largest timer interval
     var currentTimerInterval = 1024;
     var lastSetTimerInterval = 1024;
-
 
 
     // Registers ----------------------------------------------------

@@ -9,9 +9,11 @@
  */
 function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superChip, extraRAMSize) {
 
-    function init() {
-        bytes = rom.content;        // uses the content of the ROM directly
+    function init(self) {
+        self.rom = rom;
+        self.format = format;
 
+        bytes = rom.content;        // uses the content of the ROM directly
         var numBanks = bytes.length / BANK_SIZE;
         topBankSwitchAddress = baseBankSwitchAddress + numBanks - 1;
         // SuperChip mode. null = automatic mode
@@ -57,7 +59,8 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
 
     this.saveState = function() {
         return {
-            format: format.name,
+            format: this.format.name,
+            rom: this.rom.saveState(),
             bytes: bytes.slice(0),
             baseBankSwitchAddress: baseBankSwitchAddress,
             extraRAMSize: extraRAMSize,
@@ -70,6 +73,8 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
     };
 
     this.loadState = function(state) {
+        this.format = CartridgeFormats[state.format];
+        this.rom = ROM.loadState(state.rom);
         bytes = state.bytes;
         bankAddressOffset =  state.bankAddressOffset;
         baseBankSwitchAddress = state.baseBankSwitchAddress;
@@ -81,8 +86,6 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
     };
 
 
-    this.format = format;
-
     var bytes;
 
     var bankAddressOffset = 0;
@@ -92,12 +95,19 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
     var superChipAutoDetect;
     var extraRAM;
 
+
     var ADDRESS_MASK = 0x0fff;
     var BANK_SIZE = 4096;
 
 
-    if (rom) init();
+    if (rom) init(this);
 
 }
 
 CartridgeBankedByMaskedRange.prototype = new Cartridge();
+
+CartridgeBankedByMaskedRange.createFromSaveState = function(state) {
+    var cart = new CartridgeBankedByMaskedRange();
+    cart.loadState(state);
+    return cart;
+};

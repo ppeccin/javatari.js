@@ -79,9 +79,9 @@ function Monitor() {
 
     this.cartridgeInserted = function(cartridge) {
         // Only change mode if not forced
-        //if (CRT_MODE >= 0) return;
-        //if (crtMode === 0 || crtMode === 1)
-        //    setCrtMode(cartridge == null ? 0 : cartridge.getInfo().crtMode == -1 ? 0 : cartridge.getInfo().crtMode);
+        if (CRT_MODE >= 0) return;
+        if (crtMode === 0 || crtMode === 1)
+            setCrtMode(!cartridge ? 0 : cartridge.rom.info.c || 0);
     };
 
     var newFrame = function() {
@@ -242,6 +242,17 @@ function Monitor() {
         display.displayToggleFullscreen();
     };
 
+    var crtModeToggle = function() {
+        setCrtMode(crtMode + 1);
+    };
+
+    var setCrtMode = function(mode) {
+        var newMode = mode > 4 || mode < 0 ? 0 : mode;
+        if (crtMode === newMode) return;
+        crtMode = newMode;
+        display.showOSD("CRT mode: " + CRT_MODE_NAMES[crtMode], true);
+    };
+
     var exit = function() {
         display.exit();
     };
@@ -269,7 +280,7 @@ function Monitor() {
     };
 
 
-    // Controls Interface
+    // Controls Interface  -----------------------------------------
 
     this.controlActivated = function(control) {
         // All controls are Press-only and repeatable
@@ -295,8 +306,8 @@ function Monitor() {
             case Monitor.Controls.SAVE_STATE_CARTRIDGE:
                 if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog();
                 break;
-            //case Monitor.Controls.CRT_MODES:
-            //    crtModeToggle(); break;
+            case Monitor.Controls.CRT_MODES:
+                crtModeToggle(); break;
             case Monitor.Controls.CRT_FILTER:
                 display.toggleCRTFilter(); break;
             case Monitor.Controls.STATS:
@@ -344,6 +355,7 @@ function Monitor() {
                 setDisplayScaleDefaultAspect(displayScaleY + 1); break;
         }
     };
+
 
     var display;
     var romLoader;
@@ -393,7 +405,11 @@ function Monitor() {
     var DEFAULT_SCALE_Y = 2;
     var VSYNC_TOLERANCE = 16;
     var EXTRA_UPPER_VSYNC_TOLERANCE = 5;
-    //var CRT_MODE = 0;
+    var CRT_MODE = JavatariParameters.SCREEN_CRT_MODE;
+    var CRT_MODE_NAMES = [ "OFF", "Phosphor", "Phosphor Scanlines", "RGB", "RGB Phosphor" ];
+
+    var crtMode = CRT_MODE < 0 ? 0 : CRT_MODE;
+
 
     init(this);
 

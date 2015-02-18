@@ -14,7 +14,6 @@ function Cartridge() {
     };
 
     this.connectSaveStateSocket = function(socket) {
-
     };
 
     this.read = function(address) {
@@ -23,8 +22,11 @@ function Cartridge() {
     this.write = function(address, val) {
     };
 
+    this.setROM = function(rom) {
+        this.rom = rom;
+    };
 
-    // Controls interface  ------------------------------------------
+     // Controls interface  ---------------------------------
 
     this.controlStateChanged = function(control, state) {
     };
@@ -40,5 +42,11 @@ function Cartridge() {
 
     this.saveState = function() {
     };
+
+    this.loadState = function(state) {
+    };
+
+
+    this.rom = null;
 
 }

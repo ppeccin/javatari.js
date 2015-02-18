@@ -26,6 +26,7 @@ function TiaVideoSignal() {
             this.monitor.showOSD(message, overlap);
     };
 
+
     this.standard = null;
     this.monitor = null;
 

@@ -1329,7 +1329,7 @@ function M6502() {
             fetchOpcodeAndDecodeInstruction,
             fetchDataFromImmediate,                 // For debugging purposes, use operand as an arg for BRK!
             function() {
-                if (self.debug) { self.breakpoint("BRK " + data); }
+                if (self.debug) self.breakpoint("BRK " + data);
                 pushToStack((PC >>> 8) & 0xff);
             },
             function() { pushToStack(PC & 0xff); },

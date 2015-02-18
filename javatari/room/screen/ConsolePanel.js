@@ -2,7 +2,7 @@
  * Created by ppeccin on 22/11/2014.
  */
 
-function CanvasConsolePanel(mainElement) {
+function ConsolePanel(mainElement) {
 
     function init() {
         setupMain();
@@ -46,6 +46,7 @@ function CanvasConsolePanel(mainElement) {
         // Inserted Cartridge
         setVisibility(cartInsertedImage, cartridgeInserted);
         setVisibility(cartLabel, cartridgeInserted);
+        cartLabel.innerHTML = cartridgeInserted ? cartridgeInserted.rom.info.l : DEFAULT_CARTRIDGE_LABEL;
     };
 
     var updateVisibleControlsState = function() {
@@ -55,8 +56,8 @@ function CanvasConsolePanel(mainElement) {
 
     var setupMain = function () {
         mainElement.style.position = "relative";
-        mainElement.style.width = "" + CanvasConsolePanel.DEFAULT_WIDTH + "px";
-        mainElement.style.height = "" + CanvasConsolePanel.DEFAULT_HEIGHT + "px";
+        mainElement.style.width = "" + ConsolePanel.DEFAULT_WIDTH + "px";
+        mainElement.style.height = "" + ConsolePanel.DEFAULT_HEIGHT + "px";
         mainElement.style.background = "black url(" + IMAGE_PATH + "Sprites.png" + ") no-repeat";
         mainElement.style.outline = "none";
         mainElement.tabIndex = "1";               // Make it focusable
@@ -201,7 +202,7 @@ function CanvasConsolePanel(mainElement) {
     // Cartridge interface  ------------------------------------
 
     this.cartridgeInserted = function(cartridge) {
-        cartridgeInserted = !!cartridge;
+        cartridgeInserted = cartridge;
         refresh();
     };
 
@@ -237,13 +238,15 @@ function CanvasConsolePanel(mainElement) {
 
 
     var IMAGE_PATH = JavatariParameters.IMAGES_PATH;
+    var DEFAULT_CARTRIDGE_LABEL =       "JAVATARI.js";
     var DEFAULT_CARTRIDGE_LABEL_COLOR =  "#eb2820";
     var	DEFAULT_CARTRIDGE_BACK_COLOR =   "#141414";
     var	DEFAULT_CARTRIDGE_BORDER_COLOR = "transparent";
+
 
     init();
 
 }
 
-CanvasConsolePanel.DEFAULT_WIDTH = 465;
-CanvasConsolePanel.DEFAULT_HEIGHT = 137;
+ConsolePanel.DEFAULT_WIDTH = 465;
+ConsolePanel.DEFAULT_HEIGHT = 137;

@@ -163,6 +163,7 @@ function TiaAudioChannel() {
     var tone31Count = 30;
     var TONE31_STREAM = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+
     var MAX_VOLUME = 15;
 
 }

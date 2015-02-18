@@ -97,14 +97,6 @@ function TiaAudioSignal() {
     };
 
 
-    // Constants  ------------------------------------------------
-
-    var MAX_SAMPLES = 4 * JavatariParameters.AUDIO_BUFFER_SIZE;
-    var MAX_AMPLITUDE = 0.5;
-
-
-    // Variables  -------------------------------------------------
-
     var monitor;
 
     var signalOn = false;
@@ -119,6 +111,10 @@ function TiaAudioSignal() {
     var frameSamples = 0;
 
     var lastSample = 0;
+
+
+    var MAX_SAMPLES = 4 * JavatariParameters.AUDIO_BUFFER_SIZE;
+    var MAX_AMPLITUDE = 0.5;
 
 }
 

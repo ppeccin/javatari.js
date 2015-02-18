@@ -41,7 +41,7 @@ function Room(screenElement, consolePanelElement, cartridgeProvided) {
         self.screen = new CanvasDisplay(screenElement);
         self.screen.connectROMLoader(self.romLoader);
         if (consolePanelElement) {
-            self.consolePanel = new CanvasConsolePanel(consolePanelElement);
+            self.consolePanel = new ConsolePanel(consolePanelElement);
             self.consolePanel.connectScreenAndROMLoader(self.screen, self.romLoader);
         }
         self.speaker = new Speaker();

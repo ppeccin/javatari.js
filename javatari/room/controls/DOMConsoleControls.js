@@ -28,8 +28,8 @@ function DOMConsoleControls() {
 
     this.powerOn = function() {
         //joystickControls.powerOn();
-        if (PADDLES_MODE == 0) setPaddleMode(false, false);
-        else if (PADDLES_MODE == 1) setPaddleMode(true, false);
+        if (PADDLES_MODE === 0) setPaddleMode(false, false);
+        else if (PADDLES_MODE === 1) setPaddleMode(true, false);
     };
 
     this.powerOff = function() {
@@ -77,8 +77,8 @@ function DOMConsoleControls() {
 
     this.cartridgeInserted = function(cartridge) {
         if (!cartridge || PADDLES_MODE >= 0) return;	// Does not interfere if Paddle Mode is forced
-        //var usePaddles = cartridge.getInfo().paddles == 1;
-        //if (paddleMode != usePaddles) paddleMode(usePaddles, false);
+        var usePaddles = cartridge.rom.info.p === 1;
+        if (paddleMode !== usePaddles) setPaddleMode(usePaddles, false);
     };
 
     this.clockPulse = function() {
@@ -405,7 +405,7 @@ function DOMConsoleControls() {
     var KEY_ALT_MASK   = 2;
     var KEY_SHIFT_MASK = 4;
 
-    var PADDLES_MODE = -1;
+    var PADDLES_MODE = JavatariParameters.PADDLES_MODE;
 
 
     init();
