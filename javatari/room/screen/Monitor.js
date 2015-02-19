@@ -23,8 +23,7 @@ function Monitor() {
     };
 
     this.connect = function(pVideoSignal, pCartridgeSocket) {
-        cartridgeSocket = pCartridgeSocket;
-        cartridgeSocket.addInsertionListener(this);
+        pCartridgeSocket.addInsertionListener(this);
         videoSignal = pVideoSignal;
         videoSignal.connectMonitor(this);
         adjustToVideoSignal();
@@ -297,13 +296,7 @@ function Monitor() {
             case Monitor.Controls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER:
                 if (!cartridgeChangeDisabledWarning()) romLoader.openURLChooserDialog(false);
                 break;
-            case Monitor.Controls.LOAD_CARTRIDGE_EMPTY:
-                if (!cartridgeChangeDisabledWarning()) cartridgeSocket.insert(null, false);
-                break;
             case Monitor.Controls.LOAD_CARTRIDGE_PASTE:
-                if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog();
-                break;
-            case Monitor.Controls.SAVE_STATE_CARTRIDGE:
                 if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog();
                 break;
             case Monitor.Controls.CRT_MODES:
@@ -361,7 +354,6 @@ function Monitor() {
     var romLoader;
 
     var videoSignal;
-    var cartridgeSocket;
     var controls;
 
     var line = 0;
@@ -427,9 +419,7 @@ Monitor.Controls = {
     FULLSCREEN: 16,
     LOAD_CARTRIDGE_FILE: 21, LOAD_CARTRIDGE_FILE_NO_AUTO_POWER: 22,
     LOAD_CARTRIDGE_URL: 23, LOAD_CARTRIDGE_URL_NO_AUTO_POWER: 24,
-    LOAD_CARTRIDGE_EMPTY: 25,
-    LOAD_CARTRIDGE_PASTE: 26,
-    SAVE_STATE_CARTRIDGE: 27,
+    LOAD_CARTRIDGE_PASTE: 25,
     CRT_FILTER: 31, CRT_MODES: 32,
     DEBUG: 41, STATS: 42,
     EXIT: 51

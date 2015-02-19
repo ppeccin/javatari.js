@@ -231,14 +231,16 @@ function DOMConsoleControls() {
     var initKeys = function() {
         self.initPreferences();
 
-        normalCodeMap[KEY_POWER]       = controls.POWER;
-        normalCodeMap[KEY_BLACK_WHITE] = controls.BLACK_WHITE;
-        normalCodeMap[KEY_DIFFICULTY0] = controls.DIFFICULTY0;
-        normalCodeMap[KEY_DIFFICULTY1] = controls.DIFFICULTY1;
-        normalCodeMap[KEY_SELECT]      = controls.SELECT;
-        normalCodeMap[KEY_SELECT2]     = controls.SELECT;
-        normalCodeMap[KEY_RESET]       = controls.RESET;
-        normalCodeMap[KEY_FAST_SPEED]  = controls.FAST_SPEED;
+        normalCodeMap[KEY_POWER]            = controls.POWER;
+        normalCodeMap[KEY_BLACK_WHITE]      = controls.BLACK_WHITE;
+        normalCodeMap[KEY_DIFFICULTY0]      = controls.DIFFICULTY0;
+        normalCodeMap[KEY_DIFFICULTY1]      = controls.DIFFICULTY1;
+        normalCodeMap[KEY_SELECT]           = controls.SELECT;
+        normalCodeMap[KEY_SELECT2]          = controls.SELECT;
+        normalCodeMap[KEY_RESET]            = controls.RESET;
+        normalCodeMap[KEY_FAST_SPEED]       = controls.FAST_SPEED;
+        normalCodeMap[KEY_SAVE_STATE_FILE]  = controls.SAVE_STATE_FILE;
+        normalCodeMap[KEY_CARTRIDGE_REMOVE] = controls.CARTRIDGE_REMOVE;
 
         withALTCodeMap[KEY_POWER]          = controls.POWER_FRY;
         withALTCodeMap[KEY_PAUSE]          = controls.PAUSE;
@@ -398,8 +400,11 @@ function DOMConsoleControls() {
     var KEY_STATE_12         = 187;    // VK_EQUALS;
     var KEY_STATE_12a        = 61;     // VK_EQUALS;
 
+    var KEY_SAVE_STATE_FILE  = 119;    // VK_F8
+
     var KEY_CARTRIDGE_CLOCK_DEC = 35;  // VK_END
     var KEY_CARTRIDGE_CLOCK_INC = 36;  // VK_HOME
+    var KEY_CARTRIDGE_REMOVE    = 118; // VK_F7
 
     var KEY_CTRL_MASK  = 1;
     var KEY_ALT_MASK   = 2;

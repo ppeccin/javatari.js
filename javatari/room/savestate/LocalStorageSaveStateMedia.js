@@ -9,41 +9,57 @@ function LocalStorageSaveStateMedia() {
     };
 
     this.saveStateFile = function(state) {
-        return internalSaveToFile("javatarisavefile", state);
+        return internalStartDownload("JavatariSave.jst", state);
     };
 
     this.saveState = function(slot, state) {
-        return internalSaveToFile("javatarisave" + slot, state);
+        return internalSaveToStorage("javatarisave" + slot, state);
     };
 
     this.loadState = function(slot) {
-        return internalLoadFromFile("javatarisave" + slot);
+        return internalLoadFromStorage("javatarisave" + slot);
     };
 
-    this.saveResourceToFile = function(fileName, data) {
-        return internalSaveToFile(fileName, data);
+    this.saveResourceToFile = function(entry, data) {
+        return internalSaveToStorage(entry, data);
     };
 
-    this.loadResourceFromFile = function(fileName) {
-        return internalLoadFromFile(fileName);
+    this.loadResourceFromFile = function(entry) {
+        return internalLoadFromStorage(entry);
     };
 
-    var internalSaveToFile = function(fileName, data) {
+    var internalSaveToStorage = function(entry, data) {
         if (!localStorage) return null;
 
-        localStorage[fileName] = JSON.stringify(data);
+        localStorage[entry] = JSON.stringify(data);
         return data;
     };
 
-    var internalLoadFromFile = function(fileName) {
+    var internalLoadFromStorage = function(entry) {
         if (!localStorage) return null;
 
-        var data = localStorage[fileName];
+        var data = localStorage[entry];
         try {
             if (data) return JSON.parse(data);
         } catch(e) {
             return null;
         }
+    };
+
+    var internalStartDownload = function (fileName, data) {
+        // TODO Create and maintain only one link element inside a controlled parent
+
+        var content = JSON.stringify(data);
+        var blob = new Blob([content], {type: "data:application/octet-stream"});
+        var link = document.createElement('a');
+        link.download = fileName.trim();
+        link.href = (window.URL || window.webkitURL).createObjectURL(blob);
+        link.style.display = "none";
+        document.body.appendChild(link);
+
+        link.click();
+
+        return true;
     };
 
 }

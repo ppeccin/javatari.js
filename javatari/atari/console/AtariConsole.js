@@ -152,7 +152,7 @@ function AtariConsole() {
         pia.loadState(state.pia);
         ram.loadState(state.ram);
         cpu.loadState(state.cpu);
-        setCartridge(CartridgeDatabase.createCartridgeFromSaveState(state.cartridge));
+        setCartridge(state.cartridge && CartridgeDatabase.createCartridgeFromSaveState(state.cartridge));
         setVideoStandard(VideoStandard[state.videoStandard]);
         controlsSocket.controlsStatesRedefined();
     };
@@ -256,6 +256,9 @@ function AtariConsole() {
             case controls.SAVE_STATE_12:
                 saveStateSocket.saveState(control.to);
                 break;
+            case controls.SAVE_STATE_FILE:
+                saveStateSocket.saveStateFile();
+                break;
             case controls.LOAD_STATE_0:
             case controls.LOAD_STATE_1:
             case controls.LOAD_STATE_2:
@@ -279,6 +282,12 @@ function AtariConsole() {
                 break;
             case controls.CARTRIDGE_FORMAT:
                 cycleCartridgeFormat();
+                break;
+            case controls.CARTRIDGE_REMOVE:
+                if (JavatariParameters.CARTRIDGE_CHANGE_DISABLED)
+                    self.showOSD("Cartridge change is disabled", true);
+                else
+                    cartridgeSocket.insert(null, false);
         }
     };
 

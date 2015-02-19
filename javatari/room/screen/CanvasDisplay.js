@@ -18,7 +18,7 @@ function CanvasDisplay(mainElement) {
 
     this.connectROMLoader = function(pROMLoader) {
         pROMLoader.registerForDnD(mainElement);
-        pROMLoader.createFileInputElementOn(mainElement);
+        pROMLoader.registerForFileInputElement(mainElement);
         monitor.connectROMLoader(pROMLoader);
     };
 

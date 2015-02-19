@@ -79,14 +79,14 @@ function ConsolePanel(mainElement) {
 
         cartInsertedImage =  addButton(141, 51 - 145, 189, 82, -127, -139);
         cartChangeButton = addButton(143, 51 - 144, 184, 55, 0, 0, true);
-        screenCartridgeControlButton(cartChangeButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
+        monitorCartridgeControlButton(cartChangeButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
 
         if (!JavatariParameters.CARTRIDGE_CHANGE_DISABLED) {
             cartChangeFileButton = addButton(171, 51 - 86, 31, 30, 2, -188);
-            screenCartridgeControlButton(cartChangeFileButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
+            monitorCartridgeControlButton(cartChangeFileButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
             setVisibility(cartChangeFileButton, true);
             cartChangeURLButton = addButton(267, 51 - 86, 31, 30, -94, -188);
-            screenCartridgeControlButton(cartChangeURLButton, Monitor.Controls.LOAD_CARTRIDGE_URL);
+            monitorCartridgeControlButton(cartChangeURLButton, Monitor.Controls.LOAD_CARTRIDGE_URL);
             setVisibility(cartChangeURLButton, true);
         }
     };
@@ -141,9 +141,11 @@ function ConsolePanel(mainElement) {
         }
     };
 
-    var screenCartridgeControlButton = function (but, control) {
+    var monitorCartridgeControlButton = function (but, control) {
         but.style.cursor = "pointer";
-        but.addEventListener("mousedown", function (e) {
+        // A "click" event and not a "mousedown" is necessary here. Without a click, FF does not open the Open File window
+        // TODO Hotkeys for this are also not working in FF since its not a click event!
+        but.addEventListener("click", function (e) {
             e.preventDefault();
             screen.getMonitor().controlActivated(control);
         });
@@ -172,7 +174,7 @@ function ConsolePanel(mainElement) {
         cartLabel.style.border = "1px solid " + DEFAULT_CARTRIDGE_BORDER_COLOR;
         cartLabel.style.opacity = "0";
         cartLabel.innerHTML = "";
-        screenCartridgeControlButton(cartLabel, Monitor.Controls.LOAD_CARTRIDGE_FILE);
+        monitorCartridgeControlButton(cartLabel, Monitor.Controls.LOAD_CARTRIDGE_FILE);
         mainElement.appendChild(cartLabel);
     };
 

@@ -50,8 +50,6 @@ function DOMMonitorControls(monitor) {
     var initKeys = function() {
         keyCodeMap[KEY_CART_FILE]       = Monitor.Controls.LOAD_CARTRIDGE_FILE;
         keyCodeMap[KEY_CART_URL]        = Monitor.Controls.LOAD_CARTRIDGE_URL;
-        keyCodeMap[KEY_CART_EMPTY]      = Monitor.Controls.LOAD_CARTRIDGE_EMPTY;
-        keyCodeMap[KEY_CART_SAVESTATE]  = Monitor.Controls.SAVE_STATE_CARTRIDGE;
         keyCodeMap[KEY_EXIT]            = Monitor.Controls.EXIT;
 
         keyAltCodeMap[KEY_CRT_FILTER]   = Monitor.Controls.CRT_FILTER;
@@ -109,8 +107,6 @@ function DOMMonitorControls(monitor) {
     var KEY_CART_URL       = 117;       // VK_F6
     var KEY_CART_PASTE_V   = 86;        // VK_V
     var KEY_CART_PASTE_INS = 45;        // VK_INSERT;
-    var KEY_CART_EMPTY     = 118;       // VK_F7
-    var KEY_CART_SAVESTATE = 119;       // VK_F8
 
     var KEY_CRT_FILTER     = 84;        // VK_T
     var KEY_CRT_MODES      = 82;        // VK_R

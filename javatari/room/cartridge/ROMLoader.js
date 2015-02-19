@@ -14,7 +14,7 @@ function ROMLoader() {
         element.addEventListener("drop", onDrop, false);
     };
 
-    this.createFileInputElementOn = function (element) {
+    this.registerForFileInputElement = function (element) {
         fileInputElement = document.createElement("input");
         fileInputElement.id = "ROMLoaderFileInput";
         fileInputElement.type = "file";
@@ -184,8 +184,8 @@ function ROMLoader() {
     var autoPower = true;
 
 
-    var ZIP_INNER_FILES_PATTERN = /^.*\.(bin|BIN|rom|ROM|a26|A26|jat|JAT)$/;
-    var INPUT_ELEM_ACCEPT_PROP  = ".bin,.rom,.a26,.zip";
+    var ZIP_INNER_FILES_PATTERN = /^.*\.(bin|BIN|rom|ROM|a26|A26|jst|JST)$/;
+    var INPUT_ELEM_ACCEPT_PROP  = ".bin,.rom,.a26,.zip,.jst";
     var LOCAL_STOARAGE_LAST_URL_KEY = "javatarilasturl";
 
 }
