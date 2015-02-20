@@ -18,7 +18,7 @@ function Monitor() {
         displayCenter();
     };
 
-    this.connectROMLoader = function(pROMLoader) {
+    this.connectPeripherals = function(pROMLoader) {
         romLoader = pROMLoader;
     };
 

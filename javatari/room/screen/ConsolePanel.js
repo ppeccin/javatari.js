@@ -10,7 +10,7 @@ function ConsolePanel(mainElement) {
         setupCartridgeLabel();
     }
 
-    this.connectScreenAndROMLoader = function(pScreen, pROMLoader) {
+    this.connectPeripherals = function(pScreen, pROMLoader) {
         screen = pScreen;
         screen.getMonitor().addControlInputElements(this.keyControlsInputElements());
         pROMLoader.registerForDnD(mainElement);

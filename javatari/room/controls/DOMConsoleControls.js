@@ -19,7 +19,7 @@ function DOMConsoleControls() {
         //joystickControls.connect(controlsSocket);
     };
 
-    this.connectScreenAndConsolePanel = function(screen, consolePanel) {
+    this.connectPeripherals = function(screen, consolePanel) {
         videoMonitor = screen.getMonitor();
         //joystickControls.connectScreen(screen);
         this.addInputElements(screen.keyControlsInputElements());

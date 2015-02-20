@@ -37,27 +37,27 @@ function Room(screenElement, consolePanelElement, cartridgeProvided) {
     };
 
     var buildPeripherals = function() {
+        self.stateMedia = new LocalStorageSaveStateMedia();
         self.romLoader = new ROMLoader();
         self.screen = new CanvasDisplay(screenElement);
-        self.screen.connectROMLoader(self.romLoader);
+        self.screen.connectPeripherals(self.romLoader, self.stateMedia);
         if (consolePanelElement) {
             self.consolePanel = new ConsolePanel(consolePanelElement);
-            self.consolePanel.connectScreenAndROMLoader(self.screen, self.romLoader);
+            self.consolePanel.connectPeripherals(self.screen, self.romLoader);
         }
         self.speaker = new Speaker();
         self.controls = new DOMConsoleControls();
-        self.controls.connectScreenAndConsolePanel(self.screen, self.consolePanel);
-        self.stateMedia = new LocalStorageSaveStateMedia();
+        self.controls.connectPeripherals(self.screen, self.consolePanel);
     };
 
     var buildAndPlugConsole = function() {
         self.console = new AtariConsole();
-        self.controls.connect(self.console.getControlsSocket(), self.console.getCartridgeSocket());
+        self.stateMedia.connect(self.console.getSavestateSocket());
+        self.romLoader.connect(self.console.getCartridgeSocket(), self.console.getSavestateSocket());
         self.screen.connect(self.console.getVideoOutput(), self.console.getControlsSocket(), self.console.getCartridgeSocket());
         if (self.consolePanel) self.consolePanel.connect(self.console.getControlsSocket(), self.console.getCartridgeSocket(), self.controls);
         self.speaker.connect(self.console.getAudioOutput());
-        self.stateMedia.connect(self.console.getSavestateSocket());
-        self.romLoader.connect(self.console.getCartridgeSocket());
+        self.controls.connect(self.console.getControlsSocket(), self.console.getCartridgeSocket());
     };
 
 

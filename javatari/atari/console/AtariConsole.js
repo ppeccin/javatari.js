@@ -426,19 +426,10 @@ function AtariConsole() {
             cartridge.connectSaveStateSocket(this);
         };
 
-        this.saveStateFile = function() {
-            if (!self.powerIsOn || !media) return;
-            var state = saveState();
-            if (media.saveStateFile(state))
-                self.showOSD("State cartridge saved", true);
-            else
-                self.showOSD("State cartridge save failed", true);
-        };
-
         this.saveState = function(slot) {
             if (!self.powerIsOn || !media) return;
             var state = saveState();
-            state.javatariSaveStateVersion = version;
+            state.version = VERSION;
             if (media.saveState(slot, state))
                 self.showOSD("State " + slot + " saved", true);
             else
@@ -452,7 +443,7 @@ function AtariConsole() {
                 self.showOSD("State " + slot + " not found", true);
                 return;
             }
-            if (state.javatariSaveStateVersion !== version) {
+            if (state.version !== VERSION) {
                 self.showOSD("State " + slot + " load failed, wrong version", true);
                 return;
             }
@@ -460,8 +451,35 @@ function AtariConsole() {
             self.showOSD("State " + slot + " loaded", true);
         };
 
+        this.saveStateFile = function() {
+            if (!self.powerIsOn || !media) return;
+            // Use Cartrige label as file name
+            var fileName = cartridgeSocket.inserted() && cartridgeSocket.inserted().rom.info.l;
+            var state = saveState();
+            state.version = VERSION;
+            if (media.saveStateFile(fileName, state))
+                self.showOSD("State Cartridge saved", true);
+            else
+                self.showOSD("State Cartridge save failed", true);
+        };
+
+        this.loadStateFile = function(data) {       // Return true if data was indeed a SaveState
+            if (!media) return;
+            var state = media.loadStateFile(data);
+            if (!state) return;
+            if (state.version !== VERSION) {
+                self.showOSD("State Cartridge load failed, wrong version", true);
+                return true;
+            }
+            loadState(state);
+            self.showOSD("State Cartridge loaded", true);
+            return true;
+        };
+
+
         var media;
-        var version = 1;
+        var VERSION = 1;
+
     }
 
 

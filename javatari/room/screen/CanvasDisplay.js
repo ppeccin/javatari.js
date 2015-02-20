@@ -16,10 +16,11 @@ function CanvasDisplay(mainElement) {
         monitor.addControlInputElements(self.keyControlsInputElements());
     }
 
-    this.connectROMLoader = function(pROMLoader) {
+    this.connectPeripherals = function(pROMLoader, stateMedia) {
         pROMLoader.registerForDnD(mainElement);
         pROMLoader.registerForFileInputElement(mainElement);
-        monitor.connectROMLoader(pROMLoader);
+        stateMedia.registerForDownloadElement(mainElement);
+        monitor.connectPeripherals(pROMLoader);
     };
 
     this.connect = function(pVideoSignal, pControlsSocket, pCartridgeSocket) {

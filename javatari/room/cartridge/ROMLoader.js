@@ -5,8 +5,9 @@
 function ROMLoader() {
     var self = this;
 
-    this.connect = function(pCartrigeSocket) {
+    this.connect = function(pCartrigeSocket, pSaveStateSocket) {
         cartridgeSocket = pCartrigeSocket;
+        saveStateSocket = pSaveStateSocket;
     };
 
     this.registerForDnD = function (element) {
@@ -15,16 +16,11 @@ function ROMLoader() {
     };
 
     this.registerForFileInputElement = function (element) {
-        fileInputElement = document.createElement("input");
-        fileInputElement.id = "ROMLoaderFileInput";
-        fileInputElement.type = "file";
-        fileInputElement.accept = INPUT_ELEM_ACCEPT_PROP;
-        fileInputElement.style.display = "none";
-        fileInputElement.addEventListener("change", onFileInputChange);
-        element.appendChild(fileInputElement);
+        fileInputElementParent = element;
     };
 
     this.openFileChooserDialog = function(withAutoPower) {
+        if (!fileInputElement) createFileInputElement();
         autoPower = withAutoPower !== false;
         fileInputElement.click();
     };
@@ -136,6 +132,9 @@ function ROMLoader() {
         try {
             arrContent = new Array(content.length);
             Util.arrayCopy(content, 0, arrContent, 0, arrContent.length);
+            // Frist try to load as a SaveState file
+            if (saveStateSocket.loadStateFile(arrContent)) return;
+            // Then try to load as a normal, uncompressed ROM
             rom = new ROM(name, arrContent);
             cart = CartridgeDatabase.createCartridgeFromRom(rom);
             if (cartridgeSocket) cartridgeSocket.insert(cart, autoPower);
@@ -145,7 +144,7 @@ function ROMLoader() {
                 throw e;
             }
 
-            // If it fails, try assuming its a compressed content (zip)
+            // If it fails, try assuming its a compressed content (zip with ROMs)
             try {
                 var zip = new JSZip(content);
                 var files = zip.file(ZIP_INNER_FILES_PATTERN);
@@ -177,9 +176,22 @@ function ROMLoader() {
         window.alert("Could not load ROM:\n\n" + message);
     };
 
+    var createFileInputElement = function (element) {
+        fileInputElement = document.createElement("input");
+        fileInputElement.id = "ROMLoaderFileInput";
+        fileInputElement.type = "file";
+        fileInputElement.accept = INPUT_ELEM_ACCEPT_PROP;
+        fileInputElement.style.display = "none";
+        fileInputElement.addEventListener("change", onFileInputChange);
+        fileInputElementParent.appendChild(fileInputElement);
+    };
+
 
     var cartridgeSocket;
+    var saveStateSocket;
+
     var fileInputElement;
+    var fileInputElementParent;
 
     var autoPower = true;
 

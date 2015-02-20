@@ -8,58 +8,103 @@ function LocalStorageSaveStateMedia() {
         socket.connectMedia(this);
     };
 
-    this.saveStateFile = function(state) {
-        return internalStartDownload("JavatariSave.jst", state);
+    this.registerForDownloadElement = function (element) {
+        downloadLinkElementParent = element;
     };
 
     this.saveState = function(slot, state) {
-        return internalSaveToStorage("javatarisave" + slot, state);
+        var data = buildDataFromState(state);
+        return data && saveToLocalStorage("javatarisave" + slot, data);
     };
 
     this.loadState = function(slot) {
-        return internalLoadFromStorage("javatarisave" + slot);
+        var data = loadFromLocalStorage("javatarisave" + slot);
+        return buildStateFromData(data);
+    };
+
+    this.saveStateFile = function(fileName, state) {
+        var data = buildDataFromState(state);
+        return data && startDownload(fileName || "JavatariSave", data);
+    };
+
+    this.loadStateFile = function(data) {
+        return buildStateFromData(data);
     };
 
     this.saveResourceToFile = function(entry, data) {
-        return internalSaveToStorage(entry, data);
+        return saveToLocalStorage(entry, data);
     };
 
     this.loadResourceFromFile = function(entry) {
-        return internalLoadFromStorage(entry);
+        return loadFromLocalStorage(entry);
     };
 
-    var internalSaveToStorage = function(entry, data) {
-        if (!localStorage) return null;
+    var saveToLocalStorage = function(entry, data) {
+        if (!localStorage) return;
 
-        localStorage[entry] = JSON.stringify(data);
-        return data;
+        localStorage[entry] = data;
+        return true;
     };
 
-    var internalLoadFromStorage = function(entry) {
-        if (!localStorage) return null;
+    var loadFromLocalStorage = function(entry) {
+        if (!localStorage) return;
 
-        var data = localStorage[entry];
+        return localStorage[entry];
+    };
+
+    var buildDataFromState = function(state) {
+        return SAVE_STATE_IDENTIFIER + JSON.stringify(state);
+    };
+
+    var buildStateFromData = function (data) {
         try {
-            if (data) return JSON.parse(data);
+
+            console.log(typeof data);
+            console.log(data.constructor === Array);
+
+            // Check for the identifier
+            if (data.length <= SAVE_STATE_IDENTIFIER.length) return;
+            var id = data.substr(0, SAVE_STATE_IDENTIFIER.length);
+
+            console.log(id);
+
+            if (id !== SAVE_STATE_IDENTIFIER) return;
+
+            var stateData = data.slice(SAVE_STATE_IDENTIFIER.length);
+            return stateData && JSON.parse(stateData);
         } catch(e) {
-            return null;
+            console.log(e.stack);
+            return;
         }
     };
 
-    var internalStartDownload = function (fileName, data) {
-        // TODO Create and maintain only one link element inside a controlled parent
+    var startDownload = function (fileName, data) {
+        if (!downloadLinkElement) createDownloadLinkElement();
 
-        var content = JSON.stringify(data);
-        var blob = new Blob([content], {type: "data:application/octet-stream"});
-        var link = document.createElement('a');
-        link.download = fileName.trim();
-        link.href = (window.URL || window.webkitURL).createObjectURL(blob);
-        link.style.display = "none";
-        document.body.appendChild(link);
+        // Release previous URL
+        if (downloadLinkElement.href) (window.URL || window.webkitURL).revokeObjectURL(downloadLinkElement.href);
 
-        link.click();
+        if (fileName) fileName = fileName + SAVE_STATE_FILE_EXTENSION;
+        var blob = new Blob([data], {type: "data:application/octet-stream"});
+        downloadLinkElement.download = fileName.trim();
+        downloadLinkElement.href = (window.URL || window.webkitURL).createObjectURL(blob);
+        downloadLinkElement.click();
 
         return true;
     };
+
+    var createDownloadLinkElement = function () {
+        downloadLinkElement = document.createElement('a');
+        downloadLinkElement.style.display = "none";
+        downloadLinkElement.href = "#";
+        downloadLinkElementParent.appendChild(downloadLinkElement);
+    };
+
+
+    var downloadLinkElement;
+    var downloadLinkElementParent;
+
+    var SAVE_STATE_IDENTIFIER = "javatarijsstate!";
+    var SAVE_STATE_FILE_EXTENSION = ".jst";
 
 }
