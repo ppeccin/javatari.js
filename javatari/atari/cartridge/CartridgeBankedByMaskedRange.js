@@ -59,30 +59,30 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
 
     this.saveState = function() {
         return {
-            format: this.format.name,
-            rom: this.rom.saveState(),
-            bytes: bytes.slice(0),
-            baseBankSwitchAddress: baseBankSwitchAddress,
-            extraRAMSize: extraRAMSize,
-            bankAddressOffset: bankAddressOffset,
-            topBankSwitchAddress: topBankSwitchAddress,
-            superChipMode: superChipMode,
-            superChipAutoDetect: superChipAutoDetect,
-            extraRAM: extraRAM && extraRAM.slice(0)
+            f: this.format.name,
+            r: this.rom.saveState(),
+            b: btoa(Util.uInt8ArrayToByteString(bytes)),
+            bo: bankAddressOffset,
+            bb: baseBankSwitchAddress,
+            es: extraRAMSize,
+            tb: topBankSwitchAddress,
+            s: superChipMode | 0,
+            sa: superChipAutoDetect | 0,
+            e: extraRAM && btoa(Util.uInt8ArrayToByteString(extraRAM))
         };
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.format];
-        this.rom = ROM.loadState(state.rom);
-        bytes = state.bytes;
-        bankAddressOffset =  state.bankAddressOffset;
-        baseBankSwitchAddress = state.baseBankSwitchAddress;
-        extraRAMSize = state.extraRAMSize;
-        topBankSwitchAddress =  state.topBankSwitchAddress;
-        superChipMode =  state.superChipMode;
-        superChipAutoDetect =  state.superChipAutoDetect;
-        extraRAM = state.extraRAM;
+        this.format = CartridgeFormats[state.f];
+        this.rom = ROM.loadState(state.r);
+        bytes = Util.byteStringToUInt8Array(atob(state.b));
+        bankAddressOffset =  state.bo;
+        baseBankSwitchAddress = state.bb;
+        extraRAMSize = state.es;
+        topBankSwitchAddress =  state.tb;
+        superChipMode =  !!state.s;
+        superChipAutoDetect =  !!state.sa;
+        extraRAM = Util.byteStringToUInt8Array(atob(state.e));
     };
 
 

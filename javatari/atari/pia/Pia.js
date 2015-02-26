@@ -133,36 +133,36 @@ function Pia() {
 
     this.saveState = function() {
         return {
-            timerCount:           timerCount,
-            currentTimerInterval: currentTimerInterval,
-            lastSetTimerInterval: lastSetTimerInterval,
-            SWCHA:                SWCHA,
-            SWACNT:               SWACNT,
-            SWCHB:                SWCHB,
-            SWBCNT:               SWBCNT,
-            INTIM:                INTIM,
-            INSTAT:               INSTAT,
-            TIM1T:                TIM1T,
-            TIM8T:                TIM8T,
-            TIM64T:               TIM64T,
-            T1024T:               T1024T
+            t:          timerCount,
+            c:          currentTimerInterval,
+            l:          lastSetTimerInterval,
+            SA:         SWCHA,
+            SAC:        SWACNT,
+            SB:         SWCHB,
+            SBC:        SWBCNT,
+            IT:         INTIM,
+            IS:         INSTAT,
+            T1:         TIM1T,
+            T8:         TIM8T,
+            T6:         TIM64T,
+            T2:         T1024T
         };
     };
 
     this.loadState = function(state) {
-        timerCount           = state.timerCount;
-        currentTimerInterval = state.currentTimerInterval;
-        lastSetTimerInterval = state.lastSetTimerInterval;
-        // SWCHA           	 = state.SWCHA;			// Do not load controls state
-        SWACNT               = state.SWACNT;
-        SWCHB                = state.SWCHB;
-        SWBCNT               = state.SWBCNT;
-        INTIM                = state.INTIM;
-        INSTAT               = state.INSTAT;
-        TIM1T                = state.TIM1T;
-        TIM8T                = state.TIM8T;
-        TIM64T               = state.TIM64T;
-        T1024T               = state.T1024T;
+        timerCount           = state.t;
+        currentTimerInterval = state.c;
+        lastSetTimerInterval = state.l;
+        // SWCHA           	 = state.SA;			// Do not load controls state
+        SWACNT               = state.SAC;
+        SWCHB                = state.SB;
+        SWBCNT               = state.SBC;
+        INTIM                = state.IT;
+        INSTAT               = state.IS;
+        TIM1T                = state.T1;
+        TIM8T                = state.T8;
+        TIM64T               = state.T6;
+        T1024T               = state.T2;
     };
 
 

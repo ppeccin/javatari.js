@@ -133,7 +133,10 @@ function ROMLoader() {
             arrContent = new Array(content.length);
             Util.arrayCopy(content, 0, arrContent, 0, arrContent.length);
             // Frist try to load as a SaveState file
-            if (saveStateSocket.loadStateFile(arrContent)) return;
+            if (saveStateSocket.loadStateFile(arrContent)) {
+                console.log(">>> SaveState file loaded");
+                return;
+            }
             // Then try to load as a normal, uncompressed ROM
             rom = new ROM(name, arrContent);
             cart = CartridgeDatabase.createCartridgeFromRom(rom);

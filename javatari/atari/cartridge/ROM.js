@@ -14,8 +14,8 @@ function ROM(source, content, info) {
 
     this.saveState = function() {
         return {
-            source: this.source,
-            info: this.info
+            s: this.source,
+            i: this.info
             // content not needed in savestates
         };
     };
@@ -23,5 +23,5 @@ function ROM(source, content, info) {
 }
 
 ROM.loadState = function(state) {
-    return new ROM(state.source, null, state.info);
+    return new ROM(state.s, null, state.i);
 };

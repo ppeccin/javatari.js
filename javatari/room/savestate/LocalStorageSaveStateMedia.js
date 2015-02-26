@@ -58,23 +58,21 @@ function LocalStorageSaveStateMedia() {
 
     var buildStateFromData = function (data) {
         try {
-
-            console.log(typeof data);
-            console.log(data.constructor === Array);
+            var id;
+            if (data instanceof Array)
+                id = Util.uInt8ArrayToByteString(data.slice(0, SAVE_STATE_IDENTIFIER.length));
+            else
+                id = data.substr(0, SAVE_STATE_IDENTIFIER.length);
 
             // Check for the identifier
-            if (data.length <= SAVE_STATE_IDENTIFIER.length) return;
-            var id = data.substr(0, SAVE_STATE_IDENTIFIER.length);
-
-            console.log(id);
-
             if (id !== SAVE_STATE_IDENTIFIER) return;
 
             var stateData = data.slice(SAVE_STATE_IDENTIFIER.length);
+            if (stateData instanceof Array)
+                stateData = Util.uInt8ArrayToByteString(stateData);
+
             return stateData && JSON.parse(stateData);
         } catch(e) {
-            console.log(e.stack);
-            return;
         }
     };
 

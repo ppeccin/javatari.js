@@ -57,5 +57,76 @@ Util = new function() {
                 func(arr[i]);
     };
 
+    this.booleanArrayToByteString = function(boos) {
+        var str = "";
+        for(var i = 0, len = boos.length; i < len; i++)
+            str += boos[i] ? "1" : "0";
+        return str;
+    };
+
+    this.byteStringToBooleanArray = function(str) {
+        var boos = [];
+        for(var i = 0, n = str.length; i < n; i++)
+            boos.push(str.charAt(i) === "1");
+        return boos;
+    };
+
+    // Only 8 bit values
+    this.uInt8ArrayToByteString = function(ints) {
+        var str = "";
+        for(var i = 0, len = ints.length; i < len; i++)
+            str += String.fromCharCode(ints[i] & 0xff);
+        return str;
+    };
+
+    this.byteStringToUInt8Array = function(str) {
+        var ints = [];
+        for(var i = 0, len = str.length; i < len; i++)
+            ints.push(str.charCodeAt(i) & 0xff);
+        return ints;
+    };
+
+    // Only 32 bit values
+    this.uInt32ArrayToByteString = function(ints) {
+        var str = "";
+        for(var i = 0, len = ints.length; i < len; i++) {
+            var val = ints[i];
+            str += String.fromCharCode((val & 0xff000000) >>> 24);
+            str += String.fromCharCode((val & 0xff0000) >>> 16);
+            str += String.fromCharCode((val & 0xff00) >>> 8);
+            str += String.fromCharCode(val & 0xff);
+        }
+        return str;
+    };
+
+    this.byteStringToUInt32Array = function(str) {
+        var ints = [];
+        for(var i = 0, len = str.length; i < len;)
+            ints.push((str.charCodeAt(i++) * (1 << 24)) + (str.charCodeAt(i++) << 16) + (str.charCodeAt(i++) << 8) + str.charCodeAt(i++));
+        return ints;
+    };
+
+    // Only 8 bit values, inner arrays of the same length
+    this.uInt8BiArrayToByteString = function(ints) {
+        var str = "";
+        for(var a = 0, lenA = ints.length; a < lenA; a++)
+            for(var b = 0, lenB = ints[a].length; b < lenB; b++)
+                str += String.fromCharCode(ints[a][b] & 0xff);
+        return str;
+    };
+
+    // only inner arrays of the same length
+    this.byteStringToUInt8BiArray = function(str, innerLength) {
+        var outer = [];
+        for(var a = 0, len = str.length; a < len;) {
+            var inner = new Array(innerLength);
+            for(var b = 0; b < innerLength; b++)
+                inner[b] = str.charCodeAt(a++) & 0xff;
+            outer.push(inner);
+        }
+        return outer;
+    };
+
 };
+
 

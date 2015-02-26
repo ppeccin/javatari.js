@@ -28,16 +28,16 @@ function Cartridge4K(rom, format) {
 
     this.saveState = function() {
         return {
-            format: this.format.name,
-            rom: this.rom.saveState(),
-            bytes: bytes
+            f: this.format.name,
+            r: this.rom.saveState(),
+            b: btoa(Util.uInt8ArrayToByteString(bytes))
         };
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.format];
-        this.rom = ROM.loadState(state.rom);
-        bytes = state.bytes;
+        this.format = CartridgeFormats[state.f];
+        this.rom = ROM.loadState(state.r);
+        bytes = Util.byteStringToUInt8Array(atob(state.b));
     };
 
 

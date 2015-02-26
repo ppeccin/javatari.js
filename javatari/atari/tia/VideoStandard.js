@@ -270,8 +270,8 @@
     var palPalette = new Array(256);
     for (var i = 0, len = ntscRGB.length; i < len; i++) {
         // Adds 100% alpha for ARGB use
-        ntscPalette[i*2] = ntscPalette[i*2+1] = ntscRGB[i] | 0xff000000;
-        palPalette[i*2] = palPalette[i*2+1] = palRGB[i] | 0xff000000;
+        ntscPalette[i*2] = ntscPalette[i*2+1] = ntscRGB[i] + 0xff000000;
+        palPalette[i*2] = palPalette[i*2+1] = palRGB[i] + 0xff000000;
     }
     // ntscPalette[0] = ntscPalette[1] = palPalette[0] = palPalette[1] = 0;	// Full transparency for blacks. Needed for CRT emulation modes
 

@@ -42,12 +42,12 @@ function Ram() {
 
     this.saveState = function() {
         return {
-            bytes: bytes.slice(0)
+            b: btoa(Util.uInt8ArrayToByteString(bytes))
         };
     };
 
     this.loadState = function(state) {
-        bytes = state.bytes;
+        bytes = Util.byteStringToUInt8Array(atob(state.b));
     };
 
 
