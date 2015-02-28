@@ -24,7 +24,7 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
             superChipMode = !!superChip;
             superChipAutoDetect = false;
         }
-        extraRAM = (superChip || superChip == null || superChip == undefined) ? bytes.slice(0, extraRAMSize) : null;
+        extraRAM = superChip !== false ? bytes.slice(0, extraRAMSize) : null;
     }
 
     this.read = function(address) {

@@ -60,29 +60,19 @@ function TiaAudioChannel() {
     };
 
     var currentPoly4 = function() {
-        return poly4 & 0x01;
+        return POLY4_STREAM[poly4Count];
     };
 
     var nextPoly4 = function() {
-        var carry = poly4 & 0x01;					// bit 0
-        var push = ((poly4 >> 1) ^ carry) & 0x01;	// bit 1 XOR bit 0
-        poly4 = poly4 >>> 1;						// shift right
-        if (push === 0)								// set bit 3 = push
-            poly4 &= 0x07;
-        else
-            poly4 |= 0x08;
-        return carry;
+        if (++poly4Count === 15)
+            poly4Count = 0;
+        return POLY4_STREAM[poly4Count];
     };
 
     var nextPoly5 = function() {
-        var carry = poly5 & 0x01;					// bit 0
-        var push = ((poly5 >> 2) ^ carry) & 0x01;	// bit 2 XOR bit 0
-        poly5 = poly5 >>> 1;						// shift right
-        if (push === 0)								// set bit 4 = push
-            poly5 &= 0x0f;
-        else
-            poly5 |= 0x10;
-        return carry;
+        if (++poly5Count === 31)
+            poly5Count = 0;
+        return POLY5_STREAM[poly5Count];
     };
 
     var nextPoly9 = function() {
@@ -110,7 +100,7 @@ function TiaAudioChannel() {
     var nextTone6 = function() {
         if (--tone6Countdown === 0) {
             tone6Countdown = 3;
-            tone6 = tone6 === 0 ? 1 : 0;
+            tone6 = tone6 ? 0 : 1;
         }
         return tone6;
     };
@@ -130,7 +120,7 @@ function TiaAudioChannel() {
     };
 
     var nextPoly5Poly4 = function() {
-        return nextPoly5() === 1 ? nextPoly4() : currentPoly4();
+        return nextPoly5() ? nextPoly4() : currentPoly4();
     };
 
     var nextDiv93 = function() {
@@ -138,7 +128,7 @@ function TiaAudioChannel() {
     };
 
     var nextPoly5Div6 = function() {
-        return nextPoly5() === 1 ? nextTone6() : currentTone6();
+        return nextPoly5() ? nextTone6() : currentTone6();
     };
 
     var nextSampleForControl = nextSilence;
@@ -151,18 +141,21 @@ function TiaAudioChannel() {
 
     var currentSample = 0;
 
-    var poly4 = 0x0f;
-    var poly5 = 0x1f;
-    var poly9 = 0x1ff;
-
     var tone2 = 1;
 
     var tone6 = 1;
     var tone6Countdown = 3;
 
+    var poly9 = 0x1ff;
+
+    var poly4Count = 14;
+    var POLY4_STREAM = [1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0 ];
+
+    var poly5Count = 30;
+    var POLY5_STREAM = [1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0];
+
     var tone31Count = 30;
     var TONE31_STREAM = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
 
     var MAX_VOLUME = 15;
 

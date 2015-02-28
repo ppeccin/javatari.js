@@ -96,23 +96,9 @@ function M6502() {
 
     var fetchOpcodeAndDecodeInstruction = function() {
         opcode = bus.read(PC);
-
-        //console.log(PC.toString(16) + ": " + (opcode.toString(16)));
-
-        //if ((!opcode && opcode !== 0) || (opcode < 0 || opcode > 255)) {
-        //    console.log(">>>> Invalid Opcode: " + opcode);
-        //}
-
         instruction = instructions[opcode];
-
-        //if (instruction[1] === illegalOpcode)
-        //    "Illegal opcode just fetched";
-
-        //if (PC === 0x459c /* && bus.read(0xa000) === 0x80 && bus.read(0xa003) === 0 */ ) { self.trace = true }
-
         T = 0;
         //if (self.trace) { self.breakpoint(); }
-
         PC++;
     };
 
@@ -1484,5 +1470,3 @@ function M6502() {
     };
 
 }
-
-

@@ -320,26 +320,26 @@ function Tia(pCpu, pPia) {
             } else {
                 s = 19; i = 1;
             }
-            playfieldPattern[0]  = playfieldPattern[s+=i] = (PF0 & 0x10) != 0;
-            playfieldPattern[1]  = playfieldPattern[s+=i] = (PF0 & 0x20) != 0;
-            playfieldPattern[2]  = playfieldPattern[s+=i] = (PF0 & 0x40) != 0;
-            playfieldPattern[3]  = playfieldPattern[s+=i] = (PF0 & 0x80) != 0;
-            playfieldPattern[4]  = playfieldPattern[s+=i] = (PF1 & 0x80) != 0;
-            playfieldPattern[5]  = playfieldPattern[s+=i] = (PF1 & 0x40) != 0;
-            playfieldPattern[6]  = playfieldPattern[s+=i] = (PF1 & 0x20) != 0;
-            playfieldPattern[7]  = playfieldPattern[s+=i] = (PF1 & 0x10) != 0;
-            playfieldPattern[8]  = playfieldPattern[s+=i] = (PF1 & 0x08) != 0;
-            playfieldPattern[9]  = playfieldPattern[s+=i] = (PF1 & 0x04) != 0;
-            playfieldPattern[10] = playfieldPattern[s+=i] = (PF1 & 0x02) != 0;
-            playfieldPattern[11] = playfieldPattern[s+=i] = (PF1 & 0x01) != 0;
-            playfieldPattern[12] = playfieldPattern[s+=i] = (PF2 & 0x01) != 0;
-            playfieldPattern[13] = playfieldPattern[s+=i] = (PF2 & 0x02) != 0;
-            playfieldPattern[14] = playfieldPattern[s+=i] = (PF2 & 0x04) != 0;
-            playfieldPattern[15] = playfieldPattern[s+=i] = (PF2 & 0x08) != 0;
-            playfieldPattern[16] = playfieldPattern[s+=i] = (PF2 & 0x10) != 0;
-            playfieldPattern[17] = playfieldPattern[s+=i] = (PF2 & 0x20) != 0;
-            playfieldPattern[18] = playfieldPattern[s+=i] = (PF2 & 0x40) != 0;
-            playfieldPattern[19] = playfieldPattern[s+=i] = (PF2 & 0x80) != 0;
+            playfieldPattern[0]  = playfieldPattern[s+=i] = (PF0 & 0x10) !== 0;
+            playfieldPattern[1]  = playfieldPattern[s+=i] = (PF0 & 0x20) !== 0;
+            playfieldPattern[2]  = playfieldPattern[s+=i] = (PF0 & 0x40) !== 0;
+            playfieldPattern[3]  = playfieldPattern[s+=i] = (PF0 & 0x80) !== 0;
+            playfieldPattern[4]  = playfieldPattern[s+=i] = (PF1 & 0x80) !== 0;
+            playfieldPattern[5]  = playfieldPattern[s+=i] = (PF1 & 0x40) !== 0;
+            playfieldPattern[6]  = playfieldPattern[s+=i] = (PF1 & 0x20) !== 0;
+            playfieldPattern[7]  = playfieldPattern[s+=i] = (PF1 & 0x10) !== 0;
+            playfieldPattern[8]  = playfieldPattern[s+=i] = (PF1 & 0x08) !== 0;
+            playfieldPattern[9]  = playfieldPattern[s+=i] = (PF1 & 0x04) !== 0;
+            playfieldPattern[10] = playfieldPattern[s+=i] = (PF1 & 0x02) !== 0;
+            playfieldPattern[11] = playfieldPattern[s+=i] = (PF1 & 0x01) !== 0;
+            playfieldPattern[12] = playfieldPattern[s+=i] = (PF2 & 0x01) !== 0;
+            playfieldPattern[13] = playfieldPattern[s+=i] = (PF2 & 0x02) !== 0;
+            playfieldPattern[14] = playfieldPattern[s+=i] = (PF2 & 0x04) !== 0;
+            playfieldPattern[15] = playfieldPattern[s+=i] = (PF2 & 0x08) !== 0;
+            playfieldPattern[16] = playfieldPattern[s+=i] = (PF2 & 0x10) !== 0;
+            playfieldPattern[17] = playfieldPattern[s+=i] = (PF2 & 0x20) !== 0;
+            playfieldPattern[18] = playfieldPattern[s+=i] = (PF2 & 0x40) !== 0;
+            playfieldPattern[19] = playfieldPattern[s+=i] = (PF2 & 0x80) !== 0;
         }
         playfieldCurrentPixel = playfieldPattern[((clock - HBLANK_DURATION) >>> 2)];
     };

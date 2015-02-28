@@ -67,10 +67,6 @@ function Bus(pCpu, pTia, pPia, pRam) {
             data = data & 0x3f | tia.read(address);		// Use the retained data for bits 5-0
         }
 
-        //if (data < 0 || data > 255) {
-        //    console.log(">>>> Invalid Data read: " + data);
-        //}
-
         return data;
     };
 
@@ -79,10 +75,6 @@ function Bus(pCpu, pTia, pPia, pRam) {
         //if (cartridgeNeedsBusMonitoring) cartridge.monitorBusBeforeWrite(address, val);
 
         data = val;
-
-        //if (data < 0 || data > 255) {
-        //    console.log(">>>> Invalid Data write: " + data);
-        //}
 
         if ((address & TIA_MASK) === TIA_SELECT) tia.write(address, val);
         else if ((address & RAM_MASK) === RAM_SELECT) ram.write(address, val);

@@ -20,7 +20,7 @@ function Cartridge4K(rom, format) {
     };
 
     this.write = function(address, val) {
-        console.log("Trying to write into cartridge: " + address.toString(16) + "  " + val);
+        console.log(">>> Trying to write into cartridge: " + address.toString(16) + "  " + val);
     };
 
 

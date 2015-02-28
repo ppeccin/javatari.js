@@ -61,12 +61,10 @@ function TiaAudioSignal() {
         var end = retrievedSamples + quant;
         if (end >= MAX_SAMPLES) end -= MAX_SAMPLES;
 
-        var result = {
-            buffer: samples,
-            bufferSize: MAX_SAMPLES,
-            start: retrievedSamples,
-            end: end - 1
-        };
+        var result = retrieveResult;
+
+        result.start = retrievedSamples;
+        result.end = end - 1;
 
         retrievedSamples = end;
 
@@ -103,7 +101,6 @@ function TiaAudioSignal() {
     var channel0 = new TiaAudioChannel();
     var channel1 = new TiaAudioChannel();
 
-    var samples = new Array(MAX_SAMPLES);
     var generatedSamples = 0;
     var retrievedSamples = 0;
 
@@ -112,9 +109,17 @@ function TiaAudioSignal() {
 
     var lastSample = 0;
 
-
     var MAX_SAMPLES = 4 * JavatariParameters.AUDIO_BUFFER_SIZE;
     var MAX_AMPLITUDE = 0.5;
+
+    var samples = new Array(MAX_SAMPLES);
+
+    var retrieveResult = {
+        buffer: samples,
+        bufferSize: MAX_SAMPLES,
+        start: 0,
+        end: 0
+    };
 
 }
 
