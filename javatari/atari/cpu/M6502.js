@@ -263,12 +263,11 @@ function M6502() {
         D = val >>> 3 & 1; I = val >>> 2 & 1; Z = val >>> 1 & 1; C = val & 1;
     };
 
-    var illegalOpcode = function() {
+    var illegalOpcode = function(op) {
         if (self.debug) {
-            console.log("Illegal Opcode!!!");
-            self.breakpoint("Illegal Opcode!!!");
+            console.log("Illegal Opcode: " + op);
+            self.breakpoint("Illegal Opcode: " + op);
         }
-        fetchNextOpcode();
     };
 
 
@@ -343,13 +342,14 @@ function M6502() {
     };
 
     var absoluteIndexedRead = function(index) {
+        var addIndex = index === rX ? addXtoBAL : addYtoBAL;
         return function(operation) {
             return [
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,
                 fetchBAH,
                 function() {
-                    if (index === rX) addXtoBAL(); else addYtoBAL();
+                    addIndex();
                     fetchDataFromBA();
                     add1toBAHifBALCrossed();
                 },
@@ -370,13 +370,14 @@ function M6502() {
     };
 
     var zeroPageIndexedRead = function(index) {
+        var addIndex = index === rX ? addXtoBAL : addYtoBAL;
         return function(operation) {
             return [
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,                        // BAH will be zero
                 fetchDataFromBA,
                 function() {
-                    if (index === rX) addXtoBAL(); else addYtoBAL();
+                    addIndex();
                     fetchDataFromBA();
                 },
                 function() {
@@ -390,7 +391,7 @@ function M6502() {
     var indirectYRead = function(operation) {
         return [
             fetchOpcodeAndDecodeInstruction,
-            fetchIAL,
+            fetchIAL,                           // IAH will be zero
             fetchBALFromIA,
             function() {
                 add1toIAL();
@@ -463,13 +464,14 @@ function M6502() {
     };
 
     var absoluteIndexedWrite = function(index) {
+        var addIndex = index === rX ? addXtoBAL : addYtoBAL;
         return function(operation) {
             return [
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,
                 fetchBAH,
                 function() {
-                    if (index === rX) addXtoBAL(); else addYtoBAL();
+                    addIndex();
                     fetchDataFromBA();
                     add1toBAHifBALCrossed();
                 },
@@ -483,13 +485,14 @@ function M6502() {
     };
 
     var zeroPageIndexedWrite = function(index) {
+        var addIndex = index === rX ? addXtoBAL : addYtoBAL;
         return function(operation) {
             return [
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,                        // BAH will be zero
                 fetchDataFromBA,
                 function() {
-                    if (index === rX) addXtoBAL(); else addYtoBAL();
+                    addIndex();
                     operation();
                     writeDataToBA();
                 },
@@ -501,7 +504,7 @@ function M6502() {
     var indirectYWrite = function(operation) {
         return [
             fetchOpcodeAndDecodeInstruction,
-            fetchIAL,
+            fetchIAL,                           // IAH will be zero
             fetchBALFromIA,
             function() {
                 add1toIAL();
@@ -550,31 +553,84 @@ function M6502() {
         ];
     };
 
-    var zeroPageXReadModifyWrite = function(operation) {
+    var zeroPageIndexedReadModifyWrite = function(index) {
+        var addIndex = index === rX ? addXtoBAL : addYtoBAL;
+        return function(operation) {
+            return [
+                fetchOpcodeAndDecodeInstruction,
+                fetchBAL,                        // BAH will be zero
+                fetchDataFromBA,
+                function () {
+                    addIndex();
+                    fetchDataFromBA();
+                },
+                writeDataToBA,
+                function () {
+                    operation();
+                    writeDataToBA();
+                },
+                fetchNextOpcode
+            ];
+        };
+    };
+
+    var absoluteIndexedReadModifyWrite = function(index) {
+        var addIndex = index === rX ? addXtoBAL : addYtoBAL;
+        return function(operation) {
+            return [
+                fetchOpcodeAndDecodeInstruction,
+                fetchBAL,
+                fetchBAH,
+                function () {
+                    addIndex();
+                    fetchDataFromBA();
+                    add1toBAHifBALCrossed();
+                },
+                fetchDataFromBA,
+                writeDataToBA,
+                function () {
+                    operation();
+                    writeDataToBA();
+                },
+                fetchNextOpcode
+            ];
+        };
+    };
+
+    var indirectXReadModifyWrite = function(operation) {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchBAL,                        // BAH will be zero
             fetchDataFromBA,
             function() {
                 addXtoBAL();
-                fetchDataFromBA();
+                fetchADLFromBA();
             },
-            writeDataToBA,
+            function() {
+                add1toBAL();
+                fetchADHFromBA();
+            },
+            fetchDataFromAD,
+            writeDataToAD,
             function() {
                 operation();
-                writeDataToBA();
+                writeDataToAD();
             },
             fetchNextOpcode
         ];
     };
 
-    var absoluteXReadModifyWrite = function(operation) {
+    var indirectYReadModifyWrite = function(operation) {
         return [
             fetchOpcodeAndDecodeInstruction,
-            fetchBAL,
-            fetchBAH,
+            fetchIAL,                           // IAH will be zero
+            fetchBALFromIA,
             function() {
-                addXtoBAL();
+                add1toIAL();
+                fetchBAHFromIA();
+            },
+            function() {
+                addYtoBAL();
                 fetchDataFromBA();
                 add1toBAHifBALCrossed();
             },
@@ -596,275 +652,275 @@ function M6502() {
 
     instructions[0x00] = BRK();
     instructions[0x01] = ORA(indirectXRead);
-    instructions[0x02] = u();                        // Unsupported KIL
-    instructions[0x03] = u();                        // Unsupported SLO
-    instructions[0x04] = u();                        // Unsupported NOP
+    instructions[0x02] = uKIL();
+    instructions[0x03] = uSLO(indirectXReadModifyWrite);
+    instructions[0x04] = uNOP(zeroPageRead);
     instructions[0x05] = ORA(zeroPageRead);
     instructions[0x06] = ASL(zeroPageReadModifyWrite);
-    instructions[0x07] = u();                        // Unsupported SLO
+    instructions[0x07] = uSLO(zeroPageReadModifyWrite);
     instructions[0x08] = PHP();
     instructions[0x09] = ORA(immediateRead);
     instructions[0x0a] = ASL_ACC();
-    instructions[0x0b] = u();                        // Unsupported ANC
-    instructions[0x0c] = u();                        // Unsupported NOP
+    instructions[0x0b] = uANC(immediateRead);
+    instructions[0x0c] = uNOP(absoluteRead);
     instructions[0x0d] = ORA(absoluteRead);
     instructions[0x0e] = ASL(absoluteReadModifyWrite);
-    instructions[0x0f] = u();                        // Unsupported SLO
+    instructions[0x0f] = uSLO(absoluteReadModifyWrite);
 
-    instructions[0x10] = Bxx(bN, 0);             // BPL
+    instructions[0x10] = Bxx(bN, 0);                 // BPL
     instructions[0x11] = ORA(indirectYRead);
-    instructions[0x12] = u();                        // Unsupported KIL
-    instructions[0x13] = u();                        // Unsupported SLO
-    instructions[0x14] = u();                        // Unsupported NOP
+    instructions[0x12] = uKIL();
+    instructions[0x13] = uSLO(indirectYReadModifyWrite);
+    instructions[0x14] = uNOP(zeroPageIndexedRead(rX));
     instructions[0x15] = ORA(zeroPageIndexedRead(rX));
-    instructions[0x16] = ASL(zeroPageXReadModifyWrite);
-    instructions[0x17] = u();                        // Unsupported SLO
+    instructions[0x16] = ASL(zeroPageIndexedReadModifyWrite(rX));
+    instructions[0x17] = uSLO(zeroPageIndexedReadModifyWrite(rX));
     instructions[0x18] = CLC();
     instructions[0x19] = ORA(absoluteIndexedRead(rY));
-    instructions[0x1a] = u();                        // Unsupported NOP
-    instructions[0x1b] = u();                        // Unsupported SLO
-    instructions[0x1c] = u();                        // Unsupported NOP
+    instructions[0x1a] = uNOP(implied);
+    instructions[0x1b] = uSLO(absoluteIndexedReadModifyWrite(rY));
+    instructions[0x1c] = uNOP(absoluteIndexedRead(rX));
     instructions[0x1d] = ORA(absoluteIndexedRead(rX));
-    instructions[0x1e] = ASL(absoluteXReadModifyWrite);
-    instructions[0x1f] = u();                        // Unsupported SLO
+    instructions[0x1e] = ASL(absoluteIndexedReadModifyWrite(rX));
+    instructions[0x1f] = uSLO(absoluteIndexedReadModifyWrite(rX));
 
     instructions[0x20] = JSR();
     instructions[0x21] = AND(indirectXRead);
-    instructions[0x22] = u();                        // Unsupported KIL
-    instructions[0x23] = u();                        // Unsupported RLA
+    instructions[0x22] = uKIL();
+    instructions[0x23] = uRLA(indirectXReadModifyWrite);
     instructions[0x24] = BIT(zeroPageRead);
     instructions[0x25] = AND(zeroPageRead);
     instructions[0x26] = ROL(zeroPageReadModifyWrite);
-    instructions[0x27] = u();                        // Unsupported RLA
+    instructions[0x27] = uRLA(zeroPageReadModifyWrite);
     instructions[0x28] = PLP();
     instructions[0x29] = AND(immediateRead);
     instructions[0x2a] = ROL_ACC();
-    instructions[0x2b] = u();                        // Unsupported ANC
+    instructions[0x2b] = uANC(immediateRead);
     instructions[0x2c] = BIT(absoluteRead);
     instructions[0x2d] = AND(absoluteRead);
     instructions[0x2e] = ROL(absoluteReadModifyWrite);
-    instructions[0x2f] = u();                        // Unsupported RLA
+    instructions[0x2f] = uRLA(absoluteReadModifyWrite);
 
-    instructions[0x30] = Bxx(bN, 1);             // BMI
+    instructions[0x30] = Bxx(bN, 1);                 // BMI
     instructions[0x31] = AND(indirectYRead);
-    instructions[0x32] = u();                        // Unsupported KIL
-    instructions[0x33] = u();                        // Unsupported RLA
-    instructions[0x34] = u();                        // Unsupported NOP
+    instructions[0x32] = uKIL();
+    instructions[0x33] = uRLA(indirectYReadModifyWrite);
+    instructions[0x34] = uNOP(zeroPageIndexedRead(rX));
     instructions[0x35] = AND(zeroPageIndexedRead(rX));
-    instructions[0x36] = ROL(zeroPageXReadModifyWrite);
-    instructions[0x37] = u();                        // Unsupported RLA
+    instructions[0x36] = ROL(zeroPageIndexedReadModifyWrite(rX));
+    instructions[0x37] = uRLA(zeroPageIndexedReadModifyWrite(rX));
     instructions[0x38] = SEC();
     instructions[0x39] = AND(absoluteIndexedRead(rY));
-    instructions[0x3a] = u();                        // Unsupported NOP
-    instructions[0x3b] = u();                        // Unsupported RLA
-    instructions[0x3c] = u();                        // Unsupported NOP
+    instructions[0x3a] = uNOP(implied);
+    instructions[0x3b] = uRLA(absoluteIndexedReadModifyWrite(rY));
+    instructions[0x3c] = uNOP(absoluteIndexedRead(rX));
     instructions[0x3d] = AND(absoluteIndexedRead(rX));
-    instructions[0x3e] = ROL(absoluteXReadModifyWrite);
-    instructions[0x3f] = u();                        // Unsupported RLA
+    instructions[0x3e] = ROL(absoluteIndexedReadModifyWrite(rX));
+    instructions[0x3f] = uRLA(absoluteIndexedReadModifyWrite(rX));
 
     instructions[0x40] = RTI();
     instructions[0x41] = EOR(indirectXRead);
-    instructions[0x42] = u();                        // Unsupported KIL
-    instructions[0x43] = u();                        // Unsupported SRE
-    instructions[0x44] = u();                        // Unsupported NOP
+    instructions[0x42] = uKIL();
+    instructions[0x43] = uSRE(indirectXReadModifyWrite);
+    instructions[0x44] = uNOP(zeroPageRead);
     instructions[0x45] = EOR(zeroPageRead);
     instructions[0x46] = LSR(zeroPageReadModifyWrite);
-    instructions[0x47] = u();                        // Unsupported SRE
+    instructions[0x47] = uSRE(zeroPageReadModifyWrite);
     instructions[0x48] = PHA();
     instructions[0x49] = EOR(immediateRead);
     instructions[0x4a] = LSR_ACC();
-    instructions[0x4b] = u();                        // Unsupported ASR
+    instructions[0x4b] = uASR(immediateRead);
     instructions[0x4c] = JMP_ABS();
     instructions[0x4d] = EOR(absoluteRead);
     instructions[0x4e] = LSR(absoluteReadModifyWrite);
-    instructions[0x4f] = u();                        // Unsupported SRE
+    instructions[0x4f] = uSRE(absoluteReadModifyWrite);
 
-    instructions[0x50] = Bxx(bV, 0);             // BVC
+    instructions[0x50] = Bxx(bV, 0);                 // BVC
     instructions[0x51] = EOR(indirectYRead);
-    instructions[0x52] = u();                        // Unsupported KIL
-    instructions[0x53] = u();                        // Unsupported SRE
-    instructions[0x54] = u();                        // Unsupported NOP
+    instructions[0x52] = uKIL();
+    instructions[0x53] = uSRE(indirectYReadModifyWrite);
+    instructions[0x54] = uNOP(zeroPageIndexedRead(rX));
     instructions[0x55] = EOR(zeroPageIndexedRead(rX));
-    instructions[0x56] = LSR(zeroPageXReadModifyWrite);
-    instructions[0x57] = u();                        // Unsupported SRE
+    instructions[0x56] = LSR(zeroPageIndexedReadModifyWrite(rX));
+    instructions[0x57] = uSRE(zeroPageIndexedReadModifyWrite(rX));
     instructions[0x58] = CLI();
     instructions[0x59] = EOR(absoluteIndexedRead(rY));
-    instructions[0x5a] = u();                        // Unsupported NOP
-    instructions[0x5b] = u();                        // Unsupported SRE
-    instructions[0x5c] = u();                        // Unsupported NOP
+    instructions[0x5a] = uNOP(implied);
+    instructions[0x5b] = uSRE(absoluteIndexedReadModifyWrite(rY));
+    instructions[0x5c] = uNOP(absoluteIndexedRead(rX));
     instructions[0x5d] = EOR(absoluteIndexedRead(rX));
-    instructions[0x5e] = LSR(absoluteXReadModifyWrite);
-    instructions[0x5f] = u();                        // Unsupported SRE
+    instructions[0x5e] = LSR(absoluteIndexedReadModifyWrite(rX));
+    instructions[0x5f] = uSRE(absoluteIndexedReadModifyWrite(rX));
 
     instructions[0x60] = RTS();
     instructions[0x61] = ADC(indirectXRead);
-    instructions[0x62] = u();                        // Unsupported KIL
-    instructions[0x63] = u();                        // Unsupported RRA
-    instructions[0x64] = u();                        // Unsupported NOP
+    instructions[0x62] = uKIL();
+    instructions[0x63] = uRRA(indirectXReadModifyWrite);
+    instructions[0x64] = uNOP(zeroPageRead);
     instructions[0x65] = ADC(zeroPageRead);
     instructions[0x66] = ROR(zeroPageReadModifyWrite);
-    instructions[0x67] = u();                        // Unsupported RRA
+    instructions[0x67] = uRRA(zeroPageReadModifyWrite);
     instructions[0x68] = PLA();
     instructions[0x69] = ADC(immediateRead);
     instructions[0x6a] = ROR_ACC();
-    instructions[0x6b] = u();                        // Unsupported ARR
+    instructions[0x6b] = uARR(immediateRead);
     instructions[0x6c] = JMP_IND();
     instructions[0x6d] = ADC(absoluteRead);
     instructions[0x6e] = ROR(absoluteReadModifyWrite);
-    instructions[0x6f] = u();                        // Unsupported RRA
+    instructions[0x6f] = uRRA(absoluteReadModifyWrite);
 
-    instructions[0x70] = Bxx(bV, 1);             // BVS
+    instructions[0x70] = Bxx(bV, 1);                 // BVS
     instructions[0x71] = ADC(indirectYRead);
-    instructions[0x72] = u();                        // Unsupported KIL
-    instructions[0x73] = u();                        // Unsupported RRA
-    instructions[0x74] = u();                        // Unsupported NOP
+    instructions[0x72] = uKIL();
+    instructions[0x73] = uRRA(indirectYReadModifyWrite);
+    instructions[0x74] = uNOP(zeroPageIndexedRead(rX));
     instructions[0x75] = ADC(zeroPageIndexedRead(rX));
-    instructions[0x76] = ROR(zeroPageXReadModifyWrite);
-    instructions[0x77] = u();                        // Unsupported RRA
+    instructions[0x76] = ROR(zeroPageIndexedReadModifyWrite(rX));
+    instructions[0x77] = uRRA(zeroPageIndexedReadModifyWrite(rX));
     instructions[0x78] = SEI();
     instructions[0x79] = ADC(absoluteIndexedRead(rY));
-    instructions[0x7a] = u();                        // Unsupported NOP
-    instructions[0x7b] = u();                        // Unsupported RRA
-    instructions[0x7c] = u();                        // Unsupported NOP
+    instructions[0x7a] = uNOP(implied);
+    instructions[0x7b] = uRRA(absoluteIndexedReadModifyWrite(rY));
+    instructions[0x7c] = uNOP(absoluteIndexedRead(rX));
     instructions[0x7d] = ADC(absoluteIndexedRead(rX));
-    instructions[0x7e] = ROR(absoluteXReadModifyWrite);
-    instructions[0x7f] = u();                        // Unsupported SRE
+    instructions[0x7e] = ROR(absoluteIndexedReadModifyWrite(rX));
+    instructions[0x7f] = uRRA(absoluteIndexedReadModifyWrite(rX));
 
-    instructions[0x80] = u();                        // Unsupported NOP
+    instructions[0x80] = uNOP(immediateRead);
     instructions[0x81] = STA(indirectXWrite);
-    instructions[0x82] = u();                        // Unsupported NOP
-    instructions[0x83] = u();                        // Unsupported SAX
+    instructions[0x82] = uNOP(immediateRead);
+    instructions[0x83] = uSAX(indirectXWrite);
     instructions[0x84] = STY(zeroPageWrite);
     instructions[0x85] = STA(zeroPageWrite);
     instructions[0x86] = STX(zeroPageWrite);
-    instructions[0x87] = u();                        // Unsupported SAX
+    instructions[0x87] = uSAX(zeroPageWrite);
     instructions[0x88] = DEY();
-    instructions[0x89] = u();                        // Unsupported NOP
+    instructions[0x89] = uNOP(immediateRead);
     instructions[0x8a] = TXA();
-    instructions[0x8b] = u();                        // Unsupported ANE
+    instructions[0x8b] = uANE(immediateRead);
     instructions[0x8c] = STY(absoluteWrite);
     instructions[0x8d] = STA(absoluteWrite);
     instructions[0x8e] = STX(absoluteWrite);
-    instructions[0x8f] = u();                        // Unsupported SAX
+    instructions[0x8f] = uSAX(absoluteWrite);
 
-    instructions[0x90] = Bxx(bC, 0);             // BCC
+    instructions[0x90] = Bxx(bC, 0);                 // BCC
     instructions[0x91] = STA(indirectYWrite);
-    instructions[0x92] = u();                        // Unsupported KIL
-    instructions[0x93] = u();                        // Unsupported SHA
+    instructions[0x92] = uKIL();
+    instructions[0x93] = uSHA(indirectYWrite);
     instructions[0x94] = STY(zeroPageIndexedWrite(rX));
     instructions[0x95] = STA(zeroPageIndexedWrite(rX));
     instructions[0x96] = STX(zeroPageIndexedWrite(rY));
-    instructions[0x97] = u();                        // Unsupported SAX
+    instructions[0x97] = uSAX(zeroPageIndexedWrite(rY));
     instructions[0x98] = TYA();
     instructions[0x99] = STA(absoluteIndexedWrite(rY));
     instructions[0x9a] = TXS();
-    instructions[0x9b] = u();                        // Unsupported SHS
-    instructions[0x9c] = u();                        // Unsupported SHY
+    instructions[0x9b] = uSHS(absoluteIndexedWrite(rY));
+    instructions[0x9c] = uSHY(absoluteIndexedWrite(rX));
     instructions[0x9d] = STA(absoluteIndexedWrite(rX));
-    instructions[0x9e] = u();                        // Unsupported SHX
-    instructions[0x9f] = u();                        // Unsupported SHA
+    instructions[0x9e] = uSHX(absoluteIndexedWrite(rY));
+    instructions[0x9f] = uSHA(absoluteIndexedWrite(rY));
 
     instructions[0xa0] = LDY(immediateRead);
     instructions[0xa1] = LDA(indirectXRead);
     instructions[0xa2] = LDX(immediateRead);
-    instructions[0xa3] = u();                        // Unsupported LAX
+    instructions[0xa3] = uLAX(indirectXRead);
     instructions[0xa4] = LDY(zeroPageRead);
     instructions[0xa5] = LDA(zeroPageRead);
     instructions[0xa6] = LDX(zeroPageRead);
-    instructions[0xa7] = u();                        // Unsupported LAX
+    instructions[0xa7] = uLAX(zeroPageRead);
     instructions[0xa8] = TAY();
     instructions[0xa9] = LDA(immediateRead);
     instructions[0xaa] = TAX();
-    instructions[0xab] = u();                        // Unsupported LXA
+    instructions[0xab] = uLXA(immediateRead);
     instructions[0xac] = LDY(absoluteRead);
     instructions[0xad] = LDA(absoluteRead);
     instructions[0xae] = LDX(absoluteRead);
-    instructions[0xaf] = u();                        // Unsupported LAX
+    instructions[0xaf] = uLAX(absoluteRead);
 
-    instructions[0xb0] = Bxx(bC, 1);             // BCS
+    instructions[0xb0] = Bxx(bC, 1);                 // BCS
     instructions[0xb1] = LDA(indirectYRead);
-    instructions[0xb2] = u();                        // Unsupported KIL
-    instructions[0xb3] = u();                        // Unsupported LAX
+    instructions[0xb2] = uKIL();
+    instructions[0xb3] = uLAX(indirectYRead);
     instructions[0xb4] = LDY(zeroPageIndexedRead(rX));
     instructions[0xb5] = LDA(zeroPageIndexedRead(rX));
     instructions[0xb6] = LDX(zeroPageIndexedRead(rY));
-    instructions[0xb7] = u();                        // Unsupported LAX
+    instructions[0xb7] = uLAX(zeroPageIndexedRead(rY));
     instructions[0xb8] = CLV();
     instructions[0xb9] = LDA(absoluteIndexedRead(rY));
     instructions[0xba] = TSX();
-    instructions[0xbb] = u();                        // Unsupported LAS
+    instructions[0xbb] = uLAS(absoluteIndexedRead(rY));
     instructions[0xbc] = LDY(absoluteIndexedRead(rX));
     instructions[0xbd] = LDA(absoluteIndexedRead(rX));
     instructions[0xbe] = LDX(absoluteIndexedRead(rY));
-    instructions[0xbf] = u();                        // Unsupported LAX
+    instructions[0xbf] = uLAX(absoluteIndexedRead(rY));
 
     instructions[0xc0] = CPY(immediateRead);
     instructions[0xc1] = CMP(indirectXRead);
-    instructions[0xc2] = u();                        // Unsupported NOP
-    instructions[0xc3] = u();                        // Unsupported DCP
+    instructions[0xc2] = uNOP(immediateRead);
+    instructions[0xc3] = uDCP(indirectXReadModifyWrite);
     instructions[0xc4] = CPY(zeroPageRead);
     instructions[0xc5] = CMP(zeroPageRead);
     instructions[0xc6] = DEC(zeroPageReadModifyWrite);
-    instructions[0xc7] = u();                        // Unsupported DCP
+    instructions[0xc7] = uDCP(zeroPageReadModifyWrite);
     instructions[0xc8] = INY();
     instructions[0xc9] = CMP(immediateRead);
     instructions[0xca] = DEX();
-    instructions[0xcb] = u();                        // Unsupported SBX
+    instructions[0xcb] = uSBX(immediateRead);
     instructions[0xcc] = CPY(absoluteRead);
     instructions[0xcd] = CMP(absoluteRead);
     instructions[0xce] = DEC(absoluteReadModifyWrite);
-    instructions[0xcf] = u();                        // Unsupported DCP
+    instructions[0xcf] = uDCP(absoluteReadModifyWrite);
 
-    instructions[0xd0] = Bxx(bZ, 0);             // BNE
+    instructions[0xd0] = Bxx(bZ, 0);                 // BNE
     instructions[0xd1] = CMP(indirectYRead);
-    instructions[0xd2] = u();                        // Unsupported KIL
-    instructions[0xd3] = u();                        // Unsupported DCP
-    instructions[0xd4] = u();                        // Unsupported NOP
+    instructions[0xd2] = uKIL();
+    instructions[0xd3] = uDCP(indirectYReadModifyWrite);
+    instructions[0xd4] = uNOP(zeroPageIndexedRead(rX));
     instructions[0xd5] = CMP(zeroPageIndexedRead(rX));
-    instructions[0xd6] = DEC(zeroPageXReadModifyWrite);
-    instructions[0xd7] = u();                        // Unsupported DCP
+    instructions[0xd6] = DEC(zeroPageIndexedReadModifyWrite(rX));
+    instructions[0xd7] = uDCP(zeroPageIndexedReadModifyWrite(rX));
     instructions[0xd8] = CLD();
     instructions[0xd9] = CMP(absoluteIndexedRead(rY));
-    instructions[0xda] = u();                        // Unsupported NOP
-    instructions[0xdb] = u();                        // Unsupported DCP
-    instructions[0xdc] = u();                        // Unsupported NOP
+    instructions[0xda] = uNOP(implied);
+    instructions[0xdb] = uDCP(absoluteIndexedReadModifyWrite(rY));
+    instructions[0xdc] = uNOP(absoluteIndexedRead(rX));
     instructions[0xdd] = CMP(absoluteIndexedRead(rX));
-    instructions[0xde] = DEC(absoluteXReadModifyWrite);
-    instructions[0xdf] = u();                        // Unsupported LAX
+    instructions[0xde] = DEC(absoluteIndexedReadModifyWrite(rX));
+    instructions[0xdf] = uDCP(absoluteIndexedReadModifyWrite(rX));
 
     instructions[0xe0] = CPX(immediateRead);
     instructions[0xe1] = SBC(indirectXRead);
-    instructions[0xe2] = u();                        // Unsupported NOP
-    instructions[0xe3] = u();                        // Unsupported ISB
+    instructions[0xe2] = uNOP(immediateRead);
+    instructions[0xe3] = uISB(indirectXReadModifyWrite);
     instructions[0xe4] = CPX(zeroPageRead);
     instructions[0xe5] = SBC(zeroPageRead);
     instructions[0xe6] = INC(zeroPageReadModifyWrite);
-    instructions[0xe7] = u();                        // Unsupported ISB
+    instructions[0xe7] = uISB(zeroPageReadModifyWrite);
     instructions[0xe8] = INX();
     instructions[0xe9] = SBC(immediateRead);
     instructions[0xea] = NOP();
-    instructions[0xeb] = u();                        // Unsupported SBC
+    instructions[0xeb] = SBC(immediateRead);
     instructions[0xec] = CPX(absoluteRead);
     instructions[0xed] = SBC(absoluteRead);
     instructions[0xee] = INC(absoluteReadModifyWrite);
-    instructions[0xef] = u();                        // Unsupported ISB
+    instructions[0xef] = uISB(absoluteReadModifyWrite);
 
-    instructions[0xf0] = Bxx(bZ, 1);             // BEQ
+    instructions[0xf0] = Bxx(bZ, 1);                 // BEQ
     instructions[0xf1] = SBC(indirectYRead);
-    instructions[0xf2] = u();                        // Unsupported KIL
-    instructions[0xf3] = u();                        // Unsupported ISB
-    instructions[0xf4] = u();                        // Unsupported NOP
+    instructions[0xf2] = uKIL();
+    instructions[0xf3] = uISB(indirectYReadModifyWrite);
+    instructions[0xf4] = uNOP(zeroPageIndexedRead(rX));
     instructions[0xf5] = SBC(zeroPageIndexedRead(rX));
-    instructions[0xf6] = INC(zeroPageXReadModifyWrite);
-    instructions[0xf7] = u();                        // Unsupported ISB
+    instructions[0xf6] = INC(zeroPageIndexedReadModifyWrite(rX));
+    instructions[0xf7] = uISB(zeroPageIndexedReadModifyWrite(rX));
     instructions[0xf8] = SED();
     instructions[0xf9] = SBC(absoluteIndexedRead(rY));
-    instructions[0xfa] = u();                        // Unsupported NOP
-    instructions[0xfb] = u();                        // Unsupported ISB
-    instructions[0xfc] = u();                        // Unsupported NOP
+    instructions[0xfa] = uNOP(implied);
+    instructions[0xfb] = uISB(absoluteIndexedReadModifyWrite(rY));
+    instructions[0xfc] = uNOP(absoluteIndexedRead(rX));
     instructions[0xfd] = SBC(absoluteIndexedRead(rX));
-    instructions[0xfe] = INC(absoluteXReadModifyWrite);
-    instructions[0xff] = u();                        // Unsupported ISB
+    instructions[0xfe] = INC(absoluteIndexedReadModifyWrite(rX));
+    instructions[0xff] = uISB(absoluteIndexedReadModifyWrite(rX));
 
 
     // Single Byte instructions
@@ -1033,6 +1089,23 @@ function M6502() {
         });
     }
 
+    function uKIL() {
+        return [
+            fetchOpcodeAndDecodeInstruction,
+            function() {
+                illegalOpcode("KIL/HLT/JAM");
+                T--;        // Causes the processor to be stuck in this instruction forever
+            }
+        ];
+    }
+
+    function uNOP(addressing) {
+        return addressing(function() {
+            illegalOpcode("NOP/DOP");
+            // nothing
+        });
+    }
+
 
     // Internal Execution on Memory Data
 
@@ -1170,6 +1243,101 @@ function M6502() {
         });
     }
 
+    function uANC(addressing) {
+        return addressing(function() {
+            illegalOpcode("ANC");
+            A &= data;
+            setZ(A);
+            N = C = (A & 0x080) ? 1 : 0;
+        });
+    }
+
+    function uANE(addressing) {
+        return addressing(function() {
+            illegalOpcode("ANE");
+            // Exact operation unknown. Do nothing
+        });
+    }
+
+    function uARR(addressing) {
+        // Some sources say flags are affected per ROR, others say its more complex. The complex one is chosen
+        return addressing(function() {
+            illegalOpcode("ARR");
+            var val = A & data;
+            var oldC = C ? 0x80 : 0;
+            val = (val >>> 1) | oldC;
+            A = val;
+            setZ(val);
+            setN(val);
+            var comp = A & 0x60;
+            if (comp == 0x60) 		{ C = 1; V = 0; }
+            else if (comp == 0x00) 	{ C = 0; V = 0; }
+            else if (comp == 0x20) 	{ C = 0; V = 1; }
+            else if (comp == 0x40) 	{ C = 1; V = 1; }
+        });
+    }
+
+    function uASR(addressing) {
+        return addressing(function() {
+            illegalOpcode("ASR");
+            var val = A & data;
+            C = (val & 0x01);		// bit 0
+            val = val >>> 1;
+            A = val;
+            setZ(val);
+            N = 0;
+        });
+    }
+
+    function uLAS(addressing) {
+        return addressing(function() {
+            illegalOpcode("LAS");
+            var val = SP & data;
+            A = val;
+            X = val;
+            SP = val;
+            setZ(val);
+            setN(val);
+        });
+    }
+
+    function uLAX(addressing) {
+        return addressing(function() {
+            illegalOpcode("LAX");
+            var val = data;
+            A = val;
+            X = val;
+            setZ(val);
+            setN(val);
+        });
+    }
+
+    function uLXA(addressing) {
+        return addressing(function() {
+            // Some sources say its an OR with $EE then AND with IMM, others exclude the OR,
+            // others exclude both the OR and the AND. Excluding just the OR...
+            illegalOpcode("LXA");
+            var val = A /* | 0xEE) */ & data;
+            A = val;
+            X = val;
+            setZ(val);
+            setN(val);
+        });
+    }
+
+    function uSBX(addressing) {
+        return addressing(function() {
+            illegalOpcode("SBX");
+            var par = A & X;
+            var val = data;
+            var newX = (par - val) & 255;
+            X = newX;
+            setC(par >= val);
+            setZ(newX);
+            setN(newX);
+        });
+    }
+
 
     // Store operations
 
@@ -1188,6 +1356,48 @@ function M6502() {
     function STY(addressing) {
         return addressing(function() {
             data = Y;
+        });
+    }
+
+    function uSAX(addressing) {
+        return addressing(function() {
+            // Some sources say it would affect N and Z flags, some say it wouldn't. Chose not to affect
+            illegalOpcode("SAX");
+            data = A & X;
+        });
+    }
+
+    function uSHA(addressing) {
+        return addressing(function() {
+            illegalOpcode("SHA");
+            data = A & X & ((BA >>> 8) + 1) & 255; // A & X & (High byte of effective address + 1) !!!
+            // data would also be stored BAH if page boundary is crossed. Unobservable, not needed here
+        });
+    }
+
+    function uSHS(addressing) {
+        return addressing(function() {
+            illegalOpcode("SHS");
+            var val = A & X;
+            SP = val;
+            data = val & ((BA >>> 8) + 1) & 255; // A & X & (High byte of effective address + 1) !!!
+            // data would also be stored BAH if page boundary is crossed. Unobservable, not needed here
+        });
+    }
+
+    function uSHX(addressing) {
+        return addressing(function() {
+            illegalOpcode("SHX");
+            data = X & ((BA >>> 8) + 1) & 255; // X & (High byte of effective address + 1) !!!
+            // data would also be stored BAH if page boundary is crossed. Unobservable, not needed here
+        });
+    }
+
+    function uSHY(addressing) {
+        return addressing(function() {
+            illegalOpcode("SHY");
+            data = Y & ((BA >>> 8) + 1) & 255; // Y & (High byte of effective address + 1) !!!
+            // data would also be stored BAH if page boundary is crossed. Unobservable, not needed here
         });
     }
 
@@ -1250,6 +1460,119 @@ function M6502() {
             setC(newC);
             setZ(par);
             setN(par);
+        });
+    }
+
+    function uDCP(addressing) {
+        return addressing(function() {
+            illegalOpcode("DCP");
+            var par = (data - 1) & 255;
+            data = par;
+            par = A - par;
+            setC(par >= 0);
+            setZ(par);
+            setN(par);
+        });
+    }
+
+    function uISB(addressing) {
+        return addressing(function() {
+            illegalOpcode("ISB");
+            data = (data + 1) & 255;    // ISB is the same as SBC but incs the operand first
+            if (D) {
+                var operand = data;
+                var AL = (A & 15) - (operand & 15) - (1-C);
+                var AH = (A >> 4) - (operand >> 4) - (AL < 0);
+                if (AL < 0) { AL -= 6; }
+                if (AH < 0) { AH -= 6; }
+                var sub = A - operand - (1-C);
+                setC(~sub & 256);
+                setV(((A ^ operand) & (A ^ sub)) & 128);
+                setZ(sub & 255);
+                setN(sub);
+                A = ((AH << 4) | (AL & 15)) & 255;
+            } else {
+                operand = (~data) & 255;
+                sub = A + operand + C;
+                setC(sub > 255);
+                setV(((A ^ sub) & (operand ^ sub) & 0x80));
+                A = sub & 255;
+                setZ(A);
+                setN(A);
+            }
+        });
+    }
+
+    function uRLA(addressing) {
+        return addressing(function() {
+            illegalOpcode("RLA");
+            var val = data;
+            var oldC = C;
+            setC(val & 0x80);		// bit 7 was set
+            val = ((val << 1) | oldC) & 255;
+            data = val;
+            A &= val;
+            setZ(val);              // TODO Verify. May be A instead of val in the flags setting
+            setN(val);
+        });
+    }
+
+    function uRRA(addressing) {
+        return addressing(function() {
+            illegalOpcode("RRA");
+            var val = data;
+            var oldC = C ? 0x80 : 0;
+            setC(val & 0x01);		// bit 0 was set
+            val = (val >>> 1) | oldC;
+            data = val;
+            // RRA is the same as ADC from here
+            if (D) {
+                var operand = data;
+                var AL = (A & 15) + (operand & 15) + C;
+                if (AL > 9) { AL += 6; }
+                var AH = ((A >> 4) + (operand >> 4) + (AL > 15)) << 4;
+                setZ((A + operand + C) & 255);
+                setN(AH);
+                setV(((A ^AH) & ~(A ^ operand)) & 128);
+                if (AH > 0x9f) { AH += 0x60; }
+                setC(AH > 255);
+                A = (AH | (AL & 15)) & 255;
+            } else {
+                var add = A + data + C;
+                setC(add > 255);
+                setV(((A ^ add) & (data ^ add)) & 0x80);
+                A = add & 255;
+                setZ(A);
+                setN(A);
+            }
+        });
+    }
+
+    function uSLO(addressing) {
+        return addressing(function() {
+            illegalOpcode("SLO");
+            var val = data;
+            setC(val & 0x80);		// bit 7 was set
+            val = (val << 1) & 255;
+            data = val;
+            val = A | val;
+            A = val;
+            setZ(val);
+            setN(val);
+        });
+    }
+
+    function uSRE(addressing) {
+        return addressing(function() {
+            illegalOpcode("SRE");
+            var val = data;
+            setC(val & 0x01);		// bit 0 was set
+            val = val >>> 1;
+            data = val;
+            val = (A ^ val) & 255;
+            A = val;
+            setZ(val);
+            setN(val);
         });
     }
 
@@ -1362,7 +1685,7 @@ function M6502() {
     function JMP_IND() {
         return [
             fetchOpcodeAndDecodeInstruction,
-            fetchIAL,
+            fetchIAL,                           // IAH will be zero
             fetchIAH,
             fetchBALFromIA,
             function() {
@@ -1374,17 +1697,11 @@ function M6502() {
     }
 
     function Bxx(reg, cond) {
-        function branchTaken() {
-            if (reg === bZ) {
-                return Z === cond;
-            } else if (reg === bN) {
-                return N === cond;
-            } else if (reg === bC) {
-                return C === cond;
-            } else {
-                return V === cond;
-            }
-        }
+        var branchTaken;
+        if      (reg === bZ) branchTaken = function() { return Z === cond; };
+        else if (reg === bN) branchTaken = function() { return N === cond; };
+        else if (reg === bC) branchTaken = function() { return C === cond; };
+        else                 branchTaken = function() { return V === cond; };
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchBranchOffset,
@@ -1405,15 +1722,6 @@ function M6502() {
                 }
             },
             fetchNextOpcode
-        ];
-    }
-
-    // Special instructions
-
-    function u() {
-        return [
-            fetchOpcodeAndDecodeInstruction,
-            illegalOpcode
         ];
     }
 
