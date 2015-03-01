@@ -4,6 +4,10 @@
 
 Util = new function() {
 
+    this.log = function(str) {
+        console.log(">> javatari: " + str);
+    };
+
      this.arrayFill = function(arr, val) {
         var i = arr.length;
         while(i--)
@@ -48,13 +52,6 @@ Util = new function() {
         var i = arr.indexOf(element);
         if (i < 0) return;
         arr.splice(i, 1);
-    };
-
-    this.arrayForIn = function(arr, func) {
-        var len = arr.length;
-        for (var i = 0; i < len; i++)
-            if (arr[i] != undefined)
-                func(arr[i]);
     };
 
     this.booleanArrayToByteString = function(boos) {

@@ -62,6 +62,36 @@ CartridgeFormats = {
         createCartridgeFromSaveState: function(state) {
             return CartridgeBankedByMaskedRange.createFromSaveState(state);
         }
+    },
+
+    "3E": {
+        name: "3E",
+        desc: "8K-512K Tigervision (+RAM)",
+        priority: 111,
+        tryFormat: function(rom) {
+            if (rom.content.length % 2048 === 0 && rom.content.length <= 256 * 2048) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge8K_512K_3E(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge8K_512K_3E.createFromSaveState(state);
+        }
+    },
+
+    "3F": {
+        name: "3F",
+        desc: "8K-512K Tigervision",
+        priority: 112,
+        tryFormat: function(rom) {
+            if (rom.content.length % 2048 === 0 && rom.content.length <= 256 * 2048) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge8K_512K_3F(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge8K_512K_3F.createFromSaveState(state);
+        }
     }
 
 };

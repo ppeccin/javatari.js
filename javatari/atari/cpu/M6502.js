@@ -241,15 +241,15 @@ function M6502() {
 
     var popFromStack = function() {
         SP = (SP + 1) & 255;
-        return bus.read(SP);
+        return bus.read(0x0100 + SP);
     };
 
     var peekFromStack = function() {
-        return bus.read(SP);
+        return bus.read(0x0100 + SP);
     };
 
     var pushToStack = function(val) {
-        bus.write(SP, val);
+        bus.write(0x0100 + SP, val);
         SP = (SP - 1) & 255;
     };
 
@@ -265,7 +265,7 @@ function M6502() {
 
     var illegalOpcode = function(op) {
         if (self.debug) {
-            console.log("Illegal Opcode: " + op);
+            Util.log("Illegal Opcode: " + op);
             self.breakpoint("Illegal Opcode: " + op);
         }
     };

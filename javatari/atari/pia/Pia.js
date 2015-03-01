@@ -80,7 +80,7 @@ function Pia() {
 
     var debugInfo = function(str) {
         if (self.debug)
-            console.log(str);
+            Util.log(str);
     };
 
 

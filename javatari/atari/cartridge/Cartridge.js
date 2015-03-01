@@ -20,6 +20,17 @@ function Cartridge() {
     };
 
     this.write = function(address, val) {
+        // Writing to ROMs is possible, but nothing is changed
+    };
+
+    this.needsBusMonitoring = function() {
+        return false;
+    };
+
+    this.monitorBusBeforeRead = function(address, data)  {
+    };
+
+    this.monitorBusBeforeWrite = function(address, val)  {
     };
 
     this.setROM = function(rom) {
@@ -50,3 +61,5 @@ function Cartridge() {
     this.rom = null;
 
 }
+
+Cartridge.base = new Cartridge();

@@ -45,7 +45,7 @@ function TiaAudioSignal() {
     };
 
     this.retrieveSamples = function(quant) {
-        // console.log(">>> Samples generated: " + (generatedSamples - retrievedSamples));
+        // Util.log(">>> Samples generated: " + (generatedSamples - retrievedSamples));
 
         var missing = generatedSamples >= retrievedSamples
             ? quant - (generatedSamples - retrievedSamples)
@@ -53,9 +53,9 @@ function TiaAudioSignal() {
 
         if (missing > 0) {
             generateNextSamples(missing);
-            //console.log(">>> Extra samples generated: " + missing);
+            //Util.log(">>> Extra samples generated: " + missing);
         } else {
-            //console.log(">>> No missing samples");
+            //Util.log(">>> No missing samples");
         }
 
         var end = retrievedSamples + quant;

@@ -42,6 +42,7 @@ function Bus(pCpu, pTia, pPia, pRam) {
             data = 0;
             cartridge.connectBus(this);
         }
+        cartridgeNeedsBusMonitoring = cartridge && cartridge.needsBusMonitoring();
     };
 
     this.getCartridge = function() {
@@ -54,7 +55,7 @@ function Bus(pCpu, pTia, pPia, pRam) {
 
     this.read = function(address) {
         // CART Bus monitoring
-        //if (cartridgeNeedsBusMonitoring) cartridge.monitorBusBeforeRead(address, data);
+        if (cartridgeNeedsBusMonitoring) cartridge.monitorBusBeforeRead(address, data);
 
         if ((address & CART_MASK) === CART_SELECT) {
             if (cartridge) data = cartridge.read(address);
@@ -72,7 +73,7 @@ function Bus(pCpu, pTia, pPia, pRam) {
 
     this.write = function(address, val) {
         // CART Bus monitoring
-        //if (cartridgeNeedsBusMonitoring) cartridge.monitorBusBeforeWrite(address, val);
+        if (cartridgeNeedsBusMonitoring) cartridge.monitorBusBeforeWrite(address, val);
 
         data = val;
 
@@ -88,6 +89,7 @@ function Bus(pCpu, pTia, pPia, pRam) {
     var pia;
     var ram;
     var cartridge;
+    var cartridgeNeedsBusMonitoring = false;
 
     var data = 0;
 

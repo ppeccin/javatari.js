@@ -11,7 +11,7 @@ function CartridgeDatabase() {
 
         // Choose the best option
         var bestOption = options[0];
-        console.log(">>> " + bestOption.name + ": " + bestOption.desc + ", priority: " + bestOption.priority);
+        Util.log("" + bestOption.name + ": " + bestOption.desc + ", priority: " + bestOption.priority);
         return bestOption.createCartridgeFromRom(rom);
     };
 
@@ -34,10 +34,10 @@ function CartridgeDatabase() {
         // Get info from the library
         var info = CartridgeInfoLibrary[hash];
         if (info) {
-            console.log(">>> " + info.n);
+            Util.log("" + info.n);
         } else {
             info = produceInfo(rom.source);
-            console.log(">>> Unknown ROM: " + info.n);
+            Util.log("Unknown ROM: " + info.n);
         }
 
         finishInfo(info, rom.source);

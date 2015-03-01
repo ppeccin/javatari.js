@@ -96,7 +96,7 @@ function Monitor() {
 
     var maxLineExceeded = function() {
         if (line > signalHeight + VSYNC_TOLERANCE + EXTRA_UPPER_VSYNC_TOLERANCE) {
-            //if (debug > 0) console.log("Display maximum scanlines exceeded: " + line);
+            //if (debug > 0) Util.log("Display maximum scanlines exceeded: " + line);
             return newFrame();
         }
         return false;

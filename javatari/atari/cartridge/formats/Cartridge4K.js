@@ -19,10 +19,6 @@ function Cartridge4K(rom, format) {
         return bytes[address & ADDRESS_MASK];
     };
 
-    this.write = function(address, val) {
-        console.log(">>> Trying to write into cartridge: " + address.toString(16) + "  " + val);
-    };
-
 
     // Savestate  -------------------------------------------
 
@@ -52,7 +48,7 @@ function Cartridge4K(rom, format) {
 
 }
 
-Cartridge4K.prototype = new Cartridge();
+Cartridge4K.prototype = Cartridge.base;
 
 Cartridge4K.createFromSaveState = function(state) {
     var cart = new Cartridge4K();

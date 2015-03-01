@@ -488,7 +488,7 @@ function AtariConsole() {
     this.startProfiling = function() {
         var lastFrameCount = this.framesGenerated;
         setInterval(function() {
-            console.log(self.framesGenerated - lastFrameCount);
+            Util.log(self.framesGenerated - lastFrameCount);
             lastFrameCount = self.framesGenerated;
         }, 1000);
     };
@@ -499,8 +499,8 @@ function AtariConsole() {
         for (var i = 0; i < frames; i++)
             self.clockPulse();
         var duration = performance.now() - start;
-        console.log("Done running " + frames + " in " + duration + " ms");
-        console.log(frames / (duration/1000) + "frames/sec");
+        Util.log("Done running " + frames + " in " + duration + " ms");
+        Util.log(frames / (duration/1000) + "frames/sec");
         go();
     };
 

@@ -86,7 +86,7 @@ function CanvasDisplay(mainElement) {
     };
 
     this.showOSD = function(message, overlap) {
-        //console.log(message);
+        //Util.log(message);
         if (osdTimeout) clearTimeout(osdTimeout);
         if (!message) {
             osd.style.transition = "all 0.15s linear";

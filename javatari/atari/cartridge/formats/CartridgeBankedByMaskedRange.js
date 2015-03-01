@@ -76,12 +76,12 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
         this.format = CartridgeFormats[state.f];
         this.rom = ROM.loadState(state.r);
         bytes = Util.byteStringToUInt8Array(atob(state.b));
-        bankAddressOffset =  state.bo;
+        bankAddressOffset = state.bo;
         baseBankSwitchAddress = state.bb;
         extraRAMSize = state.es;
         topBankSwitchAddress =  state.tb;
-        superChipMode =  !!state.s;
-        superChipAutoDetect =  !!state.sa;
+        superChipMode = !!state.s;
+        superChipAutoDetect = !!state.sa;
         extraRAM = Util.byteStringToUInt8Array(atob(state.e));
     };
 
@@ -104,7 +104,7 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
 
 }
 
-CartridgeBankedByMaskedRange.prototype = new Cartridge();
+CartridgeBankedByMaskedRange.prototype = Cartridge.base;
 
 CartridgeBankedByMaskedRange.createFromSaveState = function(state) {
     var cart = new CartridgeBankedByMaskedRange();

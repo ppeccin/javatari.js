@@ -907,7 +907,7 @@ function Tia(pCpu, pPia) {
     };
 
     var debugInfo = function(str) {
-        if (debug) console.log("Line: " + videoSignal.monitor.currentLine() +", Pixel: " + clock + ". " + str);
+        if (debug) Util.log("Line: " + videoSignal.monitor.currentLine() +", Pixel: " + clock + ". " + str);
     };
 
 

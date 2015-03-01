@@ -37,7 +37,7 @@ function ROMLoader() {
     };
 
     this.loadFromFile = function (file) {
-        console.log(">>> Reading ROM file: " + file.name);
+        Util.log("Reading ROM file: " + file.name);
         var reader = new FileReader();
         reader.onload = function (event) {
             var content = new Uint8Array(event.target.result);
@@ -51,7 +51,7 @@ function ROMLoader() {
     };
 
     this.loadFromURL = function (url) {
-        console.log(">>> Reading ROM from URL: " + url);
+        Util.log("Reading ROM from URL: " + url);
 
         var req = new XMLHttpRequest();
         req.withCredentials = true;
@@ -134,7 +134,7 @@ function ROMLoader() {
             Util.arrayCopy(content, 0, arrContent, 0, arrContent.length);
             // Frist try to load as a SaveState file
             if (saveStateSocket.loadStateFile(arrContent)) {
-                console.log(">>> SaveState file loaded");
+                Util.log("SaveState file loaded");
                 return;
             }
             // Then try to load as a normal, uncompressed ROM
@@ -143,7 +143,7 @@ function ROMLoader() {
             if (cartridgeSocket) cartridgeSocket.insert(cart, autoPower);
         } catch(e) {
             if (!e.javatari) {
-                console.log(e.stack);
+                Util.log(e.stack);
                 throw e;
             }
 
@@ -153,7 +153,7 @@ function ROMLoader() {
                 var files = zip.file(ZIP_INNER_FILES_PATTERN);
                 for (var i = 0; i < files.length; i++) {
                     var file = files[i];
-                    console.log(">>> Trying zip file content: " + file.name);
+                    Util.log("Trying zip file content: " + file.name);
                     try {
                         var cont = file.asUint8Array();
                         arrContent = new Array(cont.length);
@@ -175,7 +175,7 @@ function ROMLoader() {
     };
 
     var showError = function(message) {
-        console.log(">>> " + message);
+        Util.log("" + message);
         window.alert("Could not load ROM:\n\n" + message);
     };
 
