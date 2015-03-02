@@ -2,12 +2,13 @@
  * Created by ppeccin on 20/11/2014.
  */
 
+// Implements the 4K unbanked format. Smaller ROMs will be copied multiple times to fill the entire 4K
+
 function Cartridge4K(rom, format) {
 
     function init(self) {
         self.rom = rom;
         self.format = format;
-
         // Always use a 4K ROM image, multiplying the ROM internally
         bytes = new Array(SIZE);
         var len = rom.content.length;

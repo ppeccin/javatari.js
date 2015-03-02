@@ -98,7 +98,8 @@ function M6502() {
         opcode = bus.read(PC);
         instruction = instructions[opcode];
         T = 0;
-        //if (self.trace) { self.breakpoint(); }
+        // if (self.trace) { self.breakpoint(); }
+        // console.log(opcodes[opcode]);
         PC++;
     };
 
@@ -264,10 +265,7 @@ function M6502() {
     };
 
     var illegalOpcode = function(op) {
-        if (self.debug) {
-            Util.log("Illegal Opcode: " + op);
-            self.breakpoint("Illegal Opcode: " + op);
-        }
+        if (self.debug) self.breakpoint("Illegal Opcode: " + op);
     };
 
 
@@ -648,279 +646,265 @@ function M6502() {
     // Instructions  ========================================================================================
 
     // Complete instruction set
+    var opcodes =      new Array(256);
     var instructions = new Array(256);
 
-    instructions[0x00] = BRK();
-    instructions[0x01] = ORA(indirectXRead);
-    instructions[0x02] = uKIL();
-    instructions[0x03] = uSLO(indirectXReadModifyWrite);
-    instructions[0x04] = uNOP(zeroPageRead);
-    instructions[0x05] = ORA(zeroPageRead);
-    instructions[0x06] = ASL(zeroPageReadModifyWrite);
-    instructions[0x07] = uSLO(zeroPageReadModifyWrite);
-    instructions[0x08] = PHP();
-    instructions[0x09] = ORA(immediateRead);
-    instructions[0x0a] = ASL_ACC();
-    instructions[0x0b] = uANC(immediateRead);
-    instructions[0x0c] = uNOP(absoluteRead);
-    instructions[0x0d] = ORA(absoluteRead);
-    instructions[0x0e] = ASL(absoluteReadModifyWrite);
-    instructions[0x0f] = uSLO(absoluteReadModifyWrite);
-
-    instructions[0x10] = Bxx(bN, 0);                 // BPL
-    instructions[0x11] = ORA(indirectYRead);
-    instructions[0x12] = uKIL();
-    instructions[0x13] = uSLO(indirectYReadModifyWrite);
-    instructions[0x14] = uNOP(zeroPageIndexedRead(rX));
-    instructions[0x15] = ORA(zeroPageIndexedRead(rX));
-    instructions[0x16] = ASL(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0x17] = uSLO(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0x18] = CLC();
-    instructions[0x19] = ORA(absoluteIndexedRead(rY));
-    instructions[0x1a] = uNOP(implied);
-    instructions[0x1b] = uSLO(absoluteIndexedReadModifyWrite(rY));
-    instructions[0x1c] = uNOP(absoluteIndexedRead(rX));
-    instructions[0x1d] = ORA(absoluteIndexedRead(rX));
-    instructions[0x1e] = ASL(absoluteIndexedReadModifyWrite(rX));
-    instructions[0x1f] = uSLO(absoluteIndexedReadModifyWrite(rX));
-
-    instructions[0x20] = JSR();
-    instructions[0x21] = AND(indirectXRead);
-    instructions[0x22] = uKIL();
-    instructions[0x23] = uRLA(indirectXReadModifyWrite);
-    instructions[0x24] = BIT(zeroPageRead);
-    instructions[0x25] = AND(zeroPageRead);
-    instructions[0x26] = ROL(zeroPageReadModifyWrite);
-    instructions[0x27] = uRLA(zeroPageReadModifyWrite);
-    instructions[0x28] = PLP();
-    instructions[0x29] = AND(immediateRead);
-    instructions[0x2a] = ROL_ACC();
-    instructions[0x2b] = uANC(immediateRead);
-    instructions[0x2c] = BIT(absoluteRead);
-    instructions[0x2d] = AND(absoluteRead);
-    instructions[0x2e] = ROL(absoluteReadModifyWrite);
-    instructions[0x2f] = uRLA(absoluteReadModifyWrite);
-
-    instructions[0x30] = Bxx(bN, 1);                 // BMI
-    instructions[0x31] = AND(indirectYRead);
-    instructions[0x32] = uKIL();
-    instructions[0x33] = uRLA(indirectYReadModifyWrite);
-    instructions[0x34] = uNOP(zeroPageIndexedRead(rX));
-    instructions[0x35] = AND(zeroPageIndexedRead(rX));
-    instructions[0x36] = ROL(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0x37] = uRLA(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0x38] = SEC();
-    instructions[0x39] = AND(absoluteIndexedRead(rY));
-    instructions[0x3a] = uNOP(implied);
-    instructions[0x3b] = uRLA(absoluteIndexedReadModifyWrite(rY));
-    instructions[0x3c] = uNOP(absoluteIndexedRead(rX));
-    instructions[0x3d] = AND(absoluteIndexedRead(rX));
-    instructions[0x3e] = ROL(absoluteIndexedReadModifyWrite(rX));
-    instructions[0x3f] = uRLA(absoluteIndexedReadModifyWrite(rX));
-
-    instructions[0x40] = RTI();
-    instructions[0x41] = EOR(indirectXRead);
-    instructions[0x42] = uKIL();
-    instructions[0x43] = uSRE(indirectXReadModifyWrite);
-    instructions[0x44] = uNOP(zeroPageRead);
-    instructions[0x45] = EOR(zeroPageRead);
-    instructions[0x46] = LSR(zeroPageReadModifyWrite);
-    instructions[0x47] = uSRE(zeroPageReadModifyWrite);
-    instructions[0x48] = PHA();
-    instructions[0x49] = EOR(immediateRead);
-    instructions[0x4a] = LSR_ACC();
-    instructions[0x4b] = uASR(immediateRead);
-    instructions[0x4c] = JMP_ABS();
-    instructions[0x4d] = EOR(absoluteRead);
-    instructions[0x4e] = LSR(absoluteReadModifyWrite);
-    instructions[0x4f] = uSRE(absoluteReadModifyWrite);
-
-    instructions[0x50] = Bxx(bV, 0);                 // BVC
-    instructions[0x51] = EOR(indirectYRead);
-    instructions[0x52] = uKIL();
-    instructions[0x53] = uSRE(indirectYReadModifyWrite);
-    instructions[0x54] = uNOP(zeroPageIndexedRead(rX));
-    instructions[0x55] = EOR(zeroPageIndexedRead(rX));
-    instructions[0x56] = LSR(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0x57] = uSRE(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0x58] = CLI();
-    instructions[0x59] = EOR(absoluteIndexedRead(rY));
-    instructions[0x5a] = uNOP(implied);
-    instructions[0x5b] = uSRE(absoluteIndexedReadModifyWrite(rY));
-    instructions[0x5c] = uNOP(absoluteIndexedRead(rX));
-    instructions[0x5d] = EOR(absoluteIndexedRead(rX));
-    instructions[0x5e] = LSR(absoluteIndexedReadModifyWrite(rX));
-    instructions[0x5f] = uSRE(absoluteIndexedReadModifyWrite(rX));
-
-    instructions[0x60] = RTS();
-    instructions[0x61] = ADC(indirectXRead);
-    instructions[0x62] = uKIL();
-    instructions[0x63] = uRRA(indirectXReadModifyWrite);
-    instructions[0x64] = uNOP(zeroPageRead);
-    instructions[0x65] = ADC(zeroPageRead);
-    instructions[0x66] = ROR(zeroPageReadModifyWrite);
-    instructions[0x67] = uRRA(zeroPageReadModifyWrite);
-    instructions[0x68] = PLA();
-    instructions[0x69] = ADC(immediateRead);
-    instructions[0x6a] = ROR_ACC();
-    instructions[0x6b] = uARR(immediateRead);
-    instructions[0x6c] = JMP_IND();
-    instructions[0x6d] = ADC(absoluteRead);
-    instructions[0x6e] = ROR(absoluteReadModifyWrite);
-    instructions[0x6f] = uRRA(absoluteReadModifyWrite);
-
-    instructions[0x70] = Bxx(bV, 1);                 // BVS
-    instructions[0x71] = ADC(indirectYRead);
-    instructions[0x72] = uKIL();
-    instructions[0x73] = uRRA(indirectYReadModifyWrite);
-    instructions[0x74] = uNOP(zeroPageIndexedRead(rX));
-    instructions[0x75] = ADC(zeroPageIndexedRead(rX));
-    instructions[0x76] = ROR(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0x77] = uRRA(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0x78] = SEI();
-    instructions[0x79] = ADC(absoluteIndexedRead(rY));
-    instructions[0x7a] = uNOP(implied);
-    instructions[0x7b] = uRRA(absoluteIndexedReadModifyWrite(rY));
-    instructions[0x7c] = uNOP(absoluteIndexedRead(rX));
-    instructions[0x7d] = ADC(absoluteIndexedRead(rX));
-    instructions[0x7e] = ROR(absoluteIndexedReadModifyWrite(rX));
-    instructions[0x7f] = uRRA(absoluteIndexedReadModifyWrite(rX));
-
-    instructions[0x80] = uNOP(immediateRead);
-    instructions[0x81] = STA(indirectXWrite);
-    instructions[0x82] = uNOP(immediateRead);
-    instructions[0x83] = uSAX(indirectXWrite);
-    instructions[0x84] = STY(zeroPageWrite);
-    instructions[0x85] = STA(zeroPageWrite);
-    instructions[0x86] = STX(zeroPageWrite);
-    instructions[0x87] = uSAX(zeroPageWrite);
-    instructions[0x88] = DEY();
-    instructions[0x89] = uNOP(immediateRead);
-    instructions[0x8a] = TXA();
-    instructions[0x8b] = uANE(immediateRead);
-    instructions[0x8c] = STY(absoluteWrite);
-    instructions[0x8d] = STA(absoluteWrite);
-    instructions[0x8e] = STX(absoluteWrite);
-    instructions[0x8f] = uSAX(absoluteWrite);
-
-    instructions[0x90] = Bxx(bC, 0);                 // BCC
-    instructions[0x91] = STA(indirectYWrite);
-    instructions[0x92] = uKIL();
-    instructions[0x93] = uSHA(indirectYWrite);
-    instructions[0x94] = STY(zeroPageIndexedWrite(rX));
-    instructions[0x95] = STA(zeroPageIndexedWrite(rX));
-    instructions[0x96] = STX(zeroPageIndexedWrite(rY));
-    instructions[0x97] = uSAX(zeroPageIndexedWrite(rY));
-    instructions[0x98] = TYA();
-    instructions[0x99] = STA(absoluteIndexedWrite(rY));
-    instructions[0x9a] = TXS();
-    instructions[0x9b] = uSHS(absoluteIndexedWrite(rY));
-    instructions[0x9c] = uSHY(absoluteIndexedWrite(rX));
-    instructions[0x9d] = STA(absoluteIndexedWrite(rX));
-    instructions[0x9e] = uSHX(absoluteIndexedWrite(rY));
-    instructions[0x9f] = uSHA(absoluteIndexedWrite(rY));
-
-    instructions[0xa0] = LDY(immediateRead);
-    instructions[0xa1] = LDA(indirectXRead);
-    instructions[0xa2] = LDX(immediateRead);
-    instructions[0xa3] = uLAX(indirectXRead);
-    instructions[0xa4] = LDY(zeroPageRead);
-    instructions[0xa5] = LDA(zeroPageRead);
-    instructions[0xa6] = LDX(zeroPageRead);
-    instructions[0xa7] = uLAX(zeroPageRead);
-    instructions[0xa8] = TAY();
-    instructions[0xa9] = LDA(immediateRead);
-    instructions[0xaa] = TAX();
-    instructions[0xab] = uLXA(immediateRead);
-    instructions[0xac] = LDY(absoluteRead);
-    instructions[0xad] = LDA(absoluteRead);
-    instructions[0xae] = LDX(absoluteRead);
-    instructions[0xaf] = uLAX(absoluteRead);
-
-    instructions[0xb0] = Bxx(bC, 1);                 // BCS
-    instructions[0xb1] = LDA(indirectYRead);
-    instructions[0xb2] = uKIL();
-    instructions[0xb3] = uLAX(indirectYRead);
-    instructions[0xb4] = LDY(zeroPageIndexedRead(rX));
-    instructions[0xb5] = LDA(zeroPageIndexedRead(rX));
-    instructions[0xb6] = LDX(zeroPageIndexedRead(rY));
-    instructions[0xb7] = uLAX(zeroPageIndexedRead(rY));
-    instructions[0xb8] = CLV();
-    instructions[0xb9] = LDA(absoluteIndexedRead(rY));
-    instructions[0xba] = TSX();
-    instructions[0xbb] = uLAS(absoluteIndexedRead(rY));
-    instructions[0xbc] = LDY(absoluteIndexedRead(rX));
-    instructions[0xbd] = LDA(absoluteIndexedRead(rX));
-    instructions[0xbe] = LDX(absoluteIndexedRead(rY));
-    instructions[0xbf] = uLAX(absoluteIndexedRead(rY));
-
-    instructions[0xc0] = CPY(immediateRead);
-    instructions[0xc1] = CMP(indirectXRead);
-    instructions[0xc2] = uNOP(immediateRead);
-    instructions[0xc3] = uDCP(indirectXReadModifyWrite);
-    instructions[0xc4] = CPY(zeroPageRead);
-    instructions[0xc5] = CMP(zeroPageRead);
-    instructions[0xc6] = DEC(zeroPageReadModifyWrite);
-    instructions[0xc7] = uDCP(zeroPageReadModifyWrite);
-    instructions[0xc8] = INY();
-    instructions[0xc9] = CMP(immediateRead);
-    instructions[0xca] = DEX();
-    instructions[0xcb] = uSBX(immediateRead);
-    instructions[0xcc] = CPY(absoluteRead);
-    instructions[0xcd] = CMP(absoluteRead);
-    instructions[0xce] = DEC(absoluteReadModifyWrite);
-    instructions[0xcf] = uDCP(absoluteReadModifyWrite);
-
-    instructions[0xd0] = Bxx(bZ, 0);                 // BNE
-    instructions[0xd1] = CMP(indirectYRead);
-    instructions[0xd2] = uKIL();
-    instructions[0xd3] = uDCP(indirectYReadModifyWrite);
-    instructions[0xd4] = uNOP(zeroPageIndexedRead(rX));
-    instructions[0xd5] = CMP(zeroPageIndexedRead(rX));
-    instructions[0xd6] = DEC(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0xd7] = uDCP(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0xd8] = CLD();
-    instructions[0xd9] = CMP(absoluteIndexedRead(rY));
-    instructions[0xda] = uNOP(implied);
-    instructions[0xdb] = uDCP(absoluteIndexedReadModifyWrite(rY));
-    instructions[0xdc] = uNOP(absoluteIndexedRead(rX));
-    instructions[0xdd] = CMP(absoluteIndexedRead(rX));
-    instructions[0xde] = DEC(absoluteIndexedReadModifyWrite(rX));
-    instructions[0xdf] = uDCP(absoluteIndexedReadModifyWrite(rX));
-
-    instructions[0xe0] = CPX(immediateRead);
-    instructions[0xe1] = SBC(indirectXRead);
-    instructions[0xe2] = uNOP(immediateRead);
-    instructions[0xe3] = uISB(indirectXReadModifyWrite);
-    instructions[0xe4] = CPX(zeroPageRead);
-    instructions[0xe5] = SBC(zeroPageRead);
-    instructions[0xe6] = INC(zeroPageReadModifyWrite);
-    instructions[0xe7] = uISB(zeroPageReadModifyWrite);
-    instructions[0xe8] = INX();
-    instructions[0xe9] = SBC(immediateRead);
-    instructions[0xea] = NOP();
-    instructions[0xeb] = SBC(immediateRead);
-    instructions[0xec] = CPX(absoluteRead);
-    instructions[0xed] = SBC(absoluteRead);
-    instructions[0xee] = INC(absoluteReadModifyWrite);
-    instructions[0xef] = uISB(absoluteReadModifyWrite);
-
-    instructions[0xf0] = Bxx(bZ, 1);                 // BEQ
-    instructions[0xf1] = SBC(indirectYRead);
-    instructions[0xf2] = uKIL();
-    instructions[0xf3] = uISB(indirectYReadModifyWrite);
-    instructions[0xf4] = uNOP(zeroPageIndexedRead(rX));
-    instructions[0xf5] = SBC(zeroPageIndexedRead(rX));
-    instructions[0xf6] = INC(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0xf7] = uISB(zeroPageIndexedReadModifyWrite(rX));
-    instructions[0xf8] = SED();
-    instructions[0xf9] = SBC(absoluteIndexedRead(rY));
-    instructions[0xfa] = uNOP(implied);
-    instructions[0xfb] = uISB(absoluteIndexedReadModifyWrite(rY));
-    instructions[0xfc] = uNOP(absoluteIndexedRead(rX));
-    instructions[0xfd] = SBC(absoluteIndexedRead(rX));
-    instructions[0xfe] = INC(absoluteIndexedReadModifyWrite(rX));
-    instructions[0xff] = uISB(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x00] = "BRK";  instructions[0x00] = BRK();
+    opcodes[0x01] = "ORA";  instructions[0x01] = ORA(indirectXRead);
+    opcodes[0x02] = "uKIL"; instructions[0x02] = uKIL();
+    opcodes[0x03] = "uSLO"; instructions[0x03] = uSLO(indirectXReadModifyWrite);
+    opcodes[0x04] = "uNOP"; instructions[0x04] = uNOP(zeroPageRead);
+    opcodes[0x05] = "ORA";  instructions[0x05] = ORA(zeroPageRead);
+    opcodes[0x06] = "ASL";  instructions[0x06] = ASL(zeroPageReadModifyWrite);
+    opcodes[0x07] = "uSLO"; instructions[0x07] = uSLO(zeroPageReadModifyWrite);
+    opcodes[0x08] = "PHP";  instructions[0x08] = PHP();
+    opcodes[0x09] = "ORA";  instructions[0x09] = ORA(immediateRead);
+    opcodes[0x0a] = "ASL_"; instructions[0x0a] = ASL_ACC();
+    opcodes[0x0b] = "uANC"; instructions[0x0b] = uANC(immediateRead);
+    opcodes[0x0c] = "uNOP"; instructions[0x0c] = uNOP(absoluteRead);
+    opcodes[0x0d] = "ORA";  instructions[0x0d] = ORA(absoluteRead);
+    opcodes[0x0e] = "ASL";  instructions[0x0e] = ASL(absoluteReadModifyWrite);
+    opcodes[0x0f] = "uSLO"; instructions[0x0f] = uSLO(absoluteReadModifyWrite);
+    opcodes[0x10] = "BPL";  instructions[0x10] = Bxx(bN, 0);                 // BPL
+    opcodes[0x11] = "ORA";  instructions[0x11] = ORA(indirectYRead);
+    opcodes[0x12] = "uKIL"; instructions[0x12] = uKIL();
+    opcodes[0x13] = "uSLO"; instructions[0x13] = uSLO(indirectYReadModifyWrite);
+    opcodes[0x14] = "uNOP"; instructions[0x14] = uNOP(zeroPageIndexedRead(rX));
+    opcodes[0x15] = "ORA";  instructions[0x15] = ORA(zeroPageIndexedRead(rX));
+    opcodes[0x16] = "ASL";  instructions[0x16] = ASL(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x17] = "uSLO"; instructions[0x17] = uSLO(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x18] = "CLC";  instructions[0x18] = CLC();
+    opcodes[0x19] = "ORA";  instructions[0x19] = ORA(absoluteIndexedRead(rY));
+    opcodes[0x1a] = "uNOP"; instructions[0x1a] = uNOP(implied);
+    opcodes[0x1b] = "uSLO"; instructions[0x1b] = uSLO(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0x1c] = "uNOP"; instructions[0x1c] = uNOP(absoluteIndexedRead(rX));
+    opcodes[0x1d] = "ORA";  instructions[0x1d] = ORA(absoluteIndexedRead(rX));
+    opcodes[0x1e] = "ASL";  instructions[0x1e] = ASL(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x1f] = "uSLO"; instructions[0x1f] = uSLO(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x20] = "JSR";  instructions[0x20] = JSR();
+    opcodes[0x21] = "AND";  instructions[0x21] = AND(indirectXRead);
+    opcodes[0x22] = "uKIL"; instructions[0x22] = uKIL();
+    opcodes[0x23] = "uRLA"; instructions[0x23] = uRLA(indirectXReadModifyWrite);
+    opcodes[0x24] = "BIT";  instructions[0x24] = BIT(zeroPageRead);
+    opcodes[0x25] = "AND";  instructions[0x25] = AND(zeroPageRead);
+    opcodes[0x26] = "ROL";  instructions[0x26] = ROL(zeroPageReadModifyWrite);
+    opcodes[0x27] = "uRLA"; instructions[0x27] = uRLA(zeroPageReadModifyWrite);
+    opcodes[0x28] = "PLP";  instructions[0x28] = PLP();
+    opcodes[0x29] = "AND";  instructions[0x29] = AND(immediateRead);
+    opcodes[0x2a] = "ROL_"; instructions[0x2a] = ROL_ACC();
+    opcodes[0x2b] = "uANC"; instructions[0x2b] = uANC(immediateRead);
+    opcodes[0x2c] = "BIT";  instructions[0x2c] = BIT(absoluteRead);
+    opcodes[0x2d] = "AND";  instructions[0x2d] = AND(absoluteRead);
+    opcodes[0x2e] = "ROL";  instructions[0x2e] = ROL(absoluteReadModifyWrite);
+    opcodes[0x2f] = "uRLA"; instructions[0x2f] = uRLA(absoluteReadModifyWrite);
+    opcodes[0x30] = "BMI";  instructions[0x30] = Bxx(bN, 1);                 // BMI
+    opcodes[0x31] = "AND";  instructions[0x31] = AND(indirectYRead);
+    opcodes[0x32] = "uKIL"; instructions[0x32] = uKIL();
+    opcodes[0x33] = "uRLA"; instructions[0x33] = uRLA(indirectYReadModifyWrite);
+    opcodes[0x34] = "uNOP"; instructions[0x34] = uNOP(zeroPageIndexedRead(rX));
+    opcodes[0x35] = "AND";  instructions[0x35] = AND(zeroPageIndexedRead(rX));
+    opcodes[0x36] = "ROL";  instructions[0x36] = ROL(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x37] = "uRLA"; instructions[0x37] = uRLA(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x38] = "SEC";  instructions[0x38] = SEC();
+    opcodes[0x39] = "AND";  instructions[0x39] = AND(absoluteIndexedRead(rY));
+    opcodes[0x3a] = "uNOP"; instructions[0x3a] = uNOP(implied);
+    opcodes[0x3b] = "uRLA"; instructions[0x3b] = uRLA(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0x3c] = "uNOP"; instructions[0x3c] = uNOP(absoluteIndexedRead(rX));
+    opcodes[0x3d] = "AND";  instructions[0x3d] = AND(absoluteIndexedRead(rX));
+    opcodes[0x3e] = "ROL";  instructions[0x3e] = ROL(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x3f] = "uRLA"; instructions[0x3f] = uRLA(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x40] = "RTI";  instructions[0x40] = RTI();
+    opcodes[0x41] = "EOR";  instructions[0x41] = EOR(indirectXRead);
+    opcodes[0x42] = "uKIL"; instructions[0x42] = uKIL();
+    opcodes[0x43] = "uSRE"; instructions[0x43] = uSRE(indirectXReadModifyWrite);
+    opcodes[0x44] = "uNOP"; instructions[0x44] = uNOP(zeroPageRead);
+    opcodes[0x45] = "EOR";  instructions[0x45] = EOR(zeroPageRead);
+    opcodes[0x46] = "LSR";  instructions[0x46] = LSR(zeroPageReadModifyWrite);
+    opcodes[0x47] = "uSRE"; instructions[0x47] = uSRE(zeroPageReadModifyWrite);
+    opcodes[0x48] = "PHA";  instructions[0x48] = PHA();
+    opcodes[0x49] = "EOR";  instructions[0x49] = EOR(immediateRead);
+    opcodes[0x4a] = "LSR_"; instructions[0x4a] = LSR_ACC();
+    opcodes[0x4b] = "uASR"; instructions[0x4b] = uASR(immediateRead);
+    opcodes[0x4c] = "JMP_"; instructions[0x4c] = JMP_ABS();
+    opcodes[0x4d] = "EOR";  instructions[0x4d] = EOR(absoluteRead);
+    opcodes[0x4e] = "LSR";  instructions[0x4e] = LSR(absoluteReadModifyWrite);
+    opcodes[0x4f] = "uSRE"; instructions[0x4f] = uSRE(absoluteReadModifyWrite);
+    opcodes[0x50] = "BVC";  instructions[0x50] = Bxx(bV, 0);                 // BVC
+    opcodes[0x51] = "EOR";  instructions[0x51] = EOR(indirectYRead);
+    opcodes[0x52] = "uKIL"; instructions[0x52] = uKIL();
+    opcodes[0x53] = "uSRE"; instructions[0x53] = uSRE(indirectYReadModifyWrite);
+    opcodes[0x54] = "uNOP"; instructions[0x54] = uNOP(zeroPageIndexedRead(rX));
+    opcodes[0x55] = "EOR";  instructions[0x55] = EOR(zeroPageIndexedRead(rX));
+    opcodes[0x56] = "LSR";  instructions[0x56] = LSR(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x57] = "uSRE"; instructions[0x57] = uSRE(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x58] = "CLI";  instructions[0x58] = CLI();
+    opcodes[0x59] = "EOR";  instructions[0x59] = EOR(absoluteIndexedRead(rY));
+    opcodes[0x5a] = "uNOP"; instructions[0x5a] = uNOP(implied);
+    opcodes[0x5b] = "uSRE"; instructions[0x5b] = uSRE(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0x5c] = "uNOP"; instructions[0x5c] = uNOP(absoluteIndexedRead(rX));
+    opcodes[0x5d] = "EOR";  instructions[0x5d] = EOR(absoluteIndexedRead(rX));
+    opcodes[0x5e] = "LSR";  instructions[0x5e] = LSR(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x5f] = "uSRE"; instructions[0x5f] = uSRE(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x60] = "RTS";  instructions[0x60] = RTS();
+    opcodes[0x61] = "ADC";  instructions[0x61] = ADC(indirectXRead);
+    opcodes[0x62] = "uKIL"; instructions[0x62] = uKIL();
+    opcodes[0x63] = "uRRA"; instructions[0x63] = uRRA(indirectXReadModifyWrite);
+    opcodes[0x64] = "uNOP"; instructions[0x64] = uNOP(zeroPageRead);
+    opcodes[0x65] = "ADC";  instructions[0x65] = ADC(zeroPageRead);
+    opcodes[0x66] = "ROR";  instructions[0x66] = ROR(zeroPageReadModifyWrite);
+    opcodes[0x67] = "uRRA"; instructions[0x67] = uRRA(zeroPageReadModifyWrite);
+    opcodes[0x68] = "PLA";  instructions[0x68] = PLA();
+    opcodes[0x69] = "ADC";  instructions[0x69] = ADC(immediateRead);
+    opcodes[0x6a] = "ROR_"; instructions[0x6a] = ROR_ACC();
+    opcodes[0x6b] = "uARR"; instructions[0x6b] = uARR(immediateRead);
+    opcodes[0x6c] = "JMP_"; instructions[0x6c] = JMP_IND();
+    opcodes[0x6d] = "ADC";  instructions[0x6d] = ADC(absoluteRead);
+    opcodes[0x6e] = "ROR";  instructions[0x6e] = ROR(absoluteReadModifyWrite);
+    opcodes[0x6f] = "uRRA"; instructions[0x6f] = uRRA(absoluteReadModifyWrite);
+    opcodes[0x70] = "BVS";  instructions[0x70] = Bxx(bV, 1);                 // BVS
+    opcodes[0x71] = "ADC";  instructions[0x71] = ADC(indirectYRead);
+    opcodes[0x72] = "uKIL"; instructions[0x72] = uKIL();
+    opcodes[0x73] = "uRRA"; instructions[0x73] = uRRA(indirectYReadModifyWrite);
+    opcodes[0x74] = "uNOP"; instructions[0x74] = uNOP(zeroPageIndexedRead(rX));
+    opcodes[0x75] = "ADC";  instructions[0x75] = ADC(zeroPageIndexedRead(rX));
+    opcodes[0x76] = "ROR";  instructions[0x76] = ROR(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x77] = "uRRA"; instructions[0x77] = uRRA(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x78] = "SEI";  instructions[0x78] = SEI();
+    opcodes[0x79] = "ADC";  instructions[0x79] = ADC(absoluteIndexedRead(rY));
+    opcodes[0x7a] = "uNOP"; instructions[0x7a] = uNOP(implied);
+    opcodes[0x7b] = "uRRA"; instructions[0x7b] = uRRA(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0x7c] = "uNOP"; instructions[0x7c] = uNOP(absoluteIndexedRead(rX));
+    opcodes[0x7d] = "ADC";  instructions[0x7d] = ADC(absoluteIndexedRead(rX));
+    opcodes[0x7e] = "ROR";  instructions[0x7e] = ROR(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x7f] = "uRRA"; instructions[0x7f] = uRRA(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x80] = "uNOP"; instructions[0x80] = uNOP(immediateRead);
+    opcodes[0x81] = "STA";  instructions[0x81] = STA(indirectXWrite);
+    opcodes[0x82] = "uNOP"; instructions[0x82] = uNOP(immediateRead);
+    opcodes[0x83] = "uSAX"; instructions[0x83] = uSAX(indirectXWrite);
+    opcodes[0x84] = "STY";  instructions[0x84] = STY(zeroPageWrite);
+    opcodes[0x85] = "STA";  instructions[0x85] = STA(zeroPageWrite);
+    opcodes[0x86] = "STX";  instructions[0x86] = STX(zeroPageWrite);
+    opcodes[0x87] = "uSAX"; instructions[0x87] = uSAX(zeroPageWrite);
+    opcodes[0x88] = "DEY";  instructions[0x88] = DEY();
+    opcodes[0x89] = "uNOP"; instructions[0x89] = uNOP(immediateRead);
+    opcodes[0x8a] = "TXA";  instructions[0x8a] = TXA();
+    opcodes[0x8b] = "uANE"; instructions[0x8b] = uANE(immediateRead);
+    opcodes[0x8c] = "STY";  instructions[0x8c] = STY(absoluteWrite);
+    opcodes[0x8d] = "STA";  instructions[0x8d] = STA(absoluteWrite);
+    opcodes[0x8e] = "STX";  instructions[0x8e] = STX(absoluteWrite);
+    opcodes[0x8f] = "uSAX"; instructions[0x8f] = uSAX(absoluteWrite);
+    opcodes[0x90] = "BCC";  instructions[0x90] = Bxx(bC, 0);                 // BCC
+    opcodes[0x91] = "STA";  instructions[0x91] = STA(indirectYWrite);
+    opcodes[0x92] = "uKIL"; instructions[0x92] = uKIL();
+    opcodes[0x93] = "uSHA"; instructions[0x93] = uSHA(indirectYWrite);
+    opcodes[0x94] = "STY";  instructions[0x94] = STY(zeroPageIndexedWrite(rX));
+    opcodes[0x95] = "STA";  instructions[0x95] = STA(zeroPageIndexedWrite(rX));
+    opcodes[0x96] = "STX";  instructions[0x96] = STX(zeroPageIndexedWrite(rY));
+    opcodes[0x97] = "uSAX"; instructions[0x97] = uSAX(zeroPageIndexedWrite(rY));
+    opcodes[0x98] = "TYA";  instructions[0x98] = TYA();
+    opcodes[0x99] = "STA";  instructions[0x99] = STA(absoluteIndexedWrite(rY));
+    opcodes[0x9a] = "TXS";  instructions[0x9a] = TXS();
+    opcodes[0x9b] = "uSHS"; instructions[0x9b] = uSHS(absoluteIndexedWrite(rY));
+    opcodes[0x9c] = "uSHY"; instructions[0x9c] = uSHY(absoluteIndexedWrite(rX));
+    opcodes[0x9d] = "STA";  instructions[0x9d] = STA(absoluteIndexedWrite(rX));
+    opcodes[0x9e] = "uSHX"; instructions[0x9e] = uSHX(absoluteIndexedWrite(rY));
+    opcodes[0x9f] = "uSHA"; instructions[0x9f] = uSHA(absoluteIndexedWrite(rY));
+    opcodes[0xa0] = "LDY";  instructions[0xa0] = LDY(immediateRead);
+    opcodes[0xa1] = "LDA";  instructions[0xa1] = LDA(indirectXRead);
+    opcodes[0xa2] = "LDX";  instructions[0xa2] = LDX(immediateRead);
+    opcodes[0xa3] = "uLAX"; instructions[0xa3] = uLAX(indirectXRead);
+    opcodes[0xa4] = "LDY";  instructions[0xa4] = LDY(zeroPageRead);
+    opcodes[0xa5] = "LDA";  instructions[0xa5] = LDA(zeroPageRead);
+    opcodes[0xa6] = "LDX";  instructions[0xa6] = LDX(zeroPageRead);
+    opcodes[0xa7] = "uLAX"; instructions[0xa7] = uLAX(zeroPageRead);
+    opcodes[0xa8] = "TAY";  instructions[0xa8] = TAY();
+    opcodes[0xa9] = "LDA";  instructions[0xa9] = LDA(immediateRead);
+    opcodes[0xaa] = "TAX";  instructions[0xaa] = TAX();
+    opcodes[0xab] = "uLXA"; instructions[0xab] = uLXA(immediateRead);
+    opcodes[0xac] = "LDY";  instructions[0xac] = LDY(absoluteRead);
+    opcodes[0xad] = "LDA";  instructions[0xad] = LDA(absoluteRead);
+    opcodes[0xae] = "LDX";  instructions[0xae] = LDX(absoluteRead);
+    opcodes[0xaf] = "uLAX"; instructions[0xaf] = uLAX(absoluteRead);
+    opcodes[0xb0] = "BCS";  instructions[0xb0] = Bxx(bC, 1);                 // BCS
+    opcodes[0xb1] = "LDA";  instructions[0xb1] = LDA(indirectYRead);
+    opcodes[0xb2] = "uKIL"; instructions[0xb2] = uKIL();
+    opcodes[0xb3] = "uLAX"; instructions[0xb3] = uLAX(indirectYRead);
+    opcodes[0xb4] = "LDY";  instructions[0xb4] = LDY(zeroPageIndexedRead(rX));
+    opcodes[0xb5] = "LDA";  instructions[0xb5] = LDA(zeroPageIndexedRead(rX));
+    opcodes[0xb6] = "LDX";  instructions[0xb6] = LDX(zeroPageIndexedRead(rY));
+    opcodes[0xb7] = "uLAX"; instructions[0xb7] = uLAX(zeroPageIndexedRead(rY));
+    opcodes[0xb8] = "CLV";  instructions[0xb8] = CLV();
+    opcodes[0xb9] = "LDA";  instructions[0xb9] = LDA(absoluteIndexedRead(rY));
+    opcodes[0xba] = "TSX";  instructions[0xba] = TSX();
+    opcodes[0xbb] = "uLAS"; instructions[0xbb] = uLAS(absoluteIndexedRead(rY));
+    opcodes[0xbc] = "LDY";  instructions[0xbc] = LDY(absoluteIndexedRead(rX));
+    opcodes[0xbd] = "LDA";  instructions[0xbd] = LDA(absoluteIndexedRead(rX));
+    opcodes[0xbe] = "LDX";  instructions[0xbe] = LDX(absoluteIndexedRead(rY));
+    opcodes[0xbf] = "uLAX"; instructions[0xbf] = uLAX(absoluteIndexedRead(rY));
+    opcodes[0xc0] = "CPY";  instructions[0xc0] = CPY(immediateRead);
+    opcodes[0xc1] = "CMP";  instructions[0xc1] = CMP(indirectXRead);
+    opcodes[0xc2] = "uNOP"; instructions[0xc2] = uNOP(immediateRead);
+    opcodes[0xc3] = "uDCP"; instructions[0xc3] = uDCP(indirectXReadModifyWrite);
+    opcodes[0xc4] = "CPY";  instructions[0xc4] = CPY(zeroPageRead);
+    opcodes[0xc5] = "CMP";  instructions[0xc5] = CMP(zeroPageRead);
+    opcodes[0xc6] = "DEC";  instructions[0xc6] = DEC(zeroPageReadModifyWrite);
+    opcodes[0xc7] = "uDCP"; instructions[0xc7] = uDCP(zeroPageReadModifyWrite);
+    opcodes[0xc8] = "INY";  instructions[0xc8] = INY();
+    opcodes[0xc9] = "CMP";  instructions[0xc9] = CMP(immediateRead);
+    opcodes[0xca] = "DEX";  instructions[0xca] = DEX();
+    opcodes[0xcb] = "uSBX"; instructions[0xcb] = uSBX(immediateRead);
+    opcodes[0xcc] = "CPY";  instructions[0xcc] = CPY(absoluteRead);
+    opcodes[0xcd] = "CMP";  instructions[0xcd] = CMP(absoluteRead);
+    opcodes[0xce] = "DEC";  instructions[0xce] = DEC(absoluteReadModifyWrite);
+    opcodes[0xcf] = "uDCP"; instructions[0xcf] = uDCP(absoluteReadModifyWrite);
+    opcodes[0xd0] = "BNE";  instructions[0xd0] = Bxx(bZ, 0);                 // BNE
+    opcodes[0xd1] = "CMP";  instructions[0xd1] = CMP(indirectYRead);
+    opcodes[0xd2] = "uKIL"; instructions[0xd2] = uKIL();
+    opcodes[0xd3] = "uDCP"; instructions[0xd3] = uDCP(indirectYReadModifyWrite);
+    opcodes[0xd4] = "uNOP"; instructions[0xd4] = uNOP(zeroPageIndexedRead(rX));
+    opcodes[0xd5] = "CMP";  instructions[0xd5] = CMP(zeroPageIndexedRead(rX));
+    opcodes[0xd6] = "DEC";  instructions[0xd6] = DEC(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0xd7] = "uDCP"; instructions[0xd7] = uDCP(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0xd8] = "CLD";  instructions[0xd8] = CLD();
+    opcodes[0xd9] = "CMP";  instructions[0xd9] = CMP(absoluteIndexedRead(rY));
+    opcodes[0xda] = "uNOP"; instructions[0xda] = uNOP(implied);
+    opcodes[0xdb] = "uDCP"; instructions[0xdb] = uDCP(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0xdc] = "uNOP"; instructions[0xdc] = uNOP(absoluteIndexedRead(rX));
+    opcodes[0xdd] = "CMP";  instructions[0xdd] = CMP(absoluteIndexedRead(rX));
+    opcodes[0xde] = "DEC";  instructions[0xde] = DEC(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0xdf] = "uDCP"; instructions[0xdf] = uDCP(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0xe0] = "CPX";  instructions[0xe0] = CPX(immediateRead);
+    opcodes[0xe1] = "SBC";  instructions[0xe1] = SBC(indirectXRead);
+    opcodes[0xe2] = "uNOP"; instructions[0xe2] = uNOP(immediateRead);
+    opcodes[0xe3] = "uISB"; instructions[0xe3] = uISB(indirectXReadModifyWrite);
+    opcodes[0xe4] = "CPX";  instructions[0xe4] = CPX(zeroPageRead);
+    opcodes[0xe5] = "SBC";  instructions[0xe5] = SBC(zeroPageRead);
+    opcodes[0xe6] = "INC";  instructions[0xe6] = INC(zeroPageReadModifyWrite);
+    opcodes[0xe7] = "uISB"; instructions[0xe7] = uISB(zeroPageReadModifyWrite);
+    opcodes[0xe8] = "INX";  instructions[0xe8] = INX();
+    opcodes[0xe9] = "SBC";  instructions[0xe9] = SBC(immediateRead);
+    opcodes[0xea] = "NOP";  instructions[0xea] = NOP();
+    opcodes[0xeb] = "SBC";  instructions[0xeb] = SBC(immediateRead);
+    opcodes[0xec] = "CPX";  instructions[0xec] = CPX(absoluteRead);
+    opcodes[0xed] = "SBC";  instructions[0xed] = SBC(absoluteRead);
+    opcodes[0xee] = "INC";  instructions[0xee] = INC(absoluteReadModifyWrite);
+    opcodes[0xef] = "uISB"; instructions[0xef] = uISB(absoluteReadModifyWrite);
+    opcodes[0xf0] = "BEQ";  instructions[0xf0] = Bxx(bZ, 1);                 // BEQ
+    opcodes[0xf1] = "SBC";  instructions[0xf1] = SBC(indirectYRead);
+    opcodes[0xf2] = "uKIL"; instructions[0xf2] = uKIL();
+    opcodes[0xf3] = "uISB"; instructions[0xf3] = uISB(indirectYReadModifyWrite);
+    opcodes[0xf4] = "uNOP"; instructions[0xf4] = uNOP(zeroPageIndexedRead(rX));
+    opcodes[0xf5] = "SBC";  instructions[0xf5] = SBC(zeroPageIndexedRead(rX));
+    opcodes[0xf6] = "INC";  instructions[0xf6] = INC(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0xf7] = "uISB"; instructions[0xf7] = uISB(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0xf8] = "SED";  instructions[0xf8] = SED();
+    opcodes[0xf9] = "SBC";  instructions[0xf9] = SBC(absoluteIndexedRead(rY));
+    opcodes[0xfa] = "uNOP"; instructions[0xfa] = uNOP(implied);
+    opcodes[0xfb] = "uISB"; instructions[0xfb] = uISB(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0xfc] = "uNOP"; instructions[0xfc] = uNOP(absoluteIndexedRead(rX));
+    opcodes[0xfd] = "SBC";  instructions[0xfd] = SBC(absoluteIndexedRead(rX));
+    opcodes[0xfe] = "INC";  instructions[0xfe] = INC(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0xff] = "uISB"; instructions[0xff] = uISB(absoluteIndexedReadModifyWrite(rX));
 
 
     // Single Byte instructions
@@ -1094,6 +1078,8 @@ function M6502() {
             fetchOpcodeAndDecodeInstruction,
             function() {
                 illegalOpcode("KIL/HLT/JAM");
+            },
+            function() {
                 T--;        // Causes the processor to be stuck in this instruction forever
             }
         ];
@@ -1759,6 +1745,7 @@ function M6502() {
     };
 
     this.breakpoint = function(mes) {
+        Util.log(mes);
         if (this.trace) {
             var text = "CPU Breakpoint!  " + (mes ? "(" + mes + ")" : "") + "\n\n" + this.toString();
             alert(text);

@@ -11,7 +11,7 @@ function CartridgeDatabase() {
 
         // Choose the best option
         var bestOption = options[0];
-        Util.log("" + bestOption.name + ": " + bestOption.desc + ", priority: " + bestOption.priority);
+        Util.log("" + bestOption.name + ": " + bestOption.desc + ", priority: " + bestOption.priority + (bestOption.priorityBoosted ? " (" + bestOption.priorityBoosted + ")" : ""));
         return bestOption.createCartridgeFromRom(rom);
     };
 
@@ -36,7 +36,7 @@ function CartridgeDatabase() {
         if (info) {
             Util.log("" + info.n);
         } else {
-            info = produceInfo(rom.source);
+            info = buildInfo(rom.source);
             Util.log("Unknown ROM: " + info.n);
         }
 
@@ -45,30 +45,30 @@ function CartridgeDatabase() {
     };
 
     var getFormatOptions = function(rom) {
-        var options = [];
-        var option;
+        var formatOptions = [];
+        var formatOption;
         for (var format in CartridgeFormats) {
-            option = CartridgeFormats[format].tryFormat(rom);
-            if (!option) continue;	    	    // rejected by format
-            //boostPriority(option, rom.info);	// adjust priority based on ROM info
-            options.push(option);
+            formatOption = CartridgeFormats[format].tryFormat(rom);
+            if (!formatOption) continue;	    	    // rejected by format
+            boostPriority(formatOption, rom.info);	// adjust priority based on ROM info
+            formatOptions.push(formatOption);
         }
 
         // If no Format could be found, throw error
-        if (options.length === 0) {
+        if (formatOptions.length === 0) {
             var ex = new Error ("Unsupported ROM Format. Size: " + rom.content.length);
             ex.javatari = true;
             throw ex;
         }
         // Sort according to priority
-        options.sort(function formatOptionComparator(a, b) {
-           return a.priority - b.priority;
+        formatOptions.sort(function formatOptionComparator(a, b) {
+           return (a.priorityBoosted || a.priority) - (b.priorityBoosted || b.priority);
         });
 
-        return options;
+        return formatOptions;
     };
 
-    var produceInfo = function(romSource) {
+    var buildInfo = function(romSource) {
         var info = { n: "Unknown" };
         if (!romSource || !romSource.trim()) return info;
 
@@ -135,6 +135,13 @@ function CartridgeDatabase() {
                     break Format;
                 }
         }
+    };
+
+    var boostPriority = function(formatOption, info) {
+        if (info.f && formatOption.name === info.f)
+            formatOption.priorityBoosted = formatOption.priority - FORMAT_PRIORITY_BOOST;
+        else
+            formatOption.priorityBoosted = undefined;
     };
 
     var produceCartridgeLabel = function(name) {
@@ -250,6 +257,8 @@ function CartridgeDatabase() {
 
     var HINTS_PREFIX_REGEX = "(|.*?(\\W|_|%20))";
     var HINTS_SUFFIX_REGEX = "(|(\\W|_|%20).*)";
+
+    var FORMAT_PRIORITY_BOOST = 50;
 
 }
 

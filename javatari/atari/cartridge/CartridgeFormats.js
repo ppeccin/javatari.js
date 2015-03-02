@@ -19,6 +19,51 @@ CartridgeFormats = {
         }
     },
 
+    "E0": {
+        name: "E0",
+        desc: "8K Parker Bros.",
+        priority: 102,
+        tryFormat: function (rom) {
+            if (rom.content.length === 8192) return this;
+        },
+        createCartridgeFromRom: function (rom) {
+            return new Cartridge8K_E0(rom, this);
+        },
+        createCartridgeFromSaveState: function (state) {
+            return Cartridge8K_E0.createFromSaveState(state);
+        }
+    },
+
+    "F0": {
+        name: "F0",
+        desc: "64K Dynacom Megaboy",
+        priority: 101,
+        tryFormat: function (rom) {
+            if (rom.content.length === 65536) return this;
+        },
+        createCartridgeFromRom: function (rom) {
+            return new Cartridge64K_F0(rom, this);
+        },
+        createCartridgeFromSaveState: function (state) {
+            return Cartridge64K_F0.createFromSaveState(state);
+        }
+    },
+
+    "FE": {
+        name: "FE",
+        desc: "8K Robotank/Decathlon",
+        priority: 103,
+        tryFormat: function (rom) {
+            if (rom.content.length === 8192) return this;
+        },
+        createCartridgeFromRom: function (rom) {
+            return new Cartridge8K_FE(rom, this);
+        },
+        createCartridgeFromSaveState: function (state) {
+            return Cartridge8K_FE.createFromSaveState(state);
+        }
+    },
+
     "F8": {
         name: "F8",
         desc: "8K Atari (+RAM)",
@@ -64,18 +109,33 @@ CartridgeFormats = {
         }
     },
 
-    "3E": {
-        name: "3E",
-        desc: "8K-512K Tigervision (+RAM)",
-        priority: 111,
+    "FA": {
+        name: "FA",
+        desc: "12K CBS RAM Plus",
+        priority: 101,
         tryFormat: function(rom) {
-            if (rom.content.length % 2048 === 0 && rom.content.length <= 256 * 2048) return this;
+            if (rom.content.length === 12288) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new Cartridge8K_512K_3E(rom, this);
+            return new CartridgeBankedByMaskedRange(rom, this, 0x0ff8, true, 256);
         },
         createCartridgeFromSaveState: function(state) {
-            return Cartridge8K_512K_3E.createFromSaveState(state);
+            return CartridgeBankedByMaskedRange.createFromSaveState(state);
+        }
+    },
+
+    "EF": {
+        name: "EF",
+        desc: "8K-64K H. Runner (+RAM)",
+        priority: 114,
+        tryFormat: function(rom) {
+            if (rom.content.length % 4096 === 0 && rom.content.length >= 8192 && rom.content.length <= 65536) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new CartridgeBankedByMaskedRange(rom, this, 0x0fe0, null, 128);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return CartridgeBankedByMaskedRange.createFromSaveState(state);
         }
     },
 
@@ -92,6 +152,22 @@ CartridgeFormats = {
         createCartridgeFromSaveState: function(state) {
             return Cartridge8K_512K_3F.createFromSaveState(state);
         }
+    },
+
+    "3E": {
+        name: "3E",
+        desc: "8K-512K Tigervision (+RAM)",
+        priority: 111,
+        tryFormat: function(rom) {
+            if (rom.content.length % 2048 === 0 && rom.content.length <= 256 * 2048) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge8K_512K_3E(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge8K_512K_3E.createFromSaveState(state);
+        }
     }
+
 
 };

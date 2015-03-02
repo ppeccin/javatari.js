@@ -2,12 +2,13 @@
  * Created by ppeccin on 20/11/2014.
  */
 
+// Implements the 8K-512K "3E" Tigervision (+RAM) format
+
 function Cartridge8K_512K_3E(rom, format) {
 
     function init(self) {
         self.rom = rom;
         self.format = format;
-
         bytes = rom.content;        // uses the content of the ROM directly
         selectableSliceMaxBank = (bytes.length - BANK_SIZE) / BANK_SIZE - 1;
         fixedSliceAddressOffset = bytes.length - BANK_SIZE * 2;
