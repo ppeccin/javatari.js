@@ -33,6 +33,10 @@ function Cartridge() {
     this.monitorBusBeforeWrite = function(address, val)  {
     };
 
+    this.needsClock = function() {
+        return false;
+    };
+
     this.setROM = function(rom) {
         this.rom = rom;
     };

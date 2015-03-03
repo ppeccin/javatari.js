@@ -43,6 +43,7 @@ function Bus(pCpu, pTia, pPia, pRam) {
             cartridge.connectBus(this);
         }
         cartridgeNeedsBusMonitoring = cartridge && cartridge.needsBusMonitoring();
+        cartridgeNeedsClock = cartridge && cartridge.needsClock();
     };
 
     this.getCartridge = function() {
@@ -51,6 +52,12 @@ function Bus(pCpu, pTia, pPia, pRam) {
 
     this.getTia = function() {
         return tia;
+    };
+
+    this.clockPulse = function() {
+        pia.clockPulse();
+        cpu.clockPulse();
+        if (cartridgeNeedsClock) cartridge.clockPulse();
     };
 
     this.read = function(address) {
@@ -90,6 +97,7 @@ function Bus(pCpu, pTia, pPia, pRam) {
     var ram;
     var cartridge;
     var cartridgeNeedsBusMonitoring = false;
+    var cartridgeNeedsClock = false;
 
     var data = 0;
 

@@ -2,6 +2,8 @@
  * Created by ppeccin on 16/02/2015.
  */
 
+// TODO Fix all Array initializations
+
 JavatariLauncher = {
 
     launch: function () {

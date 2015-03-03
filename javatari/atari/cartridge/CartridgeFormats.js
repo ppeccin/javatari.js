@@ -169,6 +169,21 @@ CartridgeFormats = {
         }
     },
 
+    "DPCa": {
+        name: "DPCa",
+        desc: "10K DPC Pitfall 2 (Enhanced Audio)",
+        priority: 101,
+        tryFormat: function(rom) {
+            if (rom.content.length >= (8192 + 2048) && rom.content.length <= (8192 + 2048 + 256)) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge10K_DPCa(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge10K_DPCa.createFromSaveState(state);
+        }
+    },
+
     "3F": {
         name: "3F",
         desc: "8K-512K Tigervision",

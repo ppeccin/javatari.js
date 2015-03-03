@@ -8,14 +8,16 @@
  * Used by several n * 4K bank formats with varying extra RAM sizes
  */
 
-function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superChip, extraRAMSize) {
+function CartridgeBankedByMaskedRange(rom, format, pBaseBankSwitchAddress, superChip, pExtraRAMSize) {
 
     function init(self) {
         self.rom = rom;
         self.format = format;
         bytes = rom.content;        // uses the content of the ROM directly
         var numBanks = bytes.length / BANK_SIZE;
+        baseBankSwitchAddress = pBaseBankSwitchAddress;
         topBankSwitchAddress = baseBankSwitchAddress + numBanks - 1;
+        extraRAMSize = pExtraRAMSize;
         // SuperChip mode. null = automatic mode
         if (superChip == null || superChip == undefined) {
             superChipMode = false;
@@ -89,10 +91,12 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
     var bytes;
 
     var bankAddressOffset = 0;
+    var baseBankSwitchAddress;
     var topBankSwitchAddress;
 
     var superChipMode = false;
     var superChipAutoDetect;
+    var extraRAMSize;
     var extraRAM;
 
 

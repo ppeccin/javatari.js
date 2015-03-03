@@ -28,8 +28,7 @@ function Tia(pCpu, pPia) {
         do {
             clock = 0;
             // Send the first clock/3 pulse to the CPU and PIA, perceived by TIA at clock 0
-            pia.clockPulse();
-            cpu.clockPulse();
+            bus.clockPulse();
             // Releases the CPU at the beginning of the line in case a WSYNC has halted it
             cpu.setRDY(true);
             // HBLANK period
@@ -50,8 +49,7 @@ function Tia(pCpu, pPia) {
                 if (vBlankDecodeActive) vBlankClockDecode();
                 // Send clock/3 pulse to the CPU and PIA each 3rd TIA cycle
                 if (--subClock3 === 0) {
-                    pia.clockPulse();
-                    cpu.clockPulse();
+                    bus.clockPulse();
                     subClock3 = 3;
                 }
                 objectsClockCounters();
