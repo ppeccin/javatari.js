@@ -10,7 +10,7 @@ function Cartridge4K(rom, format) {
         self.rom = rom;
         self.format = format;
         // Always use a 4K ROM image, multiplying the ROM internally
-        bytes = new Array(SIZE);
+        bytes = new Array(4096);
         var len = rom.content.length;
         for (var pos = 0; pos < bytes.length; pos += len)
             Util.arrayCopy(rom.content, 0, bytes, pos, len);
@@ -40,9 +40,7 @@ function Cartridge4K(rom, format) {
 
     var bytes;
 
-
     var ADDRESS_MASK = 0x0fff;
-    var SIZE = 4096;
 
 
     if (rom) init(this);

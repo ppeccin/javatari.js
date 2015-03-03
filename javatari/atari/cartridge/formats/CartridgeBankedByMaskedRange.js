@@ -37,12 +37,12 @@ function CartridgeBankedByMaskedRange(rom, format, baseBankSwitchAddress, superC
             return bytes[bankAddressOffset + maskedAddress];
     };
 
-    this.write = function(address, b) {
+    this.write = function(address, val) {
         var maskedAddress = maskAddress(address);
         // Check for Extra RAM writes and then turn superChip mode on
         if (maskedAddress < extraRAMSize && (superChipMode || superChipAutoDetect)) {
             if (!superChipMode) superChipMode = true;
-            extraRAM[maskedAddress] = b;
+            extraRAM[maskedAddress] = val;
         }
     };
 

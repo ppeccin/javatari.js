@@ -19,6 +19,21 @@ CartridgeFormats = {
         }
     },
 
+    "CV": {
+        name: "CV",
+        desc: "2K Commavid +RAM",
+        priority: 102,
+        tryFormat: function (rom) {
+            if (rom.content.length === 2048 || rom.content.length === 4096) return this;	// Also accepts 4K ROMs
+        },
+        createCartridgeFromRom: function (rom) {
+            return new Cartridge2K_CV(rom, this);
+        },
+        createCartridgeFromSaveState: function (state) {
+            return Cartridge2K_CV.createFromSaveState(state);
+        }
+    },
+
     "E0": {
         name: "E0",
         desc: "8K Parker Bros.",
@@ -61,6 +76,21 @@ CartridgeFormats = {
         },
         createCartridgeFromSaveState: function (state) {
             return Cartridge8K_FE.createFromSaveState(state);
+        }
+    },
+
+    "E7": {
+        name: "E7",
+        desc: "16K M-Network",
+        priority: 102,
+        tryFormat: function (rom) {
+            if (rom.content.length === 16384) return this;
+        },
+        createCartridgeFromRom: function (rom) {
+            return new Cartridge16K_E7(rom, this);
+        },
+        createCartridgeFromSaveState: function (state) {
+            return Cartridge16K_E7.createFromSaveState(state);
         }
     },
 
