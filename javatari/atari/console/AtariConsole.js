@@ -306,12 +306,6 @@ function AtariConsole() {
     function CartridgeSocket() {
 
         this.insert = function (cartridge, autoPower) {
-            // Special case for Savestates
-            //if (cartridge != null && cartridge instanceof CartridgeSavestate) {
-            //    insertSavestateCartridge((CartridgeSavestate) cartridge);
-            //    return;
-            //}
-            // Normal case
             if (autoPower && self.powerIsOn) self.powerOff();
             setCartridge(cartridge);
             if (autoPower && !self.powerIsOn) self.powerOn();
@@ -335,14 +329,6 @@ function AtariConsole() {
 
         this.removeInsertionListener = function (listener) {
             Util.arrayRemove(insertionListeners, listener);
-        };
-
-        this.insertSavestateCartridge = function (cartridge) {
-            //state = cartridge.getConsoleState();
-            //if (state != null) {
-            //    loadState(state);
-            //    self.showOSD("Savestate Cartridge loaded", true);
-            //}
         };
 
         var insertionListeners = [];

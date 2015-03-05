@@ -8,6 +8,17 @@ function TiaAudioSignal() {
         monitor = pMonitor;
     };
 
+    this.connectCartridge = function(pCartridge) {
+        cartridge = pCartridge;
+        if (cartridge && cartridge.needsAudioClock()) {
+            cartridgeNeedsClock = true;
+            cartridge.connectAudioSignal(this);
+        } else {
+            cartridgeNeedsClock = false;
+        }
+    };
+
+
     this.getChannel0 = function() {
         return channel0;
     };
@@ -16,7 +27,7 @@ function TiaAudioSignal() {
         return channel1;
     };
 
-    this.clockPulse = function() {
+    this.audioClockPulse = function() {
         if (frameSamples < samplesPerFrame)
             generateNextSamples(1);
     };
@@ -44,6 +55,7 @@ function TiaAudioSignal() {
         frameSamples = 0;
     };
 
+    // TODO Verify choppiness in DPC audio
     this.retrieveSamples = function(quant) {
         // Util.log(">>> Samples generated: " + (generatedSamples - retrievedSamples));
 
@@ -74,6 +86,9 @@ function TiaAudioSignal() {
     var generateNextSamples = function(quant) {
         var mixedSample;
         for (var i = quant; i > 0; i--) {
+
+            if (cartridgeNeedsClock) cartridge.audioClockPulse();
+
             if (signalOn) {
                 mixedSample = channel0.nextSample() - channel1.nextSample();
                 // Add a little damper effect to round the edges of the square wave
@@ -97,6 +112,9 @@ function TiaAudioSignal() {
 
     var monitor;
 
+    var cartridge;
+    var cartridgeNeedsClock = false;
+
     var signalOn = false;
     var channel0 = new TiaAudioChannel();
     var channel1 = new TiaAudioChannel();
@@ -109,7 +127,7 @@ function TiaAudioSignal() {
 
     var lastSample = 0;
 
-    var MAX_SAMPLES = 4 * JavatariParameters.AUDIO_BUFFER_SIZE;
+    var MAX_SAMPLES = 8 * JavatariParameters.AUDIO_BUFFER_SIZE;
     var MAX_AMPLITUDE = 0.5;
 
     var samples = new Array(MAX_SAMPLES);

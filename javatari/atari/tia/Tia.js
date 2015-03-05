@@ -35,12 +35,11 @@ function Tia(pCpu, pPia) {
             for (clock = 3; clock < HBLANK_DURATION; clock += 3) {		// 3 .. 66
                 if (!repeatLastLine) checkRepeatMode();
                 // Send clock/3 pulse to the CPU and PIA each 3rd TIA cycle
-                pia.clockPulse();
-                cpu.clockPulse();
+                bus.clockPulse();
             }
             // 67
             // First Audio Sample. 2 samples per scan line ~ 31440 KHz
-            audioSignal.clockPulse();
+            audioSignal.audioClockPulse();
             // Display period
             var subClock3 = 2;	    // To control the clock/3 cycles. First at clock 69
             for (clock = 68; clock < LINE_WIDTH; clock++) {			// 68 .. 227
@@ -59,7 +58,7 @@ function Tia(pCpu, pPia) {
             }
             // End of scan line
             // Second Audio Sample. 2 samples per scan line ~ 31440 KHz
-            audioSignal.clockPulse();
+            audioSignal.audioClockPulse();
             finishLine();
             // Send the finished line to the output and check if monitor vSynched
             frameEnd = videoSignal.nextLine(linePixels, vSyncOn);

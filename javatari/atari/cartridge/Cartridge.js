@@ -4,13 +4,14 @@
 
 function Cartridge() {
 
+    this.setROM = function(rom) {
+        this.rom = rom;
+    };
+
     this.powerOn = function() {
     };
 
     this.powerOff = function() {
-    };
-
-    this.connectBus = function(aBus) {
     };
 
     this.connectSaveStateSocket = function(socket) {
@@ -33,13 +34,16 @@ function Cartridge() {
     this.monitorBusBeforeWrite = function(address, val)  {
     };
 
-    this.needsClock = function() {
+    this.needsAudioClock = function() {
         return false;
     };
 
-    this.setROM = function(rom) {
-        this.rom = rom;
+    this.connectAudioSignal = function(signal) {
     };
+
+    this.audioClockPulse = function() {
+    };
+
 
      // Controls interface  ---------------------------------
 

@@ -15,7 +15,7 @@ function M6502() {
     this.clockPulse = function() {
         if (!RDY) return;      // TODO Should be ignored in the last cycle of the instruction
         T++;
-        instruction[T]();
+        instruction[T]();      // TODO Investigate "Chetiry" problem here when P1BUTTON pressed
     };
 
     this.connectBus = function(aBus) {
