@@ -38,8 +38,10 @@ function Bus(pCpu, pTia, pPia, pRam) {
 
     this.setCartridge = function(pCartridge) {
         cartridge = pCartridge;
-        if (cartridge) data = 0;
-        tia.getAudioOutput().connectCartridge(pCartridge);
+        if (cartridge) {
+            data = 0;
+            cartridge.connectBus(this);
+        }
         cartridgeNeedsBusMonitoring = cartridge && cartridge.needsBusMonitoring();
     };
 

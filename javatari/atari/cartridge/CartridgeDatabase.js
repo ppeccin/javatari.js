@@ -40,7 +40,7 @@ function CartridgeDatabase() {
             Util.log("Unknown ROM: " + info.n);
         }
 
-        finishInfo(info, rom.source);
+        finishInfo(info, rom.source, hash);
         return info;
     };
 
@@ -89,11 +89,12 @@ function CartridgeDatabase() {
     };
 
     // Fill absent information based on ROM name
-    var finishInfo = function(info, romSource) {
+    var finishInfo = function(info, romSource, hash) {
+        // Saves the hash on the info
+        info.h = hash;
         // Compute label based on name
         if (!info.l) info.l = produceCartridgeLabel(info.n);
         var name = info.n.toUpperCase();
-
         // Adjust Paddles information if absent
         Paddles: if (!info.p) {
             info.p = 0;
@@ -137,6 +138,7 @@ function CartridgeDatabase() {
         }
     };
 
+    // TODO Boost by filename not working properly
     var boostPriority = function(formatOption, info) {
         if (info.f && formatOption.name === info.f)
             formatOption.priorityBoosted = formatOption.priority - FORMAT_PRIORITY_BOOST;

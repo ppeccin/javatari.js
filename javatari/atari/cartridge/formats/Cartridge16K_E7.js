@@ -82,7 +82,7 @@ function Cartridge16K_E7(rom, format) {
 
     var EXTRA_RAM_SLICE1_START = 1024;
 
-    var extraRAM = new Array(2048);
+    var extraRAM = Util.arrayFill(new Array(2048), 0);
     var extraRAMSlice0Active = false;
     var extraRAMSlice1Offset = EXTRA_RAM_SLICE1_START;
 

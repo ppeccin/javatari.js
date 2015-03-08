@@ -70,13 +70,9 @@ function AtariConsole() {
 
     var setCartridge = function(cartridge) {
         JavatariCartridge = cartridge;
-        controlsSocket.removeForwardedInput(getCartridge());
+        var removedCartridge = getCartridge();
         bus.setCartridge(cartridge);
-        cartridgeSocket.cartridgeInserted(cartridge);
-        if (cartridge) {
-            controlsSocket.addForwardedInput(cartridge);
-            saveStateSocket.connectCartridge(cartridge);
-        }
+        cartridgeSocket.cartridgeInserted(cartridge, removedCartridge);
     };
 
     var getCartridge = function() {
@@ -184,7 +180,10 @@ function AtariConsole() {
         controlsSocket.addForwardedInput(tia);
         controlsSocket.addForwardedInput(pia);
         cartridgeSocket = new CartridgeSocket();
+        cartridgeSocket.addInsertionListener(tia.getAudioOutput());
+        cartridgeSocket.addInsertionListener(controlsSocket);
         saveStateSocket = new SaveStateSocket();
+        cartridgeSocket.addInsertionListener(saveStateSocket);
     };
 
 
@@ -315,9 +314,9 @@ function AtariConsole() {
             return getCartridge();
         };
 
-        this.cartridgeInserted = function (cartridge) {
+        this.cartridgeInserted = function (cartridge, removedCartridge) {
             for (var i = 0; i < insertionListeners.length; i++)
-                insertionListeners[i].cartridgeInserted(cartridge);
+                insertionListeners[i].cartridgeInserted(cartridge, removedCartridge);
         };
 
         this.addInsertionListener = function (listener) {
@@ -341,6 +340,11 @@ function AtariConsole() {
 
         this.connectControls = function(pControls) {
             controls = pControls;
+        };
+
+        this.cartridgeInserted = function(cartridge, removedCartridge) {
+            if (removedCartridge) controlsSocket.removeForwardedInput(removedCartridge);
+            if (cartridge) controlsSocket.addForwardedInput(cartridge);
         };
 
         this.clockPulse = function() {
@@ -404,12 +408,12 @@ function AtariConsole() {
             return media;
         };
 
-        this.externalStateChange = function() {
-            // Nothing
+        this.cartridgeInserted = function(cartridge) {
+            if (cartridge) cartridge.connectSaveStateSocket(this);
         };
 
-        this.connectCartridge = function(cartridge) {
-            cartridge.connectSaveStateSocket(this);
+        this.externalStateChange = function() {
+            // Nothing
         };
 
         this.saveState = function(slot) {

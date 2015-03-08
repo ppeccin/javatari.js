@@ -12,7 +12,6 @@ function Cartridge8K_512K_3E(rom, format) {
         bytes = rom.content;        // uses the content of the ROM directly
         selectableSliceMaxBank = (bytes.length - BANK_SIZE) / BANK_SIZE - 1;
         fixedSliceAddressOffset = bytes.length - BANK_SIZE * 2;
-        extraRAM = new Array(EXTRA_RAM_BANK_SIZE);  // Pre allocate minimum RAM bank for performance
     }
 
     this.read = function(address) {
@@ -87,16 +86,18 @@ function Cartridge8K_512K_3E(rom, format) {
 
     var bytes;
 
+    var EXTRA_RAM_BANK_SIZE = 1024;
+
     var bankAddressOffset = 0;
     var selectableSliceMaxBank;
-    var fixedSliceAddressOffset;		            // This slice is fixed at the last bank
-    var extraRAMBankAddressOffset = -1;		        // No Extra RAM bank selected
-    var extraRAM = [];
+    var fixedSliceAddressOffset;		                                // This slice is fixed at the last bank
+    var extraRAMBankAddressOffset = -1;		                            // No Extra RAM bank selected
+    var extraRAM = Util.arrayFill(new Array(EXTRA_RAM_BANK_SIZE), 0);   // Pre allocate minimum RAM bank for performance
+
 
     var ADDRESS_MASK = 0x0fff;
     var BANK_SIZE = 2048;
     var FIXED_SLICE_START_ADDRESS = 2048;
-    var EXTRA_RAM_BANK_SIZE = 1024;
 
 
     if (rom) init(this);

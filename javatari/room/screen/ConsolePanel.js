@@ -144,7 +144,7 @@ function ConsolePanel(mainElement) {
     var monitorCartridgeControlButton = function (but, control) {
         but.style.cursor = "pointer";
         // A "click" event and not a "mousedown" is necessary here. Without a click, FF does not open the Open File window
-        // TODO Hotkeys for this are also not working in FF since its not a click event!
+        // TODO Hotkeys for this are also not working in FF since they're not a click events!
         but.addEventListener("click", function (e) {
             e.preventDefault();
             screen.getMonitor().controlActivated(control);

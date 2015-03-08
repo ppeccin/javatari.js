@@ -154,6 +154,44 @@ CartridgeFormats = {
         }
     },
 
+    "FA2": {
+        name: "FA2",
+        desc: "24K/28K/32K CBS RAM Plus",
+        priority: 102,
+        tryFormat: function(rom) {
+            if (rom.content.length === 24576 || rom.content.length === 28672 || rom.content.length === 32768) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge24K_28K_32K_FA2(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge24K_28K_32K_FA2.createFromSaveState(state);
+        }
+    },
+
+    "FA2cu": {
+        name: "FA2cu",
+        desc: "32K CBS RAM Plus CU Image",
+        priority: 103,
+        tryFormat: function(rom) {
+            if (rom.content.length === 32768) {
+                // Check for the values $10adab1e, for "loadable", starting at position 32 (33rd byte)
+                // This is a hint that the content is in CU format
+                var foundHint = Util.arraysEqual(rom.content.slice(32, 32 + 4), this.cuMagicWord);
+                this.priority = 103 - (foundHint ? 30 : 0);
+                return this;
+            }
+        },
+        createCartridgeFromRom: function(rom) {
+            // ROM is only 28K. The first 1024 bytes are custom ARM content. ROM begins after that
+            return new Cartridge24K_28K_32K_FA2(rom, this, 1024);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge24K_28K_32K_FA2.createFromSaveState(state);
+        },
+        cuMagicWord: [0x1e, 0xab, 0xad, 0x10]
+    },
+
     "EF": {
         name: "EF",
         desc: "8K-64K H. Runner (+RAM)",

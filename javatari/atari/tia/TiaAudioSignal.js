@@ -8,16 +8,10 @@ function TiaAudioSignal() {
         monitor = pMonitor;
     };
 
-    this.connectCartridge = function(pCartridge) {
-        cartridge = pCartridge;
-        if (cartridge && cartridge.needsAudioClock()) {
-            cartridgeNeedsClock = true;
-            cartridge.connectAudioSignal(this);
-        } else {
-            cartridgeNeedsClock = false;
-        }
+    this.cartridgeInserted = function(pCartridge) {
+        if (pCartridge && pCartridge.needsAudioClock()) cartridgeNeedsAudioClock = pCartridge;
+        else cartridgeNeedsAudioClock = null;
     };
-
 
     this.getChannel0 = function() {
         return channel0;
@@ -57,37 +51,42 @@ function TiaAudioSignal() {
 
     // TODO Verify choppiness in DPC audio
     this.retrieveSamples = function(quant) {
-        // Util.log(">>> Samples generated: " + (generatedSamples - retrievedSamples));
+        //Util.log(">>> Samples generated: " + (nextSampleToGenerate - nextSampleToRetrieve));
 
-        var missing = generatedSamples >= retrievedSamples
-            ? quant - (generatedSamples - retrievedSamples)
-            : quant - (MAX_SAMPLES - retrievedSamples + generatedSamples);
+        //if (nextSampleToGenerate === nextSampleToRetrieve)
+        //    console.log("MATCH: " + nextSampleToGenerate );
+
+        //if (nextSampleToGenerate < nextSampleToRetrieve)
+        //    console.log("WRAP: " + nextSampleToGenerate );
+
+        var missing = nextSampleToGenerate >= nextSampleToRetrieve
+            ? quant - (nextSampleToGenerate - nextSampleToRetrieve)
+            : quant - (MAX_SAMPLES - nextSampleToRetrieve + nextSampleToGenerate);
 
         if (missing > 0) {
-            generateNextSamples(missing);
+            generateNextSamples(missing, true);
             //Util.log(">>> Extra samples generated: " + missing);
         } else {
             //Util.log(">>> No missing samples");
         }
 
-        var end = retrievedSamples + quant;
+        var end = nextSampleToRetrieve + quant;
         if (end >= MAX_SAMPLES) end -= MAX_SAMPLES;
 
         var result = retrieveResult;
 
-        result.start = retrievedSamples;
-        result.end = end - 1;
+        result.start = nextSampleToRetrieve;
 
-        retrievedSamples = end;
+        nextSampleToRetrieve = end;
 
         return result;
     };
 
-    var generateNextSamples = function(quant) {
+    var generateNextSamples = function(quant, extra) {
         var mixedSample;
         for (var i = quant; i > 0; i--) {
 
-            if (cartridgeNeedsClock) cartridge.audioClockPulse();
+            if (cartridgeNeedsAudioClock) cartridgeNeedsAudioClock.audioClockPulse();
 
             if (signalOn) {
                 mixedSample = channel0.nextSample() - channel1.nextSample();
@@ -100,43 +99,41 @@ function TiaAudioSignal() {
                 mixedSample = 0;
             }
 
-            samples[generatedSamples++] = mixedSample * MAX_AMPLITUDE;
+            samples[nextSampleToGenerate] = mixedSample * MAX_AMPLITUDE;
 
-            if (generatedSamples >= MAX_SAMPLES)
-                generatedSamples = 0;
-
-            frameSamples++;
+            nextSampleToGenerate++;
+            if (nextSampleToGenerate >= MAX_SAMPLES)
+                nextSampleToGenerate = 0;
         }
+        if (!extra) frameSamples += quant;
     };
 
 
     var monitor;
 
-    var cartridge;
-    var cartridgeNeedsClock = false;
+    var cartridgeNeedsAudioClock;
 
     var signalOn = false;
     var channel0 = new TiaAudioChannel();
     var channel1 = new TiaAudioChannel();
 
-    var generatedSamples = 0;
-    var retrievedSamples = 0;
+    var nextSampleToGenerate = 0;
+    var nextSampleToRetrieve = 0;
 
     var samplesPerFrame =  TiaAudioSignal.SAMPLE_RATE / VideoStandard.NTSC.fps;
     var frameSamples = 0;
 
     var lastSample = 0;
 
-    var MAX_SAMPLES = 8 * JavatariParameters.AUDIO_BUFFER_SIZE;
+    var MAX_SAMPLES = 10 * JavatariParameters.AUDIO_BUFFER_SIZE;
     var MAX_AMPLITUDE = 0.5;
 
-    var samples = new Array(MAX_SAMPLES);
+    var samples = Util.arrayFill(new Array(MAX_SAMPLES), 0);
 
     var retrieveResult = {
         buffer: samples,
         bufferSize: MAX_SAMPLES,
-        start: 0,
-        end: 0
+        start: 0
     };
 
 }

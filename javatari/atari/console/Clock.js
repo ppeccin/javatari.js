@@ -6,7 +6,7 @@ function Clock(clockDriven, pCyclesPerSecond) {
     var self = this;
 
     function init() {
-        internalSetFrequency(pCyclesPerSecond || 60);
+        internalSetFrequency(pCyclesPerSecond || NATURAL_FPS);
     }
 
     this.go = function() {
@@ -35,7 +35,7 @@ function Clock(clockDriven, pCyclesPerSecond) {
     var internalSetFrequency = function(freq) {
         cyclesPerSecond = freq;
         cycleTimeMs = 1000 / freq;
-        useRequestAnimationFrame = freq === 60;
+        useRequestAnimationFrame = freq === NATURAL_FPS;
     };
 
     var pulse = function() {
@@ -78,6 +78,7 @@ function Clock(clockDriven, pCyclesPerSecond) {
     var pausePending = false;
     var continuationAfterPause = null;
 
+    var NATURAL_FPS = JavatariParameters.HARDWARE_NATURAL_FPS;
 
     init();
 

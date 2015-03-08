@@ -39,7 +39,7 @@ function Speaker() {
 
         // Assumes there is only one channel
         var outputBuffer = event.outputBuffer.getChannelData(0);
-        var input = audioSignal.retrieveSamples(outputBuffer.length * resamplingFactor);
+        var input = audioSignal.retrieveSamples((outputBuffer.length * resamplingFactor) | 0);
 
         Util.arrayCopyCircularSourceWithStep(
             input.buffer, input.start, input.bufferSize, resamplingFactor,

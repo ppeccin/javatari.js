@@ -10,12 +10,6 @@ function CartridgeBankedByBusMonitoring(rom, format) {
         return true;
     };
 
-    this.monitorBusBeforeRead = function(address, data) {
-    };
-
-    this.monitorBusBeforeWrite = function(address, val) {
-    };
-
 }
 
 CartridgeBankedByBusMonitoring.prototype = Cartridge.base;

@@ -15,11 +15,10 @@ function Cartridge10K_DPCa(rom, format) {
     this.powerOn = function() {
         audioClockStep = AUDIO_CLOCK_DEFAULT_STEP;
         audioClockCycles = 0;
-
     };
 
-    this.connectAudioSignal = function(signal) {
-        audioSignal = signal;
+    this.connectBus = function(bus) {
+        dpcAudioChannel = bus.getTia().getAudioOutput().getChannel0();
     };
 
     this.needsAudioClock = function() {
@@ -59,7 +58,7 @@ function Cartridge10K_DPCa(rom, format) {
         if (!audioChanged) return;
         // Send a volume update directly to TIA Audio Channel 0
         updateAudioOutput();
-        audioSignal.getChannel0().setVolume(audioOutput);
+        dpcAudioChannel.setVolume(audioOutput);
     };
 
     var maskAddress = function(address) {
@@ -249,15 +248,16 @@ function Cartridge10K_DPCa(rom, format) {
     var AUDIO_CLOCK_DEFAULT_STEP = 0.62;
     var DPC_ROM_END = 8192 + 2048 - 1;
 
-    var audioSignal;
+    var dpcAudioChannel;
+
     var bytes;
     var bankAddressOffset = 0;
     var randomNumber = 0;
     var fetcherPointer = Util.arrayFill(new Array(8), 0);
-    var fetcherStart = Util.arrayFill(new Array(8), 0);
-    var fetcherEnd = Util.arrayFill(new Array(8), 0);
-    var fetcherMask = Util.arrayFill(new Array(8), 0);
-    var audioMode = Util.arrayFill(new Array(8), 0);
+    var fetcherStart =   Util.arrayFill(new Array(8), 0);
+    var fetcherEnd =     Util.arrayFill(new Array(8), 0);
+    var fetcherMask =    Util.arrayFill(new Array(8), 0);
+    var audioMode =      Util.arrayFill(new Array(8), 0);
     var audioClockStep = AUDIO_CLOCK_DEFAULT_STEP;
     var audioClockCycles = 0;
     var audioChanged = true;

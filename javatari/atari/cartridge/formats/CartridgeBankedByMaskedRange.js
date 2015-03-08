@@ -26,7 +26,7 @@ function CartridgeBankedByMaskedRange(rom, format, pBaseBankSwitchAddress, super
             superChipMode = !!superChip;
             superChipAutoDetect = false;
         }
-        extraRAM = superChip !== false ? bytes.slice(0, extraRAMSize) : null;
+        extraRAM = superChip !== false ? Util.arrayFill(new Array(extraRAMSize), 0) : null;
     }
 
     this.read = function(address) {
@@ -84,7 +84,7 @@ function CartridgeBankedByMaskedRange(rom, format, pBaseBankSwitchAddress, super
         topBankSwitchAddress =  state.tb;
         superChipMode = !!state.s;
         superChipAutoDetect = !!state.sa;
-        extraRAM = Util.byteStringToUInt8Array(atob(state.e));
+        extraRAM = state.e && Util.byteStringToUInt8Array(atob(state.e));
     };
 
 

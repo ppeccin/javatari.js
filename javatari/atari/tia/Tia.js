@@ -24,7 +24,8 @@ function Tia(pCpu, pPia) {
     };
 
     this.frame = function() {
-        var frameEnd = false;
+        if (debugPause)
+            if (debugPauseMoreFrames-- <= 0) return;
         do {
             clock = 0;
             // Send the first clock/3 pulse to the CPU and PIA, perceived by TIA at clock 0
@@ -60,9 +61,8 @@ function Tia(pCpu, pPia) {
             // Second Audio Sample. 2 samples per scan line ~ 31440 KHz
             audioSignal.audioClockPulse();
             finishLine();
-            // Send the finished line to the output and check if monitor vSynched
-            frameEnd = videoSignal.nextLine(linePixels, vSyncOn);
-        } while(!frameEnd);
+            // Send the finished line to the output and check if monitor vSynched (true returned)
+        } while(!videoSignal.nextLine(linePixels, vSyncOn));
         // Ask for a refresh of the frame
         audioSignal.finishFrame();
         videoSignal.finishFrame();
@@ -945,11 +945,12 @@ function Tia(pCpu, pPia) {
                 videoSignal.showOSD(debugNoCollisions ? "Collisions OFF" : "Collisions ON", true);
                 return;
             case controls.PAUSE:
-                debugPause = !debugPause; debugPauseMoreFrames = 0;
+                debugPause = !debugPause; debugPauseMoreFrames = 1;
                 videoSignal.showOSD(debugPause ? "PAUSE" : "RESUME", true);
                 return;
             case controls.FRAME:
-                debugPauseMoreFrames++; return;
+                if (debugPause) debugPauseMoreFrames = 1;
+                return;
             case controls.TRACE:
                 cpu.trace = !cpu.trace; return;
         }
@@ -1203,7 +1204,7 @@ function Tia(pCpu, pPia) {
     var powerOn = false;
 
     var clock;
-    var linePixels = new Array(LINE_WIDTH);
+    var linePixels = Util.arrayFill(new Array(LINE_WIDTH), 0);
 
     var vSyncOn = false;
     var vBlankOn = false;

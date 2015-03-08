@@ -39,7 +39,10 @@ if (!JavatariParameters.SCREEN_CONTROL_BAR)
     JavatariParameters.SCREEN_CONTROL_BAR =           0;             // 0 = Always, 1 = Hover, 2 = Legacy
 
 if (!JavatariParameters.AUDIO_BUFFER_SIZE)
-    JavatariParameters.AUDIO_BUFFER_SIZE =            1024;          // 256, 512, 1024, 2048, 4096, 8192
+    JavatariParameters.AUDIO_BUFFER_SIZE =            512;          // 256, 512, 1024, 2048, 4096, 8192
+
+if (!JavatariParameters.HARDWARE_NATURAL_FPS)
+    JavatariParameters.HARDWARE_NATURAL_FPS =         60;             // 60, 50 fps
 
 if (!JavatariParameters.IMAGES_PATH)
     JavatariParameters.IMAGES_PATH =                  "javatari/room/screen/images/";

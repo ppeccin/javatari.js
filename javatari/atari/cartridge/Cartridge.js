@@ -14,6 +14,9 @@ function Cartridge() {
     this.powerOff = function() {
     };
 
+    this.connectBus = function(bus) {
+    };
+
     this.connectSaveStateSocket = function(socket) {
     };
 
@@ -36,9 +39,6 @@ function Cartridge() {
 
     this.needsAudioClock = function() {
         return false;
-    };
-
-    this.connectAudioSignal = function(signal) {
     };
 
     this.audioClockPulse = function() {

@@ -43,6 +43,7 @@ JavatariLoader = {
         "javatari/atari/cartridge/formats/Cartridge8K_FE.js",
         "javatari/atari/cartridge/formats/Cartridge16K_E7.js",
         "javatari/atari/cartridge/formats/Cartridge10K_DPCa.js",
+        "javatari/atari/cartridge/formats/Cartridge24K_28K_32K_FA2.js",
         "javatari/atari/cartridge/formats/CartridgeBankedByBusMonitoring.js",
         "javatari/atari/cartridge/formats/Cartridge8K_512K_3F.js",
         "javatari/atari/cartridge/formats/Cartridge8K_512K_3E.js",

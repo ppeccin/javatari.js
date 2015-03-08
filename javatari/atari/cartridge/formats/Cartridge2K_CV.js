@@ -57,7 +57,7 @@ function Cartridge2K_CV(rom, format) {
 
 
     var bytes;
-    var extraRAM = new Array(1024);
+    var extraRAM = Util.arrayFill(new Array(1024), 0);
 
     var ADDRESS_MASK = 0x0fff;
 
