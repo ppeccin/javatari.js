@@ -139,36 +139,6 @@ CartridgeFormats = {
         }
     },
 
-    "FA": {
-        name: "FA",
-        desc: "12K CBS RAM Plus",
-        priority: 101,
-        tryFormat: function(rom) {
-            if (rom.content.length === 12288) return this;
-        },
-        createCartridgeFromRom: function(rom) {
-            return new CartridgeBankedByMaskedRange(rom, this, 0x0ff8, true, 256);
-        },
-        createCartridgeFromSaveState: function(state) {
-            return CartridgeBankedByMaskedRange.createFromSaveState(state);
-        }
-    },
-
-    "FA2": {
-        name: "FA2",
-        desc: "24K/28K/32K CBS RAM Plus",
-        priority: 102,
-        tryFormat: function(rom) {
-            if (rom.content.length === 24576 || rom.content.length === 28672 || rom.content.length === 32768) return this;
-        },
-        createCartridgeFromRom: function(rom) {
-            return new Cartridge24K_28K_32K_FA2(rom, this);
-        },
-        createCartridgeFromSaveState: function(state) {
-            return Cartridge24K_28K_32K_FA2.createFromSaveState(state);
-        }
-    },
-
     "FA2cu": {
         name: "FA2cu",
         desc: "32K CBS RAM Plus CU Image",
@@ -190,6 +160,36 @@ CartridgeFormats = {
             return Cartridge24K_28K_32K_FA2.createFromSaveState(state);
         },
         cuMagicWord: [0x1e, 0xab, 0xad, 0x10]
+    },
+
+    "FA2": {
+        name: "FA2",
+        desc: "24K/28K/32K CBS RAM Plus",
+        priority: 102,
+        tryFormat: function(rom) {
+            if (rom.content.length === 24576 || rom.content.length === 28672 || rom.content.length === 32768) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge24K_28K_32K_FA2(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge24K_28K_32K_FA2.createFromSaveState(state);
+        }
+    },
+
+    "FA": {
+        name: "FA",
+        desc: "12K CBS RAM Plus",
+        priority: 101,
+        tryFormat: function(rom) {
+            if (rom.content.length === 12288) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new CartridgeBankedByMaskedRange(rom, this, 0x0ff8, true, 256);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return CartridgeBankedByMaskedRange.createFromSaveState(state);
+        }
     },
 
     "EF": {
@@ -250,7 +250,66 @@ CartridgeFormats = {
         createCartridgeFromSaveState: function(state) {
             return Cartridge8K_512K_3E.createFromSaveState(state);
         }
-    }
+    },
 
+    "X07": {
+        name: "X07",
+        desc: "64K AtariAge",
+        priority: 102,
+        tryFormat: function(rom) {
+            if (rom.content.length === 65536) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge64K_X07(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge64K_X07.createFromSaveState(state);
+        }
+    },
+
+    "0840": {
+        name: "0840",
+        desc: "8K Econobanking",
+        priority: 116,
+        tryFormat: function(rom) {
+            if (rom.content.length === 8192) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge8K_0840(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge8K_0840.createFromSaveState(state);
+        }
+    },
+
+    "UA": {
+        name: "UA",
+        desc: "8K UA Limited",
+        priority: 115,
+        tryFormat: function(rom) {
+            if (rom.content.length === 8192) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge8K_UA(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge8K_UA.createFromSaveState(state);
+        }
+    },
+
+    "SB": {
+        name: "SB",
+        desc: "8K-256K Superbanking",
+        priority: 113,
+        tryFormat: function(rom) {
+            if (rom.content.length % 4096 === 0 && rom.content.length >= 8192 && rom.content.length <= 64 * 4096) return this;
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge8K_256K_SB(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge8K_256K_SB.createFromSaveState(state);
+        }
+    }
 
 };

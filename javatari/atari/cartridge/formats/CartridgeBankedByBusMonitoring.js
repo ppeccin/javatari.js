@@ -10,6 +10,17 @@ function CartridgeBankedByBusMonitoring(rom, format) {
         return true;
     };
 
+    this.monitorBusBeforeRead = function(address, data) {
+        this.performBankSwitchOnMonitoredAccess(address)
+    };
+
+    this.monitorBusBeforeWrite = function(address, data) {
+        this.performBankSwitchOnMonitoredAccess(address)
+    };
+
+    this.performBankSwitchOnMonitoredAccess = function(address) {
+    };
+
 }
 
 CartridgeBankedByBusMonitoring.prototype = Cartridge.base;

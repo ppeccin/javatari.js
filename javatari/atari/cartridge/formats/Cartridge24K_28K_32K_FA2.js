@@ -6,6 +6,7 @@
 // Also supports SC RAM Saving on Harmony Flash memory (emulated to a "savestate" file)
 
 function Cartridge24K_28K_32K_FA2(rom, format, pRomStartAddress) {
+    var self = this;
 
     function init(self) {
         self.rom = rom;
@@ -80,13 +81,10 @@ function Cartridge24K_28K_32K_FA2(rom, format, pRomStartAddress) {
 
     var readMemoryFromFlash = function() {
         bus.getTia().getVideoOutput().showOSD("Reading from Cartridge Flash Memory...", true);
-        if (saveStateSocket)
-            try {
-                var data = saveStateSocket.getMedia().loadResourceFromFile(flashMemoryResourceName());
-                if (data && data.length === 256) harmonyFlashMemory = data;
-            } catch(ex) {
-                // Give up
-            }
+        if (saveStateSocket) {
+            var data = saveStateSocket.getMedia().loadResourceFromFile(flashMemoryResourceName());
+            if (data) harmonyFlashMemory = Util.byteStringToUInt8Array(atob(data));
+        }
         extraRAM = harmonyFlashMemory.slice(0);
     };
 
@@ -94,7 +92,7 @@ function Cartridge24K_28K_32K_FA2(rom, format, pRomStartAddress) {
         bus.getTia().getVideoOutput().showOSD("Writing to Cartridge Flash Memory...", true);
         harmonyFlashMemory = extraRAM.slice(0);
         if (saveStateSocket)
-            saveStateSocket.getMedia().saveResourceToFile(flashMemoryResourceName(), harmonyFlashMemory);
+            saveStateSocket.getMedia().saveResourceToFile(flashMemoryResourceName(), btoa(Util.uInt8ArrayToByteString(harmonyFlashMemory)));
     };
 
     var detectFlashOperationCompletion = function() {
@@ -111,11 +109,7 @@ function Cartridge24K_28K_32K_FA2(rom, format, pRomStartAddress) {
     };
 
     var flashMemoryResourceName = function() {
-        var name = rom.info.h + ".hfm";
-
-        console.log(name);
-
-        return name;
+        return "hfm" + self.rom.info.h;
     };
 
 
@@ -129,7 +123,9 @@ function Cartridge24K_28K_32K_FA2(rom, format, pRomStartAddress) {
             rs: romStartAddress,
             bo: bankAddressOffset,
             tb: topBankSwitchAddress,
-            e: btoa(Util.uInt8ArrayToByteString(extraRAM))
+            e: btoa(Util.uInt8ArrayToByteString(extraRAM)),
+            ho: harmonyFlashOpInProgress,
+            ht: harmonyFlashOpStartTime
         };
     };
 
@@ -141,6 +137,8 @@ function Cartridge24K_28K_32K_FA2(rom, format, pRomStartAddress) {
         bankAddressOffset = state.bo;
         topBankSwitchAddress =  state.tb;
         extraRAM = Util.byteStringToUInt8Array(atob(state.e));
+        harmonyFlashOpInProgress = state.ho || 0;
+        harmonyFlashOpStartTime = Date.now();   // Always as if operation just started
     };
 
 

@@ -14,11 +14,11 @@ function LocalStorageSaveStateMedia() {
 
     this.saveState = function(slot, state) {
         var data = buildDataFromState(state);
-        return data && saveToLocalStorage("javatarisave" + slot, data);
+        return data && saveToLocalStorage("save" + slot, data);
     };
 
     this.loadState = function(slot) {
-        var data = loadFromLocalStorage("javatarisave" + slot);
+        var data = loadFromLocalStorage("save" + slot);
         return buildStateFromData(data);
     };
 
@@ -32,28 +32,42 @@ function LocalStorageSaveStateMedia() {
     };
 
     this.saveResourceToFile = function(entry, data) {
-        return saveToLocalStorage(entry, data);
+        try {
+            var res = data && JSON.stringify(data);
+            return saveToLocalStorage(entry, res);
+        } catch(ex) {
+            // give up
+        }
     };
 
     this.loadResourceFromFile = function(entry) {
-        return loadFromLocalStorage(entry);
+        try {
+            var res = loadFromLocalStorage(entry);
+            return res && JSON.parse(res);
+        } catch(ex) {
+            // give up
+        }
     };
 
     var saveToLocalStorage = function(entry, data) {
         if (!localStorage) return;
 
-        localStorage[entry] = data;
+        localStorage["javatari" + entry] = data;
         return true;
     };
 
     var loadFromLocalStorage = function(entry) {
         if (!localStorage) return;
 
-        return localStorage[entry];
+        return localStorage["javatari" + entry];
     };
 
     var buildDataFromState = function(state) {
-        return SAVE_STATE_IDENTIFIER + JSON.stringify(state);
+        try {
+            return SAVE_STATE_IDENTIFIER + JSON.stringify(state);
+        } catch(ex) {
+            // give up
+        }
     };
 
     var buildStateFromData = function (data) {

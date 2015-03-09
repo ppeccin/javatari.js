@@ -35,6 +35,11 @@ function Cartridge8K_512K_3E(rom, format) {
             extraRAM[extraRAMBankAddressOffset + maskedAddress - 0x0400] = val;
     };
 
+    var maskAddress = function(address) {
+        return address & ADDRESS_MASK;
+    };
+
+    // Bank switching is done only on monitored writes
     this.monitorBusBeforeWrite = function(address, data) {
         // Perform ROM bank switching as needed
         if (address === 0x003f) {
@@ -50,10 +55,6 @@ function Cartridge8K_512K_3E(rom, format) {
             var ramBank = data & 0xff;	// unsigned
             extraRAMBankAddressOffset = ramBank * EXTRA_RAM_BANK_SIZE;
         }
-    };
-
-    var maskAddress = function(address) {
-        return address & ADDRESS_MASK;
     };
 
 

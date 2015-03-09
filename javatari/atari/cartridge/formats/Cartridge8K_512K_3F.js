@@ -15,13 +15,14 @@ function Cartridge8K_512K_3F(rom, format) {
     }
 
     this.read = function(address) {
-        var maskedAddress = maskAddress(address);
+        var maskedAddress = address & ADDRESS_MASK;
         if (maskedAddress >= FIXED_SLICE_START_ADDRESS)			// Fixed slice
             return bytes[fixedSliceAddressOffset + maskedAddress];
         else
             return bytes[bankAddressOffset + maskedAddress];	// Selectable slice
     };
 
+     // Bank switching is done only on monitored writes
     this.monitorBusBeforeWrite = function(address, data) {
         // Perform bank switching as needed
         if (address <= 0x003f) {
@@ -29,10 +30,6 @@ function Cartridge8K_512K_3F(rom, format) {
             if (bank <= selectableSliceMaxBank)
                 bankAddressOffset = bank * BANK_SIZE;
         }
-    };
-
-    var maskAddress = function(address) {
-        return address & ADDRESS_MASK;
     };
 
 

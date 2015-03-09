@@ -138,7 +138,6 @@ function CartridgeDatabase() {
         }
     };
 
-    // TODO Boost by filename not working properly
     var boostPriority = function(formatOption, info) {
         if (info.f && formatOption.name === info.f)
             formatOption.priorityBoosted = formatOption.priority - FORMAT_PRIORITY_BOOST;
