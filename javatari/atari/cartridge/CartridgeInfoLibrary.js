@@ -1,3 +1,5 @@
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
+
 CartridgeInfoLibrary = {
 	version: 20130406,
 	"0685BD0BCB975CEEF7041749A5454A48":{n:"11 Sprite Demo (Piero Cavina) (PD)"},

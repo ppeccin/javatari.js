@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 04/01/2015.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function DOMConsoleControls() {
     var self = this;
@@ -410,7 +408,7 @@ function DOMConsoleControls() {
     var KEY_ALT_MASK   = 2;
     var KEY_SHIFT_MASK = 4;
 
-    var PADDLES_MODE = JavatariParameters.PADDLES_MODE;
+    var PADDLES_MODE = Javatari.PADDLES_MODE;
 
 
     init();

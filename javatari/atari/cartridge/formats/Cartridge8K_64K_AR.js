@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 20/11/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 // Implements the n * 8448 byte "AR" Arcadia/Starpath/Supercharger tape format
 
@@ -277,4 +275,13 @@ Cartridge8K_64K_AR.PART_SIZE = 4 * Cartridge8K_64K_AR.BANK_SIZE + Cartridge8K_64
 Cartridge8K_64K_AR.peekPartNoOnTape = function(tapeContent, tapeOffset) {
     return tapeContent[tapeOffset + 4*Cartridge8K_64K_AR.BANK_SIZE + 5];
 };
+
+Cartridge8K_64K_AR.checkTape = function(rom) {
+    if (Cartridge8K_64K_AR.peekPartNoOnTape(rom.content, 0) != 0) {
+        var ex = new Error("Wrong Supercharger Tape Part ROM!\nPlease load a Full Tape ROM file.");
+        ex.formatDenial = true;
+        throw ex;
+    }
+};
+
 

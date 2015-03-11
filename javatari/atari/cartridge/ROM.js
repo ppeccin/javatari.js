@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 14/01/2015.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function ROM(source, content, info) {
 

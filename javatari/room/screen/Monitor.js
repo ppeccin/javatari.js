@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 22/11/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function Monitor() {
 
@@ -271,7 +269,7 @@ function Monitor() {
     };
 
     var cartridgeChangeDisabledWarning = function() {
-        if (JavatariParameters.CARTRIDGE_CHANGE_DISABLED) {
+        if (Javatari.CARTRIDGE_CHANGE_DISABLED) {
             display.showOSD("Cartridge change is disabled", true);
             return true;
         }
@@ -386,7 +384,7 @@ function Monitor() {
 
     var debug = 0;
     var showStats = false;
-    var fixedSizeMode = JavatariParameters.SCREEN_RESIZE_DISABLED;
+    var fixedSizeMode = Javatari.SCREEN_RESIZE_DISABLED;
 
     var DEFAULT_ORIGIN_X = 68;
     var DEFAULT_ORIGIN_Y_PCT = 12.4;		// Percentage of height
@@ -397,7 +395,7 @@ function Monitor() {
     var DEFAULT_SCALE_Y = 2;
     var VSYNC_TOLERANCE = 16;
     var EXTRA_UPPER_VSYNC_TOLERANCE = 5;
-    var CRT_MODE = JavatariParameters.SCREEN_CRT_MODE;
+    var CRT_MODE = Javatari.SCREEN_CRT_MODE;
     var CRT_MODE_NAMES = [ "OFF", "Phosphor", "Phosphor Scanlines", "RGB", "RGB Phosphor" ];
 
     var crtMode = CRT_MODE < 0 ? 0 : CRT_MODE;

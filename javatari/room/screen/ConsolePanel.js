@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 22/11/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function ConsolePanel(mainElement) {
 
@@ -81,7 +79,7 @@ function ConsolePanel(mainElement) {
         cartChangeButton = addButton(143, 51 - 144, 184, 55, 0, 0, true);
         monitorCartridgeControlButton(cartChangeButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
 
-        if (!JavatariParameters.CARTRIDGE_CHANGE_DISABLED) {
+        if (!Javatari.CARTRIDGE_CHANGE_DISABLED) {
             cartChangeFileButton = addButton(171, 51 - 86, 31, 30, 2, -188);
             monitorCartridgeControlButton(cartChangeFileButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
             setVisibility(cartChangeFileButton, true);
@@ -239,7 +237,7 @@ function ConsolePanel(mainElement) {
     visibleControls[controls.DIFFICULTY1] = 1;
 
 
-    var IMAGE_PATH = JavatariParameters.IMAGES_PATH;
+    var IMAGE_PATH = Javatari.IMAGES_PATH;
     var DEFAULT_CARTRIDGE_LABEL =       "JAVATARI.js";
     var DEFAULT_CARTRIDGE_LABEL_COLOR =  "#eb2820";
     var	DEFAULT_CARTRIDGE_BACK_COLOR =   "#141414";

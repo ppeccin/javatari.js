@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 14/01/2015.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function Clock(clockDriven, pCyclesPerSecond) {
     var self = this;
@@ -78,7 +76,7 @@ function Clock(clockDriven, pCyclesPerSecond) {
     var pausePending = false;
     var continuationAfterPause = null;
 
-    var NATURAL_FPS = JavatariParameters.HARDWARE_NATURAL_FPS;
+    var NATURAL_FPS = Javatari.SCREEN_NATURAL_FPS;
 
     init();
 

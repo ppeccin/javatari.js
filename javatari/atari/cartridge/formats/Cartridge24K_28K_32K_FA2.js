@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 20/11/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 // Implements the 24K/28K/32K "FA2" CBS RAM Plus format
 // Also supports SC RAM Saving on Harmony Flash memory (emulated to a "savestate" file)

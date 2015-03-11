@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 16/12/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function Speaker() {
 
@@ -13,7 +11,7 @@ function Speaker() {
         createAudioContext();
         if (!audioContext) return;
 
-        processor = audioContext.createScriptProcessor(JavatariParameters.AUDIO_BUFFER_SIZE, 0, 1);
+        processor = audioContext.createScriptProcessor(Javatari.AUDIO_BUFFER_SIZE, 0, 1);
         processor.onaudioprocess = onAudioProcess;
         processor.connect(audioContext.destination);
     };

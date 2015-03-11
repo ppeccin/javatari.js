@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 01/02/2015.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function ROMLoader() {
     var self = this;
@@ -96,7 +94,7 @@ function ROMLoader() {
         event.stopPropagation();
         event.preventDefault();
 
-        if (JavatariParameters.CARTRIDGE_CHANGE_DISABLED)
+        if (Javatari.CARTRIDGE_CHANGE_DISABLED)
             event.dataTransfer.dropEffect = "none";
         else
             event.dataTransfer.dropEffect = "link";
@@ -109,7 +107,7 @@ function ROMLoader() {
 
         autoPower = event.altKey !== true;
 
-        if (JavatariParameters.CARTRIDGE_CHANGE_DISABLED) return;
+        if (Javatari.CARTRIDGE_CHANGE_DISABLED) return;
         if (!event.dataTransfer) return;
 
         // First try to get local file

@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 30/11/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function TiaAudioSignal() {
 
@@ -125,7 +123,7 @@ function TiaAudioSignal() {
 
     var lastSample = 0;
 
-    var MAX_SAMPLES = 10 * JavatariParameters.AUDIO_BUFFER_SIZE;
+    var MAX_SAMPLES = 10 * Javatari.AUDIO_BUFFER_SIZE;
     var MAX_AMPLITUDE = 0.5;
 
     var samples = Util.arrayFill(new Array(MAX_SAMPLES), 0);

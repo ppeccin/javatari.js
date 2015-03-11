@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 20/11/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function AtariConsole() {
     var self = this;
@@ -69,7 +67,7 @@ function AtariConsole() {
     };
 
     var setCartridge = function(cartridge) {
-        JavatariCartridge = cartridge;
+        Javatari.cartridge = cartridge;
         var removedCartridge = getCartridge();
         bus.setCartridge(cartridge);
         cartridgeSocket.cartridgeInserted(cartridge, removedCartridge);
@@ -283,7 +281,7 @@ function AtariConsole() {
                 cycleCartridgeFormat();
                 break;
             case controls.CARTRIDGE_REMOVE:
-                if (JavatariParameters.CARTRIDGE_CHANGE_DISABLED)
+                if (Javatari.CARTRIDGE_CHANGE_DISABLED)
                     self.showOSD("Cartridge change is disabled", true);
                 else
                     cartridgeSocket.insert(null, false);

@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 20/11/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function Room(screenElement, consolePanelElement, cartridgeProvided) {
     var self = this;
@@ -8,7 +6,7 @@ function Room(screenElement, consolePanelElement, cartridgeProvided) {
     function init() {
         if (!screenElement)
             throw new Error('Javatari cannot be started. ' +
-                'HTML document is missing screen element with id "' + JavatariParameters.SCREEN_ELEMENT_ID + '"');
+                'HTML document is missing screen element with id "' + Javatari.SCREEN_ELEMENT_ID + '"');
 
         buildPeripherals();
         buildAndPlugConsole();
@@ -73,3 +71,4 @@ function Room(screenElement, consolePanelElement, cartridgeProvided) {
     init();
 
 }
+

@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 14/01/2015.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 function CartridgeDatabase() {
 
@@ -47,16 +45,22 @@ function CartridgeDatabase() {
     var getFormatOptions = function(rom) {
         var formatOptions = [];
         var formatOption;
+        var denialEx;
         for (var format in CartridgeFormats) {
-            formatOption = CartridgeFormats[format].tryFormat(rom);
-            if (!formatOption) continue;	    	    // rejected by format
-            boostPriority(formatOption, rom.info);	// adjust priority based on ROM info
-            formatOptions.push(formatOption);
+            try {
+                formatOption = CartridgeFormats[format].tryFormat(rom);
+                if (!formatOption) continue;	    	    // rejected by format
+                boostPriority(formatOption, rom.info);	    // adjust priority based on ROM info
+                formatOptions.push(formatOption);
+            } catch (ex) {
+                if (!ex.formatDenial) throw ex;
+                if (!denialEx) denialEx = ex;               // Keep only the first one
+            }
         }
 
         // If no Format could be found, throw error
         if (formatOptions.length === 0) {
-            var ex = new Error ("Unsupported ROM Format. Size: " + rom.content.length);
+            var ex = denialEx || new Error ("Unsupported ROM Format. Size: " + rom.content.length);
             ex.javatari = true;
             throw ex;
         }

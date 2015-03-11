@@ -1,6 +1,4 @@
-/**
- * Created by ppeccin on 20/11/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 // Implements the 4K unbanked format. Smaller ROMs will be copied multiple times to fill the entire 4K
 
