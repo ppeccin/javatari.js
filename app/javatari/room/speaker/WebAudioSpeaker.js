@@ -25,8 +25,8 @@ function Speaker() {
         try {
             audioContext = new (window.AudioContext || window.WebkitAudioContext) ();
             resamplingFactor = TiaAudioSignal.SAMPLE_RATE / audioContext.sampleRate;
-            Util.log("Speaker AudioContext created. Sample rate: " + audioContext.sampleRate);
-            Util.log("Audio resampling factor: " + (1/resamplingFactor));
+            //Util.log("Speaker AudioContext created. Sample rate: " + audioContext.sampleRate);
+            //Util.log("Audio resampling factor: " + (1/resamplingFactor));
         } catch(e) {
             Util.log("Could not create AudioContext. Sound disabled: \n" + e.message);
         }

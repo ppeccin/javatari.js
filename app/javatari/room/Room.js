@@ -23,10 +23,10 @@ function Room(screenElement, consolePanelElement, cartridgeProvided) {
 
     this.powerOff = function() {
         self.console.powerOff();
-        if (self.consolePanel) this.consolePanel.powerOff();
         self.controls.powerOff();
         self.speaker.powerOff();
         self.screen.powerOff();
+        if (self.consolePanel) this.consolePanel.powerOff();
     };
 
     var insertCartridgeProvidedIfNoneInserted = function() {

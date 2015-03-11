@@ -27,12 +27,14 @@ function CanvasDisplay(mainElement) {
     };
 
     this.powerOn = function() {
+        mainElement.style.visibility = "visible";
         canvas.focus();
         drawLogo();
     };
 
     this.powerOff = function() {
-        drawLogo();
+        mainElement.style.visibility = "hidden";
+        mainElement.style.display = "none";
     };
 
     this.refresh = function(image, iWidth, iHeight) {

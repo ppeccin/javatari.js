@@ -23,10 +23,13 @@ function ConsolePanel(mainElement) {
     };
 
     this.powerOn = function() {
+        mainElement.style.visibility = "visible";
         refresh();
     };
 
     this.powerOff = function() {
+        mainElement.style.visibility = "hidden";
+        mainElement.style.display = "none";
     };
 
     this.keyControlsInputElements = function() {

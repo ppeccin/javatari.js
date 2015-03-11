@@ -201,4 +201,7 @@ function ROMLoader() {
     var INPUT_ELEM_ACCEPT_PROP  = ".bin,.rom,.a26,.zip,.jst";
     var LOCAL_STOARAGE_LAST_URL_KEY = "javatarilasturl";
 
+
+    Javatari.loadROMFromUrl = this.loadFromURL;
+
 }

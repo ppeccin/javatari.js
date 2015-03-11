@@ -4,7 +4,7 @@
 Javatari = {
 
     ROM_AUTO_LOAD_URL:              "",                         // Full or relative URL of ROM
-    AUTO_LAUNCH:                    true,                       // false = launch emulator manually with Javatari.launch()
+    AUTO_START:                     true,                       // Set false to start emulator manually with Javatari.start()
     SCREEN_ELEMENT_ID:              "javatari-screen",
     CONSOLE_PANEL_ELEMENT_ID:       "javatari-console-panel",
     CARTRIDGE_CHANGE_DISABLED:      false,
@@ -30,6 +30,7 @@ Javatari.loader = {
             tag.src = path + this.files[i];
             containerTag.appendChild(tag);
         }
+        delete Javatari.loader;
     },
     files: [
         "/util/MD5.js",
@@ -78,8 +79,8 @@ Javatari.loader = {
         "/room/savestate/LocalStorageSaveStateMedia.js",
         "/room/cartridge/ROMLoader.js",
         "/room/Room.js",
-        "/room/Launcher.js"
+        "/room/Launch.js"
     ]
 };
+
 Javatari.loader.load(window.JavatariPath || "javatari");
-delete Javatari.loader;

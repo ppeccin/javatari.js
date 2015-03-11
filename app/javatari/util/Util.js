@@ -1,11 +1,9 @@
-/**
- * Created by ppeccin on 08/11/2014.
- */
+// Copyright 2015 by Paulo Augusto Peccin. See licence.txt distributed with this file.
 
 Util = new function() {
 
     this.log = function(str) {
-        console.log(">> javatari: " + str);
+        console.log(">> Javatari: " + str);
     };
 
     this.message = function(str) {
