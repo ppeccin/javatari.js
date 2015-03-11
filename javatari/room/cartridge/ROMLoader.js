@@ -176,7 +176,7 @@ function ROMLoader() {
 
     var showError = function(message) {
         Util.log("" + message);
-        window.alert("Could not load ROM:\n\n" + message);
+        Util.message("Could not load ROM:\n\n" + message);
     };
 
     var createFileInputElement = function (element) {

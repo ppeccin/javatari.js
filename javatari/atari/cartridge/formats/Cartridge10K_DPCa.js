@@ -166,7 +166,7 @@ function Cartridge10K_DPCa(rom, format) {
         // Fetchers 5-7 Pointers MSB and Audio Mode enable
         if (reg >= 0x5d && reg <= 0x5f) {
             setFetcherPointer(reg - 0x58, (fetcherPointer[reg - 0x58] & 0x00ff) + ((b & (0x07)) << 8));			// MSB bits 0-2
-            audioMode[reg - 0x58] = (b & 0x10) != 0;
+            audioMode[reg - 0x58] = ((b & 0x10) >>> 4);
             return;
         }
         // Draw Line MOVAMT value (not supported)
@@ -229,7 +229,13 @@ function Cartridge10K_DPCa(rom, format) {
             f: this.format.name,
             r: this.rom.saveState(),
             b: btoa(Util.uInt8ArrayToByteString(bytes)),
-            bo: bankAddressOffset
+            bo: bankAddressOffset,
+            rn: randomNumber,
+            fp: btoa(Util.uInt8ArrayToByteString(fetcherPointer)),
+            fs: btoa(Util.uInt8ArrayToByteString(fetcherStart)),
+            fe: btoa(Util.uInt8ArrayToByteString(fetcherEnd)),
+            fm: btoa(Util.uInt8ArrayToByteString(fetcherMask)),
+            a: btoa(Util.uInt8ArrayToByteString(audioMode))
         };
     };
 
@@ -238,6 +244,12 @@ function Cartridge10K_DPCa(rom, format) {
         this.rom = ROM.loadState(state.r);
         bytes = Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
+        randomNumber = state.rn;
+        fetcherPointer = Util.byteStringToUInt8Array(atob(state.fp));
+        fetcherStart = Util.byteStringToUInt8Array(atob(state.fs));
+        fetcherEnd = Util.byteStringToUInt8Array(atob(state.fe));
+        fetcherMask = Util.byteStringToUInt8Array(atob(state.fm));
+        audioMode = Util.byteStringToUInt8Array(atob(state.a));
     };
 
 

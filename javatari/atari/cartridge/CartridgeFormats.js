@@ -310,6 +310,26 @@ CartridgeFormats = {
         createCartridgeFromSaveState: function(state) {
             return Cartridge8K_256K_SB.createFromSaveState(state);
         }
+    },
+
+    "AR": {
+        name: "AR",
+        desc: "8K-64K Arcadia/Starpath/Supercharger",
+        priority: 101,
+        tryFormat: function(rom) {
+            // Any number of parts between 1 and 8
+            if (rom.content.length % Cartridge8K_64K_AR.PART_SIZE !== 0 || rom.content.length / Cartridge8K_64K_AR.PART_SIZE < 1
+                || rom.content.length / Cartridge8K_64K_AR.PART_SIZE > 8) return;
+            // Check if the content starts with Part 0
+            if (Cartridge8K_64K_AR.peekPartNoOnTape(rom.content, 0) === 0) return this;
+            // TODO Implement throw new ROMFormatDenialDetailException("Wrong Supercharger Tape Part ROM!\nPlease load a Full Tape ROM file.");
+        },
+        createCartridgeFromRom: function(rom) {
+            return new Cartridge8K_64K_AR(rom, this);
+        },
+        createCartridgeFromSaveState: function(state) {
+            return Cartridge8K_64K_AR.createFromSaveState(state);
+        }
     }
 
 };

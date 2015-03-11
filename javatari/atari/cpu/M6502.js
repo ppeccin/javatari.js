@@ -1748,7 +1748,7 @@ function M6502() {
         Util.log(mes);
         if (this.trace) {
             var text = "CPU Breakpoint!  " + (mes ? "(" + mes + ")" : "") + "\n\n" + this.toString();
-            alert(text);
+            Util.message(text);
         }
     };
 
@@ -1761,7 +1761,7 @@ function M6502() {
         }
         //noinspection JSUnresolvedVariable
         var end = performance.now();
-        alert("Done running " + cycles + " cycles in " + (end - start) + " ms.");
+        Util.message("Done running " + cycles + " cycles in " + (end - start) + " ms.");
     };
 
 }

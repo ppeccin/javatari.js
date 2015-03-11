@@ -8,6 +8,10 @@ Util = new function() {
         console.log(">> javatari: " + str);
     };
 
+    this.message = function(str) {
+        alert(str);
+    };
+
     this.arraysEqual = function(a, b) {
         var i = a.length;
         if (i !== b.length) return false;
