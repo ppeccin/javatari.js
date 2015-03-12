@@ -1,2 +1,4 @@
 .idea/
-roms/*
+node_modules/
+temp/
+
