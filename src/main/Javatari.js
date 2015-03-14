@@ -15,10 +15,10 @@ Javatari = {
     PADDLES_MODE:                   -1,                         // -1 = auto, 0 = off, 1 = 0n
     SCREEN_CRT_MODE:                -1,                         // -1 = auto, 0 .. 4 = mode
     SCREEN_OPENING_SIZE:            2,                          // 1 .. 4
-    SCREEN_CONTROL_BAR:             0,                          // 0 = Always, 1 = Hover, 2 = Legacy
+    SCREEN_CONTROL_BAR:             0,                          // 0 = Always, 1 = Hover, 2 = Old Javatari
     SCREEN_NATURAL_FPS:             60,                         // 60, 50 fps
     AUDIO_BUFFER_SIZE:              512,                        // 256, 512, 1024, 2048, 4096, 8192
-    IMAGES_PATH:                    "javatari/resources/"
+    IMAGES_PATH:                    "javatari/"
 
 };
 

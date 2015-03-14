@@ -176,10 +176,13 @@ function CanvasDisplay(mainElement) {
     };
 
     var setCRTFilter = function() {
-        context.imageSmoothingEnabled = crtFilter;
-        context.webkitImageSmoothingEnabled = crtFilter;
-        context.mozImageSmoothingEnabled = crtFilter;
-        context.msImageSmoothingEnabled = crtFilter;
+        if (context.hasOwnProperty("imageSmoothingEnabled"))
+            context.imageSmoothingEnabled = crtFilter;
+        else {
+            context.webkitImageSmoothingEnabled = crtFilter;
+            context.mozImageSmoothingEnabled = crtFilter;
+            context.msImageSmoothingEnabled = crtFilter;
+        }
     };
 
     var drawLogo = function () {
@@ -210,7 +213,7 @@ function CanvasDisplay(mainElement) {
         borderElement.style.border = "0 solid black";
         borderElement.style.borderWidth = "" + borderTop + "px " + borderLateral + "px " + borderBottom + "px";
         if (Javatari.SCREEN_CONTROL_BAR === 2) {
-            borderElement.style.borderImage = "url(room/screen/images/ScreenFrameBorder.png) " +
+            borderElement.style.borderImage = "url(" + IMAGE_PATH + "ScreenBorder.png) " +
                 borderTop + " " + borderLateral + " " + borderBottom + " repeat stretch";
         }
 

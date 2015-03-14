@@ -23,7 +23,7 @@ function Speaker() {
 
     var createAudioContext = function() {
         try {
-            audioContext = new (window.AudioContext || window.WebkitAudioContext) ();
+            audioContext = new (window.AudioContext || window.webkitAudioContext || window.WebkitAudioContext) ();
             resamplingFactor = TiaAudioSignal.SAMPLE_RATE / audioContext.sampleRate;
             //Util.log("Speaker AudioContext created. Sample rate: " + audioContext.sampleRate);
             //Util.log("Audio resampling factor: " + (1/resamplingFactor));
