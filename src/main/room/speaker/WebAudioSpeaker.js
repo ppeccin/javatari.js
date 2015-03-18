@@ -23,12 +23,14 @@ function Speaker() {
 
     var createAudioContext = function() {
         try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext || window.WebkitAudioContext) ();
+            var constr = (window.AudioContext || window.webkitAudioContext || window.WebkitAudioContext);
+            if (!constr) throw new Error("WebAudio API not supported by the browser");
+            audioContext = new constr();
             resamplingFactor = TiaAudioSignal.SAMPLE_RATE / audioContext.sampleRate;
             //Util.log("Speaker AudioContext created. Sample rate: " + audioContext.sampleRate);
             //Util.log("Audio resampling factor: " + (1/resamplingFactor));
         } catch(e) {
-            Util.log("Could not create AudioContext. Sound disabled: \n" + e.message);
+            Util.log("Could not create AudioContext. Audio disabled.\n" + e.message);
         }
     };
 

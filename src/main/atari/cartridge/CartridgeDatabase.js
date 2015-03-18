@@ -169,99 +169,99 @@ function CartridgeDatabase() {
 
     var FORMAT_ROM_NAMES = {
         "E0": [
-            ".*MONTEZUMA.*",						".*MONTZREV.*",
-            ".*GYRUS.*",
-            ".*TOOTH.*PROTECTORS.*",				".*TOOTHPRO.*",
-            ".*DEATH.*STAR.*BATTLE.*",				".*DETHSTAR.*",
-            ".*JAMES.*BOND.*",						".*JAMEBOND.*",
-            ".*SUPER.*COBRA.*",						".*SPRCOBRA.*",
-            ".*TUTANKHAM.*",						".*TUTANK.*",
-            ".*POPEYE.*",
-            ".*(SW|STAR.?WARS).*ARCADE.*GAME.*",	".*SWARCADE.*",
-            ".*Q.*BERT.*QUBES.*",					".*QBRTQUBE.*",
-            ".*FROGGER.?(2|II).*",
-            ".*DO.*CASTLE.*"
+            "^.*MONTEZUMA.*$",						"^.*MONTZREV.*$",
+            "^.*GYRUS.*$",
+            "^.*TOOTH.*PROTECTORS.*$",				"^.*TOOTHPRO.*$",
+            "^.*DEATH.*STAR.*BATTLE.*$",			"^.*DETHSTAR.*$",
+            "^.*JAMES.*BOND.*$",					"^.*JAMEBOND.*$",
+            "^.*SUPER.*COBRA.*$",					"^.*SPRCOBRA.*$",
+            "^.*TUTANKHAM.*$",						"^.*TUTANK.*$",
+            "^.*POPEYE.*$",
+            "^.*(SW|STAR.?WARS).*ARCADE.*GAME.*$",	"^.*SWARCADE.*$",
+            "^.*Q.*BERT.*QUBES.*$",					"^.*QBRTQUBE.*$",
+            "^.*FROGGER.?(2|II).*$",
+            "^.*DO.*CASTLE.*$"
         ],
         "FE": [
-            ".*ROBOT.*TANK.*",			".*ROBOTANK.*",
-            ".*DECATHLON.*"	, 			".*DECATHLN.*"		// There is also a 16K F6 version
+            "^.*ROBOT.*TANK.*$",		"^.*ROBOTANK.*$",
+            "^.*DECATHLON.*$"	, 		"^.*DECATHLN.*$"		// There is also a 16K F6 version
         ],
         "E7": [
-            ".*BUMP.*JUMP.*",			".*BNJ.*",
-            ".*BURGER.*TIME.*",			".*BURGTIME.*",
-            ".*POWER.*HE.?MAN.*",		".*HE_MAN.*"
+            "^.*BUMP.*JUMP.*$",			"^.*BNJ.*$",
+            "^.*BURGER.*TIME.*$",		"^.*BURGTIME.*$",
+            "^.*POWER.*HE.?MAN.*$",		"^.*HE_MAN.*$"
         ],
         "3F": [
-            ".*POLARIS.*",
-            ".*RIVER.*PATROL.*",		".*RIVERP.*",
-            ".*SPRINGER.*",
-            ".*MINER.*2049.*",			".*MNR2049R.*",
-            ".*MINER.*2049.*VOLUME.*",	".*MINRVOL2.*",
-            ".*ESPIAL.*",
-            ".*ANDREW.*DAVIE.*",        ".*DEMO.*IMAGE.*AD.*" 		// Various 32K Image demos
+            "^.*POLARIS.*$",
+            "^.*RIVER.*PATROL.*$",		 "^.*RIVERP.*$",
+            "^.*SPRINGER.*$",
+            "^.*MINER.*2049.*$",		 "^.*MNR2049R.*$",
+            "^.*MINER.*2049.*VOLUME.*$", "^.*MINRVOL2.*$",
+            "^.*ESPIAL.*$",
+            "^.*ANDREW.*DAVIE.*$",       "^.*DEMO.*IMAGE.*AD.*$" 		// Various 32K Image demos
         ],
         "3E": [
-            ".*BOULDER.*DASH.*", 		".*BLDRDASH.*"
+            "^.*BOULDER.*DASH.*$", 		 "^.*BLDRDASH.*$"
         ],
         "DPCa": [
-            ".*PITFALL.*(2|II).*"
+            "^.*PITFALL.*(2|II).*$"
         ]
     };
 
     var PADDLES_ROM_NAMES = [
-        ".*PADDLES.*",										// Generic hint
-        ".*BREAKOUT.*",
-        ".*SUPER.*BREAKOUT.*",			".*SUPERB.*",
-        ".*WARLORDS.*",
-        ".*STEEPLE.*CHASE.*",			".*STEPLCHS.*",
-        ".*VIDEO.*OLYMPICS.*",			".*VID(|_)OLYM(|P).*",
-        ".*CIRCUS.*ATARI.*", 			".*CIRCATRI.*",
-        ".*KABOOM.*",
-        ".*BUGS((?!BUNNY).)*",								// Bugs, but not Bugs Bunny!
-        ".*BACHELOR.*PARTY.*", 			".*BACHELOR.*",
-        ".*BACHELORETTE.*PARTY.*", 		".*BACHLRTT.*",
-        ".*BEAT.*EM.*EAT.*EM.*", 		".*BEATEM.*",
-        ".*PHILLY.*FLASHER.*",			".*PHILLY.*",
-        ".*JEDI.*ARENA.*",				".*JEDIAREN.*",
-        ".*EGGOMANIA.*",				".*EGGOMANA.*",
-        ".*PICNIC.*",
-        ".*PIECE.*O.*CAKE.*",			".*PIECECKE.*",
-        ".*BACKGAMMON.*", 				".*BACKGAM.*",
-        ".*BLACKJACK.*",				".*BLACK(|_)J.*",
-        ".*CANYON.*BOMBER.*", 			".*CANYONB.*",
-        ".*CASINO.*",
-        ".*DEMONS.*DIAMONDS.*",			".*DEMONDIM.*",
-        ".*DUKES.*HAZZARD.*2.*",    	".*STUNT.?2.*",
-        ".*ENCOUNTER.*L.?5.*", 			".*ENCONTL5.*",
-        ".*G.*I.*JOE.*COBRA.*STRIKE.*", ".*GIJOE.*",
-        ".*GUARDIAN.*",
-        ".*MARBLE.*CRAZE.*",			".*MARBCRAZ.*",
-        ".*MEDIEVAL.*MAYHEM.*",
-        ".*MONDO.*PONG.*",
-        ".*NIGHT.*DRIVER.*",			".*NIGHTDRV.*",
-        ".*PARTY.*MIX.*",
-        ".*POKER.*PLUS.*",
-        ".*PONG.*SPORTS.*",
-        ".*SCSICIDE.*",
-        ".*SECRET.*AGENT.*",
-        ".*SOLAR.*STORM.*", 			".*SOLRSTRM.*",
-        ".*SPEEDWAY.*",
-        ".*STREET.*RACER.*", 			".*STRTRACE.*",
-        ".*STUNT.*CYCLE.*", 			".*STUNT.?1.*",
-        ".*TAC.?SCAN.*",
-        ".*MUSIC.*MACHINE.*", 			".*MUSCMACH.*",
-        ".*VONG.*",
-        ".*WARPLOCK.*"
+        "^.*PADDLES.*$",										// Generic hint
+        "^.*BREAKOUT.*$",
+        "^.*SUPER.*BREAKOUT.*$",		  "^.*SUPERB.*$",
+        "^.*WARLORDS.*$",
+        "^.*STEEPLE.*CHASE.*$",			  "^.*STEPLCHS.*$",
+        "^.*VIDEO.*OLYMPICS.*$",		  "^.*VID(|_)OLYM(|P).*$",
+        "^.*CIRCUS.*ATARI.*$", 			  "^.*CIRCATRI.*$",
+        "^.*KABOOM.*$",
+        "^.*BUGS((?!BUNNY).)*",								// Bugs, but not Bugs Bunny!
+        "^.*BACHELOR.*PARTY.*$", 		  "^.*BACHELOR.*$",
+        "^.*BACHELORETTE.*PARTY.*$", 	  "^.*BACHLRTT.*$",
+        "^.*BEAT.*EM.*EAT.*EM.*$", 		  "^.*BEATEM.*$",
+        "^.*PHILLY.*FLASHER.*$",	 	  "^.*PHILLY.*$",
+        "^.*JEDI.*ARENA.*$",			  "^.*JEDIAREN.*$",
+        "^.*EGGOMANIA.*$",				  "^.*EGGOMANA.*$",
+        "^.*PICNIC.*$",
+        "^.*PIECE.*O.*CAKE.*$",			  "^.*PIECECKE.*$",
+        "^.*BACKGAMMON.*$", 			  "^.*BACKGAM.*$",
+        "^.*BLACKJACK.*$",				  "^.*BLACK(|_)J.*$",
+        "^.*CANYON.*BOMBER.*$", 		  "^.*CANYONB.*$",
+        "^.*CASINO.*$",
+        "^.*DEMONS.*DIAMONDS.*$",	      "^.*DEMONDIM.*$",
+        "^.*DUKES.*HAZZARD.*2.*$",    	  "^.*STUNT.?2.*$",
+        "^.*ENCOUNTER.*L.?5.*$", 		  "^.*ENCONTL5.*$",
+        "^.*G.*I.*JOE.*COBRA.*STRIKE.*$", "^.*GIJOE.*$",
+        "^.*GUARDIAN.*$",
+        "^.*MARBLE.*CRAZE.*$",			  "^.*MARBCRAZ.*$",
+        "^.*MEDIEVAL.*MAYHEM.*$",
+        "^.*MONDO.*PONG.*$",
+        "^.*NIGHT.*DRIVER.*$",			  "^.*NIGHTDRV.*$",
+        "^.*PARTY.*MIX.*$",
+        "^.*POKER.*PLUS.*$",
+        "^.*PONG.*SPORTS.*$",
+        "^.*SCSICIDE.*$",
+        "^.*SECRET.*AGENT.*$",
+        "^.*SOLAR.*STORM.*$", 			  "^.*SOLRSTRM.*$",
+        "^.*SPEEDWAY.*$",
+        "^.*STREET.*RACER.*$", 			  "^.*STRTRACE.*$",
+        "^.*STUNT.*CYCLE.*$", 			  "^.*STUNT.?1.*$",
+        "^.*TAC.?SCAN.*$",
+        "^.*MUSIC.*MACHINE.*$", 		  "^.*MUSCMACH.*$",
+        "^.*VONG.*$",
+        "^.*WARPLOCK.*$"
     ];
 
     var CRT_MODE_ROM_NAMES = [
-        ".*STAR.*CASTLE.*",
-        ".*SEAWEED.*",
-        ".*ANDREW.*DAVIE.*",        ".*DEMO.*IMAGE.*AD.*" 		// Various 32K Image demos
+        "^.*STAR.*CASTLE.*$",
+        "^.*SEAWEED.*$",
+        "^.*ANDREW.*DAVIE.*$",          "^.*DEMO.*IMAGE.*AD.*$" 		// Various 32K Image demos
     ];
 
-    var HINTS_PREFIX_REGEX = "(|.*?(\\W|_|%20))";
-    var HINTS_SUFFIX_REGEX = "(|(\\W|_|%20).*)";
+    var HINTS_PREFIX_REGEX = "^(|.*?(\\W|_|%20))";
+    var HINTS_SUFFIX_REGEX = "(|(\\W|_|%20).*)$";
 
     var FORMAT_PRIORITY_BOOST = 50;
 

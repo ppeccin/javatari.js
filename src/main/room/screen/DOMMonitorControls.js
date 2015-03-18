@@ -48,15 +48,20 @@ function DOMMonitorControls(monitor) {
     var initKeys = function() {
         keyCodeMap[KEY_CART_FILE]       = Monitor.Controls.LOAD_CARTRIDGE_FILE;
         keyCodeMap[KEY_CART_URL]        = Monitor.Controls.LOAD_CARTRIDGE_URL;
+
+        keyAltCodeMap[KEY_CART_FILE]    = Monitor.Controls.LOAD_CARTRIDGE_FILE;
+        keyAltCodeMap[KEY_CART_URL]     = Monitor.Controls.LOAD_CARTRIDGE_URL;
+
         keyCodeMap[KEY_EXIT]            = Monitor.Controls.EXIT;
 
         keyAltCodeMap[KEY_CRT_FILTER]   = Monitor.Controls.CRT_FILTER;
         keyAltCodeMap[KEY_DEBUG]     	= Monitor.Controls.DEBUG;
         keyAltCodeMap[KEY_STATS]    	= Monitor.Controls.STATS;
         keyAltCodeMap[KEY_CRT_MODES] 	= Monitor.Controls.CRT_MODES;
-        keyAltCodeMap[KEY_CART_FILE] 	= Monitor.Controls.LOAD_CARTRIDGE_FILE_NO_AUTO_POWER;
-        keyAltCodeMap[KEY_CART_URL]  	= Monitor.Controls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER;
         keyAltCodeMap[KEY_FULLSCREEN]  	= Monitor.Controls.FULLSCREEN;
+
+        keyControlCodeMap[KEY_CART_FILE] = Monitor.Controls.LOAD_CARTRIDGE_FILE_NO_AUTO_POWER;
+        keyControlCodeMap[KEY_CART_URL]  = Monitor.Controls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER;
 
         keyShiftCodeMap[KEY_UP]     = Monitor.Controls.SIZE_MINUS;
         keyShiftCodeMap[KEY_DOWN]   = Monitor.Controls.SIZE_PLUS;

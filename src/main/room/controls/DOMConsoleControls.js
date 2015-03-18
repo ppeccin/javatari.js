@@ -232,21 +232,33 @@ function DOMConsoleControls() {
         normalCodeMap[KEY_POWER]            = controls.POWER;
         normalCodeMap[KEY_BLACK_WHITE]      = controls.BLACK_WHITE;
         normalCodeMap[KEY_DIFFICULTY0]      = controls.DIFFICULTY0;
+        normalCodeMap[KEY_CARTRIDGE_REMOVE] = controls.CARTRIDGE_REMOVE;
+        normalCodeMap[KEY_SAVE_STATE_FILE]  = controls.SAVE_STATE_FILE;
         normalCodeMap[KEY_DIFFICULTY1]      = controls.DIFFICULTY1;
         normalCodeMap[KEY_SELECT]           = controls.SELECT;
         normalCodeMap[KEY_SELECT2]          = controls.SELECT;
         normalCodeMap[KEY_RESET]            = controls.RESET;
-        normalCodeMap[KEY_FAST_SPEED]       = controls.FAST_SPEED;
-        normalCodeMap[KEY_SAVE_STATE_FILE]  = controls.SAVE_STATE_FILE;
-        normalCodeMap[KEY_CARTRIDGE_REMOVE] = controls.CARTRIDGE_REMOVE;
 
-        withALTCodeMap[KEY_POWER]          = controls.POWER_FRY;
+        withALTCodeMap[KEY_POWER]            = controls.POWER;
+        withALTCodeMap[KEY_BLACK_WHITE]      = controls.BLACK_WHITE;
+        withALTCodeMap[KEY_DIFFICULTY0]      = controls.DIFFICULTY0;
+        withALTCodeMap[KEY_CARTRIDGE_REMOVE] = controls.CARTRIDGE_REMOVE;
+        withALTCodeMap[KEY_SAVE_STATE_FILE]  = controls.SAVE_STATE_FILE;
+        withALTCodeMap[KEY_DIFFICULTY1]      = controls.DIFFICULTY1;
+        withALTCodeMap[KEY_SELECT]           = controls.SELECT;
+        withALTCodeMap[KEY_SELECT2]          = controls.SELECT;
+        withALTCodeMap[KEY_RESET]            = controls.RESET;
+
+        normalCodeMap[KEY_FAST_SPEED] = controls.FAST_SPEED;
+
         withALTCodeMap[KEY_PAUSE]          = controls.PAUSE;
         withALTCodeMap[KEY_FRAME]          = controls.FRAME;
         withALTCodeMap[KEY_TRACE]          = controls.TRACE;
         withALTCodeMap[KEY_DEBUG]          = controls.DEBUG;
         withALTCodeMap[KEY_NO_COLLISIONS]  = controls.NO_COLLISIONS;
         withALTCodeMap[KEY_VIDEO_STANDARD] = controls.VIDEO_STANDARD;
+
+        withCTRLCodeMap[KEY_POWER] = controls.POWER_FRY;
 
         withCTRLCodeMap[KEY_STATE_0] = controls.SAVE_STATE_0;
         withCTRLCodeMap[KEY_STATE_0a] = controls.SAVE_STATE_0;

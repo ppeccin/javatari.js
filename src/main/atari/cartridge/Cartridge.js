@@ -2,10 +2,6 @@
 
 function Cartridge() {
 
-    this.setROM = function(rom) {
-        this.rom = rom;
-    };
-
     this.powerOn = function() {
     };
 
