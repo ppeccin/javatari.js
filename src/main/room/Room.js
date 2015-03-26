@@ -4,10 +4,6 @@ function Room(screenElement, consolePanelElement, cartridgeProvided) {
     var self = this;
 
     function init() {
-        if (!screenElement)
-            throw new Error('Javatari cannot be started. ' +
-                'HTML document is missing screen element with id "' + Javatari.SCREEN_ELEMENT_ID + '"');
-
         buildPeripherals();
         buildAndPlugConsole();
     }

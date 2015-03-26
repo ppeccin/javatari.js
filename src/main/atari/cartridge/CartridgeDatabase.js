@@ -150,7 +150,7 @@ function CartridgeDatabase() {
     };
 
     var produceCartridgeLabel = function(name) {
-        return name.split(/(\(|\[)/)[0].trim();
+        return name.split(/(\(|\[)/)[0].trim();   //  .toUpperCase();   // TODO Validade
     };
 
     var formatMatchesByHint = function(formatName, hint) {

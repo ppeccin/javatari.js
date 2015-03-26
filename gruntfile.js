@@ -57,6 +57,7 @@ module.exports = function (grunt) {
                     "src/main/atari/cartridge/formats/Cartridge8K_UA.js",
                     "src/main/atari/cartridge/CartridgeFormats.js",
                     "src/main/atari/cartridge/CartridgeDatabase.js",
+                    "src/main/room/Preferences.js",
                     "src/main/room/controls/DOMConsoleControls.js",
                     "src/main/room/screen/DOMMonitorControls.js",
                     "src/main/room/screen/Monitor.js",
@@ -66,7 +67,7 @@ module.exports = function (grunt) {
                     "src/main/room/savestate/LocalStorageSaveStateMedia.js",
                     "src/main/room/cartridge/ROMLoader.js",
                     "src/main/room/Room.js",
-                    "src/main/room/Launch.js"
+                    "src/main/room/Launcher.js"
                 ],
                 dest: "temp/javatari.part.concat.js"
             },

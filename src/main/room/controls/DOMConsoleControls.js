@@ -207,7 +207,7 @@ function DOMConsoleControls() {
     var controlForEvent = function(keyCode, modif) {
         switch (modif) {
             case 0:
-                var joy = joysticksCodeMap[keyCode];
+                var joy = joyKeysCodeMap[keyCode];
                 if (joy) return joy;
                 return normalCodeMap[keyCode];
             case KEY_CTRL_MASK:
@@ -300,33 +300,33 @@ function DOMConsoleControls() {
     };
 
     this.initPreferences = function() {
-        joysticksCodeMap = {};
+        joyKeysCodeMap = {};
         if (!p1ControlsMode) {
-            joysticksCodeMap[KEY_P0_LEFT]    = controls.JOY0_LEFT;
-            joysticksCodeMap[KEY_P0_UP]      = controls.JOY0_UP;
-            joysticksCodeMap[KEY_P0_RIGHT]   = controls.JOY0_RIGHT;
-            joysticksCodeMap[KEY_P0_DOWN]    = controls.JOY0_DOWN;
-            joysticksCodeMap[KEY_P0_BUTTON]  = controls.JOY0_BUTTON;
-            joysticksCodeMap[KEY_P0_BUTTON2] = controls.JOY0_BUTTON;
-            joysticksCodeMap[KEY_P1_LEFT]    = controls.JOY1_LEFT;
-            joysticksCodeMap[KEY_P1_UP]      = controls.JOY1_UP;
-            joysticksCodeMap[KEY_P1_RIGHT]   = controls.JOY1_RIGHT;
-            joysticksCodeMap[KEY_P1_DOWN]    = controls.JOY1_DOWN;
-            joysticksCodeMap[KEY_P1_BUTTON]  = controls.JOY1_BUTTON;
-            joysticksCodeMap[KEY_P1_BUTTON2] = controls.JOY1_BUTTON;
+            joyKeysCodeMap[Javatari.preferences.KP0LEFT]  = controls.JOY0_LEFT;
+            joyKeysCodeMap[Javatari.preferences.KP0UP]    = controls.JOY0_UP;
+            joyKeysCodeMap[Javatari.preferences.KP0RIGHT] = controls.JOY0_RIGHT;
+            joyKeysCodeMap[Javatari.preferences.KP0DOWN]  = controls.JOY0_DOWN;
+            joyKeysCodeMap[Javatari.preferences.KP0BUT]   = controls.JOY0_BUTTON;
+            joyKeysCodeMap[Javatari.preferences.KP0BUT2]  = controls.JOY0_BUTTON;
+            joyKeysCodeMap[Javatari.preferences.KP1LEFT]  = controls.JOY1_LEFT;
+            joyKeysCodeMap[Javatari.preferences.KP1UP]    = controls.JOY1_UP;
+            joyKeysCodeMap[Javatari.preferences.KP1RIGHT] = controls.JOY1_RIGHT;
+            joyKeysCodeMap[Javatari.preferences.KP1DOWN ] = controls.JOY1_DOWN;
+            joyKeysCodeMap[Javatari.preferences.KP1BUT]   = controls.JOY1_BUTTON;
+            joyKeysCodeMap[Javatari.preferences.KP1BUT2]  = controls.JOY1_BUTTON;
         } else {
-            joysticksCodeMap[KEY_P0_LEFT]    = controls.JOY1_LEFT;
-            joysticksCodeMap[KEY_P0_UP]      = controls.JOY1_UP;
-            joysticksCodeMap[KEY_P0_RIGHT]   = controls.JOY1_RIGHT;
-            joysticksCodeMap[KEY_P0_DOWN]    = controls.JOY1_DOWN;
-            joysticksCodeMap[KEY_P0_BUTTON]  = controls.JOY1_BUTTON;
-            joysticksCodeMap[KEY_P0_BUTTON2] = controls.JOY1_BUTTON;
-            joysticksCodeMap[KEY_P1_LEFT]    = controls.JOY0_LEFT;
-            joysticksCodeMap[KEY_P1_UP]      = controls.JOY0_UP;
-            joysticksCodeMap[KEY_P1_RIGHT]   = controls.JOY0_RIGHT;
-            joysticksCodeMap[KEY_P1_DOWN]    = controls.JOY0_DOWN;
-            joysticksCodeMap[KEY_P1_BUTTON]  = controls.JOY0_BUTTON;
-            joysticksCodeMap[KEY_P1_BUTTON2] = controls.JOY0_BUTTON;
+            joyKeysCodeMap[Javatari.preferences.KP0LEFT]  = controls.JOY1_LEFT;
+            joyKeysCodeMap[Javatari.preferences.KP0UP]    = controls.JOY1_UP;
+            joyKeysCodeMap[Javatari.preferences.KP0RIGHT] = controls.JOY1_RIGHT;
+            joyKeysCodeMap[Javatari.preferences.KP0DOWN]  = controls.JOY1_DOWN;
+            joyKeysCodeMap[Javatari.preferences.KP0BUT]   = controls.JOY1_BUTTON;
+            joyKeysCodeMap[Javatari.preferences.KP0BUT2]  = controls.JOY1_BUTTON;
+            joyKeysCodeMap[Javatari.preferences.KP1LEFT]  = controls.JOY0_LEFT;
+            joyKeysCodeMap[Javatari.preferences.KP1UP]    = controls.JOY0_UP;
+            joyKeysCodeMap[Javatari.preferences.KP1RIGHT] = controls.JOY0_RIGHT;
+            joyKeysCodeMap[Javatari.preferences.KP1DOWN]  = controls.JOY0_DOWN;
+            joyKeysCodeMap[Javatari.preferences.KP1BUT]   = controls.JOY0_BUTTON;
+            joyKeysCodeMap[Javatari.preferences.KP1BUT2]  = controls.JOY0_BUTTON;
         }
     };
 
@@ -349,7 +349,7 @@ function DOMConsoleControls() {
     var paddle1MovingLeft = false;
     var paddle1MovingRight = false;
 
-    var joysticksCodeMap = {};
+    var joyKeysCodeMap = {};
     var normalCodeMap = {};
     var withCTRLCodeMap = {};
     var withALTCodeMap = {};
@@ -358,19 +358,6 @@ function DOMConsoleControls() {
 
 
     // Default Key Values
-
-    var KEY_P0_LEFT          = 37;     // VK_LEFT
-    var KEY_P0_UP            = 38;     // VK_UP
-    var KEY_P0_RIGHT         = 39;     // VK_RIGHT
-    var KEY_P0_DOWN          = 40;     // VK_DOWN
-    var KEY_P0_BUTTON        = 32;     // VK_SPACE
-    var KEY_P0_BUTTON2       = 46;     // VK_DELETE
-    var KEY_P1_LEFT          = 70;     // VK_F
-    var KEY_P1_UP            = 84;     // VK_T
-    var KEY_P1_RIGHT         = 72;     // VK_H
-    var KEY_P1_DOWN          = 71;     // VK_G
-    var KEY_P1_BUTTON        = 65;     // VK_A
-    var KEY_P1_BUTTON2       = 190;    // VK_PERIOD
 
     var KEY_TOGGLE_JOYSTICK  = 74;     // VK_J;
     var KEY_TOGGLE_P1_MODE   = 75;     // VK_K;

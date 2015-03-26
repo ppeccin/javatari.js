@@ -199,7 +199,7 @@ function Cartridge10K_DPCa(rom, format) {
     var clockRandomNumber = function() {
         randomNumber = ((randomNumber << 1) |
             (~((randomNumber >> 7) ^ (randomNumber >> 5) ^
-            (randomNumber >> 4) ^ (randomNumber >> 3)) & 0x01));
+            (randomNumber >> 4) ^ (randomNumber >> 3)) & 0x01)) & 0xff;
         if (randomNumber === 0xff) randomNumber = 0;
     };
 

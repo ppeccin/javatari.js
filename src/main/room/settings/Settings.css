@@ -1,0 +1,14 @@
+.cover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.modal {
+    background: rgb(210, 210, 210);
+    position: fixed;
+    width: 600px;
+    height: 450px;
+    top: 60px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+}

@@ -13,7 +13,7 @@ function M6502() {
     this.clockPulse = function() {
         if (!RDY) return;      // TODO Should be ignored in the last cycle of the instruction
         T++;
-        instruction[T]();      // TODO Investigate "Chetiry" problem here when P1BUTTON pressed
+        instruction[T]();
     };
 
     this.connectBus = function(aBus) {
@@ -96,8 +96,10 @@ function M6502() {
         opcode = bus.read(PC);
         instruction = instructions[opcode];
         T = 0;
-        // if (self.trace) { self.breakpoint(); }
-        // console.log(opcodes[opcode]);
+
+        // if (self.trace) self.breakpoint("TRACE");
+        // console.log("PC: " + PC + ", op: " + opcode + ": " + opcodes[opcode]);
+
         PC++;
     };
 
@@ -657,7 +659,7 @@ function M6502() {
     opcodes[0x07] = "uSLO"; instructions[0x07] = uSLO(zeroPageReadModifyWrite);
     opcodes[0x08] = "PHP";  instructions[0x08] = PHP();
     opcodes[0x09] = "ORA";  instructions[0x09] = ORA(immediateRead);
-    opcodes[0x0a] = "ASL_"; instructions[0x0a] = ASL_ACC();
+    opcodes[0x0a] = "ASL";  instructions[0x0a] = ASL_ACC();
     opcodes[0x0b] = "uANC"; instructions[0x0b] = uANC(immediateRead);
     opcodes[0x0c] = "uNOP"; instructions[0x0c] = uNOP(absoluteRead);
     opcodes[0x0d] = "ORA";  instructions[0x0d] = ORA(absoluteRead);
@@ -689,7 +691,7 @@ function M6502() {
     opcodes[0x27] = "uRLA"; instructions[0x27] = uRLA(zeroPageReadModifyWrite);
     opcodes[0x28] = "PLP";  instructions[0x28] = PLP();
     opcodes[0x29] = "AND";  instructions[0x29] = AND(immediateRead);
-    opcodes[0x2a] = "ROL_"; instructions[0x2a] = ROL_ACC();
+    opcodes[0x2a] = "ROL";  instructions[0x2a] = ROL_ACC();
     opcodes[0x2b] = "uANC"; instructions[0x2b] = uANC(immediateRead);
     opcodes[0x2c] = "BIT";  instructions[0x2c] = BIT(absoluteRead);
     opcodes[0x2d] = "AND";  instructions[0x2d] = AND(absoluteRead);
@@ -721,9 +723,9 @@ function M6502() {
     opcodes[0x47] = "uSRE"; instructions[0x47] = uSRE(zeroPageReadModifyWrite);
     opcodes[0x48] = "PHA";  instructions[0x48] = PHA();
     opcodes[0x49] = "EOR";  instructions[0x49] = EOR(immediateRead);
-    opcodes[0x4a] = "LSR_"; instructions[0x4a] = LSR_ACC();
+    opcodes[0x4a] = "LSR";  instructions[0x4a] = LSR_ACC();
     opcodes[0x4b] = "uASR"; instructions[0x4b] = uASR(immediateRead);
-    opcodes[0x4c] = "JMP_"; instructions[0x4c] = JMP_ABS();
+    opcodes[0x4c] = "JMP";  instructions[0x4c] = JMP_ABS();
     opcodes[0x4d] = "EOR";  instructions[0x4d] = EOR(absoluteRead);
     opcodes[0x4e] = "LSR";  instructions[0x4e] = LSR(absoluteReadModifyWrite);
     opcodes[0x4f] = "uSRE"; instructions[0x4f] = uSRE(absoluteReadModifyWrite);
@@ -753,9 +755,9 @@ function M6502() {
     opcodes[0x67] = "uRRA"; instructions[0x67] = uRRA(zeroPageReadModifyWrite);
     opcodes[0x68] = "PLA";  instructions[0x68] = PLA();
     opcodes[0x69] = "ADC";  instructions[0x69] = ADC(immediateRead);
-    opcodes[0x6a] = "ROR_"; instructions[0x6a] = ROR_ACC();
+    opcodes[0x6a] = "ROR";  instructions[0x6a] = ROR_ACC();
     opcodes[0x6b] = "uARR"; instructions[0x6b] = uARR(immediateRead);
-    opcodes[0x6c] = "JMP_"; instructions[0x6c] = JMP_IND();
+    opcodes[0x6c] = "JMP";  instructions[0x6c] = JMP_IND();
     opcodes[0x6d] = "ADC";  instructions[0x6d] = ADC(absoluteRead);
     opcodes[0x6e] = "ROR";  instructions[0x6e] = ROR(absoluteReadModifyWrite);
     opcodes[0x6f] = "uRRA"; instructions[0x6f] = uRRA(absoluteReadModifyWrite);

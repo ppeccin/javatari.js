@@ -19,12 +19,13 @@ function ConsolePanel(mainElement) {
         controlsSocket.addForwardedInput(this);
         controlsSocket.addRedefinitionListener(this);   	// Will fire a redefinition event
         cartridgeSocket = pCartridgeSocket;
-        cartridgeSocket.addInsertionListener(this);		    // Will fire a insertion event
+        cartridgeSocket.addInsertionListener(this);		    // Will fire an insertion event
     };
 
     this.powerOn = function() {
         mainElement.style.visibility = "visible";
-        refresh();
+        refreshControls();
+        refreshCartridge()
     };
 
     this.powerOff = function() {
@@ -36,7 +37,7 @@ function ConsolePanel(mainElement) {
         return [mainElement];
     };
 
-    var refresh = function() {
+    var refreshControls = function() {
         // Controls State
         setVisibility(powerButton, !controlsStateReport[controls.POWER]);
         setVisibility(colorButton, controlsStateReport[controls.BLACK_WHITE]);
@@ -44,15 +45,31 @@ function ConsolePanel(mainElement) {
         setVisibility(resetButton, controlsStateReport[controls.RESET]);
         setVisibility(p0DiffButton, controlsStateReport[controls.DIFFICULTY0]);
         setVisibility(p1DiffButton, controlsStateReport[controls.DIFFICULTY1]);
-        // Inserted Cartridge
+        refreshCartridge();
+    };
+
+    var refreshCartridge = function () {
+        // Cartridge Image
         setVisibility(cartInsertedImage, cartridgeInserted);
         setVisibility(cartLabel, cartridgeInserted);
-        cartLabel.innerHTML = cartridgeInserted ? cartridgeInserted.rom.info.l : DEFAULT_CARTRIDGE_LABEL;
+
+        // Cartridge Label
+        cartLabel.innerHTML = (cartridgeInserted && cartridgeInserted.rom.info.l) || DEFAULT_CARTRIDGE_LABEL;
+        if (cartridgeInserted && cartridgeInserted.rom.info.lc) {
+            var colors = cartridgeInserted.rom.info.lc.trim().split(/\s+/);
+            cartLabel.style.color = colors[0] || DEFAULT_CARTRIDGE_LABEL_COLOR;
+            cartLabel.style.background = colors[1] || DEFAULT_CARTRIDGE_BACK_COLOR;
+            cartLabel.style.borderColor = colors[2] || DEFAULT_CARTRIDGE_BORDER_COLOR;
+        } else {
+            cartLabel.style.color = DEFAULT_CARTRIDGE_LABEL_COLOR;
+            cartLabel.style.background = DEFAULT_CARTRIDGE_BACK_COLOR;
+            cartLabel.style.borderColor = DEFAULT_CARTRIDGE_BORDER_COLOR;
+        }
     };
 
     var updateVisibleControlsState = function() {
         controlsSocket.controlsStateReport(controlsStateReport);
-        refresh();
+        refreshControls();
     };
 
     var setupMain = function () {
@@ -157,6 +174,12 @@ function ConsolePanel(mainElement) {
     };
 
     var setupCartridgeLabel = function() {
+        // Adjust default colors for the label as per parameters
+        var colors = (Javatari.CARTRIDGE_LABEL_COLORS || "").trim().split(/\s+/);
+        if (colors[0]) DEFAULT_CARTRIDGE_LABEL_COLOR = colors[0];
+        if (colors[1]) DEFAULT_CARTRIDGE_BACK_COLOR = colors[1];
+        if (colors[2]) DEFAULT_CARTRIDGE_BORDER_COLOR = colors[2];
+
         cartLabel = document.createElement('div');
         cartLabel.style.position = "absolute";
         cartLabel.style.overflow = "hidden";
@@ -206,7 +229,7 @@ function ConsolePanel(mainElement) {
 
     this.cartridgeInserted = function(cartridge) {
         cartridgeInserted = cartridge;
-        refresh();
+        refreshCartridge();
     };
 
 
@@ -242,8 +265,8 @@ function ConsolePanel(mainElement) {
 
     var IMAGE_PATH = Javatari.IMAGES_PATH;
     var DEFAULT_CARTRIDGE_LABEL =       "JAVATARI.js";
-    var DEFAULT_CARTRIDGE_LABEL_COLOR =  "#eb2820";
-    var	DEFAULT_CARTRIDGE_BACK_COLOR =   "#141414";
+    var DEFAULT_CARTRIDGE_LABEL_COLOR =  "#fa2525";
+    var	DEFAULT_CARTRIDGE_BACK_COLOR =   "#101010";
     var	DEFAULT_CARTRIDGE_BORDER_COLOR = "transparent";
 
 

@@ -149,6 +149,11 @@ function CanvasDisplay(mainElement) {
         monitor.controlActivated(Monitor.Controls.SIZE_DEFAULT);
     };
 
+    var openSettings = function() {
+        if (!Settings.cover) Settings.create();
+        Settings.show();
+    };
+
     var fullScreenChanged = function() {
         var fse = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
         isFullscreen = !!fse;
@@ -196,7 +201,7 @@ function CanvasDisplay(mainElement) {
                 logoHeight = (logoHeight * factor) | 0;
                 logoWidth = (logoWidth * factor) | 0;
             }
-            context.drawImage(logoImage, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight);
+            context.drawImage(logoImage, ((canvas.width - logoWidth) / 2) | 0, ((canvas.height - logoHeight) / 2) | 0, logoWidth, logoHeight);
         }
     };
 
@@ -277,8 +282,6 @@ function CanvasDisplay(mainElement) {
         logoButton = addBarButton("CENTER", -26, 24, 24, -388, -181);
         powerButton  = addBarButton(6, -26, 24, 23, -436, -208);
         consoleControlButton(powerButton, ConsoleControls.POWER);
-        settingsButton  = addBarButton(-29, -26, 24, 22, -412, -209);
-        screenControlButton(settingsButton, Monitor.Controls.FULLSCREEN);
         var fsGap = 23;
         if (!Javatari.SCREEN_FULLSCREEN_DISABLED) {
             fullscreenButton = addBarButton(-53, -26, 24, 22, -387, -209);
@@ -291,6 +294,13 @@ function CanvasDisplay(mainElement) {
             scaleUpButton = addBarButton(-74 + fsGap, -26, 21, 22, -364, -209);
             screenControlButton(scaleUpButton, Monitor.Controls.SIZE_PLUS);
         }
+
+        settingsButton  = addBarButton(-29, -26, 24, 22, -412, -209);
+        settingsButton.style.cursor = "pointer";
+        settingsButton.addEventListener("click", function (e) {
+            e.preventDefault();
+            openSettings();
+        });
 
         mainElement.appendChild(buttonsBar);
     };

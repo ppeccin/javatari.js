@@ -1,9 +1,15 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 Javatari.start = function () {
+    // Init preferences
+    Javatari.preferencesLoad();
     // Get container elements
-    if (!Javatari.screenElement)
+    if (!Javatari.screenElement) {
         Javatari.screenElement = document.getElementById(Javatari.SCREEN_ELEMENT_ID);
+        if (!Javatari.screenElement)
+            throw new Error('Javatari cannot be started. ' +
+            'HTML document is missing screen element with id "' + Javatari.SCREEN_ELEMENT_ID + '"');
+    }
     if (!Javatari.consolePanelElement)
         Javatari.consolePanelElement = document.getElementById(Javatari.CONSOLE_PANEL_ELEMENT_ID);
     // Build and start emulator
