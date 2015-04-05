@@ -65,6 +65,15 @@ Util = new function() {
         arr.splice(i, 1);
     };
 
+    this.arrayNthTruthyIndex = function(arr, n) {
+        var found = 0;
+        for(var i = 0, len = arr.length; i < len; i++) {
+            if (arr[i]) found++;
+            if (found >= n) return i;
+        }
+        return -1;
+    };
+
     this.booleanArrayToByteString = function(boos) {
         var str = "";
         for(var i = 0, len = boos.length; i < len; i++)

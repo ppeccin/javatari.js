@@ -12,13 +12,12 @@ function DOMMonitorControls(monitor) {
     };
 
     this.filteredKeyPressed = function(event) {
-        if (processKeyEvent(event))
+        var modifiers = 0 | (event.ctrlKey ? KEY_CTRL_MASK : 0) | (event.altKey ? KEY_ALT_MASK : 0) | (event.shiftKey ? KEY_SHIFT_MASK : 0);
+        if (processKeyPress(event.keyCode, modifiers))
             event.preventDefault();
     };
 
-    var processKeyEvent = function(event) {
-        var keyCode = event.keyCode;
-        var modifiers = 0 | (event.ctrlKey ? KEY_CTRL_MASK : 0) | (event.altKey ? KEY_ALT_MASK : 0) | (event.shiftKey ? KEY_SHIFT_MASK : 0);
+    var processKeyPress = function(keyCode, modifiers) {
         var control = controlForEvent(keyCode, modifiers);
         if (!control) return false;
         monitor.controlActivated(control);

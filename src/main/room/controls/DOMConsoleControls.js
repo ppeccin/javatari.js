@@ -4,7 +4,7 @@ function DOMConsoleControls() {
     var self = this;
 
     function init() {
-        //joystickControls = new JoystickConsoleControls(this);
+        gamepadControls = new GamepadConsoleControls(self);
         initKeys();
     }
 
@@ -14,25 +14,25 @@ function DOMConsoleControls() {
         cartridgeSocket.addInsertionListener(this);
         consoleControlsSocket = pControlsSocket;
         consoleControlsSocket.connectControls(this);
-        //joystickControls.connect(controlsSocket);
+        gamepadControls.connect(pControlsSocket);
     };
 
     this.connectPeripherals = function(screen, consolePanel) {
         videoMonitor = screen.getMonitor();
-        //joystickControls.connectScreen(screen);
+        gamepadControls.connectScreen(screen);
         this.addInputElements(screen.keyControlsInputElements());
         if (consolePanel) this.addInputElements(consolePanel.keyControlsInputElements());
     };
 
     this.powerOn = function() {
-        //joystickControls.powerOn();
+        gamepadControls.powerOn();
         if (PADDLES_MODE === 0) setPaddleMode(false, false);
         else if (PADDLES_MODE === 1) setPaddleMode(true, false);
     };
 
     this.powerOff = function() {
         setPaddleMode(false, false);
-        //joystickControls.powerOff();
+        gamepadControls.powerOff();
     };
 
     this.destroy = function() {
@@ -52,6 +52,7 @@ function DOMConsoleControls() {
 
     this.setP1ControlsMode = function(state) {
         p1ControlsMode = state;
+        gamepadControls.setP1ControlsMode(state);
         this.initPreferences();
     };
 
@@ -59,17 +60,19 @@ function DOMConsoleControls() {
         setPaddleMode(!paddleMode, true);
     };
 
-    this.joystickControls = function() {
-        return joystickControls;
+    this.getGamepadControls = function() {
+        return gamepadControls;
     };
 
     this.filteredKeyPressed = function(event) {
-        if (processKeyEvent(event, true))
+        var modifiers = 0 | (event.ctrlKey ? KEY_CTRL_MASK : 0) | (event.altKey ? KEY_ALT_MASK : 0) | (event.shiftKey ? KEY_SHIFT_MASK : 0);
+        if (processKeyEvent(event.keyCode, true, modifiers))
             event.preventDefault();
     };
 
     this.filteredKeyReleased = function(event) {
-        if (processKeyEvent(event, false))
+        var modifiers = 0 | (event.ctrlKey ? KEY_CTRL_MASK : 0) | (event.altKey ? KEY_ALT_MASK : 0) | (event.shiftKey ? KEY_SHIFT_MASK : 0);
+        if (processKeyEvent(event.keyCode, false, modifiers))
             event.preventDefault();
     };
 
@@ -80,6 +83,7 @@ function DOMConsoleControls() {
     };
 
     this.clockPulse = function() {
+        gamepadControls.clockPulse();
         if (!paddleMode) return;
         // Update paddles position as time passes
         if (paddle0MovingRight) {
@@ -106,9 +110,7 @@ function DOMConsoleControls() {
         }
     };
 
-    var processKeyEvent = function(event, press) {
-        var keyCode = event.keyCode;
-        var modifiers = 0 | (event.ctrlKey ? KEY_CTRL_MASK : 0) | (event.altKey ? KEY_ALT_MASK : 0) | (event.shiftKey ? KEY_SHIFT_MASK : 0);
+    this.processKeyEvent = function(keyCode, press, modifiers) {
         if (checkLocalControlKey(keyCode, modifiers, press)) return true;
         var control = controlForEvent(keyCode, modifiers);
         if (control == null) return false;
@@ -121,6 +123,8 @@ function DOMConsoleControls() {
         }
         return true;
     };
+
+    var processKeyEvent = this.processKeyEvent;
 
     var showModeOSD = function() {
         videoMonitor.showOSD("Controllers: " + (paddleMode ? "Paddles" : "Joysticks") + (p1ControlsMode ? ", Swapped" : ""), true);
@@ -137,7 +141,7 @@ function DOMConsoleControls() {
         }
         consoleControlsSocket.controlValueChanged(controls.PADDLE0_POSITION, paddle0Position);
         consoleControlsSocket.controlValueChanged(controls.PADDLE1_POSITION, paddle1Position);
-        //joystickControls.paddleMode(paddleMode);
+        gamepadControls.setPaddleMode(paddleMode);
         if (showOSD) showModeOSD();
     };
 
@@ -150,7 +154,7 @@ function DOMConsoleControls() {
                         self.toggleP1ControlsMode();
                         return true;
                     case KEY_TOGGLE_JOYSTICK:
-                        //joystickControls.toggleMode();
+                        gamepadControls.toggleMode();
                         return true;
                     case KEY_TOGGLE_PADDLE:
                         self.togglePaddleMode(); return true;
@@ -300,7 +304,6 @@ function DOMConsoleControls() {
     };
 
     this.initPreferences = function() {
-        joyKeysCodeMap = {};
         if (!p1ControlsMode) {
             joyKeysCodeMap[Javatari.preferences.KP0LEFT]  = controls.JOY0_LEFT;
             joyKeysCodeMap[Javatari.preferences.KP0UP]    = controls.JOY0_UP;
@@ -338,7 +341,7 @@ function DOMConsoleControls() {
     var consoleControlsSocket;
     var cartridgeSocket;
     var videoMonitor;
-    var joystickControls;
+    var gamepadControls;
 
     var paddle0Position = 0;			// 380 = LEFT, 190 = MIDDLE, 0 = RIGHT
     var paddle0Speed = 3;				// 1 to 10
@@ -363,11 +366,11 @@ function DOMConsoleControls() {
     var KEY_TOGGLE_P1_MODE   = 75;     // VK_K;
     var KEY_TOGGLE_PADDLE    = 76;     // VK_L;
     var KEY_CARTRIDGE_FORMAT = 66;     // VK_B;
-    var KEY_SELECT           = 122;    // VK_F11;
-    var KEY_SELECT2          = 121;    // VK_F10;
-    var KEY_RESET            = 123;    // VK_F12;
-    var KEY_FAST_SPEED       = 9;      // VK_TAB
-    var KEY_PAUSE            = 80;     // VK_P;
+    var KEY_SELECT           = DOMConsoleControls.KEY_SELECT;
+    var KEY_SELECT2          = DOMConsoleControls.KEY_SELECT2;
+    var KEY_RESET            = DOMConsoleControls.KEY_RESET;
+    var KEY_FAST_SPEED       = DOMConsoleControls.KEY_FAST_SPEED;
+    var KEY_PAUSE            = DOMConsoleControls.KEY_PAUSE;
 
     var KEY_POWER            = 112;    // VK_F1;
     var KEY_BLACK_WHITE      = 113;    // VK_F2;
@@ -404,7 +407,7 @@ function DOMConsoleControls() {
     var KEY_CARTRIDGE_REMOVE    = 118; // VK_F7
 
     var KEY_CTRL_MASK  = 1;
-    var KEY_ALT_MASK   = 2;
+    var KEY_ALT_MASK   = DOMConsoleControls.KEY_ALT_MASK;
     var KEY_SHIFT_MASK = 4;
 
     var PADDLES_MODE = Javatari.PADDLES_MODE;
@@ -413,3 +416,11 @@ function DOMConsoleControls() {
     init();
 
 }
+
+DOMConsoleControls.KEY_SELECT     = 122;    // VK_F11;
+DOMConsoleControls.KEY_SELECT2    = 121;    // VK_F10;
+DOMConsoleControls.KEY_RESET      = 123;    // VK_F12;
+DOMConsoleControls.KEY_FAST_SPEED = 9;      // VK_TAB
+DOMConsoleControls.KEY_PAUSE      = 80;     // VK_P;
+
+DOMConsoleControls.KEY_ALT_MASK   = 2;
