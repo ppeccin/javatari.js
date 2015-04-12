@@ -218,7 +218,7 @@ function CanvasDisplay(mainElement) {
         borderElement.style.border = "0 solid black";
         borderElement.style.borderWidth = "" + borderTop + "px " + borderLateral + "px " + borderBottom + "px";
         if (Javatari.SCREEN_CONTROL_BAR === 2) {
-            borderElement.style.borderImage = "url(" + IMAGE_PATH + "ScreenBorder.png) " +
+            borderElement.style.borderImage = "url(" + IMAGE_PATH + "screenborder.png) " +
                 borderTop + " " + borderLateral + " " + borderBottom + " repeat stretch";
         }
 
@@ -318,7 +318,7 @@ function CanvasDisplay(mainElement) {
         but.style.outline = "none";
 
         if (!noImage) {
-            but.style.backgroundImage = "url(" + IMAGE_PATH + "Sprites.png" + ")";
+            but.style.backgroundImage = "url(" + IMAGE_PATH + "sprites.png" + ")";
             but.style.backgroundPosition = "" + px + "px " + py + "px";
             but.style.backgroundRepeat = "no-repeat";
         }
@@ -355,7 +355,7 @@ function CanvasDisplay(mainElement) {
             logoImage.isLoaded = true;
             drawLogo();
         };
-        logoImage.src = IMAGE_PATH + "Logo.png";
+        logoImage.src = IMAGE_PATH + "logo.png";
     };
 
     var setupOSD = function() {

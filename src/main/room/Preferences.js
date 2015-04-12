@@ -30,8 +30,8 @@ Javatari.preferencesDefaults = {
     JP0PAUSE    : 7,
     JP0FAST     : 6,
     JP0DEADZONE : 0.3,
-    JP0PCENTER  : 0,
-    JP0PSENS    : 0.9,
+    JP0PCENTER  : 0.3,
+    JP0PSENS    : 0.75,
 
     JP1DEVICE   : -1,  // -1 = auto
     JP1XAXIS    : 0,
@@ -47,8 +47,8 @@ Javatari.preferencesDefaults = {
     JP1PAUSE    : 7,
     JP1FAST     : 6,
     JP1DEADZONE : 0.3,
-    JP1PCENTER  : 0,
-    JP1PSENS    : 0.9
+    JP1PCENTER  : 0.3,
+    JP1PSENS    : 0.75
 };
 
 Javatari.preferencesLoad = function() {

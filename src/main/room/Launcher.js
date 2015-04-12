@@ -26,7 +26,7 @@ Javatari.start = function () {
 
 Javatari.shutdown = function () {
     if (Javatari.room) Javatari.room.powerOff();
-    delete Javatari.loadROMFromUrl;
+    delete Javatari.loadROMFromURL;
     delete Javatari.screenElement;
     delete Javatari.consolePanelElement;
     delete Javatari.cartridge;

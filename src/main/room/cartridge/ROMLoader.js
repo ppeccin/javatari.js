@@ -202,6 +202,6 @@ function ROMLoader() {
     var LOCAL_STOARAGE_LAST_URL_KEY = "javatarilasturl";
 
 
-    Javatari.loadROMFromUrl = this.loadFromURL;
+    Javatari.loadROMFromURL = this.loadFromURL;
 
 }

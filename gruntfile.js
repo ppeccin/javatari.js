@@ -58,6 +58,8 @@ module.exports = function (grunt) {
                     "src/main/atari/cartridge/CartridgeFormats.js",
                     "src/main/atari/cartridge/CartridgeDatabase.js",
                     "src/main/room/Preferences.js",
+                    "src/main/room/settings/Settings.js",
+                    "src/main/room/controls/GamepadConsoleControls.js",
                     "src/main/room/controls/DOMConsoleControls.js",
                     "src/main/room/screen/DOMMonitorControls.js",
                     "src/main/room/screen/Monitor.js",

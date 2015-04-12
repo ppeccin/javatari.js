@@ -14,7 +14,7 @@ function GamepadConsoleControls(domControls) {
         supported = !!navigator.getGamepads;
         if (!supported) return;
         initPreferences();
-        start();
+        initStates();
     };
 
     this.powerOff = function() {
@@ -23,14 +23,9 @@ function GamepadConsoleControls(domControls) {
 
     this.toggleMode = function() {
         if (!supported) return;
-        if (!started) {
-            swappedMode = false;
-            start();
-        } else
-            swappedMode = !swappedMode;
-        if (started) screen.getMonitor().showOSD("Joystick input " + (swappedMode ? "Swapped" : "Normal"), true);
-        else if (devices.isEmpty()) screen.getMonitor().showOSD("No Joysticks detected!", true);
-        else screen.getMonitor().showOSD("Joysticks are disabled! Open Settings", true);
+        initStates();
+        swappedMode = !swappedMode;
+        screen.getMonitor().showOSD("Joystick input " + (swappedMode ? "Swapped" : "Normal"), true);
     };
 
     this.setPaddleMode = function(state) {
@@ -45,25 +40,65 @@ function GamepadConsoleControls(domControls) {
 
     this.clockPulse = function() {
         if (!supported) return;
-        if (joystick0 && joystick0.update() && joystick0.hasMoved())
-            update(joystick0, joy0State, joy0Prefs, !swappedMode);
-        //else {
-        //    joystick0 = null;
-        //    videoMonitor.showOSD((p1ControlsMode ? "P2" : "P1") + " Joystick disconnected", true);
-        //}
-        if (joystick1 && joystick1.update() && joystick1.hasMoved())
-            update(joystick1, joy1State, joy1Prefs, swappedMode);
-        //else {
-        //    joystick1 = null;
-        //    videoMonitor.showOSD((p1ControlsMode ? "P1" : "P2") + " Joystick disconnected", true);
-        //}
+
+        // Try to avoid polling at gamepads if none are present, as it may be expensive
+        // Only try to detect connected gamepads once each 60 clocks (frames)
+        if (++gamepadsDetectionDelay >= 60) gamepadsDetectionDelay = 0;
+        if (!joystick0 && !joystick1 && gamepadsDetectionDelay !== 0) return;
+
+        var gamepads = navigator.getGamepads();     // Just one poll per clock here then use it several times
+
+        if (joystick0) {
+            if (joystick0.update(gamepads)) {
+                if (joystick0.hasMoved())
+                    update(joystick0, joy0State, joy0Prefs, !swappedMode);
+            } else {
+                joystick0 = null;
+                joystickConnectionMessage(true, false);
+            }
+        } else {
+            if (gamepadsDetectionDelay === 0) {
+                joystick0 = detectNewJoystick(joy0Prefs, joy1Prefs, gamepads);
+                if (joystick0) joystickConnectionMessage(true, true);
+            }
+        }
+
+        if (joystick1) {
+            if (joystick1.update(gamepads)) {
+                if (joystick1.hasMoved())
+                    update(joystick1, joy1State, joy1Prefs, swappedMode);
+            } else {
+                joystick1 = null;
+                joystickConnectionMessage(false, false);
+            }
+        } else {
+            if (gamepadsDetectionDelay === 0) {
+                joystick1 = detectNewJoystick(joy1Prefs, joy0Prefs, gamepads);
+                if (joystick1) joystickConnectionMessage(false, true);
+            }
+        }
     };
 
-    var start = function() {
+    var joystickConnectionMessage = function (joy0, conn) {
+        screen.getMonitor().showOSD((joy0 ^ p1ControlsMode ^ swappedMode ? "P1" : "P2") + " Joystick " + (conn ? "connected" : "disconnected"), joy0);
+    };
+
+    var detectNewJoystick = function(prefs, notPrefs, gamepads) {
+        if (!gamepads || gamepads.length === 0) return;
+        // Fixed index detection. Also allow the same gamepad to control both  players
+        if (prefs.device >= 0)   // pref.device == -1 means "auto"
+            return gamepads[prefs.device] ? new Joystick(prefs.device, prefs) : null;
+        // Auto detection
+        for (var i = 0, len = gamepads.length; i < len; i++)
+            if (gamepads[i])
+                if (i !== notPrefs.device && (!joystick0 || joystick0.index !== i) && (!joystick1 || joystick1.index !== i))
+                    // New Joystick found!
+                    return new Joystick(i, prefs);
+    };
+
+    var initStates = function() {
         joy0State = newControllerState();
         joy1State = newControllerState();
-        joystick0 = new Joystick(joy0Prefs.device === -1 ? 0 : joy0Prefs.device, joy0Prefs);
-        joystick1 = new Joystick(joy1Prefs.device === -1 ? 1 : joy1Prefs.device, joy1Prefs);
     };
 
     var update = function(joystick, joyState, joyPrefs, player0) {
@@ -98,9 +133,10 @@ function GamepadConsoleControls(domControls) {
             joyState.direction = newDirection;
         }
         // Joystick button
-        if (joyButtonDetection === joystick)
+        if (joyButtonDetection === joystick) {
             detectButton();
-        else {
+            return;
+        } else {
             var newButton = joystick.getButtonDigital(joyPrefs.button) || joystick.getButtonDigital(joyPrefs.button2);
             if (newButton !== joyState.button) {
                 domControls.processKeyEvent(player0 ? Javatari.preferences.KP0BUT : Javatari.preferences.KP1BUT, newButton, 0);
@@ -182,12 +218,12 @@ function GamepadConsoleControls(domControls) {
 
 
     var supported = false;
+    var gamepadsDetectionDelay = -1;
 
     var controls = ConsoleControls;
     var consoleControlsSocket;
     var screen;
 
-    var started = true;
     var paddleMode = false;
     var swappedMode = false;
     var p1ControlsMode = false;
@@ -204,8 +240,10 @@ function GamepadConsoleControls(domControls) {
 
     function Joystick(index, prefs) {
 
+        this.index = index;
+
         this.update = function(gamepads) {
-            gamepad = (gamepads || navigator.getGamepads())[index];
+            gamepad = gamepads[index];
             return !!gamepad;
         };
 
@@ -242,10 +280,10 @@ function GamepadConsoleControls(domControls) {
         };
 
         this.getStickDirection = function() {
-            var x = gamepad.axes[prefs.xAxis];
-            var y = gamepad.axes[prefs.yAxis];
-            if ((x < 0 ? -x : x) < prefs.deadzone) x = 0; else x *= prefs.xAxisSig;
-            if ((y < 0 ? -y : y) < prefs.deadzone) y = 0; else y *= prefs.yAxisSig;
+            var x = gamepad.axes[xAxis];
+            var y = gamepad.axes[yAxis];
+            if ((x < 0 ? -x : x) < deadzone) x = 0; else x *= xAxisSig;
+            if ((y < 0 ? -y : y) < deadzone) y = 0; else y *= yAxisSig;
             if (x === 0 && y === 0) return -1;
             var dir = (1 - Math.atan2(x, y) / Math.PI) / 2;
             dir += 1/16; if (dir >= 1) dir -= 1;
@@ -253,13 +291,24 @@ function GamepadConsoleControls(domControls) {
         };
 
         this.getPaddlePosition = function() {
-            var pos = (gamepad.axes[prefs.paddleAxis] * prefs.paddleAxisSig * prefs.paddleSens + prefs.paddleCenter) | 0;
+            var pos = (gamepad.axes[paddleAxis] * paddleAxisSig * paddleSens + paddleCenter) | 0;
             if (pos < 0) pos = 0;
             else if (pos > 380) pos = 380;
             return pos;
         };
 
         var gamepad;
+
+        var xAxis = prefs.xAxis;
+        var yAxis = prefs.yAxis;
+        var xAxisSig = prefs.xAxisSig;
+        var yAxisSig = prefs.yAxisSig;
+        var deadzone = prefs.deadzone;
+        var paddleAxis = prefs.paddleAxis;
+        var paddleAxisSig = prefs.paddleAxisSig;
+        var paddleSens = prefs.paddleSens;
+        var paddleCenter = prefs.paddleCenter;
+
         var lastTimestamp = Number.MIN_VALUE;
 
     }

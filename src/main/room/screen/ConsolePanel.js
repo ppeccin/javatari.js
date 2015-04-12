@@ -76,7 +76,7 @@ function ConsolePanel(mainElement) {
         mainElement.style.position = "relative";
         mainElement.style.width = "" + ConsolePanel.DEFAULT_WIDTH + "px";
         mainElement.style.height = "" + ConsolePanel.DEFAULT_HEIGHT + "px";
-        mainElement.style.background = "black url(" + IMAGE_PATH + "Sprites.png" + ") no-repeat";
+        mainElement.style.background = "black url(" + IMAGE_PATH + "sprites.png" + ") no-repeat";
         mainElement.style.outline = "none";
         mainElement.tabIndex = "1";               // Make it focusable
     };
@@ -120,7 +120,7 @@ function ConsolePanel(mainElement) {
         but.style.outline = "none";
 
         if (!noImage) {
-            but.style.backgroundImage = "url(" + IMAGE_PATH + "Sprites.png" + ")";
+            but.style.backgroundImage = "url(" + IMAGE_PATH + "sprites.png" + ")";
             but.style.backgroundPosition = "" + px + "px " + py + "px";
             but.style.backgroundRepeat = "no-repeat";
         }
