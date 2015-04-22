@@ -150,7 +150,7 @@ function CanvasDisplay(mainElement) {
     };
 
     var openSettings = function() {
-        if (!Settings.cover) Settings.create();
+        if (!Settings.panel) Settings.create();
         Settings.show();
     };
 
