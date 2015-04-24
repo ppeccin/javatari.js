@@ -21,17 +21,16 @@
 .menu {
     position: relative;
     border-bottom: 1px solid rgb(200, 200, 200);
-    background: white;
+    background-color: white;
 }
 
 .menu .caption {
-    height: 38px;
+    height: 29px;
     margin: 0 -1px;
     padding: 9px 0 0 23px;
     color: white;
-    background-color: rgb(244, 67, 54);
+    background-color: rgb(242, 66, 35);
     font-size: 19px;
-    box-sizing: border-box;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .75);
 }
 
@@ -39,24 +38,24 @@
     position: relative;
     overflow: hidden;
     width: 70%;
-    font-weight: 600;
+    height: 39px;
     margin: 0 auto;
+    font-weight: 600;
 }
 
 .menu .item {
     float: left;
-    height: 39px;
     width: 33%;
+    height: 100%;
     padding-top: 13px;
     font-size: 14px;
     opacity: .48;
-    box-sizing: border-box;
     text-align: center;
 }
 
 .menu .selected {
     opacity: 1;
-    color: rgb(238, 63, 50);
+    color: rgb(242, 66, 35);
 }
 
 .menu .selection-bar {
@@ -65,24 +64,31 @@
     bottom: 0;
     width: 33%;
     height: 3px;
-    background-color: rgb(244, 67, 54);
+    background-color: rgb(242, 66, 35);
+    transition: left 0.3s ease-in-out
 }
+
 
 .content {
     position: relative;
+    left: 0;
+    width: 1120px;
     height: 370px;
     background-color: rgb(230, 230, 230);
+    transition: left 0.3s ease-in-out
 }
+
 
 .help {
     position: absolute;
     left: 0;
     width: 560px;
-    padding: 18px 0 0 30px;
+    padding-top: 18px;
 }
 
 .help .left {
     float: left;
+    padding-left: 30px;
 }
 
 .help .right {
@@ -90,13 +96,13 @@
     padding-left: 50px;
 }
 
-.help .item {
+.hotkey {
     height: 23px;
     padding-top: 3px;
     font-size: 13px;
 }
 
-.help .command {
+.hotkey .command {
     position: relative;
     top: -2px;
     float: left;
@@ -104,41 +110,172 @@
     color: rgba(0, 0, 0, .40);
 }
 
-.help .desc {
+.hotkey .desc {
     float: left;
 }
 
-.help .left .command {
+.help .command {
     width: 107px;
 }
 
-.help .right .command-top {
-    width: 107px;
-}
-
-.help .right .command-bottom {
+.help .command.right-bottom {
     width: 162px;
 }
 
 
 
+.controls {
+    position: absolute;
+    left: 560px;
+    width: 560px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.controls .player {
+    position: absolute;
+    top: 15px;
+    width: 217px;
+}
+
+.controls .p1 {
+    left: 26px;
+}
+
+.controls .p2 {
+    right: 26px;
+}
+
+.controls .title {
+    padding-bottom: 4px;
+    margin: 0 14px 8px 12px;
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 18px;
+    text-align: center;
+    border-bottom: 2px solid rgba(242, 66, 35, .55);
+}
+
+.controls .player .command {
+    width: 33%;
+    height: 45px;
+}
+
+.controls .player .command {
+    float: left;
+    font-size: 13px;
+    color: rgba(0, 0, 0, .70);
+    text-align: center;
+}
+
+.controls .command.fire1, .controls .command.fire2 {
+    position: relative;
+    top: 14px;
+}
+
+.controls .command.left, .controls .command.right {
+    position: relative;
+    top: 27px;
+}
+
+.controls .command.down {
+    float: none;
+    clear: both;
+    margin: 0 auto;
+}
+
+.controls .command.controller {
+    height: 90px;
+}
+
+.controls .joystick {
+    width: 72px;
+    height: 89px;
+    margin-left: 1px;
+    background: url("../../images/sprites.png") -465px 0;
+}
+
+.controls .player .key {
+    display: inline-block;
+    float: none;
+    margin-top: 2px;
+    min-width: 45px;
+}
+
+.controls .modes {
+    position: absolute;
+    top: 202px;
+    left: 0;
+    right: 0;
+    width: 200px;
+    margin: 0 auto;
+}
+
+.controls .modes .title {
+    font-size: 18px;
+}
+
+.controls .modes .hotkey {
+    position:relative;
+    left: 10px;
+}
+
+.controls .modes .hotkey .command {
+    margin-right: 12px;
+}
+
+.controls .defaults, .controls .revert {
+    position: absolute;
+    bottom: 13px;
+    padding: 7px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 1px;
+}
+
+.controls .defaults:hover, .controls .revert:hover {
+    background-color: white;
+    box-shadow: 1px 1px 3px 1px rgb(180, 180, 180);
+}
+
+.controls .revert {
+    right: 30px;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.controls .defaults {
+    right: 115px;
+    _color: white;
+    color: #2196F3;
+    color: #4040f5;
+}
+
+
+.content {
+    left: -560px;
+}
+
+
+
+
+
+
 .key {
     position: relative;
-    height: 22px;
-    min-width: 25px;
-    box-sizing: border-box;
-    top: -1px;
     display: inline-block;
+    top: -1px;
+    min-width: 25px;
+    height: 21px;
+    padding: 4px 6px 3px;
+    box-sizing: border-box;
     font-weight: 600;
     font-size: 12px;
     line-height: 12px;
-    color: rgba(0, 0, 0, .67);
+    color: rgba(0, 0, 0, .72);
     background-color: white;
-    padding: 4px 6px 3px;
     border-radius: 4px;
     border: 1px solid;
-    border-bottom-width: 2px;
-    border-color: rgb(230, 230, 230) rgb(200, 200, 200) rgb(170, 170, 170) rgb(220, 220, 220);
+    border-color: rgb(230, 230, 230) rgb(180, 180, 180) rgb(180, 180, 180) rgb(220, 220, 220);
+    box-shadow: 0 1px rgb(100, 100, 100);
     text-align: center;
 }
 

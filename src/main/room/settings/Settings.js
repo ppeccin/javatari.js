@@ -36,7 +36,7 @@ Settings.hide = function() {
 };
 
 Settings.div =
-    '<dov class="cover">' +
+    '<div class="cover">' +
     '<div class="modal">' +
     '<div class="menu">' +
     '<div class="caption">' +
@@ -390,17 +390,16 @@ Settings.css =
     '.menu {' +
     '    position: relative;' +
     '    border-bottom: 1px solid rgb(200, 200, 200);' +
-    '    background: white;' +
+    '    background-color: white;' +
     '}' +
     '' +
     '.menu .caption {' +
-    '    height: 38px;' +
+    '    height: 29px;' +
     '    margin: 0 -1px;' +
     '    padding: 9px 0 0 23px;' +
     '    color: white;' +
-    '    background-color: rgb(244, 67, 54);' +
+    '    background-color: rgb(242, 66, 35);' +
     '    font-size: 19px;' +
-    '    box-sizing: border-box;' +
     '    box-shadow: 0 1px 3px rgba(0, 0, 0, .75);' +
     '}' +
     '' +
@@ -408,33 +407,31 @@ Settings.css =
     '    position: relative;' +
     '    overflow: hidden;' +
     '    width: 70%;' +
-    '    font-weight: 600;' +
+    '    height: 39px;' +
     '    margin: 0 auto;' +
+    '    font-weight: 600;' +
     '}' +
     '' +
     '.menu .item {' +
     '    float: left;' +
-    '    height: 39px;' +
     '    width: 33%;' +
     '    padding-top: 13px;' +
     '    font-size: 14px;' +
     '    opacity: .48;' +
-    '    box-sizing: border-box;' +
     '    text-align: center;' +
     '}' +
     '' +
     '.menu .selected {' +
     '    opacity: 1;' +
-    '    color: rgb(238, 63, 50);' +
+    '    color: rgb(242, 66, 35);' +
     '}' +
     '' +
     '.menu .selection-bar {' +
     '    position: absolute;' +
-    '    left: 0;' +
     '    bottom: 0;' +
     '    width: 33%;' +
     '    height: 3px;' +
-    '    background-color: rgb(244, 67, 54);' +
+    '    background-color: rgb(242, 66, 35);' +
     '}' +
     '' +
     '.content {' +
@@ -447,11 +444,12 @@ Settings.css =
     '    position: absolute;' +
     '    left: 0;' +
     '    width: 560px;' +
-    '    padding: 18px 0 0 30px;' +
+    '    padding-top: 18px;' +
     '}' +
     '' +
     '.help .left {' +
     '    float: left;' +
+    '    padding-left: 30px;' +
     '}' +
     '' +
     '.help .right {' +
@@ -493,21 +491,21 @@ Settings.css =
     '' +
     '.key {' +
     '    position: relative;' +
-    '    height: 22px;' +
-    '    min-width: 25px;' +
-    '    box-sizing: border-box;' +
-    '    top: -1px;' +
     '    display: inline-block;' +
+    '    top: -1px;' +
+    '    min-width: 25px;' +
+    '    height: 21px;' +
+    '    padding: 4px 6px 3px;' +
+    '    box-sizing: border-box;' +
     '    font-weight: 600;' +
     '    font-size: 12px;' +
     '    line-height: 12px;' +
     '    color: rgba(0, 0, 0, .67);' +
     '    background-color: white;' +
-    '    padding: 4px 6px 3px;' +
     '    border-radius: 4px;' +
     '    border: 1px solid;' +
-    '    border-bottom-width: 2px;' +
-    '    border-color: rgb(230, 230, 230) rgb(200, 200, 200) rgb(170, 170, 170) rgb(220, 220, 220);' +
+    '    border-color: rgb(230, 230, 230) rgb(180, 180, 180) rgb(180, 180, 180) rgb(220, 220, 220);' +
+    '    box-shadow: 0 1px rgb(100, 100, 100);' +
     '    text-align: center;' +
     '}' +
     '' +
