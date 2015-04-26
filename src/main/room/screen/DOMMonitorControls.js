@@ -98,27 +98,27 @@ function DOMMonitorControls(monitor) {
     var keyControlAltCodeMap = {};
 
 
-    var KEY_LEFT           = 37;        // VK_LEFT
-    var KEY_UP             = 38;        // VK_UP
-    var KEY_RIGHT          = 39;        // VK_RIGHT
-    var KEY_DOWN           = 40;        // VK_DOWN
+    var KEY_LEFT           = KeyCodes.VK_LEFT;
+    var KEY_UP             = KeyCodes.VK_UP;
+    var KEY_RIGHT          = KeyCodes.VK_RIGHT;
+    var KEY_DOWN           = KeyCodes.VK_DOWN;
 
-    var KEY_SIZE_DEFAULT   = 8;         // VK_BACK_SPACE
+    var KEY_SIZE_DEFAULT   = KeyCodes.VK_BACK_SPACE;
 
-    var KEY_CART_FILE      = 116;       // VK_F5
-    var KEY_CART_URL       = 117;       // VK_F6
-    var KEY_CART_PASTE_V   = 86;        // VK_V
-    var KEY_CART_PASTE_INS = 45;        // VK_INSERT;
+    var KEY_CART_FILE      = KeyCodes.VK_F5;
+    var KEY_CART_URL       = KeyCodes.VK_F6;
+    var KEY_CART_PASTE_V   = KeyCodes.VK_V;
+    var KEY_CART_PASTE_INS = KeyCodes.VK_INSERT;
 
-    var KEY_CRT_FILTER     = 84;        // VK_T
-    var KEY_CRT_MODES      = 82;        // VK_R
+    var KEY_CRT_FILTER     = KeyCodes.VK_T;
+    var KEY_CRT_MODES      = KeyCodes.VK_R;
 
-    var KEY_DEBUG          = 68;        // VK_D
-    var KEY_STATS          = 71;        // VK_G
+    var KEY_DEBUG          = KeyCodes.VK_D;
+    var KEY_STATS          = KeyCodes.VK_G;
 
-    var KEY_FULLSCREEN     = 13;        // VK_ESC
+    var KEY_FULLSCREEN     = KeyCodes.VK_ENTER;
 
-    var KEY_EXIT           = 27;        // VK_ESC
+    var KEY_EXIT           = KeyCodes.VK_ESCAPE;
 
     var KEY_CTRL_MASK  = 1;
     var KEY_ALT_MASK   = 2;

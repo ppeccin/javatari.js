@@ -28,7 +28,7 @@ function CanvasDisplay(mainElement) {
 
     this.powerOn = function() {
         mainElement.style.visibility = "visible";
-        canvas.focus();
+        this.focus();
         drawLogo();
     };
 
@@ -78,7 +78,7 @@ function CanvasDisplay(mainElement) {
     };
 
     this.displayCenter = function() {
-        canvas.focus();
+        this.focus();
     };
 
     this.getMonitor = function() {
@@ -149,9 +149,13 @@ function CanvasDisplay(mainElement) {
         monitor.controlActivated(Monitor.Controls.SIZE_DEFAULT);
     };
 
-    var openSettings = function() {
-        if (!Settings.panel) Settings.create();
-        Settings.show();
+    this.focus = function() {
+        canvas.focus();
+    };
+
+    var openSettings = function(page) {
+        if (!settings) settings = new Settings();
+        settings.show(page);
     };
 
     var fullScreenChanged = function() {
@@ -209,7 +213,7 @@ function CanvasDisplay(mainElement) {
         mainElement.style.position = "relative";
         mainElement.style.overflow = "hidden";
         mainElement.style.outline = "none";
-        mainElement.tabIndex = "1";               // Make it focusable
+        mainElement.tabIndex = "-1";               // Make it focusable
 
         borderElement = document.createElement('div');
         borderElement.style.position = "relative";
@@ -242,7 +246,7 @@ function CanvasDisplay(mainElement) {
         canvas.style.left = canvas.style.right = 0;
         canvas.style.top = canvas.style.bottom = 0;
         canvas.style.margin = "auto";
-        canvas.tabIndex = "1";               // Make it focusable
+        canvas.tabIndex = "-1";               // Make it focusable
         canvas.style.outline = "none";
         fsElement.appendChild(canvas);
 
@@ -279,7 +283,6 @@ function CanvasDisplay(mainElement) {
             buttonsBar.style.border = "1px solid black";
         }
 
-        logoButton = addBarButton("CENTER", -26, 24, 24, -388, -181);
         powerButton  = addBarButton(6, -26, 24, 23, -436, -208);
         consoleControlButton(powerButton, ConsoleControls.POWER);
         var fsGap = 23;
@@ -300,6 +303,13 @@ function CanvasDisplay(mainElement) {
         settingsButton.addEventListener("click", function (e) {
             e.preventDefault();
             openSettings();
+        });
+
+        logoButton = addBarButton("CENTER", -26, 24, 24, -388, -181);
+        logoButton.style.cursor = "pointer";
+        logoButton.addEventListener("click", function (e) {
+            e.preventDefault();
+            openSettings("ABOUT");
         });
 
         mainElement.appendChild(buttonsBar);
@@ -393,6 +403,7 @@ function CanvasDisplay(mainElement) {
 
     var monitor;
     var controlsSocket;
+    var settings;
 
     var borderElement;
     var fsElement;

@@ -13,7 +13,7 @@ function GamepadConsoleControls(domControls) {
     this.powerOn = function() {
         supported = !!navigator.getGamepads;
         if (!supported) return;
-        initPreferences();
+        this.applyPreferences();
         initStates();
     };
 
@@ -25,7 +25,7 @@ function GamepadConsoleControls(domControls) {
         if (!supported) return;
         initStates();
         swappedMode = !swappedMode;
-        screen.getMonitor().showOSD("Joystick input " + (swappedMode ? "Swapped" : "Normal"), true);
+        screen.getMonitor().showOSD("Gamepad input " + (swappedMode ? "Swapped" : "Normal"), true);
     };
 
     this.setPaddleMode = function(state) {
@@ -80,7 +80,7 @@ function GamepadConsoleControls(domControls) {
     };
 
     var joystickConnectionMessage = function (joy0, conn) {
-        screen.getMonitor().showOSD((joy0 ^ p1ControlsMode ^ swappedMode ? "P1" : "P2") + " Joystick " + (conn ? "connected" : "disconnected"), joy0);
+        screen.getMonitor().showOSD((joy0 ^ p1ControlsMode ^ swappedMode ? "P1" : "P2") + " Gamepad " + (conn ? "connected" : "disconnected"), joy0);
     };
 
     var detectNewJoystick = function(prefs, notPrefs, gamepads) {
@@ -177,7 +177,7 @@ function GamepadConsoleControls(domControls) {
     var detectButton = function() {
     };
 
-    var initPreferences = function() {
+    this.applyPreferences = function() {
         joy0Prefs = {
             device         : Javatari.preferences.JP0DEVICE,
             xAxis          : Javatari.preferences.JP0XAXIS,

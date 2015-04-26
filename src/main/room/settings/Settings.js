@@ -1,521 +1,156 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-Settings = {};
+function Settings() {
+    var self = this;
 
-Settings.create = function() {
+    this.show = function (page) {
+        if (!this.panel) create(this);
+        refreshData();
+        if (page) this.setPage(page);
+        this.panel.style.display = "block";
+        this.panel.focus();
+    };
 
-    var styles = document.createElement('style');
-    styles.type = 'text/css';
-    styles.innerHTML = Settings.css;
-    document.head.appendChild(styles);
+    this.hide = function () {
+        this.panel.style.display = "none";
+        Javatari.room.screen.focus();
+    };
 
-    var panel = document.createElement("div");
-    panel.innerHTML = Settings.div;
-    document.body.appendChild(panel);
+    self.setPage = function (page) {
+        var contentPosition = {
+            "HELP": "0",
+            "CONTROLS": "-560px",
+            "ABOUT": "-1120px"
+        }[page];
+        var selectionPosition = {
+            "HELP": "0",
+            "CONTROLS": "33.3%",
+            "ABOUT": "66.6%"
+        }[page];
 
-    panel.addEventListener("click", function (e) {
-        e.preventDefault();
-        Settings.hide();
-    });
+        if (contentPosition) self["content"].style.left = contentPosition;
+        if (selectionPosition) self["menu-selection"].style.left = selectionPosition;
 
-    Settings.panel = panel;
+        self["menu-help"].classList[page === "HELP" ? "add" : "remove"]("selected");
+        self["menu-controls"].classList[page === "CONTROLS" ? "add" : "remove"]("selected");
+        self["menu-about"].classList[page === "ABOUT" ? "add" : "remove"]("selected");
+    };
 
-    console.log("created");
-};
+    var create = function () {
+        var styles = document.createElement('style');
+        styles.type = 'text/css';
+        styles.innerHTML = Settings.css();
+        document.head.appendChild(styles);
 
-Settings.show = function() {
-    Settings.panel.style.display = "block";
+        self.panel = document.createElement("div");
+        self.panel.innerHTML = Settings.html();
+        self.panel.style.outline = "none";
+        self.panel.tabIndex = -1;
+        document.body.appendChild(self.panel);
 
-    console.log("show");
-};
+        delete Settings.html;
+        delete Settings.css;
 
-Settings.hide = function() {
-    Settings.panel.style.display = "none";
+        setFields();
+        setEvents();
+    };
 
-    console.log("close");
-};
+    // Automatic set fields for each child element that has the "id" attribute
+    var setFields = function () {
+        traverseDOM(self.panel, function (element) {
+            if (element.id) self[element.id] = element;
+        });
 
-Settings.div =
-    '<div class="cover">' +
-    '<div class="modal">' +
-    '<div class="menu">' +
-    '<div class="caption">' +
-    'Settings' +
-    '</div>' +
-    '<div class="items">' +
-    '<div class="item selected">' +
-    'HELP' +
-    '</div>' +
-    '<div class="item">' +
-    'CONTROLS' +
-    '</div>' +
-    '<div class="item">' +
-    'ABOUT' +
-    '</div>' +
-    '<div class="selection-bar">' +
-    '</div>' +
-    '</div>' +
-    '</div>' +
-    '<div class="content">' +
-    '<div class="help">' +
-    '<div class="left">' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Ctrl' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    '1 - 0' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Save State' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    '1 - 0' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Load State' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'Enter' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Full Screen' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'V' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'NTSC/PAL' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'R' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'CRT Modes' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'T' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'CRT Filter' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'G' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Show Info' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'D' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Debug Modes' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'C' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Collisions' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'P' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Pause' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'F' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Next Frame' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command">' +
-    '<div class="key">' +
-    'Tab' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Fast Speed' +
-    '</div>' +
-    '</div>' +
-    '</div>' +
-    '<div class="right">' +
-    '<div class="item">' +
-    '<div class="command command-top">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'F1' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Fry Console' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command command-top">' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'F5/F6' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Load ROM with Power ON' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command command-top">' +
-    '<div class="key">' +
-    'F7' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Remove Cartridge' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command command-top">' +
-    '<div class="key">' +
-    'F8' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Save State File' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="desc">' +
-    'Drag/Drop Files or URLs to load ROMs' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command command-bottom">' +
-    '<div class="key">' +
-    'Backspace' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Screen Defaults' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command command-bottom">' +
-    '<div class="key">' +
-    'Shift' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'Arrows' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Screen Size' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command command-bottom">' +
-    '<div class="key">' +
-    'Shift' +
-    '</div>' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'Arrows' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Screen Scale' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command command-bottom">' +
-    '<div class="key">' +
-    'Shift' +
-    '</div>' +
-    '<div class="key key-ctrlalt">' +
-    'Ctrl' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'Arrows' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Viewport Size' +
-    '</div>' +
-    '</div>' +
-    '<div class="item">' +
-    '<div class="command command-bottom">' +
-    '<div class="key key-ctrlalt">' +
-    'Ctrl' +
-    '</div>' +
-    '<div class="key key-ctrlalt">' +
-    'Alt' +
-    '</div>' +
-    ' + ' +
-    '<div class="key">' +
-    'Arrows' +
-    '</div>' +
-    '</div>' +
-    '<div class="desc">' +
-    'Viewport Origin' +
-    '</div>' +
-    '</div>' +
-    '</div>' +
-    '</div>' +
-    '</div>' +
-    '</div>' +
-    '</div>'
-;
+        function traverseDOM(element, func) {
+            func(element);
+            var child = element.childNodes;
+            for (var i = 0; i < child.length; i++) {
+                traverseDOM(child[i], func);
+            }
+        }
+    };
 
-Settings.css =
-    '.cover {' +
-    '    position: fixed;' +
-    '    top: 0;' +
-    '    right: 0;' +
-    '    bottom: 0;' +
-    '    left: 0;' +
-    '    background-color: rgba(0, 0, 0, 0.5);' +
-    '}' +
-    '' +
-    '.modal {' +
-    '    position: relative;' +
-    '    overflow: hidden;' +
-    '    width: 560px;' +
-    '    top: 60px;' +
-    '    margin: 0 auto;' +
-    '    color: rgba(0, 0, 0, 0.92);' +
-    '    font-family: arial, sans-serif;' +
-    '    box-shadow: 3px 3px 15px 2px rgba(0, 0, 0, .4);' +
-    '}' +
-    '' +
-    '.menu {' +
-    '    position: relative;' +
-    '    border-bottom: 1px solid rgb(200, 200, 200);' +
-    '    background-color: white;' +
-    '}' +
-    '' +
-    '.menu .caption {' +
-    '    height: 29px;' +
-    '    margin: 0 -1px;' +
-    '    padding: 9px 0 0 23px;' +
-    '    color: white;' +
-    '    background-color: rgb(242, 66, 35);' +
-    '    font-size: 19px;' +
-    '    box-shadow: 0 1px 3px rgba(0, 0, 0, .75);' +
-    '}' +
-    '' +
-    '.menu .items {' +
-    '    position: relative;' +
-    '    overflow: hidden;' +
-    '    width: 70%;' +
-    '    height: 39px;' +
-    '    margin: 0 auto;' +
-    '    font-weight: 600;' +
-    '}' +
-    '' +
-    '.menu .item {' +
-    '    float: left;' +
-    '    width: 33%;' +
-    '    padding-top: 13px;' +
-    '    font-size: 14px;' +
-    '    opacity: .48;' +
-    '    text-align: center;' +
-    '}' +
-    '' +
-    '.menu .selected {' +
-    '    opacity: 1;' +
-    '    color: rgb(242, 66, 35);' +
-    '}' +
-    '' +
-    '.menu .selection-bar {' +
-    '    position: absolute;' +
-    '    bottom: 0;' +
-    '    width: 33%;' +
-    '    height: 3px;' +
-    '    background-color: rgb(242, 66, 35);' +
-    '}' +
-    '' +
-    '.content {' +
-    '    position: relative;' +
-    '    height: 370px;' +
-    '    background-color: rgb(230, 230, 230);' +
-    '}' +
-    '' +
-    '.help {' +
-    '    position: absolute;' +
-    '    left: 0;' +
-    '    width: 560px;' +
-    '    padding-top: 18px;' +
-    '}' +
-    '' +
-    '.help .left {' +
-    '    float: left;' +
-    '    padding-left: 30px;' +
-    '}' +
-    '' +
-    '.help .right {' +
-    '    float: left;' +
-    '    padding-left: 50px;' +
-    '}' +
-    '' +
-    '.help .item {' +
-    '    height: 23px;' +
-    '    padding-top: 3px;' +
-    '    font-size: 13px;' +
-    '}' +
-    '' +
-    '.help .command {' +
-    '    position: relative;' +
-    '    top: -2px;' +
-    '    float: left;' +
-    '    font-weight: 600;' +
-    '    color: rgba(0, 0, 0, .40);' +
-    '}' +
-    '' +
-    '.help .desc {' +
-    '    float: left;' +
-    '}' +
-    '' +
-    '.help .left .command {' +
-    '    width: 107px;' +
-    '}' +
-    '' +
-    '.help .right .command-top {' +
-    '    width: 107px;' +
-    '}' +
-    '' +
-    '.help .right .command-bottom {' +
-    '    width: 162px;' +
-    '}' +
-    '' +
-    '' +
-    '' +
-    '.key {' +
-    '    position: relative;' +
-    '    display: inline-block;' +
-    '    top: -1px;' +
-    '    min-width: 25px;' +
-    '    height: 21px;' +
-    '    padding: 4px 6px 3px;' +
-    '    box-sizing: border-box;' +
-    '    font-weight: 600;' +
-    '    font-size: 12px;' +
-    '    line-height: 12px;' +
-    '    color: rgba(0, 0, 0, .67);' +
-    '    background-color: white;' +
-    '    border-radius: 4px;' +
-    '    border: 1px solid;' +
-    '    border-color: rgb(230, 230, 230) rgb(180, 180, 180) rgb(180, 180, 180) rgb(220, 220, 220);' +
-    '    box-shadow: 0 1px rgb(100, 100, 100);' +
-    '    text-align: center;' +
-    '}' +
-    '' +
-    '.key-ctrlalt {' +
-    '    width: 31px;' +
-    '    padding-left: 0;' +
-    '    padding-right: 2px;' +
-    '}'
-;
+    var setEvents = function () {
+        // Close the modal with a click outside
+        self.panel.addEventListener("click", function (e) {
+            e.stopPropagation();
+            self.hide();
+        });
+        // Or hitting ESC
+        self.panel.addEventListener("keydown", function (e) {
+            e.preventDefault();
+            //e.stopPropagation();
+            if (e.keyCode === KEY_CLOSE)
+                self.hide();
+        });
 
 
+        // No not close the modal with a click inside
+        self["modal"].addEventListener("click", function (e) {
+            e.stopPropagation();
+        });
 
+        self["menu-help"].addEventListener("click", function () {
+            self.setPage("HELP");
+        });
+        self["menu-controls"].addEventListener("click", function () {
+            self.setPage("CONTROLS");
+        });
+        self["menu-about"].addEventListener("click", function () {
+            self.setPage("ABOUT");
+        });
+
+    };
+
+    var refreshData = function () {
+        self["browserinfo"].innerHTML = navigator.userAgent;
+
+        if (Javatari.room.controls.isPaddleMode()) {
+            self["control-p1-controller"].style.backgroundPositionY = "-91px";
+            self["control-p2-controller"].style.backgroundPositionY = "-91px";
+            self["control-p1-up-label"].innerHTML = self["control-p2-up-label"].innerHTML = "+ Speed";
+            self["control-p1-down-label"].innerHTML = self["control-p2-down-label"].innerHTML = "- Speed";
+        } else {
+            self["control-p1-controller"].style.backgroundPositionY = "0";
+            self["control-p2-controller"].style.backgroundPositionY = "0";
+            self["control-p1-up-label"].innerHTML = self["control-p2-up-label"].innerHTML = "Up";
+            self["control-p1-down-label"].innerHTML = self["control-p2-down-label"].innerHTML = "Down";
+
+        }
+        var swapped = Javatari.room.controls.isP1ControlsMode();
+        self["control-p1-label"].innerHTML = "Player " + (swapped ? "2" : "1");
+        self["control-p2-label"].innerHTML = "Player " + (swapped ? "1" : "2");
+
+        for (var control in controlKeys) {
+            if (control === controlRedefining) {
+                self[control].classList.add("redefining");
+                self[control].innerHTML = "?";
+            } else {
+                self[control].classList.remove("redefining");
+                self[control].innerHTML = KeyNames[Javatari.preferences[controlKeys[control]]];
+            }
+        }
+    };
+
+
+    var controlKeys = {
+        "control-p1-button1": "KP0BUT",
+        "control-p1-button2": "KP0BUT2",
+        "control-p1-up": "KP0UP",
+        "control-p1-left": "KP0LEFT",
+        "control-p1-right": "KP0RIGHT",
+        "control-p1-down": "KP0DOWN",
+        "control-p2-button1": "KP1BUT",
+        "control-p2-button2": "KP1BUT2",
+        "control-p2-up": "KP1UP",
+        "control-p2-left": "KP1LEFT",
+        "control-p2-right": "KP1RIGHT",
+        "control-p2-down": "KP1DOWN"
+    };
+
+    var controlRedefining = null;
+
+    var KEY_CLOSE = 27;        // VK_ESC
+
+}
 
