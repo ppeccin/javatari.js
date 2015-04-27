@@ -6,6 +6,11 @@ Settings.html = function() {
     return '<div id="cover">' +
         '<div id="modal">' +
         '<div id="menu">' +
+        '<div id="back">' +
+        '<div id="back-arrow">' +
+        '&larr;' +
+        '</div>' +
+        '</div>' +
         '<div class="caption">' +
         'Settings' +
         '</div>' +
@@ -420,7 +425,7 @@ Settings.html = function() {
         '<div class="title">' +
         'Modes' +
         '</div>' +
-        '<div class="hotkey">' +
+        '<div id="controls-swap-keys" class="hotkey">' +
         '<div class="command">' +
         '<div class="key key-ctrlalt">' +
         'Alt' +
@@ -434,7 +439,7 @@ Settings.html = function() {
         'Swap Keys' +
         '</div>' +
         '</div>' +
-        '<div class="hotkey">' +
+        '<div id="controls-swap-gamepads" class="hotkey">' +
         '<div class="command">' +
         '<div class="key key-ctrlalt">' +
         'Alt' +
@@ -448,7 +453,7 @@ Settings.html = function() {
         'Swap Gamepads' +
         '</div>' +
         '</div>' +
-        '<div class="hotkey">' +
+        '<div id="controls-toggle-paddles" class="hotkey">' +
         '<div class="command">' +
         '<div class="key key-ctrlalt">' +
         'Alt' +
@@ -494,29 +499,43 @@ Settings.css = function() {
         'right: 0;' +
         'bottom: 0;' +
         'left: 0;' +
+        'visibility: hidden;' +
+        'opacity: 0;' +
         'background-color: rgba(0, 0, 0, 0.6);' +
+        'transition: all .2s ease-out;' +
+        '}' +
+
+        '#cover.show {' +
+        'visibility: visible;' +
+        'opacity: 1;' +
         '}' +
 
         '#modal {' +
         'position: relative;' +
         'overflow: hidden;' +
         'width: 560px;' +
-        'top: 60px;' +
+        'top: 80px;' +
+        'left: -120px;' +
         'margin: 0 auto;' +
         'color: rgba(0, 0, 0, 0.90);' +
         'font-family: arial, sans-serif;' +
         'box-shadow: 3px 3px 15px 2px rgba(0, 0, 0, .4);' +
+        'transition: all .2s ease-out;' +
+        '}' +
+
+        '#modal.show {' +
+        'left: 0;' +
         '}' +
 
         '.hotkey {' +
-        'height: 24px;' +
-        'padding-top: 3px;' +
+        'height: 27px;' +
+        'padding: 3px 5px;' +
         'font-size: 13px;' +
+        'box-sizing: border-box;' +
         '}' +
 
         '.hotkey .command {' +
         'position: relative;' +
-        'top: -3px;' +
         'float: left;' +
         'font-weight: 600;' +
         'color: rgba(0, 0, 0, .50);' +
@@ -524,6 +543,7 @@ Settings.css = function() {
 
         '.hotkey .desc {' +
         'float: left;' +
+        'padding-top: 3px;' +
         '}' +
 
         '.key {' +
@@ -557,10 +577,31 @@ Settings.css = function() {
         'border-bottom: 1px solid rgb(200, 200, 200);' +
         '}' +
 
+        '#menu #back {' +
+        'position: absolute;' +
+        'width: 18px;' +
+        'height: 32px;' +
+        'margin: 3px;' +
+        'padding: 0 11px;' +
+        'font-size: 35px;' +
+        'color: white;' +
+        'cursor: pointer;' +
+        '}' +
+
+        '#menu #back:hover {' +
+        'background-color: rgba(0, 0, 0, .12);' +
+        '}' +
+
+        '#menu #back-arrow {' +
+        'position: relative;' +
+        'overflow: hidden;' +
+        'top: -7px;' +
+        '}' +
+
         '#menu .caption {' +
         'height: 29px;' +
         'margin: 0 -1px;' +
-        'padding: 9px 0 0 23px;' +
+        'padding: 9px 0 0 48px;' +
         'font-size: 19px;' +
         'color: white;' +
         'background-color: rgb(235, 62, 35);' +
@@ -618,17 +659,17 @@ Settings.css = function() {
         '}' +
 
         '#help {' +
-        'padding-top: 24px;' +
+        'padding-top: 22px;' +
         '}' +
 
         '#help .left {' +
         'float: left;' +
-        'padding-left: 33px;' +
+        'padding-left: 30px;' +
         '}' +
 
         '#help .right {' +
         'float: left;' +
-        'padding-left: 48px;' +
+        'padding-left: 40px;' +
         '}' +
 
         '#help .left .command {' +
@@ -709,6 +750,11 @@ Settings.css = function() {
         'height: 23px;' +
         'padding: 5px 6px 4px;' +
         'margin-top: 2px;' +
+        'cursor: pointer;' +
+        '}' +
+
+        '#controls .player .key:hover {' +
+        'background-color: rgb(210, 210, 255);' +
         '}' +
 
         '#controls .player .key.redefining {' +
@@ -728,7 +774,13 @@ Settings.css = function() {
 
         '#controls .modes .hotkey {' +
         'position: relative;' +
-        'left: 10px;' +
+        'padding-left: 8px;' +
+        'cursor: pointer;' +
+        '}' +
+
+        '#controls .modes .hotkey:hover {' +
+        'background-color: white;' +
+        'box-shadow: 1px 1px 3px 1px rgb(180, 180, 180);' +
         '}' +
 
         '#controls .modes .command {' +

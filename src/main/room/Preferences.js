@@ -66,3 +66,8 @@ Javatari.preferencesSave = function() {
     localStorage.javatariprefs = JSON.stringify(Javatari.preferences);
 };
 
+Javatari.preferencesSetDefaults = function() {
+    for (var pref in Javatari.preferencesDefaults)
+        Javatari.preferences[pref] = Javatari.preferencesDefaults[pref];
+};
+

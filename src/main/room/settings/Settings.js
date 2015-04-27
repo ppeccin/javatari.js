@@ -4,15 +4,26 @@ function Settings() {
     var self = this;
 
     this.show = function (page) {
-        if (!this.panel) create(this);
+        if (!this.panel) {
+            create(this);
+            setTimeout(function() {
+                self.show(page);
+            }, 0);
+            return;
+        }
+        preferencesChanged = false;
+        controlRedefining = null;
         refreshData();
         if (page) this.setPage(page);
-        this.panel.style.display = "block";
+        this["cover"].classList.add("show");
+        this["modal"].classList.add("show");
         this.panel.focus();
     };
 
     this.hide = function () {
-        this.panel.style.display = "none";
+        if (preferencesChanged) finishPreferences();
+        this["modal"].classList.remove("show");
+        this["cover"].classList.remove("show");
         Javatari.room.screen.focus();
     };
 
@@ -72,34 +83,75 @@ function Settings() {
 
     var setEvents = function () {
         // Close the modal with a click outside
-        self.panel.addEventListener("click", function (e) {
+        self.panel.addEventListener("mousedown", function (e) {
+            e.preventDefault();
             e.stopPropagation();
             self.hide();
         });
-        // Or hitting ESC
+        // But do not close the modal with a click inside
+        self["modal"].addEventListener("mousedown", function (e) {
+            e.stopPropagation();
+            keyRedefinitonStop();
+        });
+        // Close with the back button
+        self["back"].addEventListener("mousedown", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.hide();
+        });
+
+        // Several key events
         self.panel.addEventListener("keydown", function (e) {
             e.preventDefault();
-            //e.stopPropagation();
-            if (e.keyCode === KEY_CLOSE)
-                self.hide();
-        });
-
-
-        // No not close the modal with a click inside
-        self["modal"].addEventListener("click", function (e) {
             e.stopPropagation();
+            processKeyEvent(e);
         });
 
-        self["menu-help"].addEventListener("click", function () {
+        // Tabs
+        self["menu-help"].addEventListener("mousedown", function (e) {
+            e.preventDefault();
             self.setPage("HELP");
         });
-        self["menu-controls"].addEventListener("click", function () {
+        self["menu-controls"].addEventListener("mousedown", function (e) {
+            e.preventDefault();
             self.setPage("CONTROLS");
         });
-        self["menu-about"].addEventListener("click", function () {
+        self["menu-about"].addEventListener("mousedown", function (e) {
+            e.preventDefault();
             self.setPage("ABOUT");
         });
 
+        // Double click for key redefinition
+        for (var control in controlKeys) {
+            (function(localControl) {
+                self[localControl].addEventListener("mousedown", function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    reyRedefinitionStart(localControl);
+                });
+            })(control);
+        }
+
+        // Controls Actions
+        self["controls-defaults"].addEventListener("mousedown", function (e) {
+            e.preventDefault();
+            controlsDefaults();
+        });
+        self["controls-revert"].addEventListener("mousedown", function (e) {
+            e.preventDefault();
+            controlsRevert();
+        });
+
+        // Generic Console Controls Commands
+        for (var key in controlsCommandKeys) {
+            (function(keyLocal) {
+                self[controlsCommandKeys[key]].addEventListener("mousedown", function (e) {
+                    e.preventDefault();
+                    Javatari.room.controls.processKeyEvent(keyLocal, true, DOMConsoleControls.KEY_ALT_MASK);
+                    keyRedefinitonStop();   // will refresh
+                });
+            })(key | 0);    // must be a number to simulate a keyCode
+        }
     };
 
     var refreshData = function () {
@@ -132,6 +184,58 @@ function Settings() {
         }
     };
 
+    var processKeyEvent = function (e) {
+        if (e.keyCode === KEY_ESC)
+            closeOrKeyRedefinitionStop();
+        else if(controlRedefining) keyRedefinitionTry(e.keyCode);
+        else {
+            if (e.altKey && controlsCommandKeys[e.keyCode]) {
+                Javatari.room.controls.filteredKeyPressed(e);
+                refreshData();
+            }
+        }
+    };
+
+    var reyRedefinitionStart = function(control) {
+        controlRedefining = control;
+        refreshData();
+    };
+
+    var keyRedefinitonStop = function() {
+        controlRedefining = null;
+        refreshData();
+    };
+
+    var keyRedefinitionTry = function (keyCode) {
+        if (!controlRedefining) return;
+        if (!KeyNames[keyCode]) return;
+        preferencesChanged = true;
+        Javatari.preferences[controlKeys[controlRedefining]] = keyCode;
+        keyRedefinitonStop();
+    };
+
+    var closeOrKeyRedefinitionStop = function() {
+        if (controlRedefining) keyRedefinitonStop();
+        else self.hide()
+    };
+
+    var controlsDefaults = function () {
+        Javatari.preferencesSetDefaults();
+        preferencesChanged = true;
+        keyRedefinitonStop();   // will refresh
+    };
+
+    var controlsRevert = function () {
+        Javatari.preferencesLoad();
+        preferencesChanged = false;
+        keyRedefinitonStop();   // will refresh
+    };
+
+    var finishPreferences = function () {
+        Javatari.room.controls.applyPreferences();
+        Javatari.preferencesSave();
+        preferencesChanged = false;
+    };
 
     var controlKeys = {
         "control-p1-button1": "KP0BUT",
@@ -150,7 +254,14 @@ function Settings() {
 
     var controlRedefining = null;
 
-    var KEY_CLOSE = 27;        // VK_ESC
+    var controlsCommandKeys = {};
+        controlsCommandKeys[DOMConsoleControls.KEY_TOGGLE_P1_MODE] = "controls-swap-keys";
+        controlsCommandKeys[DOMConsoleControls.KEY_TOGGLE_JOYSTICK] = "controls-swap-gamepads";
+        controlsCommandKeys[DOMConsoleControls.KEY_TOGGLE_PADDLE] = "controls-toggle-paddles";
+
+    var preferencesChanged = false;
+
+    var KEY_ESC = 27;        // VK_ESC
 
 }
 

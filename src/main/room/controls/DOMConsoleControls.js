@@ -165,7 +165,8 @@ function DOMConsoleControls() {
                         gamepadControls.toggleMode();
                         return true;
                     case KEY_TOGGLE_PADDLE:
-                        self.togglePaddleMode(); return true;
+                        self.togglePaddleMode();
+                        return true;
                 }
             if (paddleMode) {
                 control = controlForEvent(keyCode, modif);
@@ -312,6 +313,7 @@ function DOMConsoleControls() {
     };
 
     this.applyPreferences = function() {
+        joyKeysCodeMap = {};
         if (!p1ControlsMode) {
             joyKeysCodeMap[Javatari.preferences.KP0LEFT]  = controls.JOY0_LEFT;
             joyKeysCodeMap[Javatari.preferences.KP0UP]    = controls.JOY0_UP;
@@ -372,10 +374,10 @@ function DOMConsoleControls() {
 
     // Default Key Values
 
-    var KEY_TOGGLE_JOYSTICK  = KeyCodes.VK_J;
-    var KEY_TOGGLE_P1_MODE   = KeyCodes.VK_K;
-    var KEY_TOGGLE_PADDLE    = KeyCodes.VK_L;
-    var KEY_CARTRIDGE_FORMAT = KeyCodes.VK_B;
+    var KEY_TOGGLE_JOYSTICK  = DOMConsoleControls.KEY_TOGGLE_JOYSTICK;
+    var KEY_TOGGLE_P1_MODE   = DOMConsoleControls.KEY_TOGGLE_P1_MODE;
+    var KEY_TOGGLE_PADDLE    = DOMConsoleControls.KEY_TOGGLE_PADDLE;
+    var KEY_CARTRIDGE_FORMAT = DOMConsoleControls.KEY_CARTRIDGE_FORMAT;
     var KEY_SELECT           = DOMConsoleControls.KEY_SELECT;
     var KEY_SELECT2          = DOMConsoleControls.KEY_SELECT2;
     var KEY_RESET            = DOMConsoleControls.KEY_RESET;
@@ -430,5 +432,10 @@ DOMConsoleControls.KEY_SELECT2    = KeyCodes.VK_F10;
 DOMConsoleControls.KEY_RESET      = KeyCodes.VK_F12;
 DOMConsoleControls.KEY_FAST_SPEED = KeyCodes.VK_TAB;
 DOMConsoleControls.KEY_PAUSE      = KeyCodes.VK_P;
+
+DOMConsoleControls.KEY_TOGGLE_JOYSTICK  = KeyCodes.VK_J;
+DOMConsoleControls.KEY_TOGGLE_P1_MODE   = KeyCodes.VK_K;
+DOMConsoleControls.KEY_TOGGLE_PADDLE    = KeyCodes.VK_L;
+DOMConsoleControls.KEY_CARTRIDGE_FORMAT = KeyCodes.VK_B;
 
 DOMConsoleControls.KEY_ALT_MASK   = 2;

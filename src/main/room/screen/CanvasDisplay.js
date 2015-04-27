@@ -300,14 +300,14 @@ function CanvasDisplay(mainElement) {
 
         settingsButton  = addBarButton(-29, -26, 24, 22, -412, -209);
         settingsButton.style.cursor = "pointer";
-        settingsButton.addEventListener("click", function (e) {
+        settingsButton.addEventListener("mousedown", function (e) {
             e.preventDefault();
             openSettings();
         });
 
         logoButton = addBarButton("CENTER", -26, 24, 24, -388, -181);
         logoButton.style.cursor = "pointer";
-        logoButton.addEventListener("click", function (e) {
+        logoButton.addEventListener("mousedown", function (e) {
             e.preventDefault();
             openSettings("ABOUT");
         });
