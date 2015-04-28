@@ -60,6 +60,16 @@ Settings.html = function() {
         '</div>' +
         '</div>' +
         '<div class="hotkey">' +
+        '<div class="command">' +
+        '<div class="key">' +
+        'F8' +
+        '</div>' +
+        '</div>' +
+        '<div class="desc">' +
+        'Save State File' +
+        '</div>' +
+        '</div>' +
+        '<div class="hotkey">' +
         '</div>' +
         '<div class="hotkey">' +
         '<div class="command">' +
@@ -68,11 +78,25 @@ Settings.html = function() {
         '</div>' +
         ' + ' +
         '<div class="key">' +
-        'Enter' +
+        'P' +
         '</div>' +
         '</div>' +
         '<div class="desc">' +
-        'Full Screen' +
+        'Pause' +
+        '</div>' +
+        '</div>' +
+        '<div class="hotkey">' +
+        '<div class="command">' +
+        '<div class="key key-ctrlalt">' +
+        'Alt' +
+        '</div>' +
+        ' + ' +
+        '<div class="key">' +
+        'F' +
+        '</div>' +
+        '</div>' +
+        '<div class="desc">' +
+        'Next Frame' +
         '</div>' +
         '</div>' +
         '<div class="hotkey">' +
@@ -159,34 +183,6 @@ Settings.html = function() {
         'Collisions' +
         '</div>' +
         '</div>' +
-        '<div class="hotkey">' +
-        '<div class="command">' +
-        '<div class="key key-ctrlalt">' +
-        'Alt' +
-        '</div>' +
-        ' + ' +
-        '<div class="key">' +
-        'P' +
-        '</div>' +
-        '</div>' +
-        '<div class="desc">' +
-        'Pause' +
-        '</div>' +
-        '</div>' +
-        '<div class="hotkey">' +
-        '<div class="command">' +
-        '<div class="key key-ctrlalt">' +
-        'Alt' +
-        '</div>' +
-        ' + ' +
-        '<div class="key">' +
-        'F' +
-        '</div>' +
-        '</div>' +
-        '<div class="desc">' +
-        'Next Frame' +
-        '</div>' +
-        '</div>' +
         '</div>' +
         '<div class="right">' +
         '<div class="hotkey">' +
@@ -197,6 +193,20 @@ Settings.html = function() {
         '</div>' +
         '<div class="desc">' +
         'Fast Speed' +
+        '</div>' +
+        '</div>' +
+        '<div class="hotkey">' +
+        '<div class="command">' +
+        '<div class="key key-ctrlalt">' +
+        'Alt' +
+        '</div>' +
+        ' + ' +
+        '<div class="key">' +
+        'Enter' +
+        '</div>' +
+        '</div>' +
+        '<div class="desc">' +
+        'Full Screen' +
         '</div>' +
         '</div>' +
         '<div class="hotkey">' +
@@ -221,16 +231,6 @@ Settings.html = function() {
         '</div>' +
         '<div class="desc">' +
         'Remove Cartridge' +
-        '</div>' +
-        '</div>' +
-        '<div class="hotkey">' +
-        '<div class="command">' +
-        '<div class="key">' +
-        'F8' +
-        '</div>' +
-        '</div>' +
-        '<div class="desc">' +
-        'Save State File' +
         '</div>' +
         '</div>' +
         '<div class="hotkey">' +
@@ -669,19 +669,19 @@ Settings.css = function() {
 
         '#help .right {' +
         'float: left;' +
-        'padding-left: 40px;' +
+        'padding-left: 34px;' +
         '}' +
 
         '#help .left .command {' +
-        'width: 108px;' +
+        'width: 104px;' +
         '}' +
 
         '#help .right .command {' +
-        'width: 93px;' +
+        'width: 109px;' +
         '}' +
 
         '#help .command.right-bottom {' +
-        'width: 163px;' +
+        'width: 164px;' +
         '}' +
 
         '#controls {' +

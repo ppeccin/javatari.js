@@ -33,11 +33,22 @@ Javatari.shutdown = function () {
     delete Javatari.room;
     Util.log("shutdown");
 
-    // Emulator can only be shutdown once
+    // Emulator can only be started and shutdown once
+    delete Javatari.start;
     delete Javatari.shutdown;
 };
 
-// Schedule automatic launch
+Javatari.preLoadImages = function() {
+    var images = [ "sprites.png", "logo.png", "screenborder.png" ];
+    for (var i = 0; i < images.length; i++)
+        new Image().src = Javatari.IMAGES_PATH + images[i];
+};
+
+// Start pre-loading images right away
+Javatari.preLoadImages();
+
+
+// Schedule automatic launch when page is load is complete
 window.addEventListener("load", function () {
     if (Javatari.start && Javatari.AUTO_START !== false)
          Javatari.start();

@@ -175,19 +175,19 @@
 
 #help .right {
     float: left;
-    padding-left: 40px;
+    padding-left: 34px;
 }
 
 #help .left .command {
-    width: 108px;
+    width: 104px;
 }
 
 #help .right .command {
-    width: 93px;
+    width: 109px;
 }
 
 #help .command.right-bottom {
-    width: 163px;
+    width: 164px;
 }
 
 #controls {
@@ -358,6 +358,6 @@
 
 
 #content {
-    left: -560px;
+    _left: -560px;
 }
 
