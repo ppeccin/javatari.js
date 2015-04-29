@@ -2,7 +2,7 @@
 
 Javatari.start = function () {
     // Init preferences
-    Javatari.preferencesLoad();
+    Javatari.preferences.load();
     // Get container elements
     if (!Javatari.screenElement) {
         Javatari.screenElement = document.getElementById(Javatari.SCREEN_ELEMENT_ID);
@@ -21,27 +21,17 @@ Javatari.start = function () {
 
     Javatari.shutdown = function () {
         if (Javatari.room) Javatari.room.powerOff();
-        delete Javatari.loadROMFromURL;
-        delete Javatari.screenElement;
-        delete Javatari.consolePanelElement;
-        delete Javatari.cartridge;
-        delete Javatari.room;
         Util.log("shutdown");
-        // Emulator can only be shutdown once
-        delete Javatari.shutdown;
+        delete Javatari;
     };
 
     // Emulator can only be started once
     delete Javatari.start;
-    delete Javatari.autoStart;
+    delete Javatari.preLoadImagesAndStart;
 
     Util.log("started");
 };
 
-Javatari.autoStart = function() {
-    if (Javatari.start && Javatari.AUTO_START !== false)
-        Javatari.start();
-};
 
 // Pre-load images and start emulator as soon as all are loaded and DOM is ready
 Javatari.preLoadImagesAndStart = function() {
@@ -51,8 +41,8 @@ Javatari.preLoadImagesAndStart = function() {
     var domReady = false;
     var imagesToLoad = numImages;
     function checkLaunch() {
-        if (Javatari.autoStart && domReady && imagesToLoad === 0)
-            Javatari.autoStart();
+        if (Javatari.start &&  Javatari.AUTO_START !== false && domReady && imagesToLoad === 0)
+            Javatari.start();
     }
 
     document.addEventListener("DOMContentLoaded", function() {

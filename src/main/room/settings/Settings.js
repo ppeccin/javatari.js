@@ -220,20 +220,20 @@ function Settings() {
     };
 
     var controlsDefaults = function () {
-        Javatari.preferencesSetDefaults();
+        Javatari.preferences.loadDefaults();
         preferencesChanged = true;
         keyRedefinitonStop();   // will refresh
     };
 
     var controlsRevert = function () {
-        Javatari.preferencesLoad();
+        Javatari.preferences.load();
         preferencesChanged = false;
         keyRedefinitonStop();   // will refresh
     };
 
     var finishPreferences = function () {
         Javatari.room.controls.applyPreferences();
-        Javatari.preferencesSave();
+        Javatari.preferences.save();
         preferencesChanged = false;
     };
 

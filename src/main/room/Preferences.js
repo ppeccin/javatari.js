@@ -2,7 +2,7 @@
 
 Javatari.preferences = {};
 
-Javatari.preferencesDefaults = {
+Javatari.preferences.defaults = {
     KP0LEFT  : KeyCodes.VK_LEFT,
     KP0UP    : KeyCodes.VK_UP,
     KP0RIGHT : KeyCodes.VK_RIGHT,
@@ -51,23 +51,24 @@ Javatari.preferencesDefaults = {
     JP1PSENS    : 0.75
 };
 
-Javatari.preferencesLoad = function() {
-    var loaded = {};
+Javatari.preferences.loadDefaults = function() {
+    for (var pref in Javatari.preferences.defaults)
+        Javatari.preferences[pref] = Javatari.preferences.defaults[pref];
+};
+
+Javatari.preferences.load = function() {
     try {
-        loaded = JSON.parse(localStorage.javatariprefs || "{}");
+        Javatari.preferences.loadDefaults();
+        var loaded = JSON.parse(localStorage.javatariprefs || "{}");
+        for (var pref in Javatari.preferences.defaults)
+            if (loaded[pref]) Javatari.preferences[pref] = loaded[pref];
     } catch(e) {
         // giveup
     }
-    for (var pref in Javatari.preferencesDefaults)
-        Javatari.preferences[pref] = loaded[pref] || Javatari.preferencesDefaults[pref];
 };
 
-Javatari.preferencesSave = function() {
+Javatari.preferences.save = function() {
     localStorage.javatariprefs = JSON.stringify(Javatari.preferences);
 };
 
-Javatari.preferencesSetDefaults = function() {
-    for (var pref in Javatari.preferencesDefaults)
-        Javatari.preferences[pref] = Javatari.preferencesDefaults[pref];
-};
 
