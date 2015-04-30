@@ -1,12 +1,12 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.Monitor = function() {
+jt.Monitor = function() {
 
     function init(self) {
         prepareResources();
-        adjustToVideoStandard(JavatariCode.VideoStandard.NTSC);
+        adjustToVideoStandard(jt.VideoStandard.NTSC);
         setDisplayDefaultSize();
-        controls = new JavatariCode.DOMMonitorControls(self);
+        controls = new jt.DOMMonitorControls(self);
     }
 
     this.connectDisplay = function(monitorDisplay) {
@@ -40,7 +40,7 @@ JavatariCode.Monitor = function() {
         if (line < signalHeight) {
             // Copy only contents that will be displayed
             if (line >= displayOriginY && line < displayOriginY + displayHeight)
-                JavatariCode.Util.arrayCopy(pixels, displayOriginX, backBuffer, (line - displayOriginY) * signalWidth, displayWidth);
+                jt.Util.arrayCopy(pixels, displayOriginX, backBuffer, (line - displayOriginY) * signalWidth, displayWidth);
         } else
             vSynched = maxLineExceeded();
         line++;
@@ -130,7 +130,7 @@ JavatariCode.Monitor = function() {
     };
 
     var videoStandardDetectionFinish = function(linesCount) {
-        videoStandardDetected = linesCount < 290 ? JavatariCode.VideoStandard.NTSC : JavatariCode.VideoStandard.PAL;
+        videoStandardDetected = linesCount < 290 ? jt.VideoStandard.NTSC : jt.VideoStandard.PAL;
 
         // Compute an additional number of lines to make the display bigger, if needed
         // Only used when the detected number of lines per frame is bigger than standard by a reasonable amount
@@ -256,8 +256,8 @@ JavatariCode.Monitor = function() {
 
     var prepareResources = function() {
         offCanvas = document.createElement('canvas');
-        offCanvas.width = JavatariCode.VideoStandard.PAL.width;
-        offCanvas.height = JavatariCode.VideoStandard.PAL.height;
+        offCanvas.width = jt.VideoStandard.PAL.width;
+        offCanvas.height = jt.VideoStandard.PAL.height;
         offContext = offCanvas.getContext("2d");
         offImageData = offContext.getImageData(0, 0, offCanvas.width, offCanvas.height);
         backBuffer = new Uint32Array(offImageData.data.buffer);
@@ -265,7 +265,7 @@ JavatariCode.Monitor = function() {
 
     var cleanBackBuffer = function() {
         // Put a nice green for detection of undrawn lines, for debug purposes
-        JavatariCode.Util.arrayFill(backBuffer, 0xff00ff00);
+        jt.Util.arrayFill(backBuffer, 0xff00ff00);
     };
 
     var cartridgeChangeDisabledWarning = function() {
@@ -279,7 +279,7 @@ JavatariCode.Monitor = function() {
 
     // Controls Interface  -----------------------------------------
 
-    var monControls = JavatariCode.Monitor.Controls;
+    var monControls = jt.Monitor.Controls;
 
     this.controlActivated = function(control) {
         // All controls are Press-only and repeatable
@@ -407,7 +407,7 @@ JavatariCode.Monitor = function() {
 
 };
 
-JavatariCode.Monitor.Controls = {
+jt.Monitor.Controls = {
     WIDTH_PLUS: 1, HEIGHT_PLUS: 2,
     WIDTH_MINUS: 3, HEIGHT_MINUS: 4,
     ORIGIN_X_PLUS: 5, ORIGIN_Y_PLUS: 6,

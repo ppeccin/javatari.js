@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.Room = function(screenElement, consolePanelElement, cartridgeProvided) {
+jt.Room = function(screenElement, consolePanelElement, cartridgeProvided) {
     var self = this;
 
     function init() {
@@ -31,21 +31,21 @@ JavatariCode.Room = function(screenElement, consolePanelElement, cartridgeProvid
     };
 
     var buildPeripherals = function() {
-        self.stateMedia = new JavatariCode.LocalStorageSaveStateMedia();
-        self.romLoader = new JavatariCode.ROMLoader();
-        self.screen = new JavatariCode.CanvasDisplay(screenElement);
+        self.stateMedia = new jt.LocalStorageSaveStateMedia();
+        self.romLoader = new jt.ROMLoader();
+        self.screen = new jt.CanvasDisplay(screenElement);
         self.screen.connectPeripherals(self.romLoader, self.stateMedia);
         if (consolePanelElement) {
-            self.consolePanel = new JavatariCode.ConsolePanel(consolePanelElement);
+            self.consolePanel = new jt.ConsolePanel(consolePanelElement);
             self.consolePanel.connectPeripherals(self.screen, self.romLoader);
         }
-        self.speaker = new JavatariCode.WebAudioSpeaker();
-        self.controls = new JavatariCode.DOMConsoleControls();
+        self.speaker = new jt.WebAudioSpeaker();
+        self.controls = new jt.DOMConsoleControls();
         self.controls.connectPeripherals(self.screen, self.consolePanel);
     };
 
     var buildAndPlugConsole = function() {
-        self.console = new JavatariCode.AtariConsole();
+        self.console = new jt.AtariConsole();
         self.stateMedia.connect(self.console.getSavestateSocket());
         self.romLoader.connect(self.console.getCartridgeSocket(), self.console.getSavestateSocket());
         self.screen.connect(self.console.getVideoOutput(), self.console.getControlsSocket(), self.console.getCartridgeSocket());

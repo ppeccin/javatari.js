@@ -2,7 +2,7 @@
 
 // Implements the 8K + 2K "DPCa" (Pitfall2) format, enhanced version with TIA audio updates every DPC audio clock!
 
-JavatariCode.Cartridge10K_DPCa = function(rom, format) {
+jt.Cartridge10K_DPCa = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -209,13 +209,13 @@ JavatariCode.Cartridge10K_DPCa = function(rom, format) {
     this.controlStateChanged = function(control, state) {
         if (!state) return;
         switch (control) {
-            case JavatariCode.ConsoleControls.CARTRIDGE_CLOCK_DEC:
+            case jt.ConsoleControls.CARTRIDGE_CLOCK_DEC:
                 if (audioClockStep < 1) audioClockStep += 0.01;
-                JavatariCode.Util.log("DPC audio clock factor: " + audioClockStep);
+                jt.Util.log("DPC audio clock factor: " + audioClockStep);
                 break;
-            case JavatariCode.ConsoleControls.CARTRIDGE_CLOCK_INC:
+            case jt.ConsoleControls.CARTRIDGE_CLOCK_INC:
                 if (audioClockStep > 0.3) audioClockStep -= 0.01;
-                JavatariCode.Util.log("DPC audio clock factor: " + audioClockStep);
+                jt.Util.log("DPC audio clock factor: " + audioClockStep);
         }
     };
 
@@ -226,28 +226,28 @@ JavatariCode.Cartridge10K_DPCa = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset,
             rn: randomNumber,
-            fp: btoa(JavatariCode.Util.uInt8ArrayToByteString(fetcherPointer)),
-            fs: btoa(JavatariCode.Util.uInt8ArrayToByteString(fetcherStart)),
-            fe: btoa(JavatariCode.Util.uInt8ArrayToByteString(fetcherEnd)),
-            fm: btoa(JavatariCode.Util.uInt8ArrayToByteString(fetcherMask)),
-            a: btoa(JavatariCode.Util.uInt8ArrayToByteString(audioMode))
+            fp: btoa(jt.Util.uInt8ArrayToByteString(fetcherPointer)),
+            fs: btoa(jt.Util.uInt8ArrayToByteString(fetcherStart)),
+            fe: btoa(jt.Util.uInt8ArrayToByteString(fetcherEnd)),
+            fm: btoa(jt.Util.uInt8ArrayToByteString(fetcherMask)),
+            a: btoa(jt.Util.uInt8ArrayToByteString(audioMode))
         };
     };
 
     this.loadState = function(state) {
-        this.format = JavatariCode.CartridgeFormats[state.f];
-        this.rom = JavatariCode.ROM.loadState(state.r);
-        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
+        this.format = jt.CartridgeFormats[state.f];
+        this.rom = jt.ROM.loadState(state.r);
+        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
         randomNumber = state.rn;
-        fetcherPointer = JavatariCode.Util.byteStringToUInt8Array(atob(state.fp));
-        fetcherStart = JavatariCode.Util.byteStringToUInt8Array(atob(state.fs));
-        fetcherEnd = JavatariCode.Util.byteStringToUInt8Array(atob(state.fe));
-        fetcherMask = JavatariCode.Util.byteStringToUInt8Array(atob(state.fm));
-        audioMode = JavatariCode.Util.byteStringToUInt8Array(atob(state.a));
+        fetcherPointer = jt.Util.byteStringToUInt8Array(atob(state.fp));
+        fetcherStart = jt.Util.byteStringToUInt8Array(atob(state.fs));
+        fetcherEnd = jt.Util.byteStringToUInt8Array(atob(state.fe));
+        fetcherMask = jt.Util.byteStringToUInt8Array(atob(state.fm));
+        audioMode = jt.Util.byteStringToUInt8Array(atob(state.a));
     };
 
 
@@ -263,11 +263,11 @@ JavatariCode.Cartridge10K_DPCa = function(rom, format) {
     var bytes;
     var bankAddressOffset = 0;
     var randomNumber = 0;
-    var fetcherPointer = JavatariCode.Util.arrayFill(new Array(8), 0);
-    var fetcherStart =   JavatariCode.Util.arrayFill(new Array(8), 0);
-    var fetcherEnd =     JavatariCode.Util.arrayFill(new Array(8), 0);
-    var fetcherMask =    JavatariCode.Util.arrayFill(new Array(8), 0);
-    var audioMode =      JavatariCode.Util.arrayFill(new Array(8), 0);
+    var fetcherPointer = jt.Util.arrayFill(new Array(8), 0);
+    var fetcherStart =   jt.Util.arrayFill(new Array(8), 0);
+    var fetcherEnd =     jt.Util.arrayFill(new Array(8), 0);
+    var fetcherMask =    jt.Util.arrayFill(new Array(8), 0);
+    var audioMode =      jt.Util.arrayFill(new Array(8), 0);
     var audioClockStep = AUDIO_CLOCK_DEFAULT_STEP;
     var audioClockCycles = 0;
     var audioChanged = true;
@@ -278,10 +278,10 @@ JavatariCode.Cartridge10K_DPCa = function(rom, format) {
 
 };
 
-JavatariCode.Cartridge10K_DPCa.prototype = JavatariCode.Cartridge.base;
+jt.Cartridge10K_DPCa.prototype = jt.Cartridge.base;
 
-JavatariCode.Cartridge10K_DPCa.createFromSaveState = function(state) {
-    var cart = new JavatariCode.Cartridge10K_DPCa();
+jt.Cartridge10K_DPCa.createFromSaveState = function(state) {
+    var cart = new jt.Cartridge10K_DPCa();
     cart.loadState(state);
     return cart;
 };

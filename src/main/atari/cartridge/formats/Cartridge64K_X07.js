@@ -2,7 +2,7 @@
 
 // Implements the 64K "X07" AtariAge format
 
-JavatariCode.Cartridge64K_X07 = function(rom, format) {
+jt.Cartridge64K_X07 = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -29,15 +29,15 @@ JavatariCode.Cartridge64K_X07 = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset
         };
     };
 
     this.loadState = function(state) {
-        this.format = JavatariCode.CartridgeFormats[state.f];
-        this.rom = JavatariCode.ROM.loadState(state.r);
-        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
+        this.format = jt.CartridgeFormats[state.f];
+        this.rom = jt.ROM.loadState(state.r);
+        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
     };
 
@@ -54,10 +54,10 @@ JavatariCode.Cartridge64K_X07 = function(rom, format) {
 
 };
 
-JavatariCode.Cartridge64K_X07.prototype = JavatariCode.CartridgeBankedByBusMonitoring.base;
+jt.Cartridge64K_X07.prototype = jt.CartridgeBankedByBusMonitoring.base;
 
-JavatariCode.Cartridge64K_X07.createFromSaveState = function(state) {
-    var cart = new JavatariCode.Cartridge64K_X07();
+jt.Cartridge64K_X07.createFromSaveState = function(state) {
+    var cart = new jt.Cartridge64K_X07();
     cart.loadState(state);
     return cart;
 };

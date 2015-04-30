@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.Settings = function() {
+jt.Settings = function() {
     var self = this;
 
     this.show = function (page) {
@@ -147,7 +147,7 @@ JavatariCode.Settings = function() {
             (function(keyLocal) {
                 self[controlsCommandKeys[key]].addEventListener("mousedown", function (e) {
                     e.preventDefault();
-                    Javatari.room.controls.processKeyEvent(keyLocal, true, JavatariCode.DOMConsoleControls.KEY_ALT_MASK);
+                    Javatari.room.controls.processKeyEvent(keyLocal, true, jt.DOMConsoleControls.KEY_ALT_MASK);
                     keyRedefinitonStop();   // will refresh
                 });
             })(key | 0);    // must be a number to simulate a keyCode
@@ -179,7 +179,7 @@ JavatariCode.Settings = function() {
                 self[control].innerHTML = "?";
             } else {
                 self[control].classList.remove("redefining");
-                self[control].innerHTML = JavatariCode.KeysByCode[Javatari.preferences[controlKeys[control]]].n;
+                self[control].innerHTML = jt.KeysByCode[Javatari.preferences[controlKeys[control]]].n;
             }
         }
     };
@@ -208,7 +208,7 @@ JavatariCode.Settings = function() {
 
     var keyRedefinitionTry = function (keyCode) {
         if (!controlRedefining) return;
-        if (!JavatariCode.KeysByCode[keyCode]) return;
+        if (!jt.KeysByCode[keyCode]) return;
         preferencesChanged = true;
         Javatari.preferences[controlKeys[controlRedefining]] = keyCode;
         keyRedefinitonStop();
@@ -255,9 +255,9 @@ JavatariCode.Settings = function() {
     var controlRedefining = null;
 
     var controlsCommandKeys = {};
-        controlsCommandKeys[JavatariCode.DOMConsoleControls.KEY_TOGGLE_P1_MODE] = "controls-swap-keys";
-        controlsCommandKeys[JavatariCode.DOMConsoleControls.KEY_TOGGLE_JOYSTICK] = "controls-swap-gamepads";
-        controlsCommandKeys[JavatariCode.DOMConsoleControls.KEY_TOGGLE_PADDLE] = "controls-toggle-paddles";
+        controlsCommandKeys[jt.DOMConsoleControls.KEY_TOGGLE_P1_MODE] = "controls-swap-keys";
+        controlsCommandKeys[jt.DOMConsoleControls.KEY_TOGGLE_JOYSTICK] = "controls-swap-gamepads";
+        controlsCommandKeys[jt.DOMConsoleControls.KEY_TOGGLE_PADDLE] = "controls-toggle-paddles";
 
     var preferencesChanged = false;
 

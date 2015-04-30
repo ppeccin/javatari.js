@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-    JavatariCode.CartridgeFormats = {
+    jt.CartridgeFormats = {
 
     "4K": {
         name: "4K",
@@ -10,10 +10,10 @@
             if (rom.content.length >= 8 && rom.content.length <= 4096 && 4096 % rom.content.length === 0) return this;
         },
         createCartridgeFromRom: function (rom) {
-            return new JavatariCode.Cartridge4K(rom, this);
+            return new jt.Cartridge4K(rom, this);
         },
         createCartridgeFromSaveState: function (state) {
-            return JavatariCode.Cartridge4K.createFromSaveState(state);
+            return jt.Cartridge4K.createFromSaveState(state);
         }
     },
 
@@ -25,10 +25,10 @@
             if (rom.content.length === 2048 || rom.content.length === 4096) return this;	// Also accepts 4K ROMs
         },
         createCartridgeFromRom: function (rom) {
-            return new JavatariCode.Cartridge2K_CV(rom, this);
+            return new jt.Cartridge2K_CV(rom, this);
         },
         createCartridgeFromSaveState: function (state) {
-            return JavatariCode.Cartridge2K_CV.createFromSaveState(state);
+            return jt.Cartridge2K_CV.createFromSaveState(state);
         }
     },
 
@@ -40,10 +40,10 @@
             if (rom.content.length === 8192) return this;
         },
         createCartridgeFromRom: function (rom) {
-            return new JavatariCode.Cartridge8K_E0(rom, this);
+            return new jt.Cartridge8K_E0(rom, this);
         },
         createCartridgeFromSaveState: function (state) {
-            return JavatariCode.Cartridge8K_E0.createFromSaveState(state);
+            return jt.Cartridge8K_E0.createFromSaveState(state);
         }
     },
 
@@ -55,10 +55,10 @@
             if (rom.content.length === 65536) return this;
         },
         createCartridgeFromRom: function (rom) {
-            return new JavatariCode.Cartridge64K_F0(rom, this);
+            return new jt.Cartridge64K_F0(rom, this);
         },
         createCartridgeFromSaveState: function (state) {
-            return JavatariCode.Cartridge64K_F0.createFromSaveState(state);
+            return jt.Cartridge64K_F0.createFromSaveState(state);
         }
     },
 
@@ -70,10 +70,10 @@
             if (rom.content.length === 8192) return this;
         },
         createCartridgeFromRom: function (rom) {
-            return new JavatariCode.Cartridge8K_FE(rom, this);
+            return new jt.Cartridge8K_FE(rom, this);
         },
         createCartridgeFromSaveState: function (state) {
-            return JavatariCode.Cartridge8K_FE.createFromSaveState(state);
+            return jt.Cartridge8K_FE.createFromSaveState(state);
         }
     },
 
@@ -85,10 +85,10 @@
             if (rom.content.length === 16384) return this;
         },
         createCartridgeFromRom: function (rom) {
-            return new JavatariCode.Cartridge16K_E7(rom, this);
+            return new jt.Cartridge16K_E7(rom, this);
         },
         createCartridgeFromSaveState: function (state) {
-            return JavatariCode.Cartridge16K_E7.createFromSaveState(state);
+            return jt.Cartridge16K_E7.createFromSaveState(state);
         }
     },
 
@@ -100,10 +100,10 @@
             if (rom.content.length === 8192) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.CartridgeBankedByMaskedRange(rom, this, 0x0ff8, null, 128);
+            return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0ff8, null, 128);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.CartridgeBankedByMaskedRange.createFromSaveState(state);
+            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
         }
     },
 
@@ -115,10 +115,10 @@
             if (rom.content.length === 16384) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.CartridgeBankedByMaskedRange(rom, this, 0x0ff6, null, 128);
+            return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0ff6, null, 128);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.CartridgeBankedByMaskedRange.createFromSaveState(state);
+            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
         }
     },
 
@@ -130,10 +130,10 @@
             if (rom.content.length === 32768) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.CartridgeBankedByMaskedRange(rom, this, 0x0ff4, null, 128);
+            return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0ff4, null, 128);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.CartridgeBankedByMaskedRange.createFromSaveState(state);
+            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
         }
     },
 
@@ -145,17 +145,17 @@
             if (rom.content.length === 32768) {
                 // Check for the values $10adab1e, for "loadable", starting at position 32 (33rd byte)
                 // This is a hint that the content is in CU format
-                var foundHint = JavatariCode.Util.arraysEqual(rom.content.slice(32, 32 + 4), this.cuMagicWord);
+                var foundHint = jt.Util.arraysEqual(rom.content.slice(32, 32 + 4), this.cuMagicWord);
                 this.priority = 103 - (foundHint ? 30 : 0);
                 return this;
             }
         },
         createCartridgeFromRom: function(rom) {
             // ROM is only 28K. The first 1024 bytes are custom ARM content. ROM begins after that
-            return new JavatariCode.Cartridge24K_28K_32K_FA2(rom, this, 1024);
+            return new jt.Cartridge24K_28K_32K_FA2(rom, this, 1024);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge24K_28K_32K_FA2.createFromSaveState(state);
+            return jt.Cartridge24K_28K_32K_FA2.createFromSaveState(state);
         },
         cuMagicWord: [0x1e, 0xab, 0xad, 0x10]
     },
@@ -168,10 +168,10 @@
             if (rom.content.length === 24576 || rom.content.length === 28672 || rom.content.length === 32768) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.Cartridge24K_28K_32K_FA2(rom, this);
+            return new jt.Cartridge24K_28K_32K_FA2(rom, this);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge24K_28K_32K_FA2.createFromSaveState(state);
+            return jt.Cartridge24K_28K_32K_FA2.createFromSaveState(state);
         }
     },
 
@@ -183,10 +183,10 @@
             if (rom.content.length === 12288) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.CartridgeBankedByMaskedRange(rom, this, 0x0ff8, true, 256);
+            return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0ff8, true, 256);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.CartridgeBankedByMaskedRange.createFromSaveState(state);
+            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
         }
     },
 
@@ -198,10 +198,10 @@
             if (rom.content.length % 4096 === 0 && rom.content.length >= 8192 && rom.content.length <= 65536) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.CartridgeBankedByMaskedRange(rom, this, 0x0fe0, null, 128);
+            return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0fe0, null, 128);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.CartridgeBankedByMaskedRange.createFromSaveState(state);
+            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
         }
     },
 
@@ -213,10 +213,10 @@
             if (rom.content.length >= (8192 + 2048) && rom.content.length <= (8192 + 2048 + 256)) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.Cartridge10K_DPCa(rom, this);
+            return new jt.Cartridge10K_DPCa(rom, this);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge10K_DPCa.createFromSaveState(state);
+            return jt.Cartridge10K_DPCa.createFromSaveState(state);
         }
     },
 
@@ -228,10 +228,10 @@
             if (rom.content.length % 2048 === 0 && rom.content.length <= 256 * 2048) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.Cartridge8K_512K_3F(rom, this);
+            return new jt.Cartridge8K_512K_3F(rom, this);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge8K_512K_3F.createFromSaveState(state);
+            return jt.Cartridge8K_512K_3F.createFromSaveState(state);
         }
     },
 
@@ -243,10 +243,10 @@
             if (rom.content.length % 2048 === 0 && rom.content.length <= 256 * 2048) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.Cartridge8K_512K_3E(rom, this);
+            return new jt.Cartridge8K_512K_3E(rom, this);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge8K_512K_3E.createFromSaveState(state);
+            return jt.Cartridge8K_512K_3E.createFromSaveState(state);
         }
     },
 
@@ -258,10 +258,10 @@
             if (rom.content.length === 65536) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.Cartridge64K_X07(rom, this);
+            return new jt.Cartridge64K_X07(rom, this);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge64K_X07.createFromSaveState(state);
+            return jt.Cartridge64K_X07.createFromSaveState(state);
         }
     },
 
@@ -273,10 +273,10 @@
             if (rom.content.length === 8192) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.Cartridge8K_0840(rom, this);
+            return new jt.Cartridge8K_0840(rom, this);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge8K_0840.createFromSaveState(state);
+            return jt.Cartridge8K_0840.createFromSaveState(state);
         }
     },
 
@@ -288,10 +288,10 @@
             if (rom.content.length === 8192) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.Cartridge8K_UA(rom, this);
+            return new jt.Cartridge8K_UA(rom, this);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge8K_UA.createFromSaveState(state);
+            return jt.Cartridge8K_UA.createFromSaveState(state);
         }
     },
 
@@ -303,10 +303,10 @@
             if (rom.content.length % 4096 === 0 && rom.content.length >= 8192 && rom.content.length <= 64 * 4096) return this;
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.Cartridge8K_256K_SB(rom, this);
+            return new jt.Cartridge8K_256K_SB(rom, this);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge8K_256K_SB.createFromSaveState(state);
+            return jt.Cartridge8K_256K_SB.createFromSaveState(state);
         }
     },
 
@@ -316,18 +316,18 @@
         priority: 101,
         tryFormat: function(rom) {
             // Any number of parts between 1 and 8
-            if (rom.content.length % JavatariCode.Cartridge8K_64K_AR.PART_SIZE === 0 && rom.content.length / JavatariCode.Cartridge8K_64K_AR.PART_SIZE >= 1
-                && rom.content.length / JavatariCode.Cartridge8K_64K_AR.PART_SIZE <= 8) {
+            if (rom.content.length % jt.Cartridge8K_64K_AR.PART_SIZE === 0 && rom.content.length / jt.Cartridge8K_64K_AR.PART_SIZE >= 1
+                && rom.content.length / jt.Cartridge8K_64K_AR.PART_SIZE <= 8) {
                 // Check if the content starts with Part 0
-                JavatariCode.Cartridge8K_64K_AR.checkTape(rom);      // Will throw exception if not a Tape Start or Full Tape
+                jt.Cartridge8K_64K_AR.checkTape(rom);      // Will throw exception if not a Tape Start or Full Tape
                 return this;
             }
         },
         createCartridgeFromRom: function(rom) {
-            return new JavatariCode.Cartridge8K_64K_AR(rom, this);
+            return new jt.Cartridge8K_64K_AR(rom, this);
         },
         createCartridgeFromSaveState: function(state) {
-            return JavatariCode.Cartridge8K_64K_AR.createFromSaveState(state);
+            return jt.Cartridge8K_64K_AR.createFromSaveState(state);
         }
     }
 

@@ -2,7 +2,7 @@
 
 // Implements the 8K-512K "3E" Tigervision (+RAM) format
 
-JavatariCode.Cartridge8K_512K_3E = function(rom, format) {
+jt.Cartridge8K_512K_3E = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -62,24 +62,24 @@ JavatariCode.Cartridge8K_512K_3E = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset,
             sm: selectableSliceMaxBank,
             fo: fixedSliceAddressOffset,
             ro: extraRAMBankAddressOffset,
-            ra: btoa(JavatariCode.Util.uInt8ArrayToByteString(extraRAM))
+            ra: btoa(jt.Util.uInt8ArrayToByteString(extraRAM))
         };
     };
 
     this.loadState = function(state) {
-        this.format = JavatariCode.CartridgeFormats[state.f];
-        this.rom = JavatariCode.ROM.loadState(state.r);
-        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
+        this.format = jt.CartridgeFormats[state.f];
+        this.rom = jt.ROM.loadState(state.r);
+        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
         selectableSliceMaxBank = state.sm;
         fixedSliceAddressOffset = state.fo;
         extraRAMBankAddressOffset = state.ro;
-        extraRAM = JavatariCode.Util.byteStringToUInt8Array(atob(state.ra));
+        extraRAM = jt.Util.byteStringToUInt8Array(atob(state.ra));
     };
 
 
@@ -91,7 +91,7 @@ JavatariCode.Cartridge8K_512K_3E = function(rom, format) {
     var selectableSliceMaxBank;
     var fixedSliceAddressOffset;		                                // This slice is fixed at the last bank
     var extraRAMBankAddressOffset = -1;		                            // No Extra RAM bank selected
-    var extraRAM = JavatariCode.Util.arrayFill(new Array(EXTRA_RAM_BANK_SIZE), 0);   // Pre allocate minimum RAM bank for performance
+    var extraRAM = jt.Util.arrayFill(new Array(EXTRA_RAM_BANK_SIZE), 0);   // Pre allocate minimum RAM bank for performance
 
 
     var ADDRESS_MASK = 0x0fff;
@@ -103,10 +103,10 @@ JavatariCode.Cartridge8K_512K_3E = function(rom, format) {
 
 };
 
-JavatariCode.Cartridge8K_512K_3E.prototype = JavatariCode.CartridgeBankedByBusMonitoring.base;
+jt.Cartridge8K_512K_3E.prototype = jt.CartridgeBankedByBusMonitoring.base;
 
-JavatariCode.Cartridge8K_512K_3E.createFromSaveState = function(state) {
-    var cart = new JavatariCode.Cartridge8K_512K_3E();
+jt.Cartridge8K_512K_3E.createFromSaveState = function(state) {
+    var cart = new jt.Cartridge8K_512K_3E();
     cart.loadState(state);
     return cart;
 };

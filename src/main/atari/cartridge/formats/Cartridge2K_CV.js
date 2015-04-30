@@ -2,7 +2,7 @@
 
 // Implements the 2K "CV" Commavid + 1K RAM format
 
-JavatariCode.Cartridge2K_CV = function(rom, format) {
+jt.Cartridge2K_CV = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -11,7 +11,7 @@ JavatariCode.Cartridge2K_CV = function(rom, format) {
         bytes = new Array(4096);
         var len = rom.content.length;
         for (var pos = 0; pos < bytes.length; pos += len)
-            JavatariCode.Util.arrayCopy(rom.content, 0, bytes, pos, len);
+            jt.Util.arrayCopy(rom.content, 0, bytes, pos, len);
     }
 
     this.read = function(address) {
@@ -41,21 +41,21 @@ JavatariCode.Cartridge2K_CV = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
-            ra: btoa(JavatariCode.Util.uInt8ArrayToByteString(extraRAM))
+            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
+            ra: btoa(jt.Util.uInt8ArrayToByteString(extraRAM))
         };
     };
 
     this.loadState = function(state) {
-        this.format = JavatariCode.CartridgeFormats[state.f];
-        this.rom = JavatariCode.ROM.loadState(state.r);
-        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
-        extraRAM = JavatariCode.Util.byteStringToUInt8Array(atob(state.ra));
+        this.format = jt.CartridgeFormats[state.f];
+        this.rom = jt.ROM.loadState(state.r);
+        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        extraRAM = jt.Util.byteStringToUInt8Array(atob(state.ra));
     };
 
 
     var bytes;
-    var extraRAM = JavatariCode.Util.arrayFill(new Array(1024), 0);
+    var extraRAM = jt.Util.arrayFill(new Array(1024), 0);
 
     var ADDRESS_MASK = 0x0fff;
 
@@ -64,10 +64,10 @@ JavatariCode.Cartridge2K_CV = function(rom, format) {
 
 };
 
-JavatariCode.Cartridge2K_CV.prototype = JavatariCode.Cartridge.base;
+jt.Cartridge2K_CV.prototype = jt.Cartridge.base;
 
-JavatariCode.Cartridge2K_CV.createFromSaveState = function(state) {
-    var cart = new JavatariCode.Cartridge2K_CV();
+jt.Cartridge2K_CV.createFromSaveState = function(state) {
+    var cart = new jt.Cartridge2K_CV();
     cart.loadState(state);
     return cart;
 };

@@ -2,7 +2,7 @@
 
 // Implements the 8K "UA" UA Limited format
 
-JavatariCode.Cartridge8K_UA = function(rom, format) {
+jt.Cartridge8K_UA = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -30,15 +30,15 @@ JavatariCode.Cartridge8K_UA = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset
         };
     };
 
     this.loadState = function(state) {
-        this.format = JavatariCode.CartridgeFormats[state.f];
-        this.rom = JavatariCode.ROM.loadState(state.r);
-        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
+        this.format = jt.CartridgeFormats[state.f];
+        this.rom = jt.ROM.loadState(state.r);
+        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
     };
 
@@ -54,10 +54,10 @@ JavatariCode.Cartridge8K_UA = function(rom, format) {
 
 };
 
-JavatariCode.Cartridge8K_UA.prototype = JavatariCode.CartridgeBankedByBusMonitoring.base;
+jt.Cartridge8K_UA.prototype = jt.CartridgeBankedByBusMonitoring.base;
 
-JavatariCode.Cartridge8K_UA.createFromSaveState = function(state) {
-    var cart = new JavatariCode.Cartridge8K_UA();
+jt.Cartridge8K_UA.createFromSaveState = function(state) {
+    var cart = new jt.Cartridge8K_UA();
     cart.loadState(state);
     return cart;
 };

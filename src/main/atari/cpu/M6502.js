@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.M6502 = function() {
+jt.M6502 = function() {
     var self = this;
 
     this.powerOn = function() {
@@ -1745,10 +1745,10 @@ JavatariCode.M6502 = function() {
     };
 
     this.breakpoint = function(mes) {
-        JavatariCode.Util.log(mes);
+        jt.Util.log(mes);
         if (this.trace) {
             var text = "CPU Breakpoint!  " + (mes ? "(" + mes + ")" : "") + "\n\n" + this.toString();
-            JavatariCode.Util.message(text);
+            jt.Util.message(text);
         }
     };
 
@@ -1761,7 +1761,7 @@ JavatariCode.M6502 = function() {
         }
         //noinspection JSUnresolvedVariable
         var end = performance.now();
-        JavatariCode.Util.message("Done running " + cycles + " cycles in " + (end - start) + " ms.");
+        jt.Util.message("Done running " + cycles + " cycles in " + (end - start) + " ms.");
     };
 
 };

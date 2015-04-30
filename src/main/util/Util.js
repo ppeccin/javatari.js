@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.Util = new function() {
+jt.Util = new function() {
 
     this.log = function(str) {
         console.log(">> Javatari: " + str);

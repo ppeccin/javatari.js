@@ -2,7 +2,7 @@
 
 // Implements the 64K "F0" Dynacom Megaboy format
 
-JavatariCode.Cartridge64K_F0 = function(rom, format) {
+jt.Cartridge64K_F0 = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -37,15 +37,15 @@ JavatariCode.Cartridge64K_F0 = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset
         };
     };
 
     this.loadState = function(state) {
-        this.format = JavatariCode.CartridgeFormats[state.f];
-        this.rom = JavatariCode.ROM.loadState(state.r);
-        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
+        this.format = jt.CartridgeFormats[state.f];
+        this.rom = jt.ROM.loadState(state.r);
+        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
     };
 
@@ -63,10 +63,10 @@ JavatariCode.Cartridge64K_F0 = function(rom, format) {
 
 };
 
-JavatariCode.Cartridge64K_F0.prototype = JavatariCode.Cartridge.base;
+jt.Cartridge64K_F0.prototype = jt.Cartridge.base;
 
-JavatariCode.Cartridge64K_F0.createFromSaveState = function(state) {
-    var cart = new JavatariCode.Cartridge64K_F0();
+jt.Cartridge64K_F0.createFromSaveState = function(state) {
+    var cart = new jt.Cartridge64K_F0();
     cart.loadState(state);
     return cart;
 };

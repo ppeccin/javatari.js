@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.TiaAudioChannel = function() {
+jt.TiaAudioChannel = function() {
 
     this.nextSample = function() {				// Range 0 - 1
         if (--dividerCountdown <= 0) {

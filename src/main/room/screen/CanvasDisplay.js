@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.CanvasDisplay = function(mainElement) {
+jt.CanvasDisplay = function(mainElement) {
 
     function init(self) {
         setupProperties();
@@ -9,7 +9,7 @@ JavatariCode.CanvasDisplay = function(mainElement) {
         setupButtonsBar();
         loadImages();
         context = canvas.getContext("2d");
-        monitor = new JavatariCode.Monitor();
+        monitor = new jt.Monitor();
         monitor.connectDisplay(self);
         monitor.addControlInputElements(self.keyControlsInputElements());
     }
@@ -145,8 +145,8 @@ JavatariCode.CanvasDisplay = function(mainElement) {
     };
 
     this.exit = function() {
-        controlsSocket.controlStateChanged(JavatariCode.ConsoleControls.POWER_OFF, true);
-        monitor.controlActivated(JavatariCode.Monitor.Controls.SIZE_DEFAULT);
+        controlsSocket.controlStateChanged(jt.ConsoleControls.POWER_OFF, true);
+        monitor.controlActivated(jt.Monitor.Controls.SIZE_DEFAULT);
     };
 
     this.focus = function() {
@@ -154,18 +154,18 @@ JavatariCode.CanvasDisplay = function(mainElement) {
     };
 
     var openSettings = function(page) {
-        if (!settings) settings = new JavatariCode.Settings();
+        if (!settings) settings = new jt.Settings();
         settings.show(page);
     };
 
     var fullScreenChanged = function() {
         var fse = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
         isFullscreen = !!fse;
-        monitor.controlActivated(JavatariCode.Monitor.Controls.SIZE_DEFAULT);
+        monitor.controlActivated(jt.Monitor.Controls.SIZE_DEFAULT);
         // Schedule another one to give the browser some time to set full screen properly
         if (isFullscreen)
             setTimeout(function() {
-                monitor.controlActivated(JavatariCode.Monitor.Controls.SIZE_DEFAULT);
+                monitor.controlActivated(jt.Monitor.Controls.SIZE_DEFAULT);
             }, 120);
     };
 
@@ -250,7 +250,7 @@ JavatariCode.CanvasDisplay = function(mainElement) {
         canvas.style.outline = "none";
         fsElement.appendChild(canvas);
 
-        setElementsSizes(JavatariCode.CanvasDisplay.DEFAULT_STARTING_WIDTH, JavatariCode.CanvasDisplay.DEFAULT_STARTING_HEIGHT);
+        setElementsSizes(jt.CanvasDisplay.DEFAULT_STARTING_WIDTH, jt.CanvasDisplay.DEFAULT_STARTING_HEIGHT);
 
         mainElement.appendChild(borderElement);
     };
@@ -284,18 +284,18 @@ JavatariCode.CanvasDisplay = function(mainElement) {
         }
 
         powerButton  = addBarButton(6, -26, 24, 23, -436, -208);
-        consoleControlButton(powerButton, JavatariCode.ConsoleControls.POWER);
+        consoleControlButton(powerButton, jt.ConsoleControls.POWER);
         var fsGap = 23;
         if (!Javatari.SCREEN_FULLSCREEN_DISABLED) {
             fullscreenButton = addBarButton(-53, -26, 24, 22, -387, -209);
-            screenControlButton(fullscreenButton, JavatariCode.Monitor.Controls.FULLSCREEN);
+            screenControlButton(fullscreenButton, jt.Monitor.Controls.FULLSCREEN);
             fsGap = 0;
         }
         if (!Javatari.SCREEN_RESIZE_DISABLED) {
             scaleDownButton = addBarButton(-92 + fsGap, -26, 18, 22, -342, -209);
-            screenControlButton(scaleDownButton, JavatariCode.Monitor.Controls.SIZE_MINUS);
+            screenControlButton(scaleDownButton, jt.Monitor.Controls.SIZE_MINUS);
             scaleUpButton = addBarButton(-74 + fsGap, -26, 21, 22, -364, -209);
-            screenControlButton(scaleUpButton, JavatariCode.Monitor.Controls.SIZE_PLUS);
+            screenControlButton(scaleUpButton, jt.Monitor.Controls.SIZE_PLUS);
         }
 
         settingsButton  = addBarButton(-29, -26, 24, 22, -412, -209);
@@ -446,5 +446,5 @@ JavatariCode.CanvasDisplay = function(mainElement) {
 
 };
 
-JavatariCode.CanvasDisplay.DEFAULT_STARTING_WIDTH = 640;
-JavatariCode.CanvasDisplay.DEFAULT_STARTING_HEIGHT = 426;
+jt.CanvasDisplay.DEFAULT_STARTING_WIDTH = 640;
+jt.CanvasDisplay.DEFAULT_STARTING_HEIGHT = 426;

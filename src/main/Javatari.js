@@ -23,4 +23,4 @@ Javatari = {
 
 };
 
-JavatariCode = {};
+jt = window.jt || {};

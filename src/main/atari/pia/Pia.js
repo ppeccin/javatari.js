@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.Pia = function() {
+jt.Pia = function() {
 
     this.powerOn = function() {
     };
@@ -78,13 +78,13 @@ JavatariCode.Pia = function() {
 
     var debugInfo = function(str) {
         if (self.debug)
-            JavatariCode.Util.log(str);
+            jt.Util.log(str);
     };
 
 
     // Controls interface  -----------------------------------------
 
-    var controls = JavatariCode.ConsoleControls;
+    var controls = jt.ConsoleControls;
 
     this.controlStateChanged = function(control, state) {
         switch (control) {

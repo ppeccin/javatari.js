@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.Ram64K = function(data) {
+jt.Ram64K = function(data) {
 
     this.write = function(address, value) {
         data[address] = value;

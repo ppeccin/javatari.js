@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.DOMMonitorControls = function(monitor) {
+jt.DOMMonitorControls = function(monitor) {
 
     function init() {
         initKeys();
@@ -45,7 +45,7 @@ JavatariCode.DOMMonitorControls = function(monitor) {
     };
 
     var initKeys = function() {
-        var monControls = JavatariCode.Monitor.Controls;
+        var monControls = jt.Monitor.Controls;
 
         keyCodeMap[KEY_CART_FILE]       = monControls.LOAD_CARTRIDGE_FILE;
         keyCodeMap[KEY_CART_URL]        = monControls.LOAD_CARTRIDGE_URL;
@@ -100,27 +100,27 @@ JavatariCode.DOMMonitorControls = function(monitor) {
     var keyControlAltCodeMap = {};
 
 
-    var KEY_LEFT           = JavatariCode.Keys.VK_LEFT.c;
-    var KEY_UP             = JavatariCode.Keys.VK_UP.c;
-    var KEY_RIGHT          = JavatariCode.Keys.VK_RIGHT.c;
-    var KEY_DOWN           = JavatariCode.Keys.VK_DOWN.c;
+    var KEY_LEFT           = jt.Keys.VK_LEFT.c;
+    var KEY_UP             = jt.Keys.VK_UP.c;
+    var KEY_RIGHT          = jt.Keys.VK_RIGHT.c;
+    var KEY_DOWN           = jt.Keys.VK_DOWN.c;
 
-    var KEY_SIZE_DEFAULT   = JavatariCode.Keys.VK_BACK_SPACE.c;
+    var KEY_SIZE_DEFAULT   = jt.Keys.VK_BACK_SPACE.c;
 
-    var KEY_CART_FILE      = JavatariCode.Keys.VK_F5.c;
-    var KEY_CART_URL       = JavatariCode.Keys.VK_F6.c;
-    var KEY_CART_PASTE_V   = JavatariCode.Keys.VK_V.c;
-    var KEY_CART_PASTE_INS = JavatariCode.Keys.VK_INSERT.c;
+    var KEY_CART_FILE      = jt.Keys.VK_F5.c;
+    var KEY_CART_URL       = jt.Keys.VK_F6.c;
+    var KEY_CART_PASTE_V   = jt.Keys.VK_V.c;
+    var KEY_CART_PASTE_INS = jt.Keys.VK_INSERT.c;
 
-    var KEY_CRT_FILTER     = JavatariCode.Keys.VK_T.c;
-    var KEY_CRT_MODES      = JavatariCode.Keys.VK_R.c;
+    var KEY_CRT_FILTER     = jt.Keys.VK_T.c;
+    var KEY_CRT_MODES      = jt.Keys.VK_R.c;
 
-    var KEY_DEBUG          = JavatariCode.Keys.VK_D.c;
-    var KEY_STATS          = JavatariCode.Keys.VK_G.c;
+    var KEY_DEBUG          = jt.Keys.VK_D.c;
+    var KEY_STATS          = jt.Keys.VK_G.c;
 
-    var KEY_FULLSCREEN     = JavatariCode.Keys.VK_ENTER.c;
+    var KEY_FULLSCREEN     = jt.Keys.VK_ENTER.c;
 
-    var KEY_EXIT           = JavatariCode.Keys.VK_ESCAPE.c;
+    var KEY_EXIT           = jt.Keys.VK_ESCAPE.c;
 
     var KEY_CTRL_MASK  = 1;
     var KEY_ALT_MASK   = 2;

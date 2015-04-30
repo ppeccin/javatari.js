@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.LocalStorageSaveStateMedia = function() {
+jt.LocalStorageSaveStateMedia = function() {
 
     this.connect = function(socket) {
         socket.connectMedia(this);
@@ -72,7 +72,7 @@ JavatariCode.LocalStorageSaveStateMedia = function() {
         try {
             var id;
             if (data instanceof Array)
-                id = JavatariCode.Util.uInt8ArrayToByteString(data.slice(0, SAVE_STATE_IDENTIFIER.length));
+                id = jt.Util.uInt8ArrayToByteString(data.slice(0, SAVE_STATE_IDENTIFIER.length));
             else
                 id = data.substr(0, SAVE_STATE_IDENTIFIER.length);
 
@@ -81,7 +81,7 @@ JavatariCode.LocalStorageSaveStateMedia = function() {
 
             var stateData = data.slice(SAVE_STATE_IDENTIFIER.length);
             if (stateData instanceof Array)
-                stateData = JavatariCode.Util.uInt8ArrayToByteString(stateData);
+                stateData = jt.Util.uInt8ArrayToByteString(stateData);
 
             return stateData && JSON.parse(stateData);
         } catch(e) {

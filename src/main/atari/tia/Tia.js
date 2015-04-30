@@ -1,11 +1,11 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.Tia = function(pCpu, pPia) {
+jt.Tia = function(pCpu, pPia) {
     var self = this;
 
     this.powerOn = function() {
-        JavatariCode.Util.arrayFill(linePixels, HBLANK_COLOR);
-        JavatariCode.Util.arrayFill(debugPixels, 0);
+        jt.Util.arrayFill(linePixels, HBLANK_COLOR);
+        jt.Util.arrayFill(debugPixels, 0);
         audioSignal.getChannel0().setVolume(0);
         audioSignal.getChannel1().setVolume(0);
         initLatchesAtPowerOn();
@@ -80,7 +80,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
 
     this.setVideoStandard = function(standard) {
         videoSignal.standard = standard;
-        palette = standard === JavatariCode.VideoStandard.NTSC ? JavatariCode.VideoStandard.NTSC.palette : JavatariCode.VideoStandard.PAL.palette;
+        palette = standard === jt.VideoStandard.NTSC ? jt.VideoStandard.NTSC.palette : jt.VideoStandard.PAL.palette;
     };
 
     this.debug = function(level) {
@@ -305,7 +305,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
             playfieldPatternInvalid = false;
             // Shortcut if the Playfield is all clear
             if (PF0 === 0 && PF1 === 0 && PF2 === 0) {
-                JavatariCode.Util.arrayFill(playfieldPattern, false);
+                jt.Util.arrayFill(playfieldPattern, false);
                 playfieldCurrentPixel = false;
                 return;
             }
@@ -857,7 +857,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
     };
 
     var processDebugPixelsInLine = function() {
-        JavatariCode.Util.arrayFillSegment(linePixels, 0, HBLANK_DURATION, hBlankColor);
+        jt.Util.arrayFillSegment(linePixels, 0, HBLANK_DURATION, hBlankColor);
         if (debugLevel >= 4 && videoSignal.monitor.currentLine() % 10 == 0) {
             for (var i = 0; i < LINE_WIDTH; i++) {
                 if (debugPixels[i] !== 0) continue;
@@ -897,18 +897,18 @@ JavatariCode.Tia = function(pCpu, pPia) {
         hBlankColor = HBLANK_COLOR;
         vBlankColor = VBLANK_COLOR;
         playfieldBackground = palette[0];
-        JavatariCode.Util.arrayFill(linePixels, hBlankColor);
+        jt.Util.arrayFill(linePixels, hBlankColor);
         observableChange();
     };
 
     var debugInfo = function(str) {
-        if (debug) JavatariCode.Util.log("Line: " + videoSignal.monitor.currentLine() +", Pixel: " + clock + ". " + str);
+        if (debug) jt.Util.log("Line: " + videoSignal.monitor.currentLine() +", Pixel: " + clock + ". " + str);
     };
 
 
     // Controls interface  -----------------------------------
 
-    var controls = JavatariCode.ConsoleControls;
+    var controls = jt.ConsoleControls;
 
     this.controlStateChanged = function(control, state) {
         switch (control) {
@@ -972,7 +972,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
 
     this.saveState = function() {
         return {
-            lp:     btoa(JavatariCode.Util.uInt32ArrayToByteString(linePixels)),
+            lp:     btoa(jt.Util.uInt32ArrayToByteString(linePixels)),
             lo:     lastObservableChangeClock,
             oc:     observableChangeExtended | 0,
             rl:     repeatLastLine | 0,
@@ -980,7 +980,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
             vb:     vBlankOn | 0,
             vbd:    vBlankDecodeActive | 0,
             vbn:    vBlankNewState | 0,
-            f:      JavatariCode.Util.booleanArrayToByteString(playfieldPattern),
+            f:      jt.Util.booleanArrayToByteString(playfieldPattern),
             fi:     playfieldPatternInvalid | 0,
             fp:     playfieldCurrentPixel | 0,
             fc:     playfieldColor,
@@ -1036,7 +1036,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
             fd:     playfieldDelayedChangeClock,
             fdc:    playfieldDelayedChangePart,
             fdp:    playfieldDelayedChangePattern,
-            pds:    btoa(JavatariCode.Util.uInt8BiArrayToByteString(playersDelayedSpriteChanges)),
+            pds:    btoa(jt.Util.uInt8BiArrayToByteString(playersDelayedSpriteChanges)),
             pdc:    playersDelayedSpriteChangesCount,
             hb:     hMoveHitBlank | 0,
             hc:     hMoveHitClock,
@@ -1066,7 +1066,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
     };
 
     this.loadState = function(state) {
-        linePixels						 =  JavatariCode.Util.byteStringToUInt32Array(atob(state.lp));
+        linePixels						 =  jt.Util.byteStringToUInt32Array(atob(state.lp));
         lastObservableChangeClock		 =	state.lo;
         observableChangeExtended		 =  !!state.oc;
         repeatLastLine 					 =	!!state.rl;
@@ -1074,7 +1074,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
         vBlankOn                    	 =  !!state.vb;
         vBlankDecodeActive				 =  !!state.vbd;
         vBlankNewState				 	 =  !!state.vbn;
-        playfieldPattern            	 =  JavatariCode.Util.byteStringToBooleanArray(state.f);
+        playfieldPattern            	 =  jt.Util.byteStringToBooleanArray(state.f);
         playfieldPatternInvalid     	 =  !!state.fi;
         playfieldCurrentPixel       	 =  !!state.fp;
         playfieldColor              	 =  state.fc;
@@ -1130,7 +1130,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
         playfieldDelayedChangeClock		 =  state.fd;
         playfieldDelayedChangePart		 =  state.fdc;
         playfieldDelayedChangePattern	 =  state.fdp;
-        playersDelayedSpriteChanges      =  JavatariCode.Util.byteStringToUInt8BiArray(atob(state.pds), 3);
+        playersDelayedSpriteChanges      =  jt.Util.byteStringToUInt8BiArray(atob(state.pds), 3);
         playersDelayedSpriteChangesCount =  state.pdc;
         hMoveHitBlank					 =  !!state.hb;
         hMoveHitClock					 =  state.hc;
@@ -1202,14 +1202,14 @@ JavatariCode.Tia = function(pCpu, pPia) {
     var powerOn = false;
 
     var clock;
-    var linePixels = JavatariCode.Util.arrayFill(new Array(LINE_WIDTH), 0);
+    var linePixels = jt.Util.arrayFill(new Array(LINE_WIDTH), 0);
 
     var vSyncOn = false;
     var vBlankOn = false;
     var vBlankDecodeActive = false;
     var vBlankNewState;
 
-    var playfieldPattern = JavatariCode.Util.arrayFill(new Array(40), false);
+    var playfieldPattern = jt.Util.arrayFill(new Array(40), false);
     var playfieldPatternInvalid = true;
     var playfieldCurrentPixel = false;
     var playfieldColor = 0xff000000;
@@ -1271,7 +1271,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
     var ballScanSpeed = 8;							// 8 per clock = 1 pixel wide
     var ballVerticalDelay = false;
 
-    var playersDelayedSpriteChanges = JavatariCode.Util.arrayFillWithArrayClone(new Array(PLAYERS_DELAYED_SPRITE_CHANGES_MAX_COUNT), [0, 0, 0]);
+    var playersDelayedSpriteChanges = jt.Util.arrayFillWithArrayClone(new Array(PLAYERS_DELAYED_SPRITE_CHANGES_MAX_COUNT), [0, 0, 0]);
     var playersDelayedSpriteChangesCount = 0;
 
     var hMoveHitBlank = false;
@@ -1282,7 +1282,7 @@ JavatariCode.Tia = function(pCpu, pPia) {
     var debug = false;
     var debugLevel = 0;
     var debugNoCollisions = false;
-    var debugPixels = JavatariCode.Util.arrayFill(new Array(LINE_WIDTH), 0);
+    var debugPixels = jt.Util.arrayFill(new Array(LINE_WIDTH), 0);
     var debugPause = false;
     var debugPauseMoreFrames = 0;
 
@@ -1304,10 +1304,10 @@ JavatariCode.Tia = function(pCpu, pPia) {
     var paddle1Position = -1;
     var paddle1CapacitorCharge = 0;
 
-    var videoSignal = new JavatariCode.TiaVideoSignal();
+    var videoSignal = new jt.TiaVideoSignal();
     var palette;
 
-    var audioSignal = new JavatariCode.TiaAudioSignal();
+    var audioSignal = new jt.TiaAudioSignal();
 
 
     // Read registers -------------------------------------------

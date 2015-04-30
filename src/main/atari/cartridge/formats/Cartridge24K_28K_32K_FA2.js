@@ -3,7 +3,7 @@
 // Implements the 24K/28K/32K "FA2" CBS RAM Plus format
 // Also supports SC RAM Saving on Harmony Flash memory (emulated to a "savestate" file)
 
-JavatariCode.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
+jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
     var self = this;
 
     function init(self) {
@@ -81,7 +81,7 @@ JavatariCode.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) 
         bus.getTia().getVideoOutput().showOSD("Reading from Cartridge Flash Memory...", true);
         if (saveStateSocket) {
             var data = saveStateSocket.getMedia().loadResourceFromFile(flashMemoryResourceName());
-            if (data) harmonyFlashMemory = JavatariCode.Util.byteStringToUInt8Array(atob(data));
+            if (data) harmonyFlashMemory = jt.Util.byteStringToUInt8Array(atob(data));
         }
         extraRAM = harmonyFlashMemory.slice(0);
     };
@@ -90,7 +90,7 @@ JavatariCode.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) 
         bus.getTia().getVideoOutput().showOSD("Writing to Cartridge Flash Memory...", true);
         harmonyFlashMemory = extraRAM.slice(0);
         if (saveStateSocket)
-            saveStateSocket.getMedia().saveResourceToFile(flashMemoryResourceName(), btoa(JavatariCode.Util.uInt8ArrayToByteString(harmonyFlashMemory)));
+            saveStateSocket.getMedia().saveResourceToFile(flashMemoryResourceName(), btoa(jt.Util.uInt8ArrayToByteString(harmonyFlashMemory)));
     };
 
     var detectFlashOperationCompletion = function() {
@@ -117,24 +117,24 @@ JavatariCode.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) 
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
             rs: romStartAddress,
             bo: bankAddressOffset,
             tb: topBankSwitchAddress,
-            e: btoa(JavatariCode.Util.uInt8ArrayToByteString(extraRAM)),
+            e: btoa(jt.Util.uInt8ArrayToByteString(extraRAM)),
             ho: harmonyFlashOpInProgress,
             ht: harmonyFlashOpStartTime
         };
     };
 
     this.loadState = function(state) {
-        this.format = JavatariCode.CartridgeFormats[state.f];
-        this.rom = JavatariCode.ROM.loadState(state.r);
-        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
+        this.format = jt.CartridgeFormats[state.f];
+        this.rom = jt.ROM.loadState(state.r);
+        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
         romStartAddress = state.rs || 0;
         bankAddressOffset = state.bo;
         topBankSwitchAddress =  state.tb;
-        extraRAM = JavatariCode.Util.byteStringToUInt8Array(atob(state.e));
+        extraRAM = jt.Util.byteStringToUInt8Array(atob(state.e));
         harmonyFlashOpInProgress = state.ho || 0;
         harmonyFlashOpStartTime = Date.now();   // Always as if operation just started
     };
@@ -148,11 +148,11 @@ JavatariCode.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) 
     var bankAddressOffset = 0;
     var baseBankSwitchAddress = 0x0ff5;
     var topBankSwitchAddress;
-    var extraRAM = JavatariCode.Util.arrayFill(new Array(256), 0);
+    var extraRAM = jt.Util.arrayFill(new Array(256), 0);
 
     var harmonyFlashOpStartTime = Date.now();
     var harmonyFlashOpInProgress = 0;					// 0 = none, 1 = read, 2 = write
-    var harmonyFlashMemory = JavatariCode.Util.arrayFill(new Array(256), 0);
+    var harmonyFlashMemory = jt.Util.arrayFill(new Array(256), 0);
 
     var ADDRESS_MASK = 0x0fff;
     var BANK_SIZE = 4096;
@@ -164,10 +164,10 @@ JavatariCode.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) 
 
 };
 
-JavatariCode.Cartridge24K_28K_32K_FA2.prototype = JavatariCode.Cartridge.base;
+jt.Cartridge24K_28K_32K_FA2.prototype = jt.Cartridge.base;
 
-JavatariCode.Cartridge24K_28K_32K_FA2.createFromSaveState = function(state) {
-    var cart = new JavatariCode.Cartridge24K_28K_32K_FA2();
+jt.Cartridge24K_28K_32K_FA2.createFromSaveState = function(state) {
+    var cart = new jt.Cartridge24K_28K_32K_FA2();
     cart.loadState(state);
     return cart;
 };

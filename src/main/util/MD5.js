@@ -1,4 +1,4 @@
-JavatariCode.MD5 = function(data) {
+jt.MD5 = function(data) {
 
     // convert number to (unsigned) 32 bit hex, zero filled string
     function to_zerofilled_hex(n) {     

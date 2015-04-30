@@ -6,7 +6,7 @@
  * Used by several n * 4K bank formats with varying extra RAM sizes
  */
 
-JavatariCode.CartridgeBankedByMaskedRange = function(rom, format, pBaseBankSwitchAddress, superChip, pExtraRAMSize) {
+jt.CartridgeBankedByMaskedRange = function(rom, format, pBaseBankSwitchAddress, superChip, pExtraRAMSize) {
 
     function init(self) {
         self.rom = rom;
@@ -24,7 +24,7 @@ JavatariCode.CartridgeBankedByMaskedRange = function(rom, format, pBaseBankSwitc
             superChipMode = !!superChip;
             superChipAutoDetect = false;
         }
-        extraRAM = superChip !== false ? JavatariCode.Util.arrayFill(new Array(extraRAMSize), 0) : null;
+        extraRAM = superChip !== false ? jt.Util.arrayFill(new Array(extraRAMSize), 0) : null;
     }
 
     this.read = function(address) {
@@ -61,28 +61,28 @@ JavatariCode.CartridgeBankedByMaskedRange = function(rom, format, pBaseBankSwitc
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset,
             bb: baseBankSwitchAddress,
             es: extraRAMSize,
             tb: topBankSwitchAddress,
             s: superChipMode | 0,
             sa: superChipAutoDetect | 0,
-            e: extraRAM && btoa(JavatariCode.Util.uInt8ArrayToByteString(extraRAM))
+            e: extraRAM && btoa(jt.Util.uInt8ArrayToByteString(extraRAM))
         };
     };
 
     this.loadState = function(state) {
-        this.format = JavatariCode.CartridgeFormats[state.f];
-        this.rom = JavatariCode.ROM.loadState(state.r);
-        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
+        this.format = jt.CartridgeFormats[state.f];
+        this.rom = jt.ROM.loadState(state.r);
+        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
         baseBankSwitchAddress = state.bb;
         extraRAMSize = state.es;
         topBankSwitchAddress =  state.tb;
         superChipMode = !!state.s;
         superChipAutoDetect = !!state.sa;
-        extraRAM = state.e && JavatariCode.Util.byteStringToUInt8Array(atob(state.e));
+        extraRAM = state.e && jt.Util.byteStringToUInt8Array(atob(state.e));
     };
 
 
@@ -106,10 +106,10 @@ JavatariCode.CartridgeBankedByMaskedRange = function(rom, format, pBaseBankSwitc
 
 };
 
-JavatariCode.CartridgeBankedByMaskedRange.prototype = JavatariCode.Cartridge.base;
+jt.CartridgeBankedByMaskedRange.prototype = jt.Cartridge.base;
 
-JavatariCode.CartridgeBankedByMaskedRange.createFromSaveState = function(state) {
-    var cart = new JavatariCode.CartridgeBankedByMaskedRange();
+jt.CartridgeBankedByMaskedRange.createFromSaveState = function(state) {
+    var cart = new jt.CartridgeBankedByMaskedRange();
     cart.loadState(state);
     return cart;
 };

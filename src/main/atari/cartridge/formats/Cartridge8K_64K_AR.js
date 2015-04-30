@@ -2,14 +2,14 @@
 
 // Implements the n * 8448 byte "AR" Arcadia/Starpath/Supercharger tape format
 
-JavatariCode.Cartridge8K_64K_AR = function(rom, format) {
+jt.Cartridge8K_64K_AR = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
         self.format = format;
         // Cannot use the contents of the ROM directly, as cartridge is all RAM and can be modified
         // Also, ROM content represents the entire tape and can have multiple parts
-        bytes = JavatariCode.Util.arrayFill(new Array(4 * BANK_SIZE));
+        bytes = jt.Util.arrayFill(new Array(4 * BANK_SIZE));
         loadBIOS();
     }
 
@@ -119,7 +119,7 @@ JavatariCode.Cartridge8K_64K_AR = function(rom, format) {
                 tapeRewound = true;
             }
             // Check if the next part is the one we are looking for
-            if (JavatariCode.Cartridge8K_64K_AR.peekPartNoOnTape(rom.content, tapeOffset) === part) {
+            if (jt.Cartridge8K_64K_AR.peekPartNoOnTape(rom.content, tapeOffset) === part) {
                 if (part === 0) bus.getTia().getVideoOutput().showOSD("Loaded Tape from Start", true);
                 else bus.getTia().getVideoOutput().showOSD("Loaded next Part from Tape", true);
                 loadNextPart();
@@ -139,20 +139,20 @@ JavatariCode.Cartridge8K_64K_AR = function(rom, format) {
 
     var loadHeaderData = function() {
         // Store header info
-        JavatariCode.Util.arrayCopy(rom.content, tapeOffset + 4 * BANK_SIZE, header, 0, header.length);
+        jt.Util.arrayCopy(rom.content, tapeOffset + 4 * BANK_SIZE, header, 0, header.length);
         romStartupAddress = (header[1] << 8) | (header[0] & 0xff);
         romControlRegister = header[2];
         romPageCount = header[3];
         romChecksum = header[4];
         romMultiLoadIndex = header[5];
         romProgressBarSpeed = (header[7] << 8) | (header[6] & 0xff);
-        romPageOffsets = JavatariCode.Util.arrayFill(new Array(romPageCount), 0);
-        JavatariCode.Util.arrayCopy(header, 16, romPageOffsets, 0, romPageCount);
+        romPageOffsets = jt.Util.arrayFill(new Array(romPageCount), 0);
+        jt.Util.arrayCopy(header, 16, romPageOffsets, 0, romPageCount);
     };
 
     var loadPagesIntoBanks = function() {
         // Clear last page of first bank, as per original BIOS
-        JavatariCode.Util.arrayFillSegment(bytes, 7 * PAGE_SIZE, 8 * PAGE_SIZE - 1, 0);
+        jt.Util.arrayFillSegment(bytes, 7 * PAGE_SIZE, 8 * PAGE_SIZE - 1, 0);
 
         // Load pages
         var romOffset = tapeOffset;
@@ -162,7 +162,7 @@ JavatariCode.Cartridge8K_64K_AR = function(rom, format) {
             var pageOffset = (pageInfo >> 2) * PAGE_SIZE;
             // Only write if not in BIOS area
             if (bankOffset + pageOffset + 255 < BIOS_BANK_OFFSET)
-                JavatariCode.Util.arrayCopy(rom.content, romOffset, bytes, bankOffset + pageOffset, PAGE_SIZE);
+                jt.Util.arrayCopy(rom.content, romOffset, bytes, bankOffset + pageOffset, PAGE_SIZE);
             romOffset += PAGE_SIZE;
         }
         // Advance tape
@@ -185,8 +185,8 @@ JavatariCode.Cartridge8K_64K_AR = function(rom, format) {
     };
 
     var loadBIOS = function() {
-        var bios = JSZip.compressions.DEFLATE.uncompress(JavatariCode.Util.byteStringToUInt8Array(atob(STARPATH_BIOS)));
-        JavatariCode.Util.arrayCopy(bios, 0, bytes, BIOS_BANK_OFFSET, BANK_SIZE);
+        var bios = JSZip.compressions.DEFLATE.uncompress(jt.Util.byteStringToUInt8Array(atob(STARPATH_BIOS)));
+        jt.Util.arrayCopy(bios, 0, bytes, BIOS_BANK_OFFSET, BANK_SIZE);
     };
 
 
@@ -199,7 +199,7 @@ JavatariCode.Cartridge8K_64K_AR = function(rom, format) {
 
     var bank0AddressOffset = 0;
     var bank1AddressOffset = 0;
-    var header = JavatariCode.Util.arrayFill(new Array(HEADER_SIZE), 0);
+    var header = jt.Util.arrayFill(new Array(HEADER_SIZE), 0);
     var valueToWrite = 0;
     var writeEnabled = false;
     var lastAddress = -1;
@@ -244,14 +244,14 @@ JavatariCode.Cartridge8K_64K_AR = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes))
+            b: btoa(jt.Util.uInt8ArrayToByteString(bytes))
         };
     };
 
     this.loadState = function(state) {
-        this.format = JavatariCode.CartridgeFormats[state.f];
-        this.rom = JavatariCode.ROM.loadState(state.r);
-        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
+        this.format = jt.CartridgeFormats[state.f];
+        this.rom = jt.ROM.loadState(state.r);
+        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
     };
 
 
@@ -259,25 +259,25 @@ JavatariCode.Cartridge8K_64K_AR = function(rom, format) {
 
 };
 
-JavatariCode.Cartridge8K_64K_AR.prototype = JavatariCode.CartridgeBankedByBusMonitoring.base;
+jt.Cartridge8K_64K_AR.prototype = jt.CartridgeBankedByBusMonitoring.base;
 
-JavatariCode.Cartridge8K_64K_AR.createFromSaveState = function(state) {
-    var cart = new JavatariCode.Cartridge8K_64K_AR();
+jt.Cartridge8K_64K_AR.createFromSaveState = function(state) {
+    var cart = new jt.Cartridge8K_64K_AR();
     cart.loadState(state);
     return cart;
 };
 
-JavatariCode.Cartridge8K_64K_AR.HEADER_SIZE = 256;
-JavatariCode.Cartridge8K_64K_AR.PAGE_SIZE = 256;
-JavatariCode.Cartridge8K_64K_AR.BANK_SIZE = 8 * JavatariCode.Cartridge8K_64K_AR.PAGE_SIZE;
-JavatariCode.Cartridge8K_64K_AR.PART_SIZE = 4 * JavatariCode.Cartridge8K_64K_AR.BANK_SIZE + JavatariCode.Cartridge8K_64K_AR.HEADER_SIZE;	// 4 * 2048 banks + header
+jt.Cartridge8K_64K_AR.HEADER_SIZE = 256;
+jt.Cartridge8K_64K_AR.PAGE_SIZE = 256;
+jt.Cartridge8K_64K_AR.BANK_SIZE = 8 * jt.Cartridge8K_64K_AR.PAGE_SIZE;
+jt.Cartridge8K_64K_AR.PART_SIZE = 4 * jt.Cartridge8K_64K_AR.BANK_SIZE + jt.Cartridge8K_64K_AR.HEADER_SIZE;	// 4 * 2048 banks + header
 
-JavatariCode.Cartridge8K_64K_AR.peekPartNoOnTape = function(tapeContent, tapeOffset) {
-    return tapeContent[tapeOffset + 4*JavatariCode.Cartridge8K_64K_AR.BANK_SIZE + 5];
+jt.Cartridge8K_64K_AR.peekPartNoOnTape = function(tapeContent, tapeOffset) {
+    return tapeContent[tapeOffset + 4*jt.Cartridge8K_64K_AR.BANK_SIZE + 5];
 };
 
-JavatariCode.Cartridge8K_64K_AR.checkTape = function(rom) {
-    if (JavatariCode.Cartridge8K_64K_AR.peekPartNoOnTape(rom.content, 0) != 0) {
+jt.Cartridge8K_64K_AR.checkTape = function(rom) {
+    if (jt.Cartridge8K_64K_AR.peekPartNoOnTape(rom.content, 0) != 0) {
         var ex = new Error("Wrong Supercharger Tape Part ROM!\nPlease load a Full Tape ROM file.");
         ex.formatDenial = true;
         throw ex;

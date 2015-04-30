@@ -1,11 +1,11 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.ROM = function(source, content, info) {
+jt.ROM = function(source, content, info) {
 
     this.source = source;
     this.content = content;
     if (info) this.info = info;
-    else this.info = JavatariCode.CartridgeDatabase.produceInfo(this);
+    else this.info = jt.CartridgeDatabase.produceInfo(this);
 
 
     // Savestate  -------------------------------------------
@@ -20,6 +20,6 @@ JavatariCode.ROM = function(source, content, info) {
 
 };
 
-JavatariCode.ROM.loadState = function(state) {
-    return new JavatariCode.ROM(state.s, null, state.i);
+jt.ROM.loadState = function(state) {
+    return new jt.ROM(state.s, null, state.i);
 };

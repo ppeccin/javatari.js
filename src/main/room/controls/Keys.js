@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.Keys = {
+jt.Keys = {
     VK_ESCAPE: {c: 27, n: "Esc"},
     VK_F1: {c: 112, n: "F1"},
     VK_F2: {c: 113, n: "F2"},
@@ -105,7 +105,7 @@ JavatariCode.Keys = {
     VK_NUMPAD_CENTER: {c: 12, n: "Num Cntr"}
 };
 
-JavatariCode.KeysByCode = {};
-for (var key in JavatariCode.Keys)
-    JavatariCode.KeysByCode[JavatariCode.Keys[key].c] = JavatariCode.Keys[key];
+jt.KeysByCode = {};
+for (var key in jt.Keys)
+    jt.KeysByCode[jt.Keys[key].c] = jt.Keys[key];
 

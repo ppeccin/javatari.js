@@ -1,10 +1,10 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-JavatariCode.DOMConsoleControls = function() {
+jt.DOMConsoleControls = function() {
     var self = this;
 
     function init() {
-        gamepadControls = new JavatariCode.GamepadConsoleControls(self);
+        gamepadControls = new jt.GamepadConsoleControls(self);
         initKeys();
     }
 
@@ -343,7 +343,7 @@ JavatariCode.DOMConsoleControls = function() {
         }
     };
 
-    var controls = JavatariCode.ConsoleControls;
+    var controls = jt.ConsoleControls;
 
     var p1ControlsMode = false;
     var paddleMode = false;
@@ -374,52 +374,52 @@ JavatariCode.DOMConsoleControls = function() {
 
     // Default Key Values
 
-    var KEY_TOGGLE_JOYSTICK  = JavatariCode.DOMConsoleControls.KEY_TOGGLE_JOYSTICK;
-    var KEY_TOGGLE_P1_MODE   = JavatariCode.DOMConsoleControls.KEY_TOGGLE_P1_MODE;
-    var KEY_TOGGLE_PADDLE    = JavatariCode.DOMConsoleControls.KEY_TOGGLE_PADDLE;
-    var KEY_CARTRIDGE_FORMAT = JavatariCode.DOMConsoleControls.KEY_CARTRIDGE_FORMAT;
-    var KEY_SELECT           = JavatariCode.DOMConsoleControls.KEY_SELECT;
-    var KEY_SELECT2          = JavatariCode.DOMConsoleControls.KEY_SELECT2;
-    var KEY_RESET            = JavatariCode.DOMConsoleControls.KEY_RESET;
-    var KEY_FAST_SPEED       = JavatariCode.DOMConsoleControls.KEY_FAST_SPEED;
-    var KEY_PAUSE            = JavatariCode.DOMConsoleControls.KEY_PAUSE;
+    var KEY_TOGGLE_JOYSTICK  = jt.DOMConsoleControls.KEY_TOGGLE_JOYSTICK;
+    var KEY_TOGGLE_P1_MODE   = jt.DOMConsoleControls.KEY_TOGGLE_P1_MODE;
+    var KEY_TOGGLE_PADDLE    = jt.DOMConsoleControls.KEY_TOGGLE_PADDLE;
+    var KEY_CARTRIDGE_FORMAT = jt.DOMConsoleControls.KEY_CARTRIDGE_FORMAT;
+    var KEY_SELECT           = jt.DOMConsoleControls.KEY_SELECT;
+    var KEY_SELECT2          = jt.DOMConsoleControls.KEY_SELECT2;
+    var KEY_RESET            = jt.DOMConsoleControls.KEY_RESET;
+    var KEY_FAST_SPEED       = jt.DOMConsoleControls.KEY_FAST_SPEED;
+    var KEY_PAUSE            = jt.DOMConsoleControls.KEY_PAUSE;
 
-    var KEY_POWER            = JavatariCode.Keys.VK_F1.c;
-    var KEY_BLACK_WHITE      = JavatariCode.Keys.VK_F2.c;
-    var KEY_DIFFICULTY0      = JavatariCode.Keys.VK_F4.c;
-    var KEY_DIFFICULTY1      = JavatariCode.Keys.VK_F9.c;
+    var KEY_POWER            = jt.Keys.VK_F1.c;
+    var KEY_BLACK_WHITE      = jt.Keys.VK_F2.c;
+    var KEY_DIFFICULTY0      = jt.Keys.VK_F4.c;
+    var KEY_DIFFICULTY1      = jt.Keys.VK_F9.c;
 
-    var KEY_FRAME            = JavatariCode.Keys.VK_F.c;
-    var KEY_TRACE            = JavatariCode.Keys.VK_Q.c;
-    var KEY_DEBUG            = JavatariCode.Keys.VK_D.c;
-    var KEY_NO_COLLISIONS    = JavatariCode.Keys.VK_C.c;
-    var KEY_VIDEO_STANDARD   = JavatariCode.Keys.VK_V.c;
+    var KEY_FRAME            = jt.Keys.VK_F.c;
+    var KEY_TRACE            = jt.Keys.VK_Q.c;
+    var KEY_DEBUG            = jt.Keys.VK_D.c;
+    var KEY_NO_COLLISIONS    = jt.Keys.VK_C.c;
+    var KEY_VIDEO_STANDARD   = jt.Keys.VK_V.c;
 
-    var KEY_STATE_0          = JavatariCode.Keys.VK_QUOTE.c;
-    var KEY_STATE_0a         = JavatariCode.Keys.VK_QUOTE2.c;
-    var KEY_STATE_1          = JavatariCode.Keys.VK_1.c;
-    var KEY_STATE_2          = JavatariCode.Keys.VK_2.c;
-    var KEY_STATE_3          = JavatariCode.Keys.VK_3.c;
-    var KEY_STATE_4          = JavatariCode.Keys.VK_4.c;
-    var KEY_STATE_5          = JavatariCode.Keys.VK_5.c;
-    var KEY_STATE_6          = JavatariCode.Keys.VK_6.c;
-    var KEY_STATE_7          = JavatariCode.Keys.VK_7.c;
-    var KEY_STATE_8          = JavatariCode.Keys.VK_8.c;
-    var KEY_STATE_9          = JavatariCode.Keys.VK_9.c;
-    var KEY_STATE_10         = JavatariCode.Keys.VK_0.c;
-    var KEY_STATE_11         = JavatariCode.Keys.VK_MINUS.c;
-    var KEY_STATE_11a        = JavatariCode.Keys.VK_MINUS2.c;
-    var KEY_STATE_12         = JavatariCode.Keys.VK_EQUALS.c;
-    var KEY_STATE_12a        = JavatariCode.Keys.VK_EQUALS2.c;
+    var KEY_STATE_0          = jt.Keys.VK_QUOTE.c;
+    var KEY_STATE_0a         = jt.Keys.VK_QUOTE2.c;
+    var KEY_STATE_1          = jt.Keys.VK_1.c;
+    var KEY_STATE_2          = jt.Keys.VK_2.c;
+    var KEY_STATE_3          = jt.Keys.VK_3.c;
+    var KEY_STATE_4          = jt.Keys.VK_4.c;
+    var KEY_STATE_5          = jt.Keys.VK_5.c;
+    var KEY_STATE_6          = jt.Keys.VK_6.c;
+    var KEY_STATE_7          = jt.Keys.VK_7.c;
+    var KEY_STATE_8          = jt.Keys.VK_8.c;
+    var KEY_STATE_9          = jt.Keys.VK_9.c;
+    var KEY_STATE_10         = jt.Keys.VK_0.c;
+    var KEY_STATE_11         = jt.Keys.VK_MINUS.c;
+    var KEY_STATE_11a        = jt.Keys.VK_MINUS2.c;
+    var KEY_STATE_12         = jt.Keys.VK_EQUALS.c;
+    var KEY_STATE_12a        = jt.Keys.VK_EQUALS2.c;
 
-    var KEY_SAVE_STATE_FILE  = JavatariCode.Keys.VK_F8.c;
+    var KEY_SAVE_STATE_FILE  = jt.Keys.VK_F8.c;
 
-    var KEY_CARTRIDGE_CLOCK_DEC = JavatariCode.Keys.VK_END.c;
-    var KEY_CARTRIDGE_CLOCK_INC = JavatariCode.Keys.VK_HOME.c;
-    var KEY_CARTRIDGE_REMOVE    = JavatariCode.Keys.VK_F7.c;
+    var KEY_CARTRIDGE_CLOCK_DEC = jt.Keys.VK_END.c;
+    var KEY_CARTRIDGE_CLOCK_INC = jt.Keys.VK_HOME.c;
+    var KEY_CARTRIDGE_REMOVE    = jt.Keys.VK_F7.c;
 
     var KEY_CTRL_MASK  = 1;
-    var KEY_ALT_MASK   = JavatariCode.DOMConsoleControls.KEY_ALT_MASK;
+    var KEY_ALT_MASK   = jt.DOMConsoleControls.KEY_ALT_MASK;
     var KEY_SHIFT_MASK = 4;
 
 
@@ -427,15 +427,15 @@ JavatariCode.DOMConsoleControls = function() {
 
 };
 
-JavatariCode.DOMConsoleControls.KEY_SELECT     = JavatariCode.Keys.VK_F11.c;
-JavatariCode.DOMConsoleControls.KEY_SELECT2    = JavatariCode.Keys.VK_F10.c;
-JavatariCode.DOMConsoleControls.KEY_RESET      = JavatariCode.Keys.VK_F12.c;
-JavatariCode.DOMConsoleControls.KEY_FAST_SPEED = JavatariCode.Keys.VK_TAB.c;
-JavatariCode.DOMConsoleControls.KEY_PAUSE      = JavatariCode.Keys.VK_P.c;
+jt.DOMConsoleControls.KEY_SELECT     = jt.Keys.VK_F11.c;
+jt.DOMConsoleControls.KEY_SELECT2    = jt.Keys.VK_F10.c;
+jt.DOMConsoleControls.KEY_RESET      = jt.Keys.VK_F12.c;
+jt.DOMConsoleControls.KEY_FAST_SPEED = jt.Keys.VK_TAB.c;
+jt.DOMConsoleControls.KEY_PAUSE      = jt.Keys.VK_P.c;
 
-JavatariCode.DOMConsoleControls.KEY_TOGGLE_JOYSTICK  = JavatariCode.Keys.VK_J.c;
-JavatariCode.DOMConsoleControls.KEY_TOGGLE_P1_MODE   = JavatariCode.Keys.VK_K.c;
-JavatariCode.DOMConsoleControls.KEY_TOGGLE_PADDLE    = JavatariCode.Keys.VK_L.c;
-JavatariCode.DOMConsoleControls.KEY_CARTRIDGE_FORMAT = JavatariCode.Keys.VK_B.c;
+jt.DOMConsoleControls.KEY_TOGGLE_JOYSTICK  = jt.Keys.VK_J.c;
+jt.DOMConsoleControls.KEY_TOGGLE_P1_MODE   = jt.Keys.VK_K.c;
+jt.DOMConsoleControls.KEY_TOGGLE_PADDLE    = jt.Keys.VK_L.c;
+jt.DOMConsoleControls.KEY_CARTRIDGE_FORMAT = jt.Keys.VK_B.c;
 
-JavatariCode.DOMConsoleControls.KEY_ALT_MASK   = 2;
+jt.DOMConsoleControls.KEY_ALT_MASK   = 2;
