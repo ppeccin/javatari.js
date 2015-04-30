@@ -279,7 +279,7 @@
 
     // Set Global Constants --------------------------------------------
 
-    VideoStandard = {
+    JavatariCode.VideoStandard = {
         NTSC: {
             name: "NTSC",
             width: 228,

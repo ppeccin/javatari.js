@@ -23,3 +23,4 @@ Javatari = {
 
 };
 
+JavatariCode = {};

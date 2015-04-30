@@ -2,7 +2,7 @@
 
 // Implements the 8K-512K "Enhanced 3F" Tigervision format
 
-function Cartridge8K_512K_3F(rom, format) {
+JavatariCode.Cartridge8K_512K_3F = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -37,7 +37,7 @@ function Cartridge8K_512K_3F(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset,
             sm: selectableSliceMaxBank,
             fo: fixedSliceAddressOffset
@@ -45,9 +45,9 @@ function Cartridge8K_512K_3F(rom, format) {
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.f];
-        this.rom = ROM.loadState(state.r);
-        bytes = Util.byteStringToUInt8Array(atob(state.b));
+        this.format = JavatariCode.CartridgeFormats[state.f];
+        this.rom = JavatariCode.ROM.loadState(state.r);
+        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
         selectableSliceMaxBank = state.sm;
         fixedSliceAddressOffset = state.fo;
@@ -67,12 +67,12 @@ function Cartridge8K_512K_3F(rom, format) {
 
     if (rom) init(this);
 
-}
+};
 
-Cartridge8K_512K_3F.prototype = CartridgeBankedByBusMonitoring.base;
+JavatariCode.Cartridge8K_512K_3F.prototype = JavatariCode.CartridgeBankedByBusMonitoring.base;
 
-Cartridge8K_512K_3F.createFromSaveState = function(state) {
-    var cart = new Cartridge8K_512K_3F();
+JavatariCode.Cartridge8K_512K_3F.createFromSaveState = function(state) {
+    var cart = new JavatariCode.Cartridge8K_512K_3F();
     cart.loadState(state);
     return cart;
 };

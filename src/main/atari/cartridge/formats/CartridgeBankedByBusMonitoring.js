@@ -2,7 +2,7 @@
 
 // Implements generic bank switching using unmasked address access via bus monitoring (outside Cart area)
 
-function CartridgeBankedByBusMonitoring(rom, format) {
+JavatariCode.CartridgeBankedByBusMonitoring = function(rom, format) {
 
     this.needsBusMonitoring = function() {
         return true;
@@ -19,10 +19,10 @@ function CartridgeBankedByBusMonitoring(rom, format) {
     this.performBankSwitchOnMonitoredAccess = function(address) {
     };
 
-}
+};
 
-CartridgeBankedByBusMonitoring.prototype = Cartridge.base;
+JavatariCode.CartridgeBankedByBusMonitoring.prototype = JavatariCode.Cartridge.base;
 
-CartridgeBankedByBusMonitoring.base = new CartridgeBankedByBusMonitoring();
+JavatariCode.CartridgeBankedByBusMonitoring.base = new JavatariCode.CartridgeBankedByBusMonitoring();
 
 

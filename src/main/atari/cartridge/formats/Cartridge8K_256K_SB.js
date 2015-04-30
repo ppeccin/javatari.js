@@ -2,7 +2,7 @@
 
 // Implements the 8K-256K "SB" Superbanking format
 
-function Cartridge8K_256K_SB(rom, format) {
+JavatariCode.Cartridge8K_256K_SB = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -30,16 +30,16 @@ function Cartridge8K_256K_SB(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset,
             m: maxBank
         };
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.f];
-        this.rom = ROM.loadState(state.r);
-        bytes = Util.byteStringToUInt8Array(atob(state.b));
+        this.format = JavatariCode.CartridgeFormats[state.f];
+        this.rom = JavatariCode.ROM.loadState(state.r);
+        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
         maxBank = state.m;
     };
@@ -55,12 +55,12 @@ function Cartridge8K_256K_SB(rom, format) {
 
     if (rom) init(this);
 
-}
+};
 
-Cartridge8K_256K_SB.prototype = CartridgeBankedByBusMonitoring.base;
+JavatariCode.Cartridge8K_256K_SB.prototype = JavatariCode.CartridgeBankedByBusMonitoring.base;
 
-Cartridge8K_256K_SB.createFromSaveState = function(state) {
-    var cart = new Cartridge8K_256K_SB();
+JavatariCode.Cartridge8K_256K_SB.createFromSaveState = function(state) {
+    var cart = new JavatariCode.Cartridge8K_256K_SB();
     cart.loadState(state);
     return cart;
 };

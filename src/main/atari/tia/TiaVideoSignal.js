@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function TiaVideoSignal() {
+JavatariCode.TiaVideoSignal = function() {
 
     this.connectMonitor = function(pMonitor) {
         this.monitor = pMonitor;
@@ -28,4 +28,4 @@ function TiaVideoSignal() {
     this.standard = null;
     this.monitor = null;
 
-}
+};

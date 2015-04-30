@@ -2,7 +2,7 @@
 
 // Implements the 64K "F0" Dynacom Megaboy format
 
-function Cartridge64K_F0(rom, format) {
+JavatariCode.Cartridge64K_F0 = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -37,15 +37,15 @@ function Cartridge64K_F0(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset
         };
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.f];
-        this.rom = ROM.loadState(state.r);
-        bytes = Util.byteStringToUInt8Array(atob(state.b));
+        this.format = JavatariCode.CartridgeFormats[state.f];
+        this.rom = JavatariCode.ROM.loadState(state.r);
+        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
     };
 
@@ -61,12 +61,12 @@ function Cartridge64K_F0(rom, format) {
 
     if (rom) init(this);
 
-}
+};
 
-Cartridge64K_F0.prototype = Cartridge.base;
+JavatariCode.Cartridge64K_F0.prototype = JavatariCode.Cartridge.base;
 
-Cartridge64K_F0.createFromSaveState = function(state) {
-    var cart = new Cartridge64K_F0();
+JavatariCode.Cartridge64K_F0.createFromSaveState = function(state) {
+    var cart = new JavatariCode.Cartridge64K_F0();
     cart.loadState(state);
     return cart;
 };

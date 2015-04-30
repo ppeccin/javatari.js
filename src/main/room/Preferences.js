@@ -3,18 +3,18 @@
 Javatari.preferences = {};
 
 Javatari.preferences.defaults = {
-    KP0LEFT  : KeyCodes.VK_LEFT,
-    KP0UP    : KeyCodes.VK_UP,
-    KP0RIGHT : KeyCodes.VK_RIGHT,
-    KP0DOWN  : KeyCodes.VK_DOWN,
-    KP0BUT   : KeyCodes.VK_SPACE,
-    KP0BUT2  : KeyCodes.VK_DELETE,
-    KP1LEFT  : KeyCodes.VK_F,
-    KP1UP    : KeyCodes.VK_T,
-    KP1RIGHT : KeyCodes.VK_H,
-    KP1DOWN  : KeyCodes.VK_G,
-    KP1BUT   : KeyCodes.VK_A,
-    KP1BUT2  : KeyCodes.VK_PERIOD,
+    KP0LEFT  : JavatariCode.Keys.VK_LEFT.c,
+    KP0UP    : JavatariCode.Keys.VK_UP.c,
+    KP0RIGHT : JavatariCode.Keys.VK_RIGHT.c,
+    KP0DOWN  : JavatariCode.Keys.VK_DOWN.c,
+    KP0BUT   : JavatariCode.Keys.VK_SPACE.c,
+    KP0BUT2  : JavatariCode.Keys.VK_DELETE.c,
+    KP1LEFT  : JavatariCode.Keys.VK_F.c,
+    KP1UP    : JavatariCode.Keys.VK_T.c,
+    KP1RIGHT : JavatariCode.Keys.VK_H.c,
+    KP1DOWN  : JavatariCode.Keys.VK_G.c,
+    KP1BUT   : JavatariCode.Keys.VK_A.c,
+    KP1BUT2  : JavatariCode.Keys.VK_PERIOD.c,
 
     JP0DEVICE   : -1,  // -1 = auto
     JP0XAXIS    : 0,

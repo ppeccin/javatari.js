@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function GamepadConsoleControls(domControls) {
+JavatariCode.GamepadConsoleControls = function(domControls) {
 
     this.connect = function(pConsoleControlsSocket) {
         consoleControlsSocket = pConsoleControlsSocket;
@@ -146,22 +146,22 @@ function GamepadConsoleControls(domControls) {
         // Other Console controls
         var newSelect = joystick.getButtonDigital(joyPrefs.select);
         if (newSelect !== joyState.select) {
-            domControls.processKeyEvent(DOMConsoleControls.KEY_SELECT, newSelect, 0);
+            domControls.processKeyEvent(JavatariCode.DOMConsoleControls.KEY_SELECT, newSelect, 0);
             joyState.select = newSelect;
         }
         var newReset = joystick.getButtonDigital(joyPrefs.reset);
         if (newReset !== joyState.reset) {
-            domControls.processKeyEvent(DOMConsoleControls.KEY_RESET, newReset, 0);
+            domControls.processKeyEvent(JavatariCode.DOMConsoleControls.KEY_RESET, newReset, 0);
             joyState.reset = newReset;
         }
         var newPause = joystick.getButtonDigital(joyPrefs.pause);
         if (newPause !== joyState.pause) {
-            domControls.processKeyEvent(DOMConsoleControls.KEY_PAUSE, newPause, DOMConsoleControls.KEY_ALT_MASK);
+            domControls.processKeyEvent(JavatariCode.DOMConsoleControls.KEY_PAUSE, newPause, JavatariCode.DOMConsoleControls.KEY_ALT_MASK);
             joyState.pause = newPause;
         }
         var newFastSpeed = joystick.getButtonDigital(joyPrefs.fastSpeed);
         if (newFastSpeed !== joyState.fastSpeed) {
-            domControls.processKeyEvent(DOMConsoleControls.KEY_FAST_SPEED, newFastSpeed, 0);
+            domControls.processKeyEvent(JavatariCode.DOMConsoleControls.KEY_FAST_SPEED, newFastSpeed, 0);
             joyState.fastSpeed = newFastSpeed;
         }
     };
@@ -220,7 +220,7 @@ function GamepadConsoleControls(domControls) {
     var supported = false;
     var gamepadsDetectionDelay = -1;
 
-    var controls = ConsoleControls;
+    var controls = JavatariCode.ConsoleControls;
     var consoleControlsSocket;
     var screen;
 
@@ -313,6 +313,6 @@ function GamepadConsoleControls(domControls) {
 
     }
 
-}
+};
 
 

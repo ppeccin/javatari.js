@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function ROMLoader() {
+JavatariCode.ROMLoader = function() {
     var self = this;
 
     this.connect = function(pCartrigeSocket, pSaveStateSocket) {
@@ -35,7 +35,7 @@ function ROMLoader() {
     };
 
     this.loadFromFile = function (file) {
-        Util.log("Reading ROM file: " + file.name);
+        JavatariCode.Util.log("Reading ROM file: " + file.name);
         var reader = new FileReader();
         reader.onload = function (event) {
             var content = new Uint8Array(event.target.result);
@@ -49,7 +49,7 @@ function ROMLoader() {
     };
 
     this.loadFromURL = function (url) {
-        Util.log("Reading ROM from URL: " + url);
+        JavatariCode.Util.log("Reading ROM from URL: " + url);
 
         var req = new XMLHttpRequest();
         req.withCredentials = true;
@@ -129,19 +129,19 @@ function ROMLoader() {
         // First try reading and creating directly
         try {
             arrContent = new Array(content.length);
-            Util.arrayCopy(content, 0, arrContent, 0, arrContent.length);
+            JavatariCode.Util.arrayCopy(content, 0, arrContent, 0, arrContent.length);
             // Frist try to load as a SaveState file
             if (saveStateSocket.loadStateFile(arrContent)) {
-                Util.log("SaveState file loaded");
+                JavatariCode.Util.log("SaveState file loaded");
                 return;
             }
             // Then try to load as a normal, uncompressed ROM
-            rom = new ROM(name, arrContent);
-            cart = CartridgeDatabase.createCartridgeFromRom(rom);
+            rom = new JavatariCode.ROM(name, arrContent);
+            cart = JavatariCode.CartridgeDatabase.createCartridgeFromRom(rom);
             if (cartridgeSocket) cartridgeSocket.insert(cart, autoPower);
         } catch(e) {
             if (!e.javatari) {
-                Util.log(e.stack);
+                JavatariCode.Util.log(e.stack);
                 throw e;
             }
 
@@ -151,13 +151,13 @@ function ROMLoader() {
                 var files = zip.file(ZIP_INNER_FILES_PATTERN);
                 for (var i = 0; i < files.length; i++) {
                     var file = files[i];
-                    Util.log("Trying zip file content: " + file.name);
+                    JavatariCode.Util.log("Trying zip file content: " + file.name);
                     try {
                         var cont = file.asUint8Array();
                         arrContent = new Array(cont.length);
-                        Util.arrayCopy(cont, 0, arrContent, 0, arrContent.length);
-                        rom = new ROM(file.name, arrContent);
-                        cart = CartridgeDatabase.createCartridgeFromRom(rom);
+                        JavatariCode.Util.arrayCopy(cont, 0, arrContent, 0, arrContent.length);
+                        rom = new JavatariCode.ROM(file.name, arrContent);
+                        cart = JavatariCode.CartridgeDatabase.createCartridgeFromRom(rom);
                         if (cartridgeSocket) cartridgeSocket.insert(cart, autoPower);
                         return;
                     } catch (ef) {
@@ -173,8 +173,8 @@ function ROMLoader() {
     };
 
     var showError = function(message) {
-        Util.log("" + message);
-        Util.message("Could not load ROM:\n\n" + message);
+        JavatariCode.Util.log("" + message);
+        JavatariCode.Util.message("Could not load ROM:\n\n" + message);
     };
 
     var createFileInputElement = function (element) {
@@ -204,4 +204,4 @@ function ROMLoader() {
 
     Javatari.loadROMFromURL = this.loadFromURL;
 
-}
+};

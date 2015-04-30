@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function AtariConsole() {
+JavatariCode.AtariConsole = function() {
     var self = this;
 
     function init() {
@@ -89,14 +89,14 @@ function AtariConsole() {
     var setVideoStandardAuto = function() {
         videoStandardIsAuto = true;
         if (self.powerIsOn) videoStandardAutoDetectionStart();
-        else setVideoStandard(VideoStandard.NTSC);
+        else setVideoStandard(JavatariCode.VideoStandard.NTSC);
     };
 
     var videoStandardAutoDetectionStart = function() {
         if (!videoStandardIsAuto || videoStandardAutoDetectionInProgress) return;
         // If no Cartridge present, use NTSC
         if (!bus.getCartridge()) {
-            setVideoStandard(VideoStandard.NTSC);
+            setVideoStandard(JavatariCode.VideoStandard.NTSC);
             return;
         }
         // Otherwise use the VideoStandard detected by the monitor
@@ -146,8 +146,8 @@ function AtariConsole() {
         pia.loadState(state.p);
         ram.loadState(state.r);
         cpu.loadState(state.c);
-        setCartridge(state.ca && CartridgeDatabase.createCartridgeFromSaveState(state.ca));
-        setVideoStandard(VideoStandard[state.vs]);
+        setCartridge(state.ca && JavatariCode.CartridgeDatabase.createCartridgeFromSaveState(state.ca));
+        setVideoStandard(JavatariCode.VideoStandard[state.vs]);
         controlsSocket.controlsStatesRedefined();
     };
 
@@ -164,12 +164,12 @@ function AtariConsole() {
     };
 
     var mainComponentsCreate = function() {
-        cpu = new M6502();
-        pia = new Pia();
-        tia = new Tia(cpu, pia);
-        ram = new Ram();
-        bus = new Bus(cpu, tia, pia, ram);
-        mainClock = new Clock(self, VideoStandard.NTSC.fps);
+        cpu = new JavatariCode.M6502();
+        pia = new JavatariCode.Pia();
+        tia = new JavatariCode.Tia(cpu, pia);
+        ram = new JavatariCode.Ram();
+        bus = new JavatariCode.Bus(cpu, tia, pia, ram);
+        mainClock = new JavatariCode.Clock(self, JavatariCode.VideoStandard.NTSC.fps);
     };
 
     var socketsCreate = function() {
@@ -211,7 +211,7 @@ function AtariConsole() {
 
     // Controls interface  --------------------------------------------
 
-    var controls = ConsoleControls;
+    var controls = JavatariCode.ConsoleControls;
 
     this.controlStateChanged = function (control, state) {
         // Normal state controls
@@ -273,8 +273,8 @@ function AtariConsole() {
                 break;
             case controls.VIDEO_STANDARD:
                 self.showOSD(null, true);	// Prepares for the upcoming "AUTO" OSD to always show
-                if (videoStandardIsAuto) setVideoStandardForced(VideoStandard.NTSC);
-                else if (videoStandard == VideoStandard.NTSC) setVideoStandardForced(VideoStandard.PAL);
+                if (videoStandardIsAuto) setVideoStandardForced(JavatariCode.VideoStandard.NTSC);
+                else if (videoStandard == JavatariCode.VideoStandard.NTSC) setVideoStandardForced(JavatariCode.VideoStandard.PAL);
                 else setVideoStandardAuto();
                 break;
             case controls.CARTRIDGE_FORMAT:
@@ -325,7 +325,7 @@ function AtariConsole() {
         };
 
         this.removeInsertionListener = function (listener) {
-            Util.arrayRemove(insertionListeners, listener);
+            JavatariCode.Util.arrayRemove(insertionListeners, listener);
         };
 
         var insertionListeners = [];
@@ -370,7 +370,7 @@ function AtariConsole() {
         };
 
         this.removeForwardedInput = function(input) {
-            Util.arrayRemove(forwardedInputs, input);
+            JavatariCode.Util.arrayRemove(forwardedInputs, input);
             forwardedInputsCount = forwardedInputs.length;
         };
 
@@ -476,7 +476,7 @@ function AtariConsole() {
     this.startProfiling = function() {
         var lastFrameCount = this.framesGenerated;
         setInterval(function() {
-            Util.log(self.framesGenerated - lastFrameCount);
+            JavatariCode.Util.log(self.framesGenerated - lastFrameCount);
             lastFrameCount = self.framesGenerated;
         }, 1000);
     };
@@ -487,12 +487,12 @@ function AtariConsole() {
         for (var i = 0; i < frames; i++)
             self.clockPulse();
         var duration = performance.now() - start;
-        Util.log("Done running " + frames + " in " + duration + " ms");
-        Util.log(frames / (duration/1000) + "frames/sec");
+        JavatariCode.Util.log("Done running " + frames + " in " + duration + " ms");
+        JavatariCode.Util.log(frames / (duration/1000) + "frames/sec");
         go();
     };
 
 
     init();
 
-}
+};

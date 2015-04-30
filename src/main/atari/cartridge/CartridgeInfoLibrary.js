@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-CartridgeInfoLibrary = {
+JavatariCode.CartridgeInfoLibrary = {
 	version: 20130406,
 	"0685BD0BCB975CEEF7041749A5454A48":{n:"11 Sprite Demo (Piero Cavina) (PD)"},
 	"1862FCA4F98E66F363308B859B5863AF":{n:"128-in-1 Junior Console (Chip 1 of 4) (1991) (Atari) (PAL)"},

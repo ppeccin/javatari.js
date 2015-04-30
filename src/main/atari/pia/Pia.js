@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function Pia() {
+JavatariCode.Pia = function() {
 
     this.powerOn = function() {
     };
@@ -78,13 +78,13 @@ function Pia() {
 
     var debugInfo = function(str) {
         if (self.debug)
-            Util.log(str);
+            JavatariCode.Util.log(str);
     };
 
 
     // Controls interface  -----------------------------------------
 
-    var controls = ConsoleControls;
+    var controls = JavatariCode.ConsoleControls;
 
     this.controlStateChanged = function(control, state) {
         switch (control) {
@@ -196,4 +196,4 @@ function Pia() {
 
     var ADDRESS_MASK = 0x0007;
 
-}
+};

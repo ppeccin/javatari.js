@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function Ram() {
+JavatariCode.Ram = function() {
 
     function init() {
         // RAM comes totally random at creation
@@ -40,12 +40,12 @@ function Ram() {
 
     this.saveState = function() {
         return {
-            b: btoa(Util.uInt8ArrayToByteString(bytes))
+            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes))
         };
     };
 
     this.loadState = function(state) {
-        bytes = Util.byteStringToUInt8Array(atob(state.b));
+        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
     };
 
 
@@ -62,4 +62,4 @@ function Ram() {
 
     init();
 
-}
+};

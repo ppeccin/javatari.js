@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function ConsolePanel(mainElement) {
+JavatariCode.ConsolePanel = function(mainElement) {
 
     function init() {
         setupMain();
@@ -74,8 +74,8 @@ function ConsolePanel(mainElement) {
 
     var setupMain = function () {
         mainElement.style.position = "relative";
-        mainElement.style.width = "" + ConsolePanel.DEFAULT_WIDTH + "px";
-        mainElement.style.height = "" + ConsolePanel.DEFAULT_HEIGHT + "px";
+        mainElement.style.width = "" + JavatariCode.ConsolePanel.DEFAULT_WIDTH + "px";
+        mainElement.style.height = "" + JavatariCode.ConsolePanel.DEFAULT_HEIGHT + "px";
         mainElement.style.background = "black url(" + IMAGE_PATH + "sprites.png" + ") no-repeat";
         mainElement.style.outline = "none";
         mainElement.tabIndex = "-1";               // Make it focusable
@@ -97,14 +97,14 @@ function ConsolePanel(mainElement) {
 
         cartInsertedImage =  addButton(141, 51 - 145, 189, 82, -127, -139);
         cartChangeButton = addButton(143, 51 - 144, 184, 55, 0, 0, true);
-        monitorCartridgeControlButton(cartChangeButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
+        monitorCartridgeControlButton(cartChangeButton, JavatariCode.Monitor.Controls.LOAD_CARTRIDGE_FILE);
 
         if (!Javatari.CARTRIDGE_CHANGE_DISABLED) {
             cartChangeFileButton = addButton(171, 51 - 86, 31, 30, 2, -188);
-            monitorCartridgeControlButton(cartChangeFileButton, Monitor.Controls.LOAD_CARTRIDGE_FILE);
+            monitorCartridgeControlButton(cartChangeFileButton, JavatariCode.Monitor.Controls.LOAD_CARTRIDGE_FILE);
             setVisibility(cartChangeFileButton, true);
             cartChangeURLButton = addButton(267, 51 - 86, 31, 30, -94, -188);
-            monitorCartridgeControlButton(cartChangeURLButton, Monitor.Controls.LOAD_CARTRIDGE_URL);
+            monitorCartridgeControlButton(cartChangeURLButton, JavatariCode.Monitor.Controls.LOAD_CARTRIDGE_URL);
             setVisibility(cartChangeURLButton, true);
         }
     };
@@ -198,7 +198,7 @@ function ConsolePanel(mainElement) {
         cartLabel.style.border = "1px solid " + DEFAULT_CARTRIDGE_BORDER_COLOR;
         cartLabel.style.opacity = "0";
         cartLabel.innerHTML = "";
-        monitorCartridgeControlButton(cartLabel, Monitor.Controls.LOAD_CARTRIDGE_FILE);
+        monitorCartridgeControlButton(cartLabel, JavatariCode.Monitor.Controls.LOAD_CARTRIDGE_FILE);
         mainElement.appendChild(cartLabel);
     };
 
@@ -206,7 +206,7 @@ function ConsolePanel(mainElement) {
 
     // Controls interface  -----------------------------------
 
-    var controls = ConsoleControls;
+    var controls = JavatariCode.ConsoleControls;
 
     this.controlStateChanged = function(control, state) {
         if (visibleControls[control]) updateVisibleControlsState();
@@ -272,7 +272,7 @@ function ConsolePanel(mainElement) {
 
     init();
 
-}
+};
 
-ConsolePanel.DEFAULT_WIDTH = 465;
-ConsolePanel.DEFAULT_HEIGHT = 137;
+JavatariCode.ConsolePanel.DEFAULT_WIDTH = 465;
+JavatariCode.ConsolePanel.DEFAULT_HEIGHT = 137;

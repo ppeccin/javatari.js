@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function TiaAudioSignal() {
+JavatariCode.TiaAudioSignal = function() {
 
     this.connectMonitor = function(pMonitor) {
         monitor = pMonitor;
@@ -37,7 +37,7 @@ function TiaAudioSignal() {
     this.setFps = function(fps) {
         // Normal amount is 2 sample per scanline = 31440, 524 for NTSC(60Hz) and 624 for PAL(50hz)
         // Calculate total samples per frame based on fps
-        samplesPerFrame = Math.round(TiaAudioSignal.SAMPLE_RATE / fps);
+        samplesPerFrame = Math.round(JavatariCode.TiaAudioSignal.SAMPLE_RATE / fps);
         if (samplesPerFrame > MAX_SAMPLES) samplesPerFrame = MAX_SAMPLES;
     };
 
@@ -112,13 +112,13 @@ function TiaAudioSignal() {
     var cartridgeNeedsAudioClock;
 
     var signalOn = false;
-    var channel0 = new TiaAudioChannel();
-    var channel1 = new TiaAudioChannel();
+    var channel0 = new JavatariCode.TiaAudioChannel();
+    var channel1 = new JavatariCode.TiaAudioChannel();
 
     var nextSampleToGenerate = 0;
     var nextSampleToRetrieve = 0;
 
-    var samplesPerFrame =  TiaAudioSignal.SAMPLE_RATE / VideoStandard.NTSC.fps;
+    var samplesPerFrame =  JavatariCode.TiaAudioSignal.SAMPLE_RATE / JavatariCode.VideoStandard.NTSC.fps;
     var frameSamples = 0;
 
     var lastSample = 0;
@@ -126,7 +126,7 @@ function TiaAudioSignal() {
     var MAX_SAMPLES = 10 * Javatari.AUDIO_BUFFER_SIZE;
     var MAX_AMPLITUDE = 0.5;
 
-    var samples = Util.arrayFill(new Array(MAX_SAMPLES), 0);
+    var samples = JavatariCode.Util.arrayFill(new Array(MAX_SAMPLES), 0);
 
     var retrieveResult = {
         buffer: samples,
@@ -134,6 +134,6 @@ function TiaAudioSignal() {
         start: 0
     };
 
-}
+};
 
-TiaAudioSignal.SAMPLE_RATE = 31440;
+JavatariCode.TiaAudioSignal.SAMPLE_RATE = 31440;

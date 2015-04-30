@@ -2,7 +2,7 @@
 
 // Implements the 2K "CV" Commavid + 1K RAM format
 
-function Cartridge2K_CV(rom, format) {
+JavatariCode.Cartridge2K_CV = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -11,7 +11,7 @@ function Cartridge2K_CV(rom, format) {
         bytes = new Array(4096);
         var len = rom.content.length;
         for (var pos = 0; pos < bytes.length; pos += len)
-            Util.arrayCopy(rom.content, 0, bytes, pos, len);
+            JavatariCode.Util.arrayCopy(rom.content, 0, bytes, pos, len);
     }
 
     this.read = function(address) {
@@ -41,33 +41,33 @@ function Cartridge2K_CV(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(Util.uInt8ArrayToByteString(bytes)),
-            ra: btoa(Util.uInt8ArrayToByteString(extraRAM))
+            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
+            ra: btoa(JavatariCode.Util.uInt8ArrayToByteString(extraRAM))
         };
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.f];
-        this.rom = ROM.loadState(state.r);
-        bytes = Util.byteStringToUInt8Array(atob(state.b));
-        extraRAM = Util.byteStringToUInt8Array(atob(state.ra));
+        this.format = JavatariCode.CartridgeFormats[state.f];
+        this.rom = JavatariCode.ROM.loadState(state.r);
+        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
+        extraRAM = JavatariCode.Util.byteStringToUInt8Array(atob(state.ra));
     };
 
 
     var bytes;
-    var extraRAM = Util.arrayFill(new Array(1024), 0);
+    var extraRAM = JavatariCode.Util.arrayFill(new Array(1024), 0);
 
     var ADDRESS_MASK = 0x0fff;
 
 
     if (rom) init(this);
 
-}
+};
 
-Cartridge2K_CV.prototype = Cartridge.base;
+JavatariCode.Cartridge2K_CV.prototype = JavatariCode.Cartridge.base;
 
-Cartridge2K_CV.createFromSaveState = function(state) {
-    var cart = new Cartridge2K_CV();
+JavatariCode.Cartridge2K_CV.createFromSaveState = function(state) {
+    var cart = new JavatariCode.Cartridge2K_CV();
     cart.loadState(state);
     return cart;
 };

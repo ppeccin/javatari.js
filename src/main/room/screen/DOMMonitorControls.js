@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function DOMMonitorControls(monitor) {
+JavatariCode.DOMMonitorControls = function(monitor) {
 
     function init() {
         initKeys();
@@ -45,47 +45,49 @@ function DOMMonitorControls(monitor) {
     };
 
     var initKeys = function() {
-        keyCodeMap[KEY_CART_FILE]       = Monitor.Controls.LOAD_CARTRIDGE_FILE;
-        keyCodeMap[KEY_CART_URL]        = Monitor.Controls.LOAD_CARTRIDGE_URL;
+        var monControls = JavatariCode.Monitor.Controls;
 
-        keyAltCodeMap[KEY_CART_FILE]    = Monitor.Controls.LOAD_CARTRIDGE_FILE;
-        keyAltCodeMap[KEY_CART_URL]     = Monitor.Controls.LOAD_CARTRIDGE_URL;
+        keyCodeMap[KEY_CART_FILE]       = monControls.LOAD_CARTRIDGE_FILE;
+        keyCodeMap[KEY_CART_URL]        = monControls.LOAD_CARTRIDGE_URL;
 
-        keyCodeMap[KEY_EXIT]            = Monitor.Controls.EXIT;
+        keyAltCodeMap[KEY_CART_FILE]    = monControls.LOAD_CARTRIDGE_FILE;
+        keyAltCodeMap[KEY_CART_URL]     = monControls.LOAD_CARTRIDGE_URL;
 
-        keyAltCodeMap[KEY_CRT_FILTER]   = Monitor.Controls.CRT_FILTER;
-        keyAltCodeMap[KEY_DEBUG]     	= Monitor.Controls.DEBUG;
-        keyAltCodeMap[KEY_STATS]    	= Monitor.Controls.STATS;
-        keyAltCodeMap[KEY_CRT_MODES] 	= Monitor.Controls.CRT_MODES;
-        keyAltCodeMap[KEY_FULLSCREEN]  	= Monitor.Controls.FULLSCREEN;
+        keyCodeMap[KEY_EXIT]            = monControls.EXIT;
 
-        keyControlCodeMap[KEY_CART_FILE] = Monitor.Controls.LOAD_CARTRIDGE_FILE_NO_AUTO_POWER;
-        keyControlCodeMap[KEY_CART_URL]  = Monitor.Controls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER;
+        keyAltCodeMap[KEY_CRT_FILTER]   = monControls.CRT_FILTER;
+        keyAltCodeMap[KEY_DEBUG]     	= monControls.DEBUG;
+        keyAltCodeMap[KEY_STATS]    	= monControls.STATS;
+        keyAltCodeMap[KEY_CRT_MODES] 	= monControls.CRT_MODES;
+        keyAltCodeMap[KEY_FULLSCREEN]  	= monControls.FULLSCREEN;
 
-        keyShiftCodeMap[KEY_UP]     = Monitor.Controls.SIZE_MINUS;
-        keyShiftCodeMap[KEY_DOWN]   = Monitor.Controls.SIZE_PLUS;
-        keyShiftCodeMap[KEY_LEFT]   = Monitor.Controls.SIZE_MINUS;
-        keyShiftCodeMap[KEY_RIGHT]  = Monitor.Controls.SIZE_PLUS;
+        keyControlCodeMap[KEY_CART_FILE] = monControls.LOAD_CARTRIDGE_FILE_NO_AUTO_POWER;
+        keyControlCodeMap[KEY_CART_URL]  = monControls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER;
 
-        keyShiftAltCodeMap[KEY_UP]     = Monitor.Controls.SCALE_Y_MINUS;
-        keyShiftAltCodeMap[KEY_DOWN]   = Monitor.Controls.SCALE_Y_PLUS;
-        keyShiftAltCodeMap[KEY_LEFT]   = Monitor.Controls.SCALE_X_MINUS;
-        keyShiftAltCodeMap[KEY_RIGHT]  = Monitor.Controls.SCALE_X_PLUS;
+        keyShiftCodeMap[KEY_UP]     = monControls.SIZE_MINUS;
+        keyShiftCodeMap[KEY_DOWN]   = monControls.SIZE_PLUS;
+        keyShiftCodeMap[KEY_LEFT]   = monControls.SIZE_MINUS;
+        keyShiftCodeMap[KEY_RIGHT]  = monControls.SIZE_PLUS;
 
-        keyControlAltCodeMap[KEY_UP]     = Monitor.Controls.ORIGIN_Y_MINUS;
-        keyControlAltCodeMap[KEY_DOWN]   = Monitor.Controls.ORIGIN_Y_PLUS;
-        keyControlAltCodeMap[KEY_LEFT]   = Monitor.Controls.ORIGIN_X_MINUS;
-        keyControlAltCodeMap[KEY_RIGHT]  = Monitor.Controls.ORIGIN_X_PLUS;
+        keyShiftAltCodeMap[KEY_UP]     = monControls.SCALE_Y_MINUS;
+        keyShiftAltCodeMap[KEY_DOWN]   = monControls.SCALE_Y_PLUS;
+        keyShiftAltCodeMap[KEY_LEFT]   = monControls.SCALE_X_MINUS;
+        keyShiftAltCodeMap[KEY_RIGHT]  = monControls.SCALE_X_PLUS;
 
-        keyShiftControlCodeMap[KEY_UP]    = Monitor.Controls.HEIGHT_MINUS;
-        keyShiftControlCodeMap[KEY_DOWN]  = Monitor.Controls.HEIGHT_PLUS;
-        keyShiftControlCodeMap[KEY_LEFT]  = Monitor.Controls.WIDTH_MINUS;
-        keyShiftControlCodeMap[KEY_RIGHT] = Monitor.Controls.WIDTH_PLUS;
+        keyControlAltCodeMap[KEY_UP]     = monControls.ORIGIN_Y_MINUS;
+        keyControlAltCodeMap[KEY_DOWN]   = monControls.ORIGIN_Y_PLUS;
+        keyControlAltCodeMap[KEY_LEFT]   = monControls.ORIGIN_X_MINUS;
+        keyControlAltCodeMap[KEY_RIGHT]  = monControls.ORIGIN_X_PLUS;
 
-        keyShiftCodeMap[KEY_CART_PASTE_INS] = Monitor.Controls.LOAD_CARTRIDGE_PASTE;
-        keyControlCodeMap[KEY_CART_PASTE_V] = Monitor.Controls.LOAD_CARTRIDGE_PASTE;
+        keyShiftControlCodeMap[KEY_UP]    = monControls.HEIGHT_MINUS;
+        keyShiftControlCodeMap[KEY_DOWN]  = monControls.HEIGHT_PLUS;
+        keyShiftControlCodeMap[KEY_LEFT]  = monControls.WIDTH_MINUS;
+        keyShiftControlCodeMap[KEY_RIGHT] = monControls.WIDTH_PLUS;
 
-        keyCodeMap[KEY_SIZE_DEFAULT] = Monitor.Controls.SIZE_DEFAULT;
+        keyShiftCodeMap[KEY_CART_PASTE_INS] = monControls.LOAD_CARTRIDGE_PASTE;
+        keyControlCodeMap[KEY_CART_PASTE_V] = monControls.LOAD_CARTRIDGE_PASTE;
+
+        keyCodeMap[KEY_SIZE_DEFAULT] = monControls.SIZE_DEFAULT;
     };
 
 
@@ -98,27 +100,27 @@ function DOMMonitorControls(monitor) {
     var keyControlAltCodeMap = {};
 
 
-    var KEY_LEFT           = KeyCodes.VK_LEFT;
-    var KEY_UP             = KeyCodes.VK_UP;
-    var KEY_RIGHT          = KeyCodes.VK_RIGHT;
-    var KEY_DOWN           = KeyCodes.VK_DOWN;
+    var KEY_LEFT           = JavatariCode.Keys.VK_LEFT.c;
+    var KEY_UP             = JavatariCode.Keys.VK_UP.c;
+    var KEY_RIGHT          = JavatariCode.Keys.VK_RIGHT.c;
+    var KEY_DOWN           = JavatariCode.Keys.VK_DOWN.c;
 
-    var KEY_SIZE_DEFAULT   = KeyCodes.VK_BACK_SPACE;
+    var KEY_SIZE_DEFAULT   = JavatariCode.Keys.VK_BACK_SPACE.c;
 
-    var KEY_CART_FILE      = KeyCodes.VK_F5;
-    var KEY_CART_URL       = KeyCodes.VK_F6;
-    var KEY_CART_PASTE_V   = KeyCodes.VK_V;
-    var KEY_CART_PASTE_INS = KeyCodes.VK_INSERT;
+    var KEY_CART_FILE      = JavatariCode.Keys.VK_F5.c;
+    var KEY_CART_URL       = JavatariCode.Keys.VK_F6.c;
+    var KEY_CART_PASTE_V   = JavatariCode.Keys.VK_V.c;
+    var KEY_CART_PASTE_INS = JavatariCode.Keys.VK_INSERT.c;
 
-    var KEY_CRT_FILTER     = KeyCodes.VK_T;
-    var KEY_CRT_MODES      = KeyCodes.VK_R;
+    var KEY_CRT_FILTER     = JavatariCode.Keys.VK_T.c;
+    var KEY_CRT_MODES      = JavatariCode.Keys.VK_R.c;
 
-    var KEY_DEBUG          = KeyCodes.VK_D;
-    var KEY_STATS          = KeyCodes.VK_G;
+    var KEY_DEBUG          = JavatariCode.Keys.VK_D.c;
+    var KEY_STATS          = JavatariCode.Keys.VK_G.c;
 
-    var KEY_FULLSCREEN     = KeyCodes.VK_ENTER;
+    var KEY_FULLSCREEN     = JavatariCode.Keys.VK_ENTER.c;
 
-    var KEY_EXIT           = KeyCodes.VK_ESCAPE;
+    var KEY_EXIT           = JavatariCode.Keys.VK_ESCAPE.c;
 
     var KEY_CTRL_MASK  = 1;
     var KEY_ALT_MASK   = 2;
@@ -127,4 +129,4 @@ function DOMMonitorControls(monitor) {
 
     init();
 
-}
+};

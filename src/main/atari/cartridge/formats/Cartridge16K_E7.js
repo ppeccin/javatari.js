@@ -2,7 +2,7 @@
 
 // Implements the 16K "E7" M-Network format
 
-function Cartridge16K_E7(rom, format) {
+JavatariCode.Cartridge16K_E7 = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -56,22 +56,22 @@ function Cartridge16K_E7(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset,
             rs: extraRAMSlice0Active,
             ro: extraRAMSlice1Offset,
-            ra: btoa(Util.uInt8ArrayToByteString(extraRAM))
+            ra: btoa(JavatariCode.Util.uInt8ArrayToByteString(extraRAM))
         };
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.f];
-        this.rom = ROM.loadState(state.r);
-        bytes = Util.byteStringToUInt8Array(atob(state.b));
+        this.format = JavatariCode.CartridgeFormats[state.f];
+        this.rom = JavatariCode.ROM.loadState(state.r);
+        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
         extraRAMSlice0Active = state.rs;
         extraRAMSlice1Offset = state.ro;
-        extraRAM = Util.byteStringToUInt8Array(atob(state.ra));
+        extraRAM = JavatariCode.Util.byteStringToUInt8Array(atob(state.ra));
     };
 
 
@@ -80,7 +80,7 @@ function Cartridge16K_E7(rom, format) {
 
     var EXTRA_RAM_SLICE1_START = 1024;
 
-    var extraRAM = Util.arrayFill(new Array(2048), 0);
+    var extraRAM = JavatariCode.Util.arrayFill(new Array(2048), 0);
     var extraRAMSlice0Active = false;
     var extraRAMSlice1Offset = EXTRA_RAM_SLICE1_START;
 
@@ -94,12 +94,12 @@ function Cartridge16K_E7(rom, format) {
 
     if (rom) init(this);
 
-}
+};
 
-Cartridge16K_E7.prototype = Cartridge.base;
+JavatariCode.Cartridge16K_E7.prototype = JavatariCode.Cartridge.base;
 
-Cartridge16K_E7.createFromSaveState = function(state) {
-    var cart = new Cartridge16K_E7();
+JavatariCode.Cartridge16K_E7.createFromSaveState = function(state) {
+    var cart = new JavatariCode.Cartridge16K_E7();
     cart.loadState(state);
     return cart;
 };

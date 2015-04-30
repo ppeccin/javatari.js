@@ -1,11 +1,11 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function ROM(source, content, info) {
+JavatariCode.ROM = function(source, content, info) {
 
     this.source = source;
     this.content = content;
     if (info) this.info = info;
-    else this.info = CartridgeDatabase.produceInfo(this);
+    else this.info = JavatariCode.CartridgeDatabase.produceInfo(this);
 
 
     // Savestate  -------------------------------------------
@@ -18,8 +18,8 @@ function ROM(source, content, info) {
         };
     };
 
-}
+};
 
-ROM.loadState = function(state) {
-    return new ROM(state.s, null, state.i);
+JavatariCode.ROM.loadState = function(state) {
+    return new JavatariCode.ROM(state.s, null, state.i);
 };

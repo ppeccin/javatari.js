@@ -1,12 +1,12 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function Monitor() {
+JavatariCode.Monitor = function() {
 
     function init(self) {
         prepareResources();
-        adjustToVideoStandard(VideoStandard.NTSC);
+        adjustToVideoStandard(JavatariCode.VideoStandard.NTSC);
         setDisplayDefaultSize();
-        controls = new DOMMonitorControls(self);
+        controls = new JavatariCode.DOMMonitorControls(self);
     }
 
     this.connectDisplay = function(monitorDisplay) {
@@ -40,7 +40,7 @@ function Monitor() {
         if (line < signalHeight) {
             // Copy only contents that will be displayed
             if (line >= displayOriginY && line < displayOriginY + displayHeight)
-                Util.arrayCopy(pixels, displayOriginX, backBuffer, (line - displayOriginY) * signalWidth, displayWidth);
+                JavatariCode.Util.arrayCopy(pixels, displayOriginX, backBuffer, (line - displayOriginY) * signalWidth, displayWidth);
         } else
             vSynched = maxLineExceeded();
         line++;
@@ -130,7 +130,7 @@ function Monitor() {
     };
 
     var videoStandardDetectionFinish = function(linesCount) {
-        videoStandardDetected = linesCount < 290 ? VideoStandard.NTSC : VideoStandard.PAL;
+        videoStandardDetected = linesCount < 290 ? JavatariCode.VideoStandard.NTSC : JavatariCode.VideoStandard.PAL;
 
         // Compute an additional number of lines to make the display bigger, if needed
         // Only used when the detected number of lines per frame is bigger than standard by a reasonable amount
@@ -256,8 +256,8 @@ function Monitor() {
 
     var prepareResources = function() {
         offCanvas = document.createElement('canvas');
-        offCanvas.width = VideoStandard.PAL.width;
-        offCanvas.height = VideoStandard.PAL.height;
+        offCanvas.width = JavatariCode.VideoStandard.PAL.width;
+        offCanvas.height = JavatariCode.VideoStandard.PAL.height;
         offContext = offCanvas.getContext("2d");
         offImageData = offContext.getImageData(0, 0, offCanvas.width, offCanvas.height);
         backBuffer = new Uint32Array(offImageData.data.buffer);
@@ -265,7 +265,7 @@ function Monitor() {
 
     var cleanBackBuffer = function() {
         // Put a nice green for detection of undrawn lines, for debug purposes
-        Util.arrayFill(backBuffer, 0xff00ff00);
+        JavatariCode.Util.arrayFill(backBuffer, 0xff00ff00);
     };
 
     var cartridgeChangeDisabledWarning = function() {
@@ -279,70 +279,72 @@ function Monitor() {
 
     // Controls Interface  -----------------------------------------
 
+    var monControls = JavatariCode.Monitor.Controls;
+
     this.controlActivated = function(control) {
         // All controls are Press-only and repeatable
         switch(control) {
-            case Monitor.Controls.LOAD_CARTRIDGE_FILE:
+            case monControls.LOAD_CARTRIDGE_FILE:
                 if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog(true);
                 break;
-            case Monitor.Controls.LOAD_CARTRIDGE_FILE_NO_AUTO_POWER:
+            case monControls.LOAD_CARTRIDGE_FILE_NO_AUTO_POWER:
                 if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog(false);
                 break;
-            case Monitor.Controls.LOAD_CARTRIDGE_URL:
+            case monControls.LOAD_CARTRIDGE_URL:
                 if (!cartridgeChangeDisabledWarning()) romLoader.openURLChooserDialog(true);
                 break;
-            case Monitor.Controls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER:
+            case monControls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER:
                 if (!cartridgeChangeDisabledWarning()) romLoader.openURLChooserDialog(false);
                 break;
-            case Monitor.Controls.LOAD_CARTRIDGE_PASTE:
+            case monControls.LOAD_CARTRIDGE_PASTE:
                 if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog();
                 break;
-            case Monitor.Controls.CRT_MODES:
+            case monControls.CRT_MODES:
                 crtModeToggle(); break;
-            case Monitor.Controls.CRT_FILTER:
+            case monControls.CRT_FILTER:
                 display.toggleCRTFilter(); break;
-            case Monitor.Controls.STATS:
+            case monControls.STATS:
                 showStats = !showStats; display.showOSD(null, true); break;
-            case Monitor.Controls.DEBUG:
+            case monControls.DEBUG:
                 debug++;
                 if (debug > 4) debug = 0;
                 break;
-            case Monitor.Controls.ORIGIN_X_MINUS:
+            case monControls.ORIGIN_X_MINUS:
                 setDisplayOrigin(displayOriginX + 1, displayOriginYPct); break;
-            case Monitor.Controls.ORIGIN_X_PLUS:
+            case monControls.ORIGIN_X_PLUS:
                 setDisplayOrigin(displayOriginX - 1, displayOriginYPct); break;
-            case Monitor.Controls.ORIGIN_Y_MINUS:
+            case monControls.ORIGIN_Y_MINUS:
                 setDisplayOrigin(displayOriginX, displayOriginYPct + 0.5); break;
-            case Monitor.Controls.ORIGIN_Y_PLUS:
+            case monControls.ORIGIN_Y_PLUS:
                 setDisplayOrigin(displayOriginX, displayOriginYPct - 0.5); break;
-            case Monitor.Controls.SIZE_DEFAULT:
+            case monControls.SIZE_DEFAULT:
                 setDisplayDefaultSize(); break;
-            case Monitor.Controls.FULLSCREEN:
+            case monControls.FULLSCREEN:
                 toggleFullscreen(); break;
-            case Monitor.Controls.EXIT:
+            case monControls.EXIT:
                 exit(); break;
         }
         if (fixedSizeMode) return;
         switch(control) {
-            case Monitor.Controls.WIDTH_MINUS:
+            case monControls.WIDTH_MINUS:
                 setDisplaySize(displayWidth - 1, displayHeightPct); break;
-            case Monitor.Controls.WIDTH_PLUS:
+            case monControls.WIDTH_PLUS:
                 setDisplaySize(displayWidth + 1, displayHeightPct); break;
-            case Monitor.Controls.HEIGHT_MINUS:
+            case monControls.HEIGHT_MINUS:
                 setDisplaySize(displayWidth, displayHeightPct - 0.5); break;
-            case Monitor.Controls.HEIGHT_PLUS:
+            case monControls.HEIGHT_PLUS:
                 setDisplaySize(displayWidth, displayHeightPct + 0.5); break;
-            case Monitor.Controls.SCALE_X_MINUS:
+            case monControls.SCALE_X_MINUS:
                 setDisplayScale(displayScaleX - 0.5, displayScaleY); break;
-            case Monitor.Controls.SCALE_X_PLUS:
+            case monControls.SCALE_X_PLUS:
                 setDisplayScale(displayScaleX + 0.5, displayScaleY); break;
-            case Monitor.Controls.SCALE_Y_MINUS:
+            case monControls.SCALE_Y_MINUS:
                 setDisplayScale(displayScaleX, displayScaleY - 0.5); break;
-            case Monitor.Controls.SCALE_Y_PLUS:
+            case monControls.SCALE_Y_PLUS:
                 setDisplayScale(displayScaleX, displayScaleY + 0.5); break;
-            case Monitor.Controls.SIZE_MINUS:
+            case monControls.SIZE_MINUS:
                 setDisplayScaleDefaultAspect(displayScaleY - 1); break;
-            case Monitor.Controls.SIZE_PLUS:
+            case monControls.SIZE_PLUS:
                 setDisplayScaleDefaultAspect(displayScaleY + 1); break;
         }
     };
@@ -403,9 +405,9 @@ function Monitor() {
 
     init(this);
 
-}
+};
 
-Monitor.Controls = {
+JavatariCode.Monitor.Controls = {
     WIDTH_PLUS: 1, HEIGHT_PLUS: 2,
     WIDTH_MINUS: 3, HEIGHT_MINUS: 4,
     ORIGIN_X_PLUS: 5, ORIGIN_Y_PLUS: 6,

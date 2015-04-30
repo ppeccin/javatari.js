@@ -2,7 +2,7 @@
 
 // Implements the 8K "FE" Robotank/Decathlon format
 
-function Cartridge8K_FE(rom, format) {
+JavatariCode.Cartridge8K_FE = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -37,15 +37,15 @@ function Cartridge8K_FE(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
             bo: bankAddressOffset
         };
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.f];
-        this.rom = ROM.loadState(state.r);
-        bytes = Util.byteStringToUInt8Array(atob(state.b));
+        this.format = JavatariCode.CartridgeFormats[state.f];
+        this.rom = JavatariCode.ROM.loadState(state.r);
+        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
         bankAddressOffset = state.bo;
     };
 
@@ -59,12 +59,12 @@ function Cartridge8K_FE(rom, format) {
 
     if (rom) init(this);
 
-}
+};
 
-Cartridge8K_FE.prototype = Cartridge.base;
+JavatariCode.Cartridge8K_FE.prototype = JavatariCode.Cartridge.base;
 
-Cartridge8K_FE.createFromSaveState = function(state) {
-    var cart = new Cartridge8K_FE();
+JavatariCode.Cartridge8K_FE.createFromSaveState = function(state) {
+    var cart = new JavatariCode.Cartridge8K_FE();
     cart.loadState(state);
     return cart;
 };

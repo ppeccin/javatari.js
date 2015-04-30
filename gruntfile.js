@@ -22,7 +22,7 @@ module.exports = function (grunt) {
                 src: [
                     "src/main/util/MD5.js",
                     "src/main/util/Util.js",
-                    "src/main/util/jszip.min.js",
+                    "src/main/util/ZIP.js",
                     "src/main/atari/cpu/M6502.js",
                     "src/main/atari/pia/Ram.js",
                     "src/main/atari/pia/Pia.js",
@@ -57,7 +57,7 @@ module.exports = function (grunt) {
                     "src/main/atari/cartridge/formats/Cartridge8K_UA.js",
                     "src/main/atari/cartridge/CartridgeFormats.js",
                     "src/main/atari/cartridge/CartridgeDatabase.js",
-                    "src/main/room/controls/KeysInfo.js",
+                    "src/main/room/controls/Keys.js",
                     "src/main/room/Preferences.js",
                     "src/main/room/controls/GamepadConsoleControls.js",
                     "src/main/room/controls/DOMConsoleControls.js",

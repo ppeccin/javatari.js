@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function Settings() {
+JavatariCode.Settings = function() {
     var self = this;
 
     this.show = function (page) {
@@ -50,17 +50,17 @@ function Settings() {
     var create = function () {
         var styles = document.createElement('style');
         styles.type = 'text/css';
-        styles.innerHTML = Settings.css();
+        styles.innerHTML = SettingsGUI.css();
         document.head.appendChild(styles);
 
         self.panel = document.createElement("div");
-        self.panel.innerHTML = Settings.html();
+        self.panel.innerHTML = SettingsGUI.html();
         self.panel.style.outline = "none";
         self.panel.tabIndex = -1;
         document.body.appendChild(self.panel);
 
-        delete Settings.html;
-        delete Settings.css;
+        delete SettingsGUI.html;
+        delete SettingsGUI.css;
 
         setFields();
         setEvents();
@@ -147,7 +147,7 @@ function Settings() {
             (function(keyLocal) {
                 self[controlsCommandKeys[key]].addEventListener("mousedown", function (e) {
                     e.preventDefault();
-                    Javatari.room.controls.processKeyEvent(keyLocal, true, DOMConsoleControls.KEY_ALT_MASK);
+                    Javatari.room.controls.processKeyEvent(keyLocal, true, JavatariCode.DOMConsoleControls.KEY_ALT_MASK);
                     keyRedefinitonStop();   // will refresh
                 });
             })(key | 0);    // must be a number to simulate a keyCode
@@ -179,7 +179,7 @@ function Settings() {
                 self[control].innerHTML = "?";
             } else {
                 self[control].classList.remove("redefining");
-                self[control].innerHTML = KeyNames[Javatari.preferences[controlKeys[control]]];
+                self[control].innerHTML = JavatariCode.KeysByCode[Javatari.preferences[controlKeys[control]]].n;
             }
         }
     };
@@ -208,7 +208,7 @@ function Settings() {
 
     var keyRedefinitionTry = function (keyCode) {
         if (!controlRedefining) return;
-        if (!KeyNames[keyCode]) return;
+        if (!JavatariCode.KeysByCode[keyCode]) return;
         preferencesChanged = true;
         Javatari.preferences[controlKeys[controlRedefining]] = keyCode;
         keyRedefinitonStop();
@@ -255,13 +255,13 @@ function Settings() {
     var controlRedefining = null;
 
     var controlsCommandKeys = {};
-        controlsCommandKeys[DOMConsoleControls.KEY_TOGGLE_P1_MODE] = "controls-swap-keys";
-        controlsCommandKeys[DOMConsoleControls.KEY_TOGGLE_JOYSTICK] = "controls-swap-gamepads";
-        controlsCommandKeys[DOMConsoleControls.KEY_TOGGLE_PADDLE] = "controls-toggle-paddles";
+        controlsCommandKeys[JavatariCode.DOMConsoleControls.KEY_TOGGLE_P1_MODE] = "controls-swap-keys";
+        controlsCommandKeys[JavatariCode.DOMConsoleControls.KEY_TOGGLE_JOYSTICK] = "controls-swap-gamepads";
+        controlsCommandKeys[JavatariCode.DOMConsoleControls.KEY_TOGGLE_PADDLE] = "controls-toggle-paddles";
 
     var preferencesChanged = false;
 
     var KEY_ESC = 27;        // VK_ESC
 
-}
+};
 

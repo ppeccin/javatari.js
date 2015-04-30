@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function LocalStorageSaveStateMedia() {
+JavatariCode.LocalStorageSaveStateMedia = function() {
 
     this.connect = function(socket) {
         socket.connectMedia(this);
@@ -72,7 +72,7 @@ function LocalStorageSaveStateMedia() {
         try {
             var id;
             if (data instanceof Array)
-                id = Util.uInt8ArrayToByteString(data.slice(0, SAVE_STATE_IDENTIFIER.length));
+                id = JavatariCode.Util.uInt8ArrayToByteString(data.slice(0, SAVE_STATE_IDENTIFIER.length));
             else
                 id = data.substr(0, SAVE_STATE_IDENTIFIER.length);
 
@@ -81,7 +81,7 @@ function LocalStorageSaveStateMedia() {
 
             var stateData = data.slice(SAVE_STATE_IDENTIFIER.length);
             if (stateData instanceof Array)
-                stateData = Util.uInt8ArrayToByteString(stateData);
+                stateData = JavatariCode.Util.uInt8ArrayToByteString(stateData);
 
             return stateData && JSON.parse(stateData);
         } catch(e) {
@@ -117,4 +117,4 @@ function LocalStorageSaveStateMedia() {
     var SAVE_STATE_IDENTIFIER = "javatarijsstate!";
     var SAVE_STATE_FILE_EXTENSION = ".jst";
 
-}
+};

@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function CanvasDisplay(mainElement) {
+JavatariCode.CanvasDisplay = function(mainElement) {
 
     function init(self) {
         setupProperties();
@@ -9,7 +9,7 @@ function CanvasDisplay(mainElement) {
         setupButtonsBar();
         loadImages();
         context = canvas.getContext("2d");
-        monitor = new Monitor();
+        monitor = new JavatariCode.Monitor();
         monitor.connectDisplay(self);
         monitor.addControlInputElements(self.keyControlsInputElements());
     }
@@ -145,8 +145,8 @@ function CanvasDisplay(mainElement) {
     };
 
     this.exit = function() {
-        controlsSocket.controlStateChanged(ConsoleControls.POWER_OFF, true);
-        monitor.controlActivated(Monitor.Controls.SIZE_DEFAULT);
+        controlsSocket.controlStateChanged(JavatariCode.ConsoleControls.POWER_OFF, true);
+        monitor.controlActivated(JavatariCode.Monitor.Controls.SIZE_DEFAULT);
     };
 
     this.focus = function() {
@@ -154,18 +154,18 @@ function CanvasDisplay(mainElement) {
     };
 
     var openSettings = function(page) {
-        if (!settings) settings = new Settings();
+        if (!settings) settings = new JavatariCode.Settings();
         settings.show(page);
     };
 
     var fullScreenChanged = function() {
         var fse = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
         isFullscreen = !!fse;
-        monitor.controlActivated(Monitor.Controls.SIZE_DEFAULT);
+        monitor.controlActivated(JavatariCode.Monitor.Controls.SIZE_DEFAULT);
         // Schedule another one to give the browser some time to set full screen properly
         if (isFullscreen)
             setTimeout(function() {
-                monitor.controlActivated(Monitor.Controls.SIZE_DEFAULT);
+                monitor.controlActivated(JavatariCode.Monitor.Controls.SIZE_DEFAULT);
             }, 120);
     };
 
@@ -250,7 +250,7 @@ function CanvasDisplay(mainElement) {
         canvas.style.outline = "none";
         fsElement.appendChild(canvas);
 
-        setElementsSizes(CanvasDisplay.DEFAULT_STARTING_WIDTH, CanvasDisplay.DEFAULT_STARTING_HEIGHT);
+        setElementsSizes(JavatariCode.CanvasDisplay.DEFAULT_STARTING_WIDTH, JavatariCode.CanvasDisplay.DEFAULT_STARTING_HEIGHT);
 
         mainElement.appendChild(borderElement);
     };
@@ -284,18 +284,18 @@ function CanvasDisplay(mainElement) {
         }
 
         powerButton  = addBarButton(6, -26, 24, 23, -436, -208);
-        consoleControlButton(powerButton, ConsoleControls.POWER);
+        consoleControlButton(powerButton, JavatariCode.ConsoleControls.POWER);
         var fsGap = 23;
         if (!Javatari.SCREEN_FULLSCREEN_DISABLED) {
             fullscreenButton = addBarButton(-53, -26, 24, 22, -387, -209);
-            screenControlButton(fullscreenButton, Monitor.Controls.FULLSCREEN);
+            screenControlButton(fullscreenButton, JavatariCode.Monitor.Controls.FULLSCREEN);
             fsGap = 0;
         }
         if (!Javatari.SCREEN_RESIZE_DISABLED) {
             scaleDownButton = addBarButton(-92 + fsGap, -26, 18, 22, -342, -209);
-            screenControlButton(scaleDownButton, Monitor.Controls.SIZE_MINUS);
+            screenControlButton(scaleDownButton, JavatariCode.Monitor.Controls.SIZE_MINUS);
             scaleUpButton = addBarButton(-74 + fsGap, -26, 21, 22, -364, -209);
-            screenControlButton(scaleUpButton, Monitor.Controls.SIZE_PLUS);
+            screenControlButton(scaleUpButton, JavatariCode.Monitor.Controls.SIZE_PLUS);
         }
 
         settingsButton  = addBarButton(-29, -26, 24, 22, -412, -209);
@@ -444,7 +444,7 @@ function CanvasDisplay(mainElement) {
 
     init(this);
 
-}
+};
 
-CanvasDisplay.DEFAULT_STARTING_WIDTH = 640;
-CanvasDisplay.DEFAULT_STARTING_HEIGHT = 426;
+JavatariCode.CanvasDisplay.DEFAULT_STARTING_WIDTH = 640;
+JavatariCode.CanvasDisplay.DEFAULT_STARTING_HEIGHT = 426;

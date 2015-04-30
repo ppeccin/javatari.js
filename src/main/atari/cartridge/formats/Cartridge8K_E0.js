@@ -2,7 +2,7 @@
 
 // Implements the 8K "E0" Parker Bros. format
 
-function Cartridge8K_E0(rom, format) {
+JavatariCode.Cartridge8K_E0 = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -50,7 +50,7 @@ function Cartridge8K_E0(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(Util.uInt8ArrayToByteString(bytes)),
+            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes)),
             s0: slice0AddressOffset,
             s1: slice1AddressOffset,
             s2: slice2AddressOffset
@@ -58,9 +58,9 @@ function Cartridge8K_E0(rom, format) {
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.f];
-        this.rom = ROM.loadState(state.r);
-        bytes = Util.byteStringToUInt8Array(atob(state.b));
+        this.format = JavatariCode.CartridgeFormats[state.f];
+        this.rom = JavatariCode.ROM.loadState(state.r);
+        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
         slice0AddressOffset = state.s0;
         slice1AddressOffset = state.s1;
         slice2AddressOffset = state.s2;
@@ -79,12 +79,12 @@ function Cartridge8K_E0(rom, format) {
 
     if (rom) init(this);
 
-}
+};
 
-Cartridge8K_E0.prototype = Cartridge.base;
+JavatariCode.Cartridge8K_E0.prototype = JavatariCode.Cartridge.base;
 
-Cartridge8K_E0.createFromSaveState = function(state) {
-    var cart = new Cartridge8K_E0();
+JavatariCode.Cartridge8K_E0.createFromSaveState = function(state) {
+    var cart = new JavatariCode.Cartridge8K_E0();
     cart.loadState(state);
     return cart;
 };

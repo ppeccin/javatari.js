@@ -13,7 +13,7 @@ Javatari.start = function () {
     if (!Javatari.consolePanelElement)
         Javatari.consolePanelElement = document.getElementById(Javatari.CONSOLE_PANEL_ELEMENT_ID);
     // Build and start emulator
-    Javatari.room = new Room(Javatari.screenElement, Javatari.consolePanelElement);
+    Javatari.room = new JavatariCode.Room(Javatari.screenElement, Javatari.consolePanelElement);
     Javatari.room.powerOn();
     // Auto-load ROM if specified
     if (Javatari.ROM_AUTO_LOAD_URL)
@@ -21,7 +21,7 @@ Javatari.start = function () {
 
     Javatari.shutdown = function () {
         if (Javatari.room) Javatari.room.powerOff();
-        Util.log("shutdown");
+        JavatariCode.Util.log("shutdown");
         delete Javatari;
     };
 
@@ -29,7 +29,7 @@ Javatari.start = function () {
     delete Javatari.start;
     delete Javatari.preLoadImagesAndStart;
 
-    Util.log("started");
+    JavatariCode.Util.log("started");
 };
 
 

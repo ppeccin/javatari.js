@@ -2,7 +2,9 @@
 
 // HTML and CSS data for Settings
 
-Settings.html = function() {
+SettingsGUI = {};
+
+SettingsGUI.html = function() {
     return '<div id="cover">' +
         '<div id="modal">' +
         '<div id="menu">' +
@@ -492,7 +494,7 @@ Settings.html = function() {
         '</div>';
 };
 
-Settings.css = function() {
+SettingsGUI.css = function() {
     return '#cover {' +
         'position: fixed;' +
         'top: 0;' +

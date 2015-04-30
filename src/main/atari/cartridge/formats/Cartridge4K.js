@@ -2,7 +2,7 @@
 
 // Implements the 4K unbanked format. Smaller ROMs will be copied multiple times to fill the entire 4K
 
-function Cartridge4K(rom, format) {
+JavatariCode.Cartridge4K = function(rom, format) {
 
     function init(self) {
         self.rom = rom;
@@ -11,7 +11,7 @@ function Cartridge4K(rom, format) {
         bytes = new Array(4096);
         var len = rom.content.length;
         for (var pos = 0; pos < bytes.length; pos += len)
-            Util.arrayCopy(rom.content, 0, bytes, pos, len);
+            JavatariCode.Util.arrayCopy(rom.content, 0, bytes, pos, len);
     }
 
     this.read = function(address) {
@@ -25,14 +25,14 @@ function Cartridge4K(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(Util.uInt8ArrayToByteString(bytes))
+            b: btoa(JavatariCode.Util.uInt8ArrayToByteString(bytes))
         };
     };
 
     this.loadState = function(state) {
-        this.format = CartridgeFormats[state.f];
-        this.rom = ROM.loadState(state.r);
-        bytes = Util.byteStringToUInt8Array(atob(state.b));
+        this.format = JavatariCode.CartridgeFormats[state.f];
+        this.rom = JavatariCode.ROM.loadState(state.r);
+        bytes = JavatariCode.Util.byteStringToUInt8Array(atob(state.b));
     };
 
 
@@ -43,12 +43,12 @@ function Cartridge4K(rom, format) {
 
     if (rom) init(this);
 
-}
+};
 
-Cartridge4K.prototype = Cartridge.base;
+JavatariCode.Cartridge4K.prototype = JavatariCode.Cartridge.base;
 
-Cartridge4K.createFromSaveState = function(state) {
-    var cart = new Cartridge4K();
+JavatariCode.Cartridge4K.createFromSaveState = function(state) {
+    var cart = new JavatariCode.Cartridge4K();
     cart.loadState(state);
     return cart;
 };

@@ -37,15 +37,15 @@ function readFile(file) {
 function startEmulator(rom) {
 
     if (rom.length < 65535) {
-        var cart = new Cartridge4K(rom);
-        R = new Room(cart);
+        var cart = new JavatariCode.Cartridge4K(rom);
+        R = new JavatariCode.Room(cart);
         R.console.cpu.DEBUG = true;
         return R;
     }
 
     var ram = Array.prototype.slice.call(rom);
-    var cpu = new M6502();
-    cpu.connectBus(new Ram64K(ram));
+    var cpu = new JavatariCode.M6502();
+    cpu.connectBus(new JavatariCode.Ram64K(ram));
     cpu.reset();
 
     CPU = cpu;

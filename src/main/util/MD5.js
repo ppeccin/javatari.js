@@ -1,63 +1,4 @@
-/*
- Javascript MD5 library - version 0.4
-
- Coded (2011) by Luigi Galli - LG@4e71.org - http://faultylabs.com
-
- Thanks to: Roberto Viola
-
- The below code is PUBLIC DOMAIN - NO WARRANTY!
-
- Changelog: 
-            Version 0.4   - 2011-06-19
-            + added compact version (md5_compact_min.js), this is a slower but smaller version 
-              (more than 4KB lighter before stripping/minification)
-            + added preliminary support for Typed Arrays (see: 
-              https://developer.mozilla.org/en/JavaScript_typed_arrays and 
-              http://www.khronos.org/registry/typedarray/specs/latest/)
-              MD5() now accepts input data as ArrayBuffer, Float32Array, Float64Array, 
-              Int16Array, Int32Array, Int8Array, Uint16Array, Uint32Array or Uint8Array 
-            - moved unit tests to md5_test.js
-            - minor refactoring 
-
-            Version 0.3.* - 2011-06-##
-            - Internal dev versions
-
-            Version 0.2 - 2011-05-22 
-            ** FIXED: serious integer overflow problems which could cause a wrong MD5 hash being returned
-
-            Version 0.1 - 2011
-            -Initial version
-*/
-
-if (typeof faultylabs == 'undefined') {
-    faultylabs = {}
-}
-
-/*
-   MD5()
-
-    Computes the MD5 hash for the given input data
-
-    input :  data as String - (Assumes Unicode code points are encoded as UTF-8. If you 
-                               attempt to digest Unicode strings using other encodings 
-                               you will get incorrect results!)
-
-             data as array of characters - (Assumes Unicode code points are encoded as UTF-8. If you 
-                              attempt to digest Unicode strings using other encodings 
-                              you will get incorrect results!)
-
-             data as array of bytes (plain javascript array of integer numbers)
-
-             data as ArrayBuffer (see: https://developer.mozilla.org/en/JavaScript_typed_arrays)
-            
-             data as Float32Array, Float64Array, Int16Array, Int32Array, Int8Array, Uint16Array, Uint32Array or Uint8Array (see: https://developer.mozilla.org/en/JavaScript_typed_arrays)
-             
-             (DataView is not supported yet)
-
-   output: MD5 hash (as Hex Uppercase String)
-*/
-
-faultylabs.MD5 = function(data) {
+JavatariCode.MD5 = function(data) {
 
     // convert number to (unsigned) 32 bit hex, zero filled string
     function to_zerofilled_hex(n) {     
@@ -347,6 +288,5 @@ faultylabs.MD5 = function(data) {
         return int128le_to_hex(h3, h2, h1, h0).toUpperCase()
     }
     
-    
-}
+};
 

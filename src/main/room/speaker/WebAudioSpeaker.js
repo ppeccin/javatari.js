@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function Speaker() {
+JavatariCode.WebAudioSpeaker = function() {
 
     this.connect = function(pAudioSignal) {
         audioSignal = pAudioSignal;
@@ -26,11 +26,11 @@ function Speaker() {
             var constr = (window.AudioContext || window.webkitAudioContext || window.WebkitAudioContext);
             if (!constr) throw new Error("WebAudio API not supported by the browser");
             audioContext = new constr();
-            resamplingFactor = TiaAudioSignal.SAMPLE_RATE / audioContext.sampleRate;
+            resamplingFactor = JavatariCode.TiaAudioSignal.SAMPLE_RATE / audioContext.sampleRate;
             //Util.log("Speaker AudioContext created. Sample rate: " + audioContext.sampleRate);
             //Util.log("Audio resampling factor: " + (1/resamplingFactor));
         } catch(e) {
-            Util.log("Could not create AudioContext. Audio disabled.\n" + e.message);
+            JavatariCode.Util.log("Could not create AudioContext. Audio disabled.\n" + e.message);
         }
     };
 
@@ -41,7 +41,7 @@ function Speaker() {
         var outputBuffer = event.outputBuffer.getChannelData(0);
         var input = audioSignal.retrieveSamples((outputBuffer.length * resamplingFactor) | 0);
 
-        Util.arrayCopyCircularSourceWithStep(
+        JavatariCode.Util.arrayCopyCircularSourceWithStep(
             input.buffer, input.start, input.bufferSize, resamplingFactor,
             outputBuffer, 0, outputBuffer.length
         );
@@ -54,4 +54,4 @@ function Speaker() {
     var audioContext;
     var processor;
 
-}
+};

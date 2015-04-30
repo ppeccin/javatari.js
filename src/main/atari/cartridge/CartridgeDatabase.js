@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-function CartridgeDatabase() {
+JavatariCode.CartridgeDatabase = function() {
 
     this.createCartridgeFromRom = function(rom) {
         // Try to build the Cartridge if a supported format is found
@@ -9,12 +9,12 @@ function CartridgeDatabase() {
 
         // Choose the best option
         var bestOption = options[0];
-        Util.log("" + bestOption.name + ": " + bestOption.desc + ", priority: " + bestOption.priority + (bestOption.priorityBoosted ? " (" + bestOption.priorityBoosted + ")" : ""));
+        JavatariCode.Util.log("" + bestOption.name + ": " + bestOption.desc + ", priority: " + bestOption.priority + (bestOption.priorityBoosted ? " (" + bestOption.priorityBoosted + ")" : ""));
         return bestOption.createCartridgeFromRom(rom);
     };
 
     this.createCartridgeFromSaveState = function(saveState) {
-        var cartridgeFormat = CartridgeFormats[saveState.f];
+        var cartridgeFormat = JavatariCode.CartridgeFormats[saveState.f];
         if (!cartridgeFormat) {
             var ex = new Error ("Unsupported ROM Format: " + saveState.f);
             ex.javatari = true;
@@ -26,16 +26,16 @@ function CartridgeDatabase() {
     this.produceInfo = function(rom) {
         // Preserve original length as MD5 computation may increase it
         var origLen = rom.content.length;
-        var hash = faultylabs.MD5(rom.content);
+        var hash = JavatariCode.MD5(rom.content);
         if (rom.content.length > origLen) rom.content.splice(origLen);
 
         // Get info from the library
-        var info = CartridgeInfoLibrary[hash];
+        var info = JavatariCode.CartridgeInfoLibrary[hash];
         if (info) {
-            Util.log("" + info.n);
+            JavatariCode.Util.log("" + info.n);
         } else {
             info = buildInfo(rom.source);
-            Util.log("Unknown ROM: " + info.n);
+            JavatariCode.Util.log("Unknown ROM: " + info.n);
         }
 
         finishInfo(info, rom.source, hash);
@@ -46,9 +46,9 @@ function CartridgeDatabase() {
         var formatOptions = [];
         var formatOption;
         var denialEx;
-        for (var format in CartridgeFormats) {
+        for (var format in JavatariCode.CartridgeFormats) {
             try {
-                formatOption = CartridgeFormats[format].tryFormat(rom);
+                formatOption = JavatariCode.CartridgeFormats[format].tryFormat(rom);
                 if (!formatOption) continue;	    	    // rejected by format
                 boostPriority(formatOption, rom.info);	    // adjust priority based on ROM info
                 formatOptions.push(formatOption);
@@ -128,7 +128,7 @@ function CartridgeDatabase() {
         Format: if (!info.f) {
             // First by explicit format hint
             var romURL = romSource.toUpperCase();
-            for (var formatName in CartridgeFormats)
+            for (var formatName in JavatariCode.CartridgeFormats)
                 if (formatMatchesByHint(formatName, name) || formatMatchesByHint(formatName, romURL)) {
                     info.f = formatName;
                     break Format;
@@ -265,6 +265,6 @@ function CartridgeDatabase() {
 
     var FORMAT_PRIORITY_BOOST = 50;
 
-}
+};
 
-CartridgeDatabase = new CartridgeDatabase();
+JavatariCode.CartridgeDatabase = new JavatariCode.CartridgeDatabase();
