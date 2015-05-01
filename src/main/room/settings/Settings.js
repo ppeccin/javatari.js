@@ -15,19 +15,19 @@ jt.Settings = function() {
         controlRedefining = null;
         refreshData();
         if (page) this.setPage(page);
-        this["cover"].classList.add("show");
-        this["modal"].classList.add("show");
+        this["jt-cover"].classList.add("show");
+        this["jt-modal"].classList.add("show");
         this.panel.focus();
     };
 
     this.hide = function () {
         if (preferencesChanged) finishPreferences();
-        this["modal"].classList.remove("show");
-        this["cover"].classList.remove("show");
+        this["jt-modal"].classList.remove("show");
+        this["jt-cover"].classList.remove("show");
         Javatari.room.screen.focus();
     };
 
-    self.setPage = function (page) {
+    this.setPage = function (page) {
         var contentPosition = {
             "HELP": "0",
             "CONTROLS": "-560px",
@@ -39,12 +39,12 @@ jt.Settings = function() {
             "ABOUT": "66.6%"
         }[page];
 
-        if (contentPosition) self["content"].style.left = contentPosition;
-        if (selectionPosition) self["menu-selection"].style.left = selectionPosition;
+        if (contentPosition) self["jt-content"].style.left = contentPosition;
+        if (selectionPosition) self["jt-menu-selection"].style.left = selectionPosition;
 
-        self["menu-help"].classList[page === "HELP" ? "add" : "remove"]("selected");
-        self["menu-controls"].classList[page === "CONTROLS" ? "add" : "remove"]("selected");
-        self["menu-about"].classList[page === "ABOUT" ? "add" : "remove"]("selected");
+        self["jt-menu-help"].classList[page === "HELP" ? "add" : "remove"]("selected");
+        self["jt-menu-controls"].classList[page === "CONTROLS" ? "add" : "remove"]("selected");
+        self["jt-menu-about"].classList[page === "ABOUT" ? "add" : "remove"]("selected");
     };
 
     var create = function () {
@@ -89,12 +89,12 @@ jt.Settings = function() {
             self.hide();
         });
         // But do not close the modal with a click inside
-        self["modal"].addEventListener("mousedown", function (e) {
+        self["jt-modal"].addEventListener("mousedown", function (e) {
             e.stopPropagation();
             keyRedefinitonStop();
         });
         // Close with the back button
-        self["back"].addEventListener("mousedown", function (e) {
+        self["jt-back"].addEventListener("mousedown", function (e) {
             e.preventDefault();
             e.stopPropagation();
             self.hide();
@@ -108,15 +108,15 @@ jt.Settings = function() {
         });
 
         // Tabs
-        self["menu-help"].addEventListener("mousedown", function (e) {
+        self["jt-menu-help"].addEventListener("mousedown", function (e) {
             e.preventDefault();
             self.setPage("HELP");
         });
-        self["menu-controls"].addEventListener("mousedown", function (e) {
+        self["jt-menu-controls"].addEventListener("mousedown", function (e) {
             e.preventDefault();
             self.setPage("CONTROLS");
         });
-        self["menu-about"].addEventListener("mousedown", function (e) {
+        self["jt-menu-about"].addEventListener("mousedown", function (e) {
             e.preventDefault();
             self.setPage("ABOUT");
         });
@@ -133,11 +133,11 @@ jt.Settings = function() {
         }
 
         // Controls Actions
-        self["controls-defaults"].addEventListener("mousedown", function (e) {
+        self["jt-controls-defaults"].addEventListener("mousedown", function (e) {
             e.preventDefault();
             controlsDefaults();
         });
-        self["controls-revert"].addEventListener("mousedown", function (e) {
+        self["jt-controls-revert"].addEventListener("mousedown", function (e) {
             e.preventDefault();
             controlsRevert();
         });
@@ -155,31 +155,39 @@ jt.Settings = function() {
     };
 
     var refreshData = function () {
-        self["browserinfo"].innerHTML = navigator.userAgent;
+        self["jt-browserinfo"].innerHTML = navigator.userAgent;
 
         if (Javatari.room.controls.isPaddleMode()) {
-            self["control-p1-controller"].style.backgroundPositionY = "-91px";
-            self["control-p2-controller"].style.backgroundPositionY = "-91px";
-            self["control-p1-up-label"].innerHTML = self["control-p2-up-label"].innerHTML = "+ Speed";
-            self["control-p1-down-label"].innerHTML = self["control-p2-down-label"].innerHTML = "- Speed";
+            self["jt-control-p1-controller"].style.backgroundPositionY = "-91px";
+            self["jt-control-p2-controller"].style.backgroundPositionY = "-91px";
+            self["jt-control-p1-up-label"].innerHTML = self["jt-control-p2-up-label"].innerHTML = "+ Speed";
+            self["jt-control-p1-down-label"].innerHTML = self["jt-control-p2-down-label"].innerHTML = "- Speed";
         } else {
-            self["control-p1-controller"].style.backgroundPositionY = "0";
-            self["control-p2-controller"].style.backgroundPositionY = "0";
-            self["control-p1-up-label"].innerHTML = self["control-p2-up-label"].innerHTML = "Up";
-            self["control-p1-down-label"].innerHTML = self["control-p2-down-label"].innerHTML = "Down";
+            self["jt-control-p1-controller"].style.backgroundPositionY = "0";
+            self["jt-control-p2-controller"].style.backgroundPositionY = "0";
+            self["jt-control-p1-up-label"].innerHTML = self["jt-control-p2-up-label"].innerHTML = "Up";
+            self["jt-control-p1-down-label"].innerHTML = self["jt-control-p2-down-label"].innerHTML = "Down";
 
         }
         var swapped = Javatari.room.controls.isP1ControlsMode();
-        self["control-p1-label"].innerHTML = "Player " + (swapped ? "2" : "1");
-        self["control-p2-label"].innerHTML = "Player " + (swapped ? "1" : "2");
+        self["jt-control-p1-label"].innerHTML = "Player " + (swapped ? "2" : "1");
+        self["jt-control-p2-label"].innerHTML = "Player " + (swapped ? "1" : "2");
 
         for (var control in controlKeys) {
             if (control === controlRedefining) {
                 self[control].classList.add("redefining");
+                self[control].classList.remove("undefined");
                 self[control].innerHTML = "?";
             } else {
                 self[control].classList.remove("redefining");
-                self[control].innerHTML = jt.KeysByCode[Javatari.preferences[controlKeys[control]]].n;
+                var keyInfo = jt.KeysByCode[Javatari.preferences[controlKeys[control]]];
+                if (keyInfo) {
+                    self[control].classList.remove("undefined");
+                    self[control].innerHTML = keyInfo.n;
+                } else {
+                    self[control].classList.add("undefined");
+                    self[control].innerHTML = "-";
+                }
             }
         }
     };
@@ -209,8 +217,14 @@ jt.Settings = function() {
     var keyRedefinitionTry = function (keyCode) {
         if (!controlRedefining) return;
         if (!jt.KeysByCode[keyCode]) return;
-        preferencesChanged = true;
-        Javatari.preferences[controlKeys[controlRedefining]] = keyCode;
+        if (Javatari.preferences[controlKeys[controlRedefining]] !== keyCode) {
+            for (var con in controlKeys)
+                if (Javatari.preferences[controlKeys[con]] === keyCode)
+                    Javatari.preferences[controlKeys[con]] = -1;
+
+            Javatari.preferences[controlKeys[controlRedefining]] = keyCode;
+            preferencesChanged = true;
+        }
         keyRedefinitonStop();
     };
 
@@ -238,26 +252,26 @@ jt.Settings = function() {
     };
 
     var controlKeys = {
-        "control-p1-button1": "KP0BUT",
-        "control-p1-button2": "KP0BUT2",
-        "control-p1-up": "KP0UP",
-        "control-p1-left": "KP0LEFT",
-        "control-p1-right": "KP0RIGHT",
-        "control-p1-down": "KP0DOWN",
-        "control-p2-button1": "KP1BUT",
-        "control-p2-button2": "KP1BUT2",
-        "control-p2-up": "KP1UP",
-        "control-p2-left": "KP1LEFT",
-        "control-p2-right": "KP1RIGHT",
-        "control-p2-down": "KP1DOWN"
+        "jt-control-p1-button1": "KP0BUT",
+        "jt-control-p1-button2": "KP0BUT2",
+        "jt-control-p1-up": "KP0UP",
+        "jt-control-p1-left": "KP0LEFT",
+        "jt-control-p1-right": "KP0RIGHT",
+        "jt-control-p1-down": "KP0DOWN",
+        "jt-control-p2-button1": "KP1BUT",
+        "jt-control-p2-button2": "KP1BUT2",
+        "jt-control-p2-up": "KP1UP",
+        "jt-control-p2-left": "KP1LEFT",
+        "jt-control-p2-right": "KP1RIGHT",
+        "jt-control-p2-down": "KP1DOWN"
     };
 
     var controlRedefining = null;
 
     var controlsCommandKeys = {};
-        controlsCommandKeys[jt.DOMConsoleControls.KEY_TOGGLE_P1_MODE] = "controls-swap-keys";
-        controlsCommandKeys[jt.DOMConsoleControls.KEY_TOGGLE_JOYSTICK] = "controls-swap-gamepads";
-        controlsCommandKeys[jt.DOMConsoleControls.KEY_TOGGLE_PADDLE] = "controls-toggle-paddles";
+        controlsCommandKeys[jt.DOMConsoleControls.KEY_TOGGLE_P1_MODE] = "jt-controls-swap-keys";
+        controlsCommandKeys[jt.DOMConsoleControls.KEY_TOGGLE_JOYSTICK] = "jt-controls-swap-gamepads";
+        controlsCommandKeys[jt.DOMConsoleControls.KEY_TOGGLE_PADDLE] = "jt-controls-toggle-paddles";
 
     var preferencesChanged = false;
 

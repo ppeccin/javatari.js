@@ -5,11 +5,11 @@
 SettingsGUI = {};
 
 SettingsGUI.html = function() {
-    return '<div id="cover">' +
-        '<div id="modal">' +
-        '<div id="menu">' +
-        '<div id="back">' +
-        '<div id="back-arrow">' +
+    return '<div id="jt-cover">' +
+        '<div id="jt-modal">' +
+        '<div id="jt-menu">' +
+        '<div id="jt-back">' +
+        '<div id="jt-back-arrow">' +
         '&larr;' +
         '</div>' +
         '</div>' +
@@ -17,21 +17,21 @@ SettingsGUI.html = function() {
         'Settings' +
         '</div>' +
         '<div class="items">' +
-        '<div id="menu-help" class="item selected">' +
+        '<div id="jt-menu-help" class="item selected">' +
         'HELP' +
         '</div>' +
-        '<div id="menu-controls" class="item">' +
+        '<div id="jt-menu-controls" class="item">' +
         'CONTROLS' +
         '</div>' +
-        '<div id="menu-about" class="item">' +
+        '<div id="jt-menu-about" class="item">' +
         'ABOUT' +
         '</div>' +
-        '<div id="menu-selection">' +
+        '<div id="jt-menu-selection">' +
         '</div>' +
         '</div>' +
         '</div>' +
-        '<div id="content">' +
-        '<div id="help">' +
+        '<div id="jt-content">' +
+        '<div id="jt-help">' +
         '<div class="left">' +
         '<div class="hotkey">' +
         '<div class="command">' +
@@ -324,101 +324,101 @@ SettingsGUI.html = function() {
         '</div>' +
         '</div>' +
         '</div>' +
-        '<div id="controls">' +
+        '<div id="jt-controls">' +
         '<div class="player p1">' +
-        '<div id="control-p1-label" class="title">' +
+        '<div id="jt-control-p1-label" class="title">' +
         'Player 1' +
         '</div>' +
         '<div class="command fire1">' +
         'Button<br>' +
-        '<div id="control-p1-button1" class="key">' +
+        '<div id="jt-control-p1-button1" class="key">' +
         'Space' +
         '</div>' +
         '</div>' +
         '<div class="command up">' +
-        '<div id="control-p1-up-label">' +
+        '<div id="jt-control-p1-up-label">' +
         'Up' +
         '</div>' +
-        '<div id="control-p1-up" class="key">' +
+        '<div id="jt-control-p1-up" class="key">' +
         'Up' +
         '</div>' +
         '</div>' +
         '<div class="command fire2">' +
         'Button<br>' +
-        '<div id="control-p1-button2" class="key">' +
+        '<div id="jt-control-p1-button2" class="key">' +
         'Del' +
         '</div>' +
         '</div>' +
         '<div class="command left">' +
         'Left<br>' +
-        '<div id="control-p1-left" class="key">' +
+        '<div id="jt-control-p1-left" class="key">' +
         'Left' +
         '</div>' +
         '</div>' +
         '<div class="command controller">' +
-        '<div id="control-p1-controller">' +
+        '<div id="jt-control-p1-controller">' +
         '</div>' +
         '</div>' +
         '<div class="command right">' +
         'Right<br>' +
-        '<div id="control-p1-right" class="key">' +
+        '<div id="jt-control-p1-right" class="key">' +
         'Right' +
         '</div>' +
         '</div>' +
         '<div class="command down">' +
-        '<div id="control-p1-down-label">' +
+        '<div id="jt-control-p1-down-label">' +
         'Down' +
         '</div>' +
-        '<div id="control-p1-down" class="key">' +
+        '<div id="jt-control-p1-down" class="key">' +
         'Down' +
         '</div>' +
         '</div>' +
         '</div>' +
         '<div class="player p2">' +
-        '<div id="control-p2-label" class="title">' +
+        '<div id="jt-control-p2-label" class="title">' +
         'Player 2' +
         '</div>' +
         '<div class="command fire1">' +
         'Button<br>' +
-        '<div id="control-p2-button1" class="key">' +
+        '<div id="jt-control-p2-button1" class="key">' +
         'A' +
         '</div>' +
         '</div>' +
         '<div class="command up">' +
-        '<div id="control-p2-up-label">' +
+        '<div id="jt-control-p2-up-label">' +
         'Up' +
         '</div>' +
-        '<div id="control-p2-up" class="key">' +
+        '<div id="jt-control-p2-up" class="key">' +
         'T' +
         '</div>' +
         '</div>' +
         '<div class="command fire2">' +
         'Button<br>' +
-        '<div id="control-p2-button2" class="key">' +
+        '<div id="jt-control-p2-button2" class="key">' +
         'Dot' +
         '</div>' +
         '</div>' +
         '<div class="command left">' +
         'Left<br>' +
-        '<div id="control-p2-left" class="key">' +
+        '<div id="jt-control-p2-left" class="key">' +
         'F' +
         '</div>' +
         '</div>' +
         '<div class="command controller">' +
-        '<div id="control-p2-controller">' +
+        '<div id="jt-control-p2-controller">' +
         '</div>' +
         '</div>' +
         '<div class="command right">' +
         'Right<br>' +
-        '<div id="control-p2-right" class="key">' +
+        '<div id="jt-control-p2-right" class="key">' +
         'H' +
         '</div>' +
         '</div>' +
         '<div class="command down">' +
-        '<div id="control-p2-down-label">' +
+        '<div id="jt-control-p2-down-label">' +
         'Down' +
         '</div>' +
-        '<div id="control-p2-down" class="key">' +
+        '<div id="jt-control-p2-down" class="key">' +
         'G' +
         '</div>' +
         '</div>' +
@@ -427,7 +427,7 @@ SettingsGUI.html = function() {
         '<div class="title">' +
         'Modes' +
         '</div>' +
-        '<div id="controls-swap-keys" class="hotkey">' +
+        '<div id="jt-controls-swap-keys" class="hotkey">' +
         '<div class="command">' +
         '<div class="key key-ctrlalt">' +
         'Alt' +
@@ -441,7 +441,7 @@ SettingsGUI.html = function() {
         'Swap Keys' +
         '</div>' +
         '</div>' +
-        '<div id="controls-swap-gamepads" class="hotkey">' +
+        '<div id="jt-controls-swap-gamepads" class="hotkey">' +
         '<div class="command">' +
         '<div class="key key-ctrlalt">' +
         'Alt' +
@@ -455,7 +455,7 @@ SettingsGUI.html = function() {
         'Swap Gamepads' +
         '</div>' +
         '</div>' +
-        '<div id="controls-toggle-paddles" class="hotkey">' +
+        '<div id="jt-controls-toggle-paddles" class="hotkey">' +
         '<div class="command">' +
         '<div class="key key-ctrlalt">' +
         'Alt' +
@@ -470,15 +470,15 @@ SettingsGUI.html = function() {
         '</div>' +
         '</div>' +
         '</div>' +
-        '<div id="controls-revert">' +
+        '<div id="jt-controls-revert">' +
         'REVERT' +
         '</div>' +
-        '<div id="controls-defaults">' +
+        '<div id="jt-controls-defaults">' +
         'DEFAULTS' +
         '</div>' +
         '</div>' +
-        '<div id="about">' +
-        '<div id="logo-version">' +
+        '<div id="jt-about">' +
+        '<div id="jt-logo-version">' +
         'version 0.9' +
         '</div>' +
         '<div class="info">' +
@@ -486,7 +486,7 @@ SettingsGUI.html = function() {
         '<br>' +
         '<a href="http://javatari.org">http://javatari.org</a>' +
         '</div>' +
-        '<div id="browserinfo">' +
+        '<div id="jt-browserinfo">' +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -495,7 +495,7 @@ SettingsGUI.html = function() {
 };
 
 SettingsGUI.css = function() {
-    return '#cover {' +
+    return '#jt-cover {' +
         'position: fixed;' +
         'top: 0;' +
         'right: 0;' +
@@ -507,12 +507,12 @@ SettingsGUI.css = function() {
         'transition: all .2s ease-out;' +
         '}' +
 
-        '#cover.show {' +
+        '#jt-cover.show {' +
         'visibility: visible;' +
         'opacity: 1;' +
         '}' +
 
-        '#modal {' +
+        '#jt-modal {' +
         'position: relative;' +
         'overflow: hidden;' +
         'width: 560px;' +
@@ -525,30 +525,30 @@ SettingsGUI.css = function() {
         'transition: all .2s ease-out;' +
         '}' +
 
-        '#modal.show {' +
+        '#jt-modal.show {' +
         'left: 0;' +
         '}' +
 
-        '.hotkey {' +
+        '#jt-modal .hotkey {' +
         'height: 27px;' +
         'padding: 3px 5px;' +
         'font-size: 13px;' +
         'box-sizing: border-box;' +
         '}' +
 
-        '.hotkey .command {' +
+        '#jt-modal .hotkey .command {' +
         'position: relative;' +
         'float: left;' +
         'font-weight: 600;' +
         'color: rgba(0, 0, 0, .50);' +
         '}' +
 
-        '.hotkey .desc {' +
+        '#jt-modal .hotkey .desc {' +
         'float: left;' +
         'padding-top: 3px;' +
         '}' +
 
-        '.key {' +
+        '#jt-modal .key {' +
         'position: relative;' +
         'display: inline-block;' +
         'top: -1px;' +
@@ -567,19 +567,19 @@ SettingsGUI.css = function() {
         'text-align: center;' +
         '}' +
 
-        '.key-ctrlalt {' +
+        '#jt-modal .key-ctrlalt {' +
         'width: 31px;' +
         'padding-left: 0;' +
         'padding-right: 2px;' +
         '}' +
 
-        '#menu {' +
+        '#jt-menu {' +
         'position: relative;' +
         'background-color: white;' +
         'border-bottom: 1px solid rgb(200, 200, 200);' +
         '}' +
 
-        '#menu #back {' +
+        '#jt-menu #jt-back {' +
         'position: absolute;' +
         'width: 18px;' +
         'height: 32px;' +
@@ -590,17 +590,17 @@ SettingsGUI.css = function() {
         'cursor: pointer;' +
         '}' +
 
-        '#menu #back:hover {' +
+        '#jt-menu #jt-back:hover {' +
         'background-color: rgba(0, 0, 0, .12);' +
         '}' +
 
-        '#menu #back-arrow {' +
+        '#jt-menu #jt-back-arrow {' +
         'position: relative;' +
         'overflow: hidden;' +
         'top: -7px;' +
         '}' +
 
-        '#menu .caption {' +
+        '#jt-menu .caption {' +
         'height: 29px;' +
         'margin: 0 -1px;' +
         'padding: 9px 0 0 48px;' +
@@ -610,7 +610,7 @@ SettingsGUI.css = function() {
         'box-shadow: 0 1px 4px rgba(0, 0, 0, .8);' +
         '}' +
 
-        '#menu .items {' +
+        '#jt-menu .items {' +
         'position: relative;' +
         'width: 70%;' +
         'height: 39px;' +
@@ -618,7 +618,7 @@ SettingsGUI.css = function() {
         'font-weight: 600;' +
         '}' +
 
-        '#menu .item {' +
+        '#jt-menu .item {' +
         'float: left;' +
         'width: 33.3%;' +
         'height: 100%;' +
@@ -629,11 +629,11 @@ SettingsGUI.css = function() {
         'cursor: pointer' +
         '}' +
 
-        '#menu .selected {' +
+        '#jt-menu .selected {' +
         'color: rgb(224, 56, 34);' +
         '}' +
 
-        '#menu #menu-selection {' +
+        '#jt-menu #jt-menu-selection {' +
         'position: absolute;' +
         'left: 0;' +
         'bottom: 0;' +
@@ -644,7 +644,7 @@ SettingsGUI.css = function() {
         '}' +
 
 
-        '#content {' +
+        '#jt-content {' +
         'position: relative;' +
         'left: 0;' +
         'width: 1680px;' +
@@ -653,59 +653,59 @@ SettingsGUI.css = function() {
         'transition: left 0.3s ease-in-out' +
         '}' +
 
-        '#help, #controls, #about {' +
+        '#jt-help, #jt-controls, #jt-about {' +
         'position: absolute;' +
         'width: 560px;' +
         'height: 100%;' +
         'box-sizing: border-box;' +
         '}' +
 
-        '#help {' +
+        '#jt-help {' +
         'padding-top: 22px;' +
         '}' +
 
-        '#help .left {' +
+        '#jt-help .left {' +
         'float: left;' +
         'padding-left: 30px;' +
         '}' +
 
-        '#help .right {' +
+        '#jt-help .right {' +
         'float: left;' +
         'padding-left: 34px;' +
         '}' +
 
-        '#help .left .command {' +
+        '#jt-help .left .command {' +
         'width: 104px;' +
         '}' +
 
-        '#help .right .command {' +
+        '#jt-help .right .command {' +
         'width: 109px;' +
         '}' +
 
-        '#help .command.right-bottom {' +
+        '#jt-help .command.right-bottom {' +
         'width: 164px;' +
         '}' +
 
-        '#controls {' +
+        '#jt-controls {' +
         'left: 560px;' +
         '}' +
 
-        '#controls .player {' +
+        '#jt-controls .player {' +
         'position: absolute;' +
         'top: 15px;' +
         'width: 217px;' +
         'color: rgba(0, 0, 0, .8);' +
         '}' +
 
-        '#controls .p1 {' +
+        '#jt-controls .p1 {' +
         'left: 28px;' +
         '}' +
 
-        '#controls .p2 {' +
+        '#jt-controls .p2 {' +
         'right: 28px;' +
         '}' +
 
-        '#controls .title {' +
+        '#jt-controls .title {' +
         'padding-bottom: 4px;' +
         'margin: 0 14px 8px 12px;' +
         'font-size: 18px;' +
@@ -713,7 +713,7 @@ SettingsGUI.css = function() {
         'border-bottom: 2px solid rgba(242, 66, 35, .55);' +
         '}' +
 
-        '#controls .player .command {' +
+        '#jt-controls .player .command {' +
         'position: relative;' +
         'float: left;' +
         'width: 33%;' +
@@ -722,32 +722,32 @@ SettingsGUI.css = function() {
         'text-align: center;' +
         '}' +
 
-        '#controls .command.fire1, #controls .command.fire2 {' +
+        '#jt-controls .command.fire1, #jt-controls .command.fire2 {' +
         'top: 14px;' +
         '}' +
 
-        '#controls .command.left, #controls .command.right {' +
+        '#jt-controls .command.left, #jt-controls .command.right {' +
         'top: 27px;' +
         '}' +
 
-        '#controls .command.down {' +
+        '#jt-controls .command.down {' +
         'float: none;' +
         'clear: both;' +
         'margin: 0 auto;' +
         '}' +
 
-        '#controls .command.controller {' +
+        '#jt-controls .command.controller {' +
         'height: 90px;' +
         '}' +
 
-        '#controls #control-p1-controller, #controls #control-p2-controller {' +
+        '#jt-controls #jt-control-p1-controller, #jt-controls #jt-control-p2-controller {' +
         'width: 70px;' +
         'height: 89px;' +
         'margin-left: 1px;' +
         'background: url("' + Javatari.IMAGES_PATH + 'sprites.png") no-repeat -466px 0;' +
         '}' +
 
-        '#controls .player .key {' +
+        '#jt-controls .player .key {' +
         'min-width: 33px;' +
         'height: 23px;' +
         'padding: 5px 6px 4px;' +
@@ -755,17 +755,22 @@ SettingsGUI.css = function() {
         'cursor: pointer;' +
         '}' +
 
-        '#controls .player .key:hover {' +
-        'background-color: rgb(210, 210, 255);' +
+        '#jt-controls .player .key:hover {' +
+        'box-shadow: 0 1px 0 1px rgba(0, 0, 0, .5), 1px 2px 6px 4px rgb(170, 170, 170);' +
         '}' +
 
-        '#controls .player .key.redefining {' +
+        '#jt-controls .player .key.redefining {' +
         'color: white;' +
         'background-color: rgb(87, 128, 255);' +
         'border-color: rgb(71, 117, 255);' +
         '}' +
 
-        '#controls .modes {' +
+        '#jt-controls .player .key.undefined {' +
+        'background-color: rgb(255, 150, 130);' +
+        'border-color: rgb(255, 130, 90);' +
+        '}' +
+
+        '#jt-controls .modes {' +
         'position: absolute;' +
         'top: 200px;' +
         'left: 0;' +
@@ -774,22 +779,22 @@ SettingsGUI.css = function() {
         'margin: 0 auto;' +
         '}' +
 
-        '#controls .modes .hotkey {' +
+        '#jt-controls .modes .hotkey {' +
         'position: relative;' +
         'padding-left: 8px;' +
         'cursor: pointer;' +
         '}' +
 
-        '#controls .modes .hotkey:hover {' +
+        '#jt-controls .modes .hotkey:hover {' +
         'background-color: white;' +
         'box-shadow: 1px 1px 3px 1px rgb(180, 180, 180);' +
         '}' +
 
-        '#controls .modes .command {' +
+        '#jt-controls .modes .command {' +
         'margin-right: 12px;' +
         '}' +
 
-        '#controls-defaults, #controls-revert {' +
+        '#jt-controls-defaults, #jt-controls-revert {' +
         'position: absolute;' +
         'bottom: 18px;' +
         'padding: 7px 10px;' +
@@ -799,27 +804,27 @@ SettingsGUI.css = function() {
         'cursor: pointer' +
         '}' +
 
-        '#controls-defaults:hover, #controls-revert:hover {' +
+        '#jt-controls-defaults:hover, #jt-controls-revert:hover {' +
         'background-color: white;' +
         'box-shadow: 1px 1px 3px 1px rgb(180, 180, 180);' +
         '}' +
 
-        '#controls-revert {' +
+        '#jt-controls-revert {' +
         'right: 30px;' +
         'color: rgba(0, 0, 0, 0.8);' +
         '}' +
 
-        '#controls-defaults {' +
+        '#jt-controls-defaults {' +
         'right: 115px;' +
-        'color: #4040f5;' +
+        'color: rgb(64, 64, 245);' +
         '}' +
 
 
-        '#about {' +
+        '#jt-about {' +
         'left: 1120px;' +
         '}' +
 
-        '#about #logo-version {' +
+        '#jt-about #jt-logo-version {' +
         'width: 248px;' +
         'height: 220px;' +
         'margin: 28px auto 14px;' +
@@ -833,17 +838,18 @@ SettingsGUI.css = function() {
         'box-shadow: 3px 3px 14px rgb(75, 75, 75);' +
         '}' +
 
-        '#about .info {' +
+        '#jt-about .info {' +
         'font-size: 18px;' +
         'line-height: 30px;' +
         'text-align: center;' +
         '}' +
 
-        '#about a {' +
-        'color: #4040f5;' +
+        '#jt-about a {' +
+        'color: rgb(64, 64, 245);' +
+        'text-decoration: none;' +
         '}' +
 
-        '#about #browserinfo {' +
+        '#jt-about #jt-browserinfo {' +
         'position: absolute;' +
         'left: 0;' +
         'right: 0;' +

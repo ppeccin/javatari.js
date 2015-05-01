@@ -1,5 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
+// TODO Implement phosphor and other CRT modes
 jt.CanvasDisplay = function(mainElement) {
 
     function init(self) {
