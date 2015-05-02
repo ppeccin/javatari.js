@@ -319,7 +319,7 @@ border-color: rgb(255, 130, 90);
 
 #jt-controls-defaults {
     right: 115px;
-    color: rgb(64, 64, 245);
+    color: rgb(0, 80, 230);
 }
 
 
@@ -348,7 +348,7 @@ border-color: rgb(255, 130, 90);
 }
 
 #jt-about a {
-    color: rgb(64, 64, 245);
+    color: rgb(0, 80, 230);
     text-decoration: none;
 }
 

@@ -816,7 +816,7 @@ SettingsGUI.css = function() {
 
         '#jt-controls-defaults {' +
         'right: 115px;' +
-        'color: rgb(64, 64, 245);' +
+        'color: rgb(0, 80, 230);' +
         '}' +
 
 
@@ -845,7 +845,7 @@ SettingsGUI.css = function() {
         '}' +
 
         '#jt-about a {' +
-        'color: rgb(64, 64, 245);' +
+        'color: rgb(0, 80, 230);' +
         'text-decoration: none;' +
         '}' +
 
