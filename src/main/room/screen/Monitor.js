@@ -38,9 +38,13 @@ jt.Monitor = function() {
         // Process new line received
         var vSynched = false;
         if (line < signalHeight) {
-            // Copy only contents that will be displayed
-            if (line >= displayOriginY && line < displayOriginY + displayHeight)
-                jt.Util.arrayCopy(pixels, displayOriginX, backBuffer, (line - displayOriginY) * signalWidth, displayWidth);
+            // Copy to the back buffer only contents that will be displayed
+            if (line >= displayOriginY && line < displayOriginY + displayHeight) {
+                if (backBuffer)
+                    jt.Util.arrayCopy(pixels, displayOriginX, backBuffer, (line - displayOriginY) * signalWidth, displayWidth);
+                else
+                    jt.Util.uInt32ArrayCopyToUInt8Array(pixels, displayOriginX, backData, (line - displayOriginY) * signalWidth, displayWidth);
+            }
         } else
             vSynched = maxLineExceeded();
         line++;
@@ -260,12 +264,17 @@ jt.Monitor = function() {
         offCanvas.height = jt.VideoStandard.PAL.height;
         offContext = offCanvas.getContext("2d");
         offImageData = offContext.getImageData(0, 0, offCanvas.width, offCanvas.height);
-        backBuffer = new Uint32Array(offImageData.data.buffer);
+        if (offImageData.data.buffer)
+            backBuffer = new Uint32Array(offImageData.data.buffer);
+        else {
+            // Needed for IE compatibility, which has no underlying buffer
+            backData = offImageData.data;
+        }
     };
 
     var cleanBackBuffer = function() {
         // Put a nice green for detection of undrawn lines, for debug purposes
-        jt.Util.arrayFill(backBuffer, 0xff00ff00);
+        if (backBuffer) jt.Util.arrayFill(backBuffer, 0xff00ff00);
     };
 
     var cartridgeChangeDisabledWarning = function() {
@@ -364,6 +373,7 @@ jt.Monitor = function() {
     var offImageData;
 
     var backBuffer;
+    var backData;       // Needed for IE compatibility, which has no underlying buffer
 
     var signalOn = false;
     var signalStandard;

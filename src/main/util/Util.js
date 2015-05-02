@@ -13,9 +13,8 @@ jt.Util = new function() {
     this.arraysEqual = function(a, b) {
         var i = a.length;
         if (i !== b.length) return false;
-        while (i--) {
+        while (i--)
             if (a[i] !== b[i]) return false;
-        }
         return true;
     };
 
@@ -42,8 +41,20 @@ jt.Util = new function() {
     };
 
     this.arrayCopy = function(src, srcPos, dest, destPos, length) {
-        for (var i = 0; i < length; i++) {
-            dest[destPos + i] = src[srcPos + i];
+        var finalSrcPos = srcPos + length;
+        while(srcPos < finalSrcPos)
+            dest[destPos++] = src[srcPos++];
+    };
+
+    this.uInt32ArrayCopyToUInt8Array = function(src, srcPos, dest, destPos, length) {
+        var finalSrcPos = srcPos + length;
+        destPos *= 4;
+        while(srcPos < finalSrcPos) {
+            var val =  src[srcPos++];
+            dest[destPos++] = val & 255;
+            dest[destPos++] = (val >> 8) & 255;
+            dest[destPos++] = (val >> 16) & 255;
+            dest[destPos++] = val >>> 24;
         }
     };
 
