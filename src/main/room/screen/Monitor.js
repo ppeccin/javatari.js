@@ -305,9 +305,10 @@ jt.Monitor = function() {
             case monControls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER:
                 if (!cartridgeChangeDisabledWarning()) romLoader.openURLChooserDialog(false);
                 break;
-            case monControls.LOAD_CARTRIDGE_PASTE:
-                if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog();
-                break;
+            // TODO Maybe get URL from clipboard?
+            //case monControls.LOAD_CARTRIDGE_PASTE:
+            //    if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog();
+            //    break;
             case monControls.CRT_MODES:
                 crtModeToggle(); break;
             case monControls.CRT_FILTER:

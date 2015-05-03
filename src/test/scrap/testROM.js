@@ -1,8 +1,8 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 function handleFileSelect(event) {
-    event.stopPropagation();
-    event.preventDefault();
+    if (event.stopPropagation) event.stopPropagation();
+    if (event.preventDefault) event.preventDefault();
 
     var files = event.dataTransfer.files; // FileList object.
     if (!files || files.length === 0) {
@@ -16,8 +16,8 @@ function handleFileSelect(event) {
 }
 
 function handleDragOver(event) {
-    event.stopPropagation();
-    event.preventDefault();
+    if (event.stopPropagation) event.stopPropagation();
+    if (event.preventDefault) event.preventDefault();
     event.dataTransfer.dropEffect = 'copy';
 }
 

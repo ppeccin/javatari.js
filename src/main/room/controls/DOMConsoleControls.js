@@ -25,6 +25,7 @@ jt.DOMConsoleControls = function() {
     };
 
     this.powerOn = function() {
+        preventIEHelp();
         gamepadControls.powerOn();
         if (PADDLES_MODE === 0) setPaddleMode(false, false);
         else if (PADDLES_MODE === 1) setPaddleMode(true, false);
@@ -40,8 +41,8 @@ jt.DOMConsoleControls = function() {
 
     this.addInputElements = function(elements) {
         for (var i = 0; i < elements.length; i++) {
-            elements[i].addEventListener("keydown", this.filteredKeyPressed);
-            elements[i].addEventListener("keyup", this.filteredKeyReleased);
+            elements[i].addEventListener("keydown", this.keyDown);
+            elements[i].addEventListener("keyup", this.keyUp);
         }
     };
 
@@ -72,16 +73,24 @@ jt.DOMConsoleControls = function() {
         return gamepadControls;
     };
 
-    this.filteredKeyPressed = function(event) {
+    this.keyDown = function(event) {
         var modifiers = 0 | (event.ctrlKey ? KEY_CTRL_MASK : 0) | (event.altKey ? KEY_ALT_MASK : 0) | (event.shiftKey ? KEY_SHIFT_MASK : 0);
-        if (processKeyEvent(event.keyCode, true, modifiers))
-            event.preventDefault();
+        if (processKeyEvent(event.keyCode, true, modifiers)) {
+            event.returnValue = false;  // IE
+            if (event.preventDefault) event.preventDefault();
+            if (event.stopPropagation) event.stopPropagation();
+            return false;
+        }
     };
 
-    this.filteredKeyReleased = function(event) {
+    this.keyUp = function(event) {
         var modifiers = 0 | (event.ctrlKey ? KEY_CTRL_MASK : 0) | (event.altKey ? KEY_ALT_MASK : 0) | (event.shiftKey ? KEY_SHIFT_MASK : 0);
-        if (processKeyEvent(event.keyCode, false, modifiers))
-            event.preventDefault();
+        if (processKeyEvent(event.keyCode, false, modifiers)) {
+            event.returnValue = false;  // IE
+            if (event.preventDefault) event.preventDefault();
+            if (event.stopPropagation) event.stopPropagation();
+            return false;
+        }
     };
 
     this.cartridgeInserted = function(cartridge) {
@@ -156,7 +165,7 @@ jt.DOMConsoleControls = function() {
     var checkLocalControlKey = function(keyCode, modif, press) {
         var control;
         if (press) {
-            if (modif === KEY_ALT_MASK)
+            if (modif === KEY_ALT_MASK || modif === KEY_CTRL_MASK)
                 switch(keyCode) {
                     case KEY_TOGGLE_P1_MODE:
                         self.toggleP1ControlsMode();
@@ -239,6 +248,12 @@ jt.DOMConsoleControls = function() {
         return control;
     };
 
+    var preventIEHelp = function() {
+        window.onhelp = function () {
+            return false;
+        };
+    };
+
     var initKeys = function() {
         self.applyPreferences();
 
@@ -270,6 +285,13 @@ jt.DOMConsoleControls = function() {
         withALTCodeMap[KEY_DEBUG]          = controls.DEBUG;
         withALTCodeMap[KEY_NO_COLLISIONS]  = controls.NO_COLLISIONS;
         withALTCodeMap[KEY_VIDEO_STANDARD] = controls.VIDEO_STANDARD;
+
+        withCTRLCodeMap[KEY_PAUSE]          = controls.PAUSE;
+        withCTRLCodeMap[KEY_FRAME]          = controls.FRAME;
+        withCTRLCodeMap[KEY_TRACE]          = controls.TRACE;
+        withCTRLCodeMap[KEY_DEBUG]          = controls.DEBUG;
+        withCTRLCodeMap[KEY_NO_COLLISIONS]  = controls.NO_COLLISIONS;
+        withCTRLCodeMap[KEY_VIDEO_STANDARD] = controls.VIDEO_STANDARD;
 
         withCTRLCodeMap[KEY_POWER] = controls.POWER_FRY;
 
@@ -310,6 +332,10 @@ jt.DOMConsoleControls = function() {
         withALTCodeMap[KEY_CARTRIDGE_FORMAT]    = controls.CARTRIDGE_FORMAT;
         withALTCodeMap[KEY_CARTRIDGE_CLOCK_DEC] = controls.CARTRIDGE_CLOCK_DEC;
         withALTCodeMap[KEY_CARTRIDGE_CLOCK_INC] = controls.CARTRIDGE_CLOCK_INC;
+
+        withCTRLCodeMap[KEY_CARTRIDGE_FORMAT]    = controls.CARTRIDGE_FORMAT;
+        withCTRLCodeMap[KEY_CARTRIDGE_CLOCK_DEC] = controls.CARTRIDGE_CLOCK_DEC;
+        withCTRLCodeMap[KEY_CARTRIDGE_CLOCK_INC] = controls.CARTRIDGE_CLOCK_INC;
     };
 
     this.applyPreferences = function() {

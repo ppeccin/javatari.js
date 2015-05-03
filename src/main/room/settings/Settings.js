@@ -84,40 +84,40 @@ jt.Settings = function() {
     var setEvents = function () {
         // Close the modal with a click outside
         self.panel.addEventListener("mousedown", function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+            if (e.preventDefault) e.preventDefault();
+            if (e.stopPropagation) e.stopPropagation();
             self.hide();
         });
         // But do not close the modal with a click inside
         self["jt-modal"].addEventListener("mousedown", function (e) {
-            e.stopPropagation();
+            if (e.stopPropagation) e.stopPropagation();
             keyRedefinitonStop();
         });
         // Close with the back button
         self["jt-back"].addEventListener("mousedown", function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+            if (e.preventDefault) e.preventDefault();
+            if (e.stopPropagation) e.stopPropagation();
             self.hide();
         });
 
         // Several key events
         self.panel.addEventListener("keydown", function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+            if (e.preventDefault) e.preventDefault();
+            if (e.stopPropagation) e.stopPropagation();
             processKeyEvent(e);
         });
 
         // Tabs
         self["jt-menu-help"].addEventListener("mousedown", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             self.setPage("HELP");
         });
         self["jt-menu-controls"].addEventListener("mousedown", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             self.setPage("CONTROLS");
         });
         self["jt-menu-about"].addEventListener("mousedown", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             self.setPage("ABOUT");
         });
 
@@ -125,8 +125,8 @@ jt.Settings = function() {
         for (var control in controlKeys) {
             (function(localControl) {
                 self[localControl].addEventListener("mousedown", function (e) {
-                    e.stopPropagation();
-                    e.preventDefault();
+                    if (e.stopPropagation) e.stopPropagation();
+                    if (e.preventDefault) e.preventDefault();
                     reyRedefinitionStart(localControl);
                 });
             })(control);
@@ -134,11 +134,11 @@ jt.Settings = function() {
 
         // Controls Actions
         self["jt-controls-defaults"].addEventListener("mousedown", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             controlsDefaults();
         });
         self["jt-controls-revert"].addEventListener("mousedown", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             controlsRevert();
         });
 
@@ -146,7 +146,7 @@ jt.Settings = function() {
         for (var key in controlsCommandKeys) {
             (function(keyLocal) {
                 self[controlsCommandKeys[key]].addEventListener("mousedown", function (e) {
-                    e.preventDefault();
+                    if (e.preventDefault) e.preventDefault();
                     Javatari.room.controls.processKeyEvent(keyLocal, true, jt.DOMConsoleControls.KEY_ALT_MASK);
                     keyRedefinitonStop();   // will refresh
                 });
@@ -198,7 +198,7 @@ jt.Settings = function() {
         else if(controlRedefining) keyRedefinitionTry(e.keyCode);
         else {
             if (e.altKey && controlsCommandKeys[e.keyCode]) {
-                Javatari.room.controls.filteredKeyPressed(e);
+                Javatari.room.controls.keyDown(e);
                 refreshData();
             }
         }

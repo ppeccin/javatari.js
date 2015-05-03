@@ -25,12 +25,21 @@ jt.ROMLoader = function() {
 
     this.openURLChooserDialog = function(withAutoPower) {
         autoPower = withAutoPower !== false;
-        var url = localStorage[LOCAL_STOARAGE_LAST_URL_KEY];
-        url = prompt("Load ROM from URL:", url);
+        var url;
+        try {
+            url = localStorage && localStorage[LOCAL_STOARAGE_LAST_URL_KEY];
+        } catch (e) {
+            // give up
+        }
+        url = prompt("Load ROM from URL:", url || "");
         if (!url) return;
         url = url.toString().trim();
         if (!url) return;
-        localStorage[LOCAL_STOARAGE_LAST_URL_KEY] = url;
+        try {
+            localStorage[LOCAL_STOARAGE_LAST_URL_KEY] = url;
+        } catch (e) {
+            // give up
+        }
         this.loadFromURL(url);
     };
 
@@ -74,8 +83,9 @@ jt.ROMLoader = function() {
     };
 
     var onFileInputChange = function(event) {
-        event.stopPropagation();
-        event.preventDefault();
+        event.returnValue = false;  // IE
+        if (event.preventDefault) event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
         event.target.focus();
         if (!this.files || !this.files.length) return;
 
@@ -91,8 +101,9 @@ jt.ROMLoader = function() {
     };
 
     var onDragOver = function (event) {
-        event.stopPropagation();
-        event.preventDefault();
+        event.returnValue = false;  // IE
+        if (event.preventDefault) event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
 
         if (Javatari.CARTRIDGE_CHANGE_DISABLED)
             event.dataTransfer.dropEffect = "none";
@@ -101,8 +112,9 @@ jt.ROMLoader = function() {
     };
 
     var onDrop = function (event) {
-        event.stopPropagation();
-        event.preventDefault();
+        event.returnValue = false;  // IE
+        if (event.preventDefault) event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
         event.target.focus();
 
         autoPower = event.altKey !== true;

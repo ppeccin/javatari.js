@@ -48,16 +48,20 @@ jt.LocalStorageSaveStateMedia = function() {
     };
 
     var saveToLocalStorage = function(entry, data) {
-        if (!localStorage) return;
-
-        localStorage["javatari" + entry] = data;
-        return true;
+        try {
+            localStorage["javatari" + entry] = data;
+            return true;
+        } catch (e) {
+            return false;
+        }
     };
 
     var loadFromLocalStorage = function(entry) {
-        if (!localStorage) return;
-
-        return localStorage["javatari" + entry];
+        try {
+            return localStorage["javatari" + entry];
+        } catch (e) {
+            // give up
+        }
     };
 
     var buildDataFromState = function(state) {

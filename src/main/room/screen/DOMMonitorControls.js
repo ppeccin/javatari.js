@@ -8,13 +8,17 @@ jt.DOMMonitorControls = function(monitor) {
 
     this.addInputElements = function(elements) {
         for (var i = 0; i < elements.length; i++)
-            elements[i].addEventListener("keydown", this.filteredKeyPressed);
+            elements[i].addEventListener("keydown", this.keyDown);
     };
 
-    this.filteredKeyPressed = function(event) {
+    this.keyDown = function(event) {
         var modifiers = 0 | (event.ctrlKey ? KEY_CTRL_MASK : 0) | (event.altKey ? KEY_ALT_MASK : 0) | (event.shiftKey ? KEY_SHIFT_MASK : 0);
-        if (processKeyPress(event.keyCode, modifiers))
-            event.preventDefault();
+        if (processKeyPress(event.keyCode, modifiers)) {
+            event.returnValue = false;  // IE
+            if (event.preventDefault) event.preventDefault();
+            if (event.stopPropagation) event.stopPropagation();
+            return false;
+        }
     };
 
     var processKeyPress = function(keyCode, modifiers) {
@@ -47,13 +51,16 @@ jt.DOMMonitorControls = function(monitor) {
     var initKeys = function() {
         var monControls = jt.Monitor.Controls;
 
+        keyCodeMap[KEY_EXIT]            = monControls.EXIT;
+
         keyCodeMap[KEY_CART_FILE]       = monControls.LOAD_CARTRIDGE_FILE;
         keyCodeMap[KEY_CART_URL]        = monControls.LOAD_CARTRIDGE_URL;
 
         keyAltCodeMap[KEY_CART_FILE]    = monControls.LOAD_CARTRIDGE_FILE;
         keyAltCodeMap[KEY_CART_URL]     = monControls.LOAD_CARTRIDGE_URL;
 
-        keyCodeMap[KEY_EXIT]            = monControls.EXIT;
+        keyControlCodeMap[KEY_CART_FILE] = monControls.LOAD_CARTRIDGE_FILE_NO_AUTO_POWER;
+        keyControlCodeMap[KEY_CART_URL]  = monControls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER;
 
         keyAltCodeMap[KEY_CRT_FILTER]   = monControls.CRT_FILTER;
         keyAltCodeMap[KEY_DEBUG]     	= monControls.DEBUG;
@@ -61,8 +68,12 @@ jt.DOMMonitorControls = function(monitor) {
         keyAltCodeMap[KEY_CRT_MODES] 	= monControls.CRT_MODES;
         keyAltCodeMap[KEY_FULLSCREEN]  	= monControls.FULLSCREEN;
 
-        keyControlCodeMap[KEY_CART_FILE] = monControls.LOAD_CARTRIDGE_FILE_NO_AUTO_POWER;
-        keyControlCodeMap[KEY_CART_URL]  = monControls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER;
+        keyControlCodeMap[KEY_CRT_FILTER]   = monControls.CRT_FILTER;
+        keyControlCodeMap[KEY_DEBUG]     	= monControls.DEBUG;
+        keyControlCodeMap[KEY_STATS]    	= monControls.STATS;
+        keyControlCodeMap[KEY_CRT_MODES] 	= monControls.CRT_MODES;
+        keyControlCodeMap[KEY_FULLSCREEN]  	= monControls.FULLSCREEN;
+
 
         keyShiftCodeMap[KEY_UP]     = monControls.SIZE_MINUS;
         keyShiftCodeMap[KEY_DOWN]   = monControls.SIZE_PLUS;

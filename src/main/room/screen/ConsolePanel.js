@@ -139,18 +139,18 @@ jt.ConsolePanel = function(mainElement) {
             but.style.cursor = "pointer";
             var mouseDown;
             but.addEventListener("mousedown", function (e) {
-                e.preventDefault();
+                if (e.preventDefault) e.preventDefault();
                 mouseDown = true;
                 controlsSocket.controlStateChanged(control, true);
             });
             if (isHold) {
                 but.addEventListener("mouseup", function (e) {
-                    e.preventDefault();
+                    if (e.preventDefault) e.preventDefault();
                     mouseDown = false;
                     controlsSocket.controlStateChanged(control, false);
                 });
                 but.addEventListener("mouseleave", function (e) {
-                    e.preventDefault();
+                    if (e.preventDefault) e.preventDefault();
                     if (!mouseDown) return;
                     mouseDown = false;
                     controlsSocket.controlStateChanged(control, false);
@@ -164,7 +164,7 @@ jt.ConsolePanel = function(mainElement) {
         // A "click" event and not a "mousedown" is necessary here. Without a click, FF does not open the Open File window
         // TODO Hotkeys for this are also not working in FF since they're not click events!
         but.addEventListener("click", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             screen.getMonitor().controlActivated(control);
         });
     };

@@ -9,6 +9,7 @@ jt.Room = function(screenElement, consolePanelElement, cartridgeProvided) {
     }
 
     this.powerOn = function(paused) {
+        setPageVisibilityHandling();
         self.screen.powerOn();
         if (self.consolePanel) this.consolePanel.powerOn();
         self.speaker.powerOn();
@@ -52,6 +53,14 @@ jt.Room = function(screenElement, consolePanelElement, cartridgeProvided) {
         if (self.consolePanel) self.consolePanel.connect(self.console.getControlsSocket(), self.console.getCartridgeSocket(), self.controls);
         self.speaker.connect(self.console.getAudioOutput());
         self.controls.connect(self.console.getControlsSocket(), self.console.getCartridgeSocket());
+    };
+
+    var setPageVisibilityHandling = function() {
+        function visibilityChange() {
+            if (document.hidden) self.speaker.mute();
+            else self.speaker.play();
+        }
+        document.addEventListener("visibilitychange", visibilityChange);
     };
 
 

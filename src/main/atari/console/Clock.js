@@ -33,7 +33,7 @@ jt.Clock = function(clockDriven, pCyclesPerSecond) {
     var internalSetFrequency = function(freq) {
         cyclesPerSecond = freq;
         cycleTimeMs = 1000 / freq;
-        useRequestAnimationFrame = freq === NATURAL_FPS;
+        useRequestAnimationFrame = window.requestAnimationFrame && (freq === NATURAL_FPS);
     };
 
     var pulse = function() {

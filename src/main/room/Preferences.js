@@ -68,7 +68,11 @@ Javatari.preferences.load = function() {
 };
 
 Javatari.preferences.save = function() {
-    localStorage.javatariprefs = JSON.stringify(Javatari.preferences);
+    try {
+        localStorage.javatariprefs = JSON.stringify(Javatari.preferences);
+    } catch (e) {
+        // giveup
+    }
 };
 
 

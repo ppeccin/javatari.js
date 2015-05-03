@@ -302,14 +302,14 @@ jt.CanvasDisplay = function(mainElement) {
         settingsButton  = addBarButton(-29, -26, 24, 22, -412, -209);
         settingsButton.style.cursor = "pointer";
         settingsButton.addEventListener("mousedown", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             openSettings();
         });
 
         logoButton = addBarButton("CENTER", -26, 24, 24, -388, -181);
         logoButton.style.cursor = "pointer";
         logoButton.addEventListener("mousedown", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             openSettings("ABOUT");
         });
 
@@ -346,7 +346,7 @@ jt.CanvasDisplay = function(mainElement) {
     var screenControlButton = function (but, control) {
         but.style.cursor = "pointer";
         but.addEventListener("mousedown", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             monitor.controlActivated(control);
         });
     };
@@ -354,7 +354,7 @@ jt.CanvasDisplay = function(mainElement) {
     var consoleControlButton = function (but, control) {
         but.style.cursor = "pointer";
         but.addEventListener("mousedown", function (e) {
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             controlsSocket.controlStateChanged(control, true);
         });
     };

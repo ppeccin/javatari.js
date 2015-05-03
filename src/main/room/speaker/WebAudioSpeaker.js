@@ -13,12 +13,20 @@ jt.WebAudioSpeaker = function() {
 
         processor = audioContext.createScriptProcessor(Javatari.AUDIO_BUFFER_SIZE, 0, 1);
         processor.onaudioprocess = onAudioProcess;
-        processor.connect(audioContext.destination);
+        this.play();
     };
 
     this.powerOff = function() {
-        if (processor) processor.disconnect();
+        this.mute();
         audioContext = undefined;
+    };
+
+    this.play = function () {
+        if (processor) processor.connect(audioContext.destination);
+    };
+
+    this.mute = function () {
+        if (processor) processor.disconnect();
     };
 
     var createAudioContext = function() {
