@@ -5,6 +5,8 @@
 
 Javatari = {
 
+    VERSION:                        "version 0.91",             // Don't change this one!
+
     ROM_AUTO_LOAD_URL:              "",                         // Full or relative URL of ROM
     AUTO_START:                     true,                       // Set false to start emulator manually with Javatari.start()
     SCREEN_ELEMENT_ID:              "javatari-screen",

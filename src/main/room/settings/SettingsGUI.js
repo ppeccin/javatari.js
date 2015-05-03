@@ -479,7 +479,7 @@ SettingsGUI.html = function() {
         '</div>' +
         '<div id="jt-about">' +
         '<div id="jt-logo-version">' +
-        'version 0.9' +
+        Javatari.VERSION +
         '</div>' +
         '<div class="info">' +
         'Created by Paulo Augusto Peccin' +

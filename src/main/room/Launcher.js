@@ -29,7 +29,7 @@ Javatari.start = function () {
     delete Javatari.start;
     delete Javatari.preLoadImagesAndStart;
 
-    jt.Util.log("started");
+    jt.Util.log(Javatari.VERSION + " started");
 };
 
 
@@ -40,14 +40,14 @@ Javatari.preLoadImagesAndStart = function() {
 
     var domReady = false;
     var imagesToLoad = numImages;
-    function checkLaunch() {
-        if (Javatari.start &&  Javatari.AUTO_START !== false && domReady && imagesToLoad === 0)
+    function tryLaunch(bypass) {
+        if (Javatari.start && Javatari.AUTO_START !== false && (bypass || (domReady && imagesToLoad === 0)))
             Javatari.start();
     }
 
     document.addEventListener("DOMContentLoaded", function() {
         domReady = true;
-        checkLaunch();
+        tryLaunch(false);
     });
 
     for (var i = 0; i < numImages; i++) {
@@ -55,9 +55,14 @@ Javatari.preLoadImagesAndStart = function() {
         img.src = Javatari.IMAGES_PATH + images[i];
         img.onload = function() {
             imagesToLoad--;
-            checkLaunch();
+            tryLaunch(false);
         };
     }
+
+    window.addEventListener("load", function() {
+        tryLaunch(true);
+    });
+
 };
 
 // Start pre-loading images right away
