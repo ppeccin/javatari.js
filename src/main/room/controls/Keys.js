@@ -17,7 +17,7 @@ jt.Keys = {
     VK_SCROLL_LOCK: {c: 145, n: "ScrLck"},
     VK_PAUSE: {c: 19, n: "Pause"},
     VK_QUOTE: {c: 192, n: "'"},
-    VK_QUOTE2: {c: 222, n: "~"},
+    VK_TILDE: {c: 222, n: "~"},
     VK_1: {c: 49, n: "1"},
     VK_2: {c: 50, n: "2"},
     VK_3: {c: 51, n: "3"},

@@ -422,7 +422,7 @@ jt.DOMConsoleControls = function() {
     var KEY_VIDEO_STANDARD   = jt.Keys.VK_V.c;
 
     var KEY_STATE_0          = jt.Keys.VK_QUOTE.c;
-    var KEY_STATE_0a         = jt.Keys.VK_QUOTE2.c;
+    var KEY_STATE_0a         = jt.Keys.VK_TILDE.c;
     var KEY_STATE_1          = jt.Keys.VK_1.c;
     var KEY_STATE_2          = jt.Keys.VK_2.c;
     var KEY_STATE_3          = jt.Keys.VK_3.c;

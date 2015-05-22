@@ -214,7 +214,7 @@ SettingsGUI.html = function() {
         '<div class="hotkey">' +
         '<div class="command">' +
         '<div class="key key-ctrlalt">' +
-        'Alt' +
+        'Ctrl' +
         '</div>' +
         ' + ' +
         '<div class="key">' +
