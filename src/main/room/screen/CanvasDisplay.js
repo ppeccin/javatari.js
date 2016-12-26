@@ -186,9 +186,9 @@ jt.CanvasDisplay = function(mainElement) {
     };
 
     var setCRTFilter = function() {
-        if (context.hasOwnProperty("imageSmoothingEnabled"))
+        if (context.imageSmoothingEnabled !== undefined) {
             context.imageSmoothingEnabled = crtFilter;
-        else {
+        } else {
             context.webkitImageSmoothingEnabled = crtFilter;
             context.mozImageSmoothingEnabled = crtFilter;
             context.msImageSmoothingEnabled = crtFilter;

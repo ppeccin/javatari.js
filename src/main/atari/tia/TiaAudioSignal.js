@@ -124,7 +124,7 @@ jt.TiaAudioSignal = function() {
     var lastSample = 0;
 
     var MAX_SAMPLES = 10 * Javatari.AUDIO_BUFFER_SIZE;
-    var MAX_AMPLITUDE = 0.5;
+    var MAX_AMPLITUDE = 0.4;
 
     var samples = jt.Util.arrayFill(new Array(MAX_SAMPLES), 0);
 

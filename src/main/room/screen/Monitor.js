@@ -244,7 +244,8 @@ jt.Monitor = function() {
     };
 
     var crtModeToggle = function() {
-        setCrtMode(crtMode + 1);
+        return display.showOSD("Not yet supported!", true);
+        //setCrtMode(crtMode + 1);
     };
 
     var setCrtMode = function(mode) {
@@ -408,7 +409,7 @@ jt.Monitor = function() {
     var DEFAULT_SCALE_Y = 2;
     var VSYNC_TOLERANCE = 16;
     var EXTRA_UPPER_VSYNC_TOLERANCE = 5;
-    var CRT_MODE = Javatari.SCREEN_CRT_MODE;
+    var CRT_MODE = 0;
     var CRT_MODE_NAMES = [ "OFF", "Phosphor", "Phosphor Scanlines", "RGB", "RGB Phosphor" ];
 
     var crtMode = CRT_MODE < 0 ? 0 : CRT_MODE;

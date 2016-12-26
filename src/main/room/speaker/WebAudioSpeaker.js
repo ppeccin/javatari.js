@@ -47,7 +47,7 @@ jt.WebAudioSpeaker = function() {
 
         // Assumes there is only one channel
         var outputBuffer = event.outputBuffer.getChannelData(0);
-        var input = audioSignal.retrieveSamples((outputBuffer.length * resamplingFactor) | 0);
+        var input = audioSignal.retrieveSamples(((outputBuffer.length * resamplingFactor) | 0) + 1);        // TODO Be aware of fractional samples to avoid +1 here
 
         jt.Util.arrayCopyCircularSourceWithStep(
             input.buffer, input.start, input.bufferSize, resamplingFactor,
