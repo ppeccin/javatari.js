@@ -41,7 +41,7 @@ jt.Monitor = function() {
             // Copy to the back buffer only contents that will be displayed
             if (line >= displayOriginY && line < displayOriginY + displayHeight) {
                 if (backBuffer)
-                    jt.Util.arrayCopy(pixels, displayOriginX, backBuffer, (line - displayOriginY) * signalWidth, displayWidth);
+                    jt.Util.arrayCopy2(pixels, displayOriginX, backBuffer, (line - displayOriginY) * signalWidth, displayWidth);
                 else
                     jt.Util.uInt32ArrayCopyToUInt8Array(pixels, displayOriginX, backData, (line - displayOriginY) * signalWidth, displayWidth);
             }
@@ -206,8 +206,7 @@ jt.Monitor = function() {
 
     var displayUpdateSize = function() {
         if (!display) return;
-        display.displaySize((displayWidth * displayScaleX) | 0, (displayHeight * displayScaleY) | 0);
-        display.displayMinimumSize((displayWidth * DEFAULT_SCALE_X / DEFAULT_SCALE_Y) | 0, displayHeight);
+        display.displaySize(displayWidth, displayHeight, displayScaleX, displayScaleY);
     };
 
     var setDisplayScale = function(x, y) {
@@ -263,7 +262,9 @@ jt.Monitor = function() {
         offCanvas = document.createElement('canvas');
         offCanvas.width = jt.VideoStandard.PAL.width;
         offCanvas.height = jt.VideoStandard.PAL.height;
-        offContext = offCanvas.getContext("2d");
+        offContext = offCanvas.getContext("2d", { alpha: false, antialias: false });
+        offContext.globalCompositeOperation = "copy";
+        offContext.globalAlpha = 1;
         offImageData = offContext.getImageData(0, 0, offCanvas.width, offCanvas.height);
         if (offImageData.data.buffer)
             backBuffer = new Uint32Array(offImageData.data.buffer);

@@ -264,8 +264,8 @@
         0xF1F1F1		// FE
     ];
 
-    var ntscPalette = new Array(256);
-    var palPalette = new Array(256);
+    var ntscPalette = new Uint32Array(256);
+    var palPalette = new Uint32Array(256);
     for (var i = 0, len = ntscRGB.length; i < len; i++) {
         // Adds 100% alpha for ARGB use
         ntscPalette[i*2] = ntscPalette[i*2+1] = ntscRGB[i] + 0xff000000;

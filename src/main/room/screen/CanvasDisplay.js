@@ -9,7 +9,6 @@ jt.CanvasDisplay = function(mainElement) {
         setupOSD();
         setupButtonsBar();
         loadImages();
-        context = canvas.getContext("2d");
         monitor = new jt.Monitor();
         monitor.connectDisplay(self);
         monitor.addControlInputElements(self.keyControlsInputElements());
@@ -69,13 +68,10 @@ jt.CanvasDisplay = function(mainElement) {
             return DEFAULT_OPENING_SCALE_X;
     };
 
-    this.displaySize = function(width, height) {
-        setElementsSizes(width, height);
+    this.displaySize = function(width, height, scaleX, scaleY) {
+        setElementsSizes(width, height, scaleX, scaleY);
         setCRTFilter();
         if (!signalIsOn) drawLogo();
-    };
-
-    this.displayMinimumSize = function(width, height) {
     };
 
     this.displayCenter = function() {
@@ -170,30 +166,39 @@ jt.CanvasDisplay = function(mainElement) {
             }, 120);
     };
 
-    var setElementsSizes = function (width, height) {
+    var setElementsSizes = function (width, height, scaleX, scaleY) {
         canvas.width = width;
         canvas.height = height;
-        canvas.style.width = "" + width + "px";
-        canvas.style.height = "" + height + "px";
+        var totalWidth = (width * scaleX) | 0;
+        var totalHeight = (height * scaleY) | 0;
+        canvas.style.width = "" + totalWidth + "px";
+        canvas.style.height = "" + totalHeight + "px";
         // Do not change containers sizes while in fullscreen
         if (isFullscreen) return;
-        borderElement.style.width = "" + width + "px";
-        borderElement.style.height = "" + height + "px";
-        width += borderLateral * 2;
-        height += borderTop + borderBottom;
-        mainElement.style.width = "" + width + "px";
-        mainElement.style.height = "" + height + "px";
+        borderElement.style.width = "" + totalWidth + "px";
+        borderElement.style.height = "" + totalHeight + "px";
+        totalWidth += borderLateral * 2;
+        totalHeight += borderTop + borderBottom;
+        mainElement.style.width = "" + totalWidth + "px";
+        mainElement.style.height = "" + totalHeight + "px";
     };
 
     var setCRTFilter = function() {
-        if (context.imageSmoothingEnabled !== undefined) {
-            context.imageSmoothingEnabled = crtFilter;
-        } else {
-            context.webkitImageSmoothingEnabled = crtFilter;
-            context.mozImageSmoothingEnabled = crtFilter;
-            context.msImageSmoothingEnabled = crtFilter;
-        }
+        updateImageSmoothing();
     };
+
+    function updateImageSmoothing() {
+        canvas.style.imageRendering = crtFilter ? "initial" : canvasImageRenderingValue;
+
+        //var smoothing = !!crtFilter;
+        //if (canvasContext.imageSmoothingEnabled !== undefined)
+        //    canvasContext.imageSmoothingEnabled = smoothing;
+        //else {
+        //    canvasContext.webkitImageSmoothingEnabled = smoothing;
+        //    canvasContext.mozImageSmoothingEnabled = smoothing;
+        //    canvasContext.msImageSmoothingEnabled = smoothing;
+        //}
+    }
 
     var drawLogo = function () {
         context.fillStyle = "black";
@@ -251,7 +256,21 @@ jt.CanvasDisplay = function(mainElement) {
         canvas.style.outline = "none";
         fsElement.appendChild(canvas);
 
-        setElementsSizes(jt.CanvasDisplay.DEFAULT_STARTING_WIDTH, jt.CanvasDisplay.DEFAULT_STARTING_HEIGHT);
+        context = canvas.getContext("2d", { alpha: false, antialias: false });
+        context.globalCompositeOperation = "copy";
+        context.globalAlpha = 1;
+
+        // Try to determine correct value for image-rendering for the canvas filter modes
+        switch (jt.Util.browserInfo().name) {
+            case "CHROME":
+            case "EDGE":
+            case "OPERA":   canvasImageRenderingValue = "pixelated"; break;
+            case "FIREFOX": canvasImageRenderingValue = "-moz-crisp-edges"; break;
+            case "SAFARI":  canvasImageRenderingValue = "-webkit-optimize-contrast"; break;
+            default:        canvasImageRenderingValue = "pixelated";
+        }
+
+        setElementsSizes(jt.CanvasDisplay.DEFAULT_STARTING_WIDTH, jt.CanvasDisplay.DEFAULT_STARTING_HEIGHT, 1, 1);
 
         mainElement.appendChild(borderElement);
     };
@@ -402,6 +421,7 @@ jt.CanvasDisplay = function(mainElement) {
         }
     };
 
+
     var monitor;
     var controlsSocket;
     var settings;
@@ -411,6 +431,7 @@ jt.CanvasDisplay = function(mainElement) {
 
     var canvas;
     var context;
+    var canvasImageRenderingValue;
 
     var buttonsBar;
     var buttonsBarHideTimeout;
@@ -447,5 +468,5 @@ jt.CanvasDisplay = function(mainElement) {
 
 };
 
-jt.CanvasDisplay.DEFAULT_STARTING_WIDTH = 640;
-jt.CanvasDisplay.DEFAULT_STARTING_HEIGHT = 426;
+jt.CanvasDisplay.DEFAULT_STARTING_WIDTH = 160;
+jt.CanvasDisplay.DEFAULT_STARTING_HEIGHT = 213;

@@ -46,6 +46,11 @@ jt.Util = new function() {
             dest[destPos++] = src[srcPos++];
     };
 
+    this.arrayCopy2 = function(src, srcPos, dest, destPos, length) {
+        for (var i = length - 1; i >= 0; --i)
+        dest[destPos + i] = src[srcPos + i];
+    };
+
     this.uInt32ArrayCopyToUInt8Array = function(src, srcPos, dest, destPos, length) {
         var finalSrcPos = srcPos + length;
         destPos *= 4;
@@ -144,6 +149,28 @@ jt.Util = new function() {
             outer.push(inner);
         }
         return outer;
+    };
+
+    this.browserInfo = function() {
+        if (this.browserInfoAvailable) return this.browserInfoAvailable;
+
+        var ua = navigator.userAgent;
+        var temp;
+        var m = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+        if (/trident/i.test(m[1])) {
+            temp = /\brv[ :]+(\d+)/g.exec(ua) || [];
+            return this.browserInfoAvailable = { name:'IE', version: (temp[1] || '') };
+        }
+        if (m[1] === 'Chrome') {
+            temp = ua.match(/\bOPR\/(\d+)/);
+            if (temp != null) return this.browserInfoAvailable = { name:'Opera', version: temp[1] };
+        }
+        m = m[2] ? [m[1], m[2]]: [ navigator.appName, navigator.appVersion, '-?' ];
+        if ((temp = ua.match(/version\/(\d+)/i)) != null) m.splice(1, 1, temp[1]);
+        return this.browserInfoAvailable = {
+            name: m[0].toUpperCase(),
+            version: m[1]
+        };
     };
 
 };

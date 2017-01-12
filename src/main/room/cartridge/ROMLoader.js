@@ -61,7 +61,7 @@ jt.ROMLoader = function() {
         jt.Util.log("Reading ROM from URL: " + url);
 
         var req = new XMLHttpRequest();
-        req.withCredentials = true;
+        //req.withCredentials = true;   TODO Not needed...
         req.open("GET", url, true);
         req.responseType = "arraybuffer";
         req.timeout = 2000;

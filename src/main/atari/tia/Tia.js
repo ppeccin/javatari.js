@@ -1202,7 +1202,7 @@ jt.Tia = function(pCpu, pPia) {
     var powerOn = false;
 
     var clock;
-    var linePixels = jt.Util.arrayFill(new Array(LINE_WIDTH), 0);
+    var linePixels = new Uint32Array(LINE_WIDTH);
 
     var vSyncOn = false;
     var vBlankOn = false;
