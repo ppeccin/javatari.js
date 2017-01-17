@@ -275,7 +275,7 @@ jt.M6502 = function() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchOpcodeAndDiscard,
-            function() {
+            function implied() {
                 operation();
                 fetchNextOpcode();
             }
@@ -286,7 +286,7 @@ jt.M6502 = function() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchDataFromImmediate,
-            function() {
+            function immediateRead() {
                 operation();
                 fetchNextOpcode();
             }
@@ -298,7 +298,7 @@ jt.M6502 = function() {
             fetchOpcodeAndDecodeInstruction,
             fetchADL,                        // ADH will be zero
             fetchDataFromAD,
-            function() {
+            function zeroPageRead() {
                 operation();
                 fetchNextOpcode();
             }
@@ -311,7 +311,7 @@ jt.M6502 = function() {
             fetchADL,
             fetchADH,
             fetchDataFromAD,
-            function() {
+            function absoluteRead() {
                 operation();
                 fetchNextOpcode();
             }
@@ -323,16 +323,16 @@ jt.M6502 = function() {
             fetchOpcodeAndDecodeInstruction,
             fetchBAL,                        // BAH will be zero
             fetchDataFromBA,
-            function() {
+            function indirectXRead1() {
                 addXtoBAL();
                 fetchADLFromBA();
             },
-            function() {
+            function indirectXRead2() {
                 add1toBAL();
                 fetchADHFromBA();
             },
             fetchDataFromAD,
-            function() {
+            function indirectXRead3() {
                 operation();
                 fetchNextOpcode();
             }
@@ -346,12 +346,12 @@ jt.M6502 = function() {
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,
                 fetchBAH,
-                function() {
+                function absoluteIndexedRead1() {
                     addIndex();
                     fetchDataFromBA();
                     add1toBAHifBALCrossed();
                 },
-                function() {
+                function absoluteIndexedRead2() {
                     if (BALCrossed) {
                         fetchDataFromBA();
                     } else {
@@ -359,7 +359,7 @@ jt.M6502 = function() {
                         fetchNextOpcode();
                     }
                 },
-                function() {
+                function absoluteIndexedRead3() {
                     operation();
                     fetchNextOpcode();
                 }
@@ -374,11 +374,11 @@ jt.M6502 = function() {
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,                        // BAH will be zero
                 fetchDataFromBA,
-                function() {
+                function zeroPageIndexedRead1() {
                     addIndex();
                     fetchDataFromBA();
                 },
-                function() {
+                function zeroPageIndexedRead2() {
                     operation();
                     fetchNextOpcode();
                 }
@@ -391,16 +391,16 @@ jt.M6502 = function() {
             fetchOpcodeAndDecodeInstruction,
             fetchIAL,                           // IAH will be zero
             fetchBALFromIA,
-            function() {
+            function indirectYRead1() {
                 add1toIAL();
                 fetchBAHFromIA();
             },
-            function() {
+            function indirectYRead2() {
                 addYtoBAL();
                 fetchDataFromBA();
                 add1toBAHifBALCrossed();
             },
-            function() {
+            function indirectYRead3() {
                 if(BALCrossed) {
                     fetchDataFromBA();
                 } else {
@@ -408,7 +408,7 @@ jt.M6502 = function() {
                     fetchNextOpcode();
                 }
             },
-            function() {
+            function indirectYRead4() {
                 operation();
                 fetchNextOpcode();
             }
@@ -419,7 +419,7 @@ jt.M6502 = function() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchADL,                        // ADH will be zero
-            function() {
+            function zeroPageWrite() {
                 operation();
                 writeDataToAD();
             },
@@ -432,7 +432,7 @@ jt.M6502 = function() {
             fetchOpcodeAndDecodeInstruction,
             fetchADL,
             fetchADH,
-            function() {
+            function absoluteWrite() {
                 operation();
                 writeDataToAD();
             },
@@ -445,15 +445,15 @@ jt.M6502 = function() {
             fetchOpcodeAndDecodeInstruction,
             fetchBAL,                        // BAH will be zero
             fetchDataFromBA,
-            function() {
+            function indirectXWrite1() {
                 addXtoBAL();
                 fetchADLFromBA();
             },
-            function() {
+            function indirectXWrite2() {
                 add1toBAL();
                 fetchADHFromBA();
             },
-            function() {
+            function indirectXWrite3() {
                 operation();
                 writeDataToAD();
             },
@@ -468,12 +468,12 @@ jt.M6502 = function() {
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,
                 fetchBAH,
-                function() {
+                function absoluteIndexedWrite1() {
                     addIndex();
                     fetchDataFromBA();
                     add1toBAHifBALCrossed();
                 },
-                function() {
+                function absoluteIndexedWrite2() {
                     operation();
                     writeDataToBA();
                 },
@@ -489,7 +489,7 @@ jt.M6502 = function() {
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,                        // BAH will be zero
                 fetchDataFromBA,
-                function() {
+                function zeroPageIndexedWrite() {
                     addIndex();
                     operation();
                     writeDataToBA();
@@ -504,16 +504,16 @@ jt.M6502 = function() {
             fetchOpcodeAndDecodeInstruction,
             fetchIAL,                           // IAH will be zero
             fetchBALFromIA,
-            function() {
+            function indirectYWrite1() {
                 add1toIAL();
                 fetchBAHFromIA();
             },
-            function() {
+            function indirectYWrite2() {
                 addYtoBAL();
                 fetchDataFromBA();
                 add1toBAHifBALCrossed();
             },
-            function() {
+            function indirectYWrite3() {
                 operation();
                 writeDataToBA();
             },
@@ -528,7 +528,7 @@ jt.M6502 = function() {
             fetchADL,                        // ADH will be zero
             fetchDataFromAD,
             writeDataToAD,
-            function() {
+            function zeroPageReadModifyWrite() {
                 operation();
                 writeDataToAD();
             },
@@ -543,7 +543,7 @@ jt.M6502 = function() {
             fetchADH,
             fetchDataFromAD,
             writeDataToAD,
-            function() {
+            function absoluteReadModifyWrite() {
                 operation();
                 writeDataToAD();
             },
@@ -558,12 +558,12 @@ jt.M6502 = function() {
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,                        // BAH will be zero
                 fetchDataFromBA,
-                function () {
+                function zeroPageIndexedReadModifyWrite1() {
                     addIndex();
                     fetchDataFromBA();
                 },
                 writeDataToBA,
-                function () {
+                function zeroPageIndexedReadModifyWrite2() {
                     operation();
                     writeDataToBA();
                 },
@@ -579,14 +579,14 @@ jt.M6502 = function() {
                 fetchOpcodeAndDecodeInstruction,
                 fetchBAL,
                 fetchBAH,
-                function () {
+                function absoluteIndexedReadModifyWrite1() {
                     addIndex();
                     fetchDataFromBA();
                     add1toBAHifBALCrossed();
                 },
                 fetchDataFromBA,
                 writeDataToBA,
-                function () {
+                function absoluteIndexedReadModifyWrite2() {
                     operation();
                     writeDataToBA();
                 },
@@ -600,17 +600,17 @@ jt.M6502 = function() {
             fetchOpcodeAndDecodeInstruction,
             fetchBAL,                        // BAH will be zero
             fetchDataFromBA,
-            function() {
+            function indirectXReadModifyWrite1() {
                 addXtoBAL();
                 fetchADLFromBA();
             },
-            function() {
+            function indirectXReadModifyWrite2() {
                 add1toBAL();
                 fetchADHFromBA();
             },
             fetchDataFromAD,
             writeDataToAD,
-            function() {
+            function indirectXReadModifyWrite3() {
                 operation();
                 writeDataToAD();
             },
@@ -623,18 +623,18 @@ jt.M6502 = function() {
             fetchOpcodeAndDecodeInstruction,
             fetchIAL,                           // IAH will be zero
             fetchBALFromIA,
-            function() {
+            function indirectYReadModifyWrite1() {
                 add1toIAL();
                 fetchBAHFromIA();
             },
-            function() {
+            function indirectYReadModifyWrite2() {
                 addYtoBAL();
                 fetchDataFromBA();
                 add1toBAHifBALCrossed();
             },
             fetchDataFromBA,
             writeDataToBA,
-            function() {
+            function indirectYReadModifyWrite3() {
                 operation();
                 writeDataToBA();
             },
@@ -649,268 +649,268 @@ jt.M6502 = function() {
     var opcodes =      new Array(256);
     var instructions = new Array(256);
 
-    opcodes[0x00] = "BRK";  instructions[0x00] = BRK();
-    opcodes[0x01] = "ORA";  instructions[0x01] = ORA(indirectXRead);
-    opcodes[0x02] = "uKIL"; instructions[0x02] = uKIL();
-    opcodes[0x03] = "uSLO"; instructions[0x03] = uSLO(indirectXReadModifyWrite);
-    opcodes[0x04] = "uNOP"; instructions[0x04] = uNOP(zeroPageRead);
-    opcodes[0x05] = "ORA";  instructions[0x05] = ORA(zeroPageRead);
-    opcodes[0x06] = "ASL";  instructions[0x06] = ASL(zeroPageReadModifyWrite);
-    opcodes[0x07] = "uSLO"; instructions[0x07] = uSLO(zeroPageReadModifyWrite);
-    opcodes[0x08] = "PHP";  instructions[0x08] = PHP();
-    opcodes[0x09] = "ORA";  instructions[0x09] = ORA(immediateRead);
-    opcodes[0x0a] = "ASL";  instructions[0x0a] = ASL_ACC();
-    opcodes[0x0b] = "uANC"; instructions[0x0b] = uANC(immediateRead);
-    opcodes[0x0c] = "uNOP"; instructions[0x0c] = uNOP(absoluteRead);
-    opcodes[0x0d] = "ORA";  instructions[0x0d] = ORA(absoluteRead);
-    opcodes[0x0e] = "ASL";  instructions[0x0e] = ASL(absoluteReadModifyWrite);
-    opcodes[0x0f] = "uSLO"; instructions[0x0f] = uSLO(absoluteReadModifyWrite);
-    opcodes[0x10] = "BPL";  instructions[0x10] = Bxx(bN, 0);                 // BPL
-    opcodes[0x11] = "ORA";  instructions[0x11] = ORA(indirectYRead);
-    opcodes[0x12] = "uKIL"; instructions[0x12] = uKIL();
-    opcodes[0x13] = "uSLO"; instructions[0x13] = uSLO(indirectYReadModifyWrite);
-    opcodes[0x14] = "uNOP"; instructions[0x14] = uNOP(zeroPageIndexedRead(rX));
-    opcodes[0x15] = "ORA";  instructions[0x15] = ORA(zeroPageIndexedRead(rX));
-    opcodes[0x16] = "ASL";  instructions[0x16] = ASL(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0x17] = "uSLO"; instructions[0x17] = uSLO(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0x18] = "CLC";  instructions[0x18] = CLC();
-    opcodes[0x19] = "ORA";  instructions[0x19] = ORA(absoluteIndexedRead(rY));
-    opcodes[0x1a] = "uNOP"; instructions[0x1a] = uNOP(implied);
-    opcodes[0x1b] = "uSLO"; instructions[0x1b] = uSLO(absoluteIndexedReadModifyWrite(rY));
-    opcodes[0x1c] = "uNOP"; instructions[0x1c] = uNOP(absoluteIndexedRead(rX));
-    opcodes[0x1d] = "ORA";  instructions[0x1d] = ORA(absoluteIndexedRead(rX));
-    opcodes[0x1e] = "ASL";  instructions[0x1e] = ASL(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0x1f] = "uSLO"; instructions[0x1f] = uSLO(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0x20] = "JSR";  instructions[0x20] = JSR();
-    opcodes[0x21] = "AND";  instructions[0x21] = AND(indirectXRead);
-    opcodes[0x22] = "uKIL"; instructions[0x22] = uKIL();
-    opcodes[0x23] = "uRLA"; instructions[0x23] = uRLA(indirectXReadModifyWrite);
-    opcodes[0x24] = "BIT";  instructions[0x24] = BIT(zeroPageRead);
-    opcodes[0x25] = "AND";  instructions[0x25] = AND(zeroPageRead);
-    opcodes[0x26] = "ROL";  instructions[0x26] = ROL(zeroPageReadModifyWrite);
-    opcodes[0x27] = "uRLA"; instructions[0x27] = uRLA(zeroPageReadModifyWrite);
-    opcodes[0x28] = "PLP";  instructions[0x28] = PLP();
-    opcodes[0x29] = "AND";  instructions[0x29] = AND(immediateRead);
-    opcodes[0x2a] = "ROL";  instructions[0x2a] = ROL_ACC();
-    opcodes[0x2b] = "uANC"; instructions[0x2b] = uANC(immediateRead);
-    opcodes[0x2c] = "BIT";  instructions[0x2c] = BIT(absoluteRead);
-    opcodes[0x2d] = "AND";  instructions[0x2d] = AND(absoluteRead);
-    opcodes[0x2e] = "ROL";  instructions[0x2e] = ROL(absoluteReadModifyWrite);
-    opcodes[0x2f] = "uRLA"; instructions[0x2f] = uRLA(absoluteReadModifyWrite);
-    opcodes[0x30] = "BMI";  instructions[0x30] = Bxx(bN, 1);                 // BMI
-    opcodes[0x31] = "AND";  instructions[0x31] = AND(indirectYRead);
-    opcodes[0x32] = "uKIL"; instructions[0x32] = uKIL();
-    opcodes[0x33] = "uRLA"; instructions[0x33] = uRLA(indirectYReadModifyWrite);
-    opcodes[0x34] = "uNOP"; instructions[0x34] = uNOP(zeroPageIndexedRead(rX));
-    opcodes[0x35] = "AND";  instructions[0x35] = AND(zeroPageIndexedRead(rX));
-    opcodes[0x36] = "ROL";  instructions[0x36] = ROL(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0x37] = "uRLA"; instructions[0x37] = uRLA(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0x38] = "SEC";  instructions[0x38] = SEC();
-    opcodes[0x39] = "AND";  instructions[0x39] = AND(absoluteIndexedRead(rY));
-    opcodes[0x3a] = "uNOP"; instructions[0x3a] = uNOP(implied);
-    opcodes[0x3b] = "uRLA"; instructions[0x3b] = uRLA(absoluteIndexedReadModifyWrite(rY));
-    opcodes[0x3c] = "uNOP"; instructions[0x3c] = uNOP(absoluteIndexedRead(rX));
-    opcodes[0x3d] = "AND";  instructions[0x3d] = AND(absoluteIndexedRead(rX));
-    opcodes[0x3e] = "ROL";  instructions[0x3e] = ROL(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0x3f] = "uRLA"; instructions[0x3f] = uRLA(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0x40] = "RTI";  instructions[0x40] = RTI();
-    opcodes[0x41] = "EOR";  instructions[0x41] = EOR(indirectXRead);
-    opcodes[0x42] = "uKIL"; instructions[0x42] = uKIL();
-    opcodes[0x43] = "uSRE"; instructions[0x43] = uSRE(indirectXReadModifyWrite);
-    opcodes[0x44] = "uNOP"; instructions[0x44] = uNOP(zeroPageRead);
-    opcodes[0x45] = "EOR";  instructions[0x45] = EOR(zeroPageRead);
-    opcodes[0x46] = "LSR";  instructions[0x46] = LSR(zeroPageReadModifyWrite);
-    opcodes[0x47] = "uSRE"; instructions[0x47] = uSRE(zeroPageReadModifyWrite);
-    opcodes[0x48] = "PHA";  instructions[0x48] = PHA();
-    opcodes[0x49] = "EOR";  instructions[0x49] = EOR(immediateRead);
-    opcodes[0x4a] = "LSR";  instructions[0x4a] = LSR_ACC();
-    opcodes[0x4b] = "uASR"; instructions[0x4b] = uASR(immediateRead);
-    opcodes[0x4c] = "JMP";  instructions[0x4c] = JMP_ABS();
-    opcodes[0x4d] = "EOR";  instructions[0x4d] = EOR(absoluteRead);
-    opcodes[0x4e] = "LSR";  instructions[0x4e] = LSR(absoluteReadModifyWrite);
-    opcodes[0x4f] = "uSRE"; instructions[0x4f] = uSRE(absoluteReadModifyWrite);
-    opcodes[0x50] = "BVC";  instructions[0x50] = Bxx(bV, 0);                 // BVC
-    opcodes[0x51] = "EOR";  instructions[0x51] = EOR(indirectYRead);
-    opcodes[0x52] = "uKIL"; instructions[0x52] = uKIL();
-    opcodes[0x53] = "uSRE"; instructions[0x53] = uSRE(indirectYReadModifyWrite);
-    opcodes[0x54] = "uNOP"; instructions[0x54] = uNOP(zeroPageIndexedRead(rX));
-    opcodes[0x55] = "EOR";  instructions[0x55] = EOR(zeroPageIndexedRead(rX));
-    opcodes[0x56] = "LSR";  instructions[0x56] = LSR(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0x57] = "uSRE"; instructions[0x57] = uSRE(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0x58] = "CLI";  instructions[0x58] = CLI();
-    opcodes[0x59] = "EOR";  instructions[0x59] = EOR(absoluteIndexedRead(rY));
-    opcodes[0x5a] = "uNOP"; instructions[0x5a] = uNOP(implied);
-    opcodes[0x5b] = "uSRE"; instructions[0x5b] = uSRE(absoluteIndexedReadModifyWrite(rY));
-    opcodes[0x5c] = "uNOP"; instructions[0x5c] = uNOP(absoluteIndexedRead(rX));
-    opcodes[0x5d] = "EOR";  instructions[0x5d] = EOR(absoluteIndexedRead(rX));
-    opcodes[0x5e] = "LSR";  instructions[0x5e] = LSR(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0x5f] = "uSRE"; instructions[0x5f] = uSRE(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0x60] = "RTS";  instructions[0x60] = RTS();
-    opcodes[0x61] = "ADC";  instructions[0x61] = ADC(indirectXRead);
-    opcodes[0x62] = "uKIL"; instructions[0x62] = uKIL();
-    opcodes[0x63] = "uRRA"; instructions[0x63] = uRRA(indirectXReadModifyWrite);
-    opcodes[0x64] = "uNOP"; instructions[0x64] = uNOP(zeroPageRead);
-    opcodes[0x65] = "ADC";  instructions[0x65] = ADC(zeroPageRead);
-    opcodes[0x66] = "ROR";  instructions[0x66] = ROR(zeroPageReadModifyWrite);
-    opcodes[0x67] = "uRRA"; instructions[0x67] = uRRA(zeroPageReadModifyWrite);
-    opcodes[0x68] = "PLA";  instructions[0x68] = PLA();
-    opcodes[0x69] = "ADC";  instructions[0x69] = ADC(immediateRead);
-    opcodes[0x6a] = "ROR";  instructions[0x6a] = ROR_ACC();
-    opcodes[0x6b] = "uARR"; instructions[0x6b] = uARR(immediateRead);
-    opcodes[0x6c] = "JMP";  instructions[0x6c] = JMP_IND();
-    opcodes[0x6d] = "ADC";  instructions[0x6d] = ADC(absoluteRead);
-    opcodes[0x6e] = "ROR";  instructions[0x6e] = ROR(absoluteReadModifyWrite);
-    opcodes[0x6f] = "uRRA"; instructions[0x6f] = uRRA(absoluteReadModifyWrite);
-    opcodes[0x70] = "BVS";  instructions[0x70] = Bxx(bV, 1);                 // BVS
-    opcodes[0x71] = "ADC";  instructions[0x71] = ADC(indirectYRead);
-    opcodes[0x72] = "uKIL"; instructions[0x72] = uKIL();
-    opcodes[0x73] = "uRRA"; instructions[0x73] = uRRA(indirectYReadModifyWrite);
-    opcodes[0x74] = "uNOP"; instructions[0x74] = uNOP(zeroPageIndexedRead(rX));
-    opcodes[0x75] = "ADC";  instructions[0x75] = ADC(zeroPageIndexedRead(rX));
-    opcodes[0x76] = "ROR";  instructions[0x76] = ROR(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0x77] = "uRRA"; instructions[0x77] = uRRA(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0x78] = "SEI";  instructions[0x78] = SEI();
-    opcodes[0x79] = "ADC";  instructions[0x79] = ADC(absoluteIndexedRead(rY));
-    opcodes[0x7a] = "uNOP"; instructions[0x7a] = uNOP(implied);
-    opcodes[0x7b] = "uRRA"; instructions[0x7b] = uRRA(absoluteIndexedReadModifyWrite(rY));
-    opcodes[0x7c] = "uNOP"; instructions[0x7c] = uNOP(absoluteIndexedRead(rX));
-    opcodes[0x7d] = "ADC";  instructions[0x7d] = ADC(absoluteIndexedRead(rX));
-    opcodes[0x7e] = "ROR";  instructions[0x7e] = ROR(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0x7f] = "uRRA"; instructions[0x7f] = uRRA(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0x80] = "uNOP"; instructions[0x80] = uNOP(immediateRead);
-    opcodes[0x81] = "STA";  instructions[0x81] = STA(indirectXWrite);
-    opcodes[0x82] = "uNOP"; instructions[0x82] = uNOP(immediateRead);
-    opcodes[0x83] = "uSAX"; instructions[0x83] = uSAX(indirectXWrite);
-    opcodes[0x84] = "STY";  instructions[0x84] = STY(zeroPageWrite);
-    opcodes[0x85] = "STA";  instructions[0x85] = STA(zeroPageWrite);
-    opcodes[0x86] = "STX";  instructions[0x86] = STX(zeroPageWrite);
-    opcodes[0x87] = "uSAX"; instructions[0x87] = uSAX(zeroPageWrite);
-    opcodes[0x88] = "DEY";  instructions[0x88] = DEY();
-    opcodes[0x89] = "uNOP"; instructions[0x89] = uNOP(immediateRead);
-    opcodes[0x8a] = "TXA";  instructions[0x8a] = TXA();
-    opcodes[0x8b] = "uANE"; instructions[0x8b] = uANE(immediateRead);
-    opcodes[0x8c] = "STY";  instructions[0x8c] = STY(absoluteWrite);
-    opcodes[0x8d] = "STA";  instructions[0x8d] = STA(absoluteWrite);
-    opcodes[0x8e] = "STX";  instructions[0x8e] = STX(absoluteWrite);
-    opcodes[0x8f] = "uSAX"; instructions[0x8f] = uSAX(absoluteWrite);
-    opcodes[0x90] = "BCC";  instructions[0x90] = Bxx(bC, 0);                 // BCC
-    opcodes[0x91] = "STA";  instructions[0x91] = STA(indirectYWrite);
-    opcodes[0x92] = "uKIL"; instructions[0x92] = uKIL();
-    opcodes[0x93] = "uSHA"; instructions[0x93] = uSHA(indirectYWrite);
-    opcodes[0x94] = "STY";  instructions[0x94] = STY(zeroPageIndexedWrite(rX));
-    opcodes[0x95] = "STA";  instructions[0x95] = STA(zeroPageIndexedWrite(rX));
-    opcodes[0x96] = "STX";  instructions[0x96] = STX(zeroPageIndexedWrite(rY));
-    opcodes[0x97] = "uSAX"; instructions[0x97] = uSAX(zeroPageIndexedWrite(rY));
-    opcodes[0x98] = "TYA";  instructions[0x98] = TYA();
-    opcodes[0x99] = "STA";  instructions[0x99] = STA(absoluteIndexedWrite(rY));
-    opcodes[0x9a] = "TXS";  instructions[0x9a] = TXS();
-    opcodes[0x9b] = "uSHS"; instructions[0x9b] = uSHS(absoluteIndexedWrite(rY));
-    opcodes[0x9c] = "uSHY"; instructions[0x9c] = uSHY(absoluteIndexedWrite(rX));
-    opcodes[0x9d] = "STA";  instructions[0x9d] = STA(absoluteIndexedWrite(rX));
-    opcodes[0x9e] = "uSHX"; instructions[0x9e] = uSHX(absoluteIndexedWrite(rY));
-    opcodes[0x9f] = "uSHA"; instructions[0x9f] = uSHA(absoluteIndexedWrite(rY));
-    opcodes[0xa0] = "LDY";  instructions[0xa0] = LDY(immediateRead);
-    opcodes[0xa1] = "LDA";  instructions[0xa1] = LDA(indirectXRead);
-    opcodes[0xa2] = "LDX";  instructions[0xa2] = LDX(immediateRead);
-    opcodes[0xa3] = "uLAX"; instructions[0xa3] = uLAX(indirectXRead);
-    opcodes[0xa4] = "LDY";  instructions[0xa4] = LDY(zeroPageRead);
-    opcodes[0xa5] = "LDA";  instructions[0xa5] = LDA(zeroPageRead);
-    opcodes[0xa6] = "LDX";  instructions[0xa6] = LDX(zeroPageRead);
-    opcodes[0xa7] = "uLAX"; instructions[0xa7] = uLAX(zeroPageRead);
-    opcodes[0xa8] = "TAY";  instructions[0xa8] = TAY();
-    opcodes[0xa9] = "LDA";  instructions[0xa9] = LDA(immediateRead);
-    opcodes[0xaa] = "TAX";  instructions[0xaa] = TAX();
-    opcodes[0xab] = "uLXA"; instructions[0xab] = uLXA(immediateRead);
-    opcodes[0xac] = "LDY";  instructions[0xac] = LDY(absoluteRead);
-    opcodes[0xad] = "LDA";  instructions[0xad] = LDA(absoluteRead);
-    opcodes[0xae] = "LDX";  instructions[0xae] = LDX(absoluteRead);
-    opcodes[0xaf] = "uLAX"; instructions[0xaf] = uLAX(absoluteRead);
-    opcodes[0xb0] = "BCS";  instructions[0xb0] = Bxx(bC, 1);                 // BCS
-    opcodes[0xb1] = "LDA";  instructions[0xb1] = LDA(indirectYRead);
-    opcodes[0xb2] = "uKIL"; instructions[0xb2] = uKIL();
-    opcodes[0xb3] = "uLAX"; instructions[0xb3] = uLAX(indirectYRead);
-    opcodes[0xb4] = "LDY";  instructions[0xb4] = LDY(zeroPageIndexedRead(rX));
-    opcodes[0xb5] = "LDA";  instructions[0xb5] = LDA(zeroPageIndexedRead(rX));
-    opcodes[0xb6] = "LDX";  instructions[0xb6] = LDX(zeroPageIndexedRead(rY));
-    opcodes[0xb7] = "uLAX"; instructions[0xb7] = uLAX(zeroPageIndexedRead(rY));
-    opcodes[0xb8] = "CLV";  instructions[0xb8] = CLV();
-    opcodes[0xb9] = "LDA";  instructions[0xb9] = LDA(absoluteIndexedRead(rY));
-    opcodes[0xba] = "TSX";  instructions[0xba] = TSX();
-    opcodes[0xbb] = "uLAS"; instructions[0xbb] = uLAS(absoluteIndexedRead(rY));
-    opcodes[0xbc] = "LDY";  instructions[0xbc] = LDY(absoluteIndexedRead(rX));
-    opcodes[0xbd] = "LDA";  instructions[0xbd] = LDA(absoluteIndexedRead(rX));
-    opcodes[0xbe] = "LDX";  instructions[0xbe] = LDX(absoluteIndexedRead(rY));
-    opcodes[0xbf] = "uLAX"; instructions[0xbf] = uLAX(absoluteIndexedRead(rY));
-    opcodes[0xc0] = "CPY";  instructions[0xc0] = CPY(immediateRead);
-    opcodes[0xc1] = "CMP";  instructions[0xc1] = CMP(indirectXRead);
-    opcodes[0xc2] = "uNOP"; instructions[0xc2] = uNOP(immediateRead);
-    opcodes[0xc3] = "uDCP"; instructions[0xc3] = uDCP(indirectXReadModifyWrite);
-    opcodes[0xc4] = "CPY";  instructions[0xc4] = CPY(zeroPageRead);
-    opcodes[0xc5] = "CMP";  instructions[0xc5] = CMP(zeroPageRead);
-    opcodes[0xc6] = "DEC";  instructions[0xc6] = DEC(zeroPageReadModifyWrite);
-    opcodes[0xc7] = "uDCP"; instructions[0xc7] = uDCP(zeroPageReadModifyWrite);
-    opcodes[0xc8] = "INY";  instructions[0xc8] = INY();
-    opcodes[0xc9] = "CMP";  instructions[0xc9] = CMP(immediateRead);
-    opcodes[0xca] = "DEX";  instructions[0xca] = DEX();
-    opcodes[0xcb] = "uSBX"; instructions[0xcb] = uSBX(immediateRead);
-    opcodes[0xcc] = "CPY";  instructions[0xcc] = CPY(absoluteRead);
-    opcodes[0xcd] = "CMP";  instructions[0xcd] = CMP(absoluteRead);
-    opcodes[0xce] = "DEC";  instructions[0xce] = DEC(absoluteReadModifyWrite);
-    opcodes[0xcf] = "uDCP"; instructions[0xcf] = uDCP(absoluteReadModifyWrite);
-    opcodes[0xd0] = "BNE";  instructions[0xd0] = Bxx(bZ, 0);                 // BNE
-    opcodes[0xd1] = "CMP";  instructions[0xd1] = CMP(indirectYRead);
-    opcodes[0xd2] = "uKIL"; instructions[0xd2] = uKIL();
-    opcodes[0xd3] = "uDCP"; instructions[0xd3] = uDCP(indirectYReadModifyWrite);
-    opcodes[0xd4] = "uNOP"; instructions[0xd4] = uNOP(zeroPageIndexedRead(rX));
-    opcodes[0xd5] = "CMP";  instructions[0xd5] = CMP(zeroPageIndexedRead(rX));
-    opcodes[0xd6] = "DEC";  instructions[0xd6] = DEC(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0xd7] = "uDCP"; instructions[0xd7] = uDCP(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0xd8] = "CLD";  instructions[0xd8] = CLD();
-    opcodes[0xd9] = "CMP";  instructions[0xd9] = CMP(absoluteIndexedRead(rY));
-    opcodes[0xda] = "uNOP"; instructions[0xda] = uNOP(implied);
-    opcodes[0xdb] = "uDCP"; instructions[0xdb] = uDCP(absoluteIndexedReadModifyWrite(rY));
-    opcodes[0xdc] = "uNOP"; instructions[0xdc] = uNOP(absoluteIndexedRead(rX));
-    opcodes[0xdd] = "CMP";  instructions[0xdd] = CMP(absoluteIndexedRead(rX));
-    opcodes[0xde] = "DEC";  instructions[0xde] = DEC(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0xdf] = "uDCP"; instructions[0xdf] = uDCP(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0xe0] = "CPX";  instructions[0xe0] = CPX(immediateRead);
-    opcodes[0xe1] = "SBC";  instructions[0xe1] = SBC(indirectXRead);
-    opcodes[0xe2] = "uNOP"; instructions[0xe2] = uNOP(immediateRead);
-    opcodes[0xe3] = "uISB"; instructions[0xe3] = uISB(indirectXReadModifyWrite);
-    opcodes[0xe4] = "CPX";  instructions[0xe4] = CPX(zeroPageRead);
-    opcodes[0xe5] = "SBC";  instructions[0xe5] = SBC(zeroPageRead);
-    opcodes[0xe6] = "INC";  instructions[0xe6] = INC(zeroPageReadModifyWrite);
-    opcodes[0xe7] = "uISB"; instructions[0xe7] = uISB(zeroPageReadModifyWrite);
-    opcodes[0xe8] = "INX";  instructions[0xe8] = INX();
-    opcodes[0xe9] = "SBC";  instructions[0xe9] = SBC(immediateRead);
-    opcodes[0xea] = "NOP";  instructions[0xea] = NOP();
-    opcodes[0xeb] = "SBC";  instructions[0xeb] = SBC(immediateRead);
-    opcodes[0xec] = "CPX";  instructions[0xec] = CPX(absoluteRead);
-    opcodes[0xed] = "SBC";  instructions[0xed] = SBC(absoluteRead);
-    opcodes[0xee] = "INC";  instructions[0xee] = INC(absoluteReadModifyWrite);
-    opcodes[0xef] = "uISB"; instructions[0xef] = uISB(absoluteReadModifyWrite);
-    opcodes[0xf0] = "BEQ";  instructions[0xf0] = Bxx(bZ, 1);                 // BEQ
-    opcodes[0xf1] = "SBC";  instructions[0xf1] = SBC(indirectYRead);
-    opcodes[0xf2] = "uKIL"; instructions[0xf2] = uKIL();
-    opcodes[0xf3] = "uISB"; instructions[0xf3] = uISB(indirectYReadModifyWrite);
-    opcodes[0xf4] = "uNOP"; instructions[0xf4] = uNOP(zeroPageIndexedRead(rX));
-    opcodes[0xf5] = "SBC";  instructions[0xf5] = SBC(zeroPageIndexedRead(rX));
-    opcodes[0xf6] = "INC";  instructions[0xf6] = INC(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0xf7] = "uISB"; instructions[0xf7] = uISB(zeroPageIndexedReadModifyWrite(rX));
-    opcodes[0xf8] = "SED";  instructions[0xf8] = SED();
-    opcodes[0xf9] = "SBC";  instructions[0xf9] = SBC(absoluteIndexedRead(rY));
-    opcodes[0xfa] = "uNOP"; instructions[0xfa] = uNOP(implied);
-    opcodes[0xfb] = "uISB"; instructions[0xfb] = uISB(absoluteIndexedReadModifyWrite(rY));
-    opcodes[0xfc] = "uNOP"; instructions[0xfc] = uNOP(absoluteIndexedRead(rX));
-    opcodes[0xfd] = "SBC";  instructions[0xfd] = SBC(absoluteIndexedRead(rX));
-    opcodes[0xfe] = "INC";  instructions[0xfe] = INC(absoluteIndexedReadModifyWrite(rX));
-    opcodes[0xff] = "uISB"; instructions[0xff] = uISB(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x00] = "BRK";  instructions[0x00] = newBRK();
+    opcodes[0x01] = "ORA";  instructions[0x01] = newORA(indirectXRead);
+    opcodes[0x02] = "uKIL"; instructions[0x02] = newuKIL();
+    opcodes[0x03] = "uSLO"; instructions[0x03] = newuSLO(indirectXReadModifyWrite);
+    opcodes[0x04] = "uNOP"; instructions[0x04] = newuNOP(zeroPageRead);
+    opcodes[0x05] = "ORA";  instructions[0x05] = newORA(zeroPageRead);
+    opcodes[0x06] = "ASL";  instructions[0x06] = newASL(zeroPageReadModifyWrite);
+    opcodes[0x07] = "uSLO"; instructions[0x07] = newuSLO(zeroPageReadModifyWrite);
+    opcodes[0x08] = "PHP";  instructions[0x08] = newPHP();
+    opcodes[0x09] = "ORA";  instructions[0x09] = newORA(immediateRead);
+    opcodes[0x0a] = "ASL";  instructions[0x0a] = newASL_ACC();
+    opcodes[0x0b] = "uANC"; instructions[0x0b] = newuANC(immediateRead);
+    opcodes[0x0c] = "uNOP"; instructions[0x0c] = newuNOP(absoluteRead);
+    opcodes[0x0d] = "ORA";  instructions[0x0d] = newORA(absoluteRead);
+    opcodes[0x0e] = "ASL";  instructions[0x0e] = newASL(absoluteReadModifyWrite);
+    opcodes[0x0f] = "uSLO"; instructions[0x0f] = newuSLO(absoluteReadModifyWrite);
+    opcodes[0x10] = "BPL";  instructions[0x10] = newBxx(bN, 0);                 // BPL
+    opcodes[0x11] = "ORA";  instructions[0x11] = newORA(indirectYRead);
+    opcodes[0x12] = "uKIL"; instructions[0x12] = newuKIL();
+    opcodes[0x13] = "uSLO"; instructions[0x13] = newuSLO(indirectYReadModifyWrite);
+    opcodes[0x14] = "uNOP"; instructions[0x14] = newuNOP(zeroPageIndexedRead(rX));
+    opcodes[0x15] = "ORA";  instructions[0x15] = newORA(zeroPageIndexedRead(rX));
+    opcodes[0x16] = "ASL";  instructions[0x16] = newASL(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x17] = "uSLO"; instructions[0x17] = newuSLO(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x18] = "CLC";  instructions[0x18] = newCLC();
+    opcodes[0x19] = "ORA";  instructions[0x19] = newORA(absoluteIndexedRead(rY));
+    opcodes[0x1a] = "uNOP"; instructions[0x1a] = newuNOP(implied);
+    opcodes[0x1b] = "uSLO"; instructions[0x1b] = newuSLO(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0x1c] = "uNOP"; instructions[0x1c] = newuNOP(absoluteIndexedRead(rX));
+    opcodes[0x1d] = "ORA";  instructions[0x1d] = newORA(absoluteIndexedRead(rX));
+    opcodes[0x1e] = "ASL";  instructions[0x1e] = newASL(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x1f] = "uSLO"; instructions[0x1f] = newuSLO(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x20] = "JSR";  instructions[0x20] = newJSR();
+    opcodes[0x21] = "AND";  instructions[0x21] = newAND(indirectXRead);
+    opcodes[0x22] = "uKIL"; instructions[0x22] = newuKIL();
+    opcodes[0x23] = "uRLA"; instructions[0x23] = newuRLA(indirectXReadModifyWrite);
+    opcodes[0x24] = "BIT";  instructions[0x24] = newBIT(zeroPageRead);
+    opcodes[0x25] = "AND";  instructions[0x25] = newAND(zeroPageRead);
+    opcodes[0x26] = "ROL";  instructions[0x26] = newROL(zeroPageReadModifyWrite);
+    opcodes[0x27] = "uRLA"; instructions[0x27] = newuRLA(zeroPageReadModifyWrite);
+    opcodes[0x28] = "PLP";  instructions[0x28] = newPLP();
+    opcodes[0x29] = "AND";  instructions[0x29] = newAND(immediateRead);
+    opcodes[0x2a] = "ROL";  instructions[0x2a] = newROL_ACC();
+    opcodes[0x2b] = "uANC"; instructions[0x2b] = newuANC(immediateRead);
+    opcodes[0x2c] = "BIT";  instructions[0x2c] = newBIT(absoluteRead);
+    opcodes[0x2d] = "AND";  instructions[0x2d] = newAND(absoluteRead);
+    opcodes[0x2e] = "ROL";  instructions[0x2e] = newROL(absoluteReadModifyWrite);
+    opcodes[0x2f] = "uRLA"; instructions[0x2f] = newuRLA(absoluteReadModifyWrite);
+    opcodes[0x30] = "BMI";  instructions[0x30] = newBxx(bN, 1);                 // BMI
+    opcodes[0x31] = "AND";  instructions[0x31] = newAND(indirectYRead);
+    opcodes[0x32] = "uKIL"; instructions[0x32] = newuKIL();
+    opcodes[0x33] = "uRLA"; instructions[0x33] = newuRLA(indirectYReadModifyWrite);
+    opcodes[0x34] = "uNOP"; instructions[0x34] = newuNOP(zeroPageIndexedRead(rX));
+    opcodes[0x35] = "AND";  instructions[0x35] = newAND(zeroPageIndexedRead(rX));
+    opcodes[0x36] = "ROL";  instructions[0x36] = newROL(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x37] = "uRLA"; instructions[0x37] = newuRLA(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x38] = "SEC";  instructions[0x38] = newSEC();
+    opcodes[0x39] = "AND";  instructions[0x39] = newAND(absoluteIndexedRead(rY));
+    opcodes[0x3a] = "uNOP"; instructions[0x3a] = newuNOP(implied);
+    opcodes[0x3b] = "uRLA"; instructions[0x3b] = newuRLA(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0x3c] = "uNOP"; instructions[0x3c] = newuNOP(absoluteIndexedRead(rX));
+    opcodes[0x3d] = "AND";  instructions[0x3d] = newAND(absoluteIndexedRead(rX));
+    opcodes[0x3e] = "ROL";  instructions[0x3e] = newROL(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x3f] = "uRLA"; instructions[0x3f] = newuRLA(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x40] = "RTI";  instructions[0x40] = newRTI();
+    opcodes[0x41] = "EOR";  instructions[0x41] = newEOR(indirectXRead);
+    opcodes[0x42] = "uKIL"; instructions[0x42] = newuKIL();
+    opcodes[0x43] = "uSRE"; instructions[0x43] = newuSRE(indirectXReadModifyWrite);
+    opcodes[0x44] = "uNOP"; instructions[0x44] = newuNOP(zeroPageRead);
+    opcodes[0x45] = "EOR";  instructions[0x45] = newEOR(zeroPageRead);
+    opcodes[0x46] = "LSR";  instructions[0x46] = newLSR(zeroPageReadModifyWrite);
+    opcodes[0x47] = "uSRE"; instructions[0x47] = newuSRE(zeroPageReadModifyWrite);
+    opcodes[0x48] = "PHA";  instructions[0x48] = mewPHA();
+    opcodes[0x49] = "EOR";  instructions[0x49] = newEOR(immediateRead);
+    opcodes[0x4a] = "LSR";  instructions[0x4a] = newLSR_ACC();
+    opcodes[0x4b] = "uASR"; instructions[0x4b] = newuASR(immediateRead);
+    opcodes[0x4c] = "JMP";  instructions[0x4c] = newJMP_ABS();
+    opcodes[0x4d] = "EOR";  instructions[0x4d] = newEOR(absoluteRead);
+    opcodes[0x4e] = "LSR";  instructions[0x4e] = newLSR(absoluteReadModifyWrite);
+    opcodes[0x4f] = "uSRE"; instructions[0x4f] = newuSRE(absoluteReadModifyWrite);
+    opcodes[0x50] = "BVC";  instructions[0x50] = newBxx(bV, 0);                 // BVC
+    opcodes[0x51] = "EOR";  instructions[0x51] = newEOR(indirectYRead);
+    opcodes[0x52] = "uKIL"; instructions[0x52] = newuKIL();
+    opcodes[0x53] = "uSRE"; instructions[0x53] = newuSRE(indirectYReadModifyWrite);
+    opcodes[0x54] = "uNOP"; instructions[0x54] = newuNOP(zeroPageIndexedRead(rX));
+    opcodes[0x55] = "EOR";  instructions[0x55] = newEOR(zeroPageIndexedRead(rX));
+    opcodes[0x56] = "LSR";  instructions[0x56] = newLSR(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x57] = "uSRE"; instructions[0x57] = newuSRE(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x58] = "CLI";  instructions[0x58] = newCLI();
+    opcodes[0x59] = "EOR";  instructions[0x59] = newEOR(absoluteIndexedRead(rY));
+    opcodes[0x5a] = "uNOP"; instructions[0x5a] = newuNOP(implied);
+    opcodes[0x5b] = "uSRE"; instructions[0x5b] = newuSRE(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0x5c] = "uNOP"; instructions[0x5c] = newuNOP(absoluteIndexedRead(rX));
+    opcodes[0x5d] = "EOR";  instructions[0x5d] = newEOR(absoluteIndexedRead(rX));
+    opcodes[0x5e] = "LSR";  instructions[0x5e] = newLSR(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x5f] = "uSRE"; instructions[0x5f] = newuSRE(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x60] = "RTS";  instructions[0x60] = newRTS();
+    opcodes[0x61] = "ADC";  instructions[0x61] = newADC(indirectXRead);
+    opcodes[0x62] = "uKIL"; instructions[0x62] = newuKIL();
+    opcodes[0x63] = "uRRA"; instructions[0x63] = newuRRA(indirectXReadModifyWrite);
+    opcodes[0x64] = "uNOP"; instructions[0x64] = newuNOP(zeroPageRead);
+    opcodes[0x65] = "ADC";  instructions[0x65] = newADC(zeroPageRead);
+    opcodes[0x66] = "ROR";  instructions[0x66] = newROR(zeroPageReadModifyWrite);
+    opcodes[0x67] = "uRRA"; instructions[0x67] = newuRRA(zeroPageReadModifyWrite);
+    opcodes[0x68] = "PLA";  instructions[0x68] = newPLA();
+    opcodes[0x69] = "ADC";  instructions[0x69] = newADC(immediateRead);
+    opcodes[0x6a] = "ROR";  instructions[0x6a] = newROR_ACC();
+    opcodes[0x6b] = "uARR"; instructions[0x6b] = newuARR(immediateRead);
+    opcodes[0x6c] = "JMP";  instructions[0x6c] = newJMP_IND();
+    opcodes[0x6d] = "ADC";  instructions[0x6d] = newADC(absoluteRead);
+    opcodes[0x6e] = "ROR";  instructions[0x6e] = newROR(absoluteReadModifyWrite);
+    opcodes[0x6f] = "uRRA"; instructions[0x6f] = newuRRA(absoluteReadModifyWrite);
+    opcodes[0x70] = "BVS";  instructions[0x70] = newBxx(bV, 1);                 // BVS
+    opcodes[0x71] = "ADC";  instructions[0x71] = newADC(indirectYRead);
+    opcodes[0x72] = "uKIL"; instructions[0x72] = newuKIL();
+    opcodes[0x73] = "uRRA"; instructions[0x73] = newuRRA(indirectYReadModifyWrite);
+    opcodes[0x74] = "uNOP"; instructions[0x74] = newuNOP(zeroPageIndexedRead(rX));
+    opcodes[0x75] = "ADC";  instructions[0x75] = newADC(zeroPageIndexedRead(rX));
+    opcodes[0x76] = "ROR";  instructions[0x76] = newROR(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x77] = "uRRA"; instructions[0x77] = newuRRA(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0x78] = "SEI";  instructions[0x78] = newSEI();
+    opcodes[0x79] = "ADC";  instructions[0x79] = newADC(absoluteIndexedRead(rY));
+    opcodes[0x7a] = "uNOP"; instructions[0x7a] = newuNOP(implied);
+    opcodes[0x7b] = "uRRA"; instructions[0x7b] = newuRRA(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0x7c] = "uNOP"; instructions[0x7c] = newuNOP(absoluteIndexedRead(rX));
+    opcodes[0x7d] = "ADC";  instructions[0x7d] = newADC(absoluteIndexedRead(rX));
+    opcodes[0x7e] = "ROR";  instructions[0x7e] = newROR(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x7f] = "uRRA"; instructions[0x7f] = newuRRA(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0x80] = "uNOP"; instructions[0x80] = newuNOP(immediateRead);
+    opcodes[0x81] = "STA";  instructions[0x81] = newSTA(indirectXWrite);
+    opcodes[0x82] = "uNOP"; instructions[0x82] = newuNOP(immediateRead);
+    opcodes[0x83] = "uSAX"; instructions[0x83] = newuSAX(indirectXWrite);
+    opcodes[0x84] = "STY";  instructions[0x84] = newSTY(zeroPageWrite);
+    opcodes[0x85] = "STA";  instructions[0x85] = newSTA(zeroPageWrite);
+    opcodes[0x86] = "STX";  instructions[0x86] = newSTX(zeroPageWrite);
+    opcodes[0x87] = "uSAX"; instructions[0x87] = newuSAX(zeroPageWrite);
+    opcodes[0x88] = "DEY";  instructions[0x88] = newDEY();
+    opcodes[0x89] = "uNOP"; instructions[0x89] = newuNOP(immediateRead);
+    opcodes[0x8a] = "TXA";  instructions[0x8a] = newTXA();
+    opcodes[0x8b] = "uANE"; instructions[0x8b] = newuANE(immediateRead);
+    opcodes[0x8c] = "STY";  instructions[0x8c] = newSTY(absoluteWrite);
+    opcodes[0x8d] = "STA";  instructions[0x8d] = newSTA(absoluteWrite);
+    opcodes[0x8e] = "STX";  instructions[0x8e] = newSTX(absoluteWrite);
+    opcodes[0x8f] = "uSAX"; instructions[0x8f] = newuSAX(absoluteWrite);
+    opcodes[0x90] = "BCC";  instructions[0x90] = newBxx(bC, 0);                 // BCC
+    opcodes[0x91] = "STA";  instructions[0x91] = newSTA(indirectYWrite);
+    opcodes[0x92] = "uKIL"; instructions[0x92] = newuKIL();
+    opcodes[0x93] = "uSHA"; instructions[0x93] = newuSHA(indirectYWrite);
+    opcodes[0x94] = "STY";  instructions[0x94] = newSTY(zeroPageIndexedWrite(rX));
+    opcodes[0x95] = "STA";  instructions[0x95] = newSTA(zeroPageIndexedWrite(rX));
+    opcodes[0x96] = "STX";  instructions[0x96] = newSTX(zeroPageIndexedWrite(rY));
+    opcodes[0x97] = "uSAX"; instructions[0x97] = newuSAX(zeroPageIndexedWrite(rY));
+    opcodes[0x98] = "TYA";  instructions[0x98] = newTYA();
+    opcodes[0x99] = "STA";  instructions[0x99] = newSTA(absoluteIndexedWrite(rY));
+    opcodes[0x9a] = "TXS";  instructions[0x9a] = newTXS();
+    opcodes[0x9b] = "uSHS"; instructions[0x9b] = newuSHS(absoluteIndexedWrite(rY));
+    opcodes[0x9c] = "uSHY"; instructions[0x9c] = newuSHY(absoluteIndexedWrite(rX));
+    opcodes[0x9d] = "STA";  instructions[0x9d] = newSTA(absoluteIndexedWrite(rX));
+    opcodes[0x9e] = "uSHX"; instructions[0x9e] = newuSHX(absoluteIndexedWrite(rY));
+    opcodes[0x9f] = "uSHA"; instructions[0x9f] = newuSHA(absoluteIndexedWrite(rY));
+    opcodes[0xa0] = "LDY";  instructions[0xa0] = newLDY(immediateRead);
+    opcodes[0xa1] = "LDA";  instructions[0xa1] = newLDA(indirectXRead);
+    opcodes[0xa2] = "LDX";  instructions[0xa2] = newLDX(immediateRead);
+    opcodes[0xa3] = "uLAX"; instructions[0xa3] = newuLAX(indirectXRead);
+    opcodes[0xa4] = "LDY";  instructions[0xa4] = newLDY(zeroPageRead);
+    opcodes[0xa5] = "LDA";  instructions[0xa5] = newLDA(zeroPageRead);
+    opcodes[0xa6] = "LDX";  instructions[0xa6] = newLDX(zeroPageRead);
+    opcodes[0xa7] = "uLAX"; instructions[0xa7] = newuLAX(zeroPageRead);
+    opcodes[0xa8] = "TAY";  instructions[0xa8] = newTAY();
+    opcodes[0xa9] = "LDA";  instructions[0xa9] = newLDA(immediateRead);
+    opcodes[0xaa] = "TAX";  instructions[0xaa] = newTAX();
+    opcodes[0xab] = "uLXA"; instructions[0xab] = newuLXA(immediateRead);
+    opcodes[0xac] = "LDY";  instructions[0xac] = newLDY(absoluteRead);
+    opcodes[0xad] = "LDA";  instructions[0xad] = newLDA(absoluteRead);
+    opcodes[0xae] = "LDX";  instructions[0xae] = newLDX(absoluteRead);
+    opcodes[0xaf] = "uLAX"; instructions[0xaf] = newuLAX(absoluteRead);
+    opcodes[0xb0] = "BCS";  instructions[0xb0] = newBxx(bC, 1);                 // BCS
+    opcodes[0xb1] = "LDA";  instructions[0xb1] = newLDA(indirectYRead);
+    opcodes[0xb2] = "uKIL"; instructions[0xb2] = newuKIL();
+    opcodes[0xb3] = "uLAX"; instructions[0xb3] = newuLAX(indirectYRead);
+    opcodes[0xb4] = "LDY";  instructions[0xb4] = newLDY(zeroPageIndexedRead(rX));
+    opcodes[0xb5] = "LDA";  instructions[0xb5] = newLDA(zeroPageIndexedRead(rX));
+    opcodes[0xb6] = "LDX";  instructions[0xb6] = newLDX(zeroPageIndexedRead(rY));
+    opcodes[0xb7] = "uLAX"; instructions[0xb7] = newuLAX(zeroPageIndexedRead(rY));
+    opcodes[0xb8] = "CLV";  instructions[0xb8] = newCLV();
+    opcodes[0xb9] = "LDA";  instructions[0xb9] = newLDA(absoluteIndexedRead(rY));
+    opcodes[0xba] = "TSX";  instructions[0xba] = newTSX();
+    opcodes[0xbb] = "uLAS"; instructions[0xbb] = newuLAS(absoluteIndexedRead(rY));
+    opcodes[0xbc] = "LDY";  instructions[0xbc] = newLDY(absoluteIndexedRead(rX));
+    opcodes[0xbd] = "LDA";  instructions[0xbd] = newLDA(absoluteIndexedRead(rX));
+    opcodes[0xbe] = "LDX";  instructions[0xbe] = newLDX(absoluteIndexedRead(rY));
+    opcodes[0xbf] = "uLAX"; instructions[0xbf] = newuLAX(absoluteIndexedRead(rY));
+    opcodes[0xc0] = "CPY";  instructions[0xc0] = newCPY(immediateRead);
+    opcodes[0xc1] = "CMP";  instructions[0xc1] = newCMP(indirectXRead);
+    opcodes[0xc2] = "uNOP"; instructions[0xc2] = newuNOP(immediateRead);
+    opcodes[0xc3] = "uDCP"; instructions[0xc3] = newuDCP(indirectXReadModifyWrite);
+    opcodes[0xc4] = "CPY";  instructions[0xc4] = newCPY(zeroPageRead);
+    opcodes[0xc5] = "CMP";  instructions[0xc5] = newCMP(zeroPageRead);
+    opcodes[0xc6] = "DEC";  instructions[0xc6] = newDEC(zeroPageReadModifyWrite);
+    opcodes[0xc7] = "uDCP"; instructions[0xc7] = newuDCP(zeroPageReadModifyWrite);
+    opcodes[0xc8] = "INY";  instructions[0xc8] = newINY();
+    opcodes[0xc9] = "CMP";  instructions[0xc9] = newCMP(immediateRead);
+    opcodes[0xca] = "DEX";  instructions[0xca] = newDEX();
+    opcodes[0xcb] = "uSBX"; instructions[0xcb] = newuSBX(immediateRead);
+    opcodes[0xcc] = "CPY";  instructions[0xcc] = newCPY(absoluteRead);
+    opcodes[0xcd] = "CMP";  instructions[0xcd] = newCMP(absoluteRead);
+    opcodes[0xce] = "DEC";  instructions[0xce] = newDEC(absoluteReadModifyWrite);
+    opcodes[0xcf] = "uDCP"; instructions[0xcf] = newuDCP(absoluteReadModifyWrite);
+    opcodes[0xd0] = "BNE";  instructions[0xd0] = newBxx(bZ, 0);                 // BNE
+    opcodes[0xd1] = "CMP";  instructions[0xd1] = newCMP(indirectYRead);
+    opcodes[0xd2] = "uKIL"; instructions[0xd2] = newuKIL();
+    opcodes[0xd3] = "uDCP"; instructions[0xd3] = newuDCP(indirectYReadModifyWrite);
+    opcodes[0xd4] = "uNOP"; instructions[0xd4] = newuNOP(zeroPageIndexedRead(rX));
+    opcodes[0xd5] = "CMP";  instructions[0xd5] = newCMP(zeroPageIndexedRead(rX));
+    opcodes[0xd6] = "DEC";  instructions[0xd6] = newDEC(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0xd7] = "uDCP"; instructions[0xd7] = newuDCP(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0xd8] = "CLD";  instructions[0xd8] = newCLD();
+    opcodes[0xd9] = "CMP";  instructions[0xd9] = newCMP(absoluteIndexedRead(rY));
+    opcodes[0xda] = "uNOP"; instructions[0xda] = newuNOP(implied);
+    opcodes[0xdb] = "uDCP"; instructions[0xdb] = newuDCP(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0xdc] = "uNOP"; instructions[0xdc] = newuNOP(absoluteIndexedRead(rX));
+    opcodes[0xdd] = "CMP";  instructions[0xdd] = newCMP(absoluteIndexedRead(rX));
+    opcodes[0xde] = "DEC";  instructions[0xde] = newDEC(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0xdf] = "uDCP"; instructions[0xdf] = newuDCP(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0xe0] = "CPX";  instructions[0xe0] = newCPX(immediateRead);
+    opcodes[0xe1] = "SBC";  instructions[0xe1] = newSBC(indirectXRead);
+    opcodes[0xe2] = "uNOP"; instructions[0xe2] = newuNOP(immediateRead);
+    opcodes[0xe3] = "uISB"; instructions[0xe3] = newuISB(indirectXReadModifyWrite);
+    opcodes[0xe4] = "CPX";  instructions[0xe4] = newCPX(zeroPageRead);
+    opcodes[0xe5] = "SBC";  instructions[0xe5] = newSBC(zeroPageRead);
+    opcodes[0xe6] = "INC";  instructions[0xe6] = newINC(zeroPageReadModifyWrite);
+    opcodes[0xe7] = "uISB"; instructions[0xe7] = newuISB(zeroPageReadModifyWrite);
+    opcodes[0xe8] = "newINX";  instructions[0xe8] = newINX();
+    opcodes[0xe9] = "SBC";  instructions[0xe9] = newSBC(immediateRead);
+    opcodes[0xea] = "NOP";  instructions[0xea] = newNOP();
+    opcodes[0xeb] = "SBC";  instructions[0xeb] = newSBC(immediateRead);
+    opcodes[0xec] = "CPX";  instructions[0xec] = newCPX(absoluteRead);
+    opcodes[0xed] = "SBC";  instructions[0xed] = newSBC(absoluteRead);
+    opcodes[0xee] = "INC";  instructions[0xee] = newINC(absoluteReadModifyWrite);
+    opcodes[0xef] = "uISB"; instructions[0xef] = newuISB(absoluteReadModifyWrite);
+    opcodes[0xf0] = "BEQ";  instructions[0xf0] = newBxx(bZ, 1);                 // BEQ
+    opcodes[0xf1] = "SBC";  instructions[0xf1] = newSBC(indirectYRead);
+    opcodes[0xf2] = "uKIL"; instructions[0xf2] = newuKIL();
+    opcodes[0xf3] = "uISB"; instructions[0xf3] = newuISB(indirectYReadModifyWrite);
+    opcodes[0xf4] = "uNOP"; instructions[0xf4] = newuNOP(zeroPageIndexedRead(rX));
+    opcodes[0xf5] = "SBC";  instructions[0xf5] = newSBC(zeroPageIndexedRead(rX));
+    opcodes[0xf6] = "INC";  instructions[0xf6] = newINC(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0xf7] = "uISB"; instructions[0xf7] = newuISB(zeroPageIndexedReadModifyWrite(rX));
+    opcodes[0xf8] = "SED";  instructions[0xf8] = newSED();
+    opcodes[0xf9] = "SBC";  instructions[0xf9] = newSBC(absoluteIndexedRead(rY));
+    opcodes[0xfa] = "uNOP"; instructions[0xfa] = newuNOP(implied);
+    opcodes[0xfb] = "uISB"; instructions[0xfb] = newuISB(absoluteIndexedReadModifyWrite(rY));
+    opcodes[0xfc] = "uNOP"; instructions[0xfc] = newuNOP(absoluteIndexedRead(rX));
+    opcodes[0xfd] = "SBC";  instructions[0xfd] = newSBC(absoluteIndexedRead(rX));
+    opcodes[0xfe] = "INC";  instructions[0xfe] = newINC(absoluteIndexedReadModifyWrite(rX));
+    opcodes[0xff] = "uISB"; instructions[0xff] = newuISB(absoluteIndexedReadModifyWrite(rX));
 
 
     // Single Byte instructions
 
-    function ASL_ACC() {
-        return implied(function() {
+    function newASL_ACC() {
+        return implied(function ASL_ACC() {
             setC(A > 127);
             A = (A << 1) & 255;
             setZ(A);
@@ -918,64 +918,64 @@ jt.M6502 = function() {
         });
     }
 
-    function CLC() {
-        return implied(function() {
+    function newCLC() {
+        return implied(function CLC() {
             C = 0;
         });
     }
 
-    function CLD() {
-        return implied(function() {
+    function newCLD() {
+        return implied(function CLD() {
             D = 0;
         });
     }
 
-    function CLI() {
-        return implied(function() {
+    function newCLI() {
+        return implied(function CLI() {
             I = 0;
         });
     }
 
-    function CLV() {
-        return implied(function() {
+    function newCLV() {
+        return implied(function CLV() {
             V = 0;
         });
     }
 
-    function DEX() {
-        return implied(function() {
+    function newDEX() {
+        return implied(function DEX() {
             X = (X - 1) & 255;
             setZ(X);
             setN(X);
         });
     }
 
-    function DEY() {
-        return implied(function() {
+    function newDEY() {
+        return implied(function DEY() {
             Y = (Y - 1) & 255;
             setZ(Y);
             setN(Y);
         });
     }
 
-    function INX() {
-        return implied(function() {
+    function newINX() {
+        return implied(function INX() {
             X = (X + 1) & 255;
             setZ(X);
             setN(X);
         });
     }
 
-    function INY() {
-        return implied(function() {
+    function newINY() {
+        return implied(function INY() {
             Y = (Y + 1) & 255;
             setZ(Y);
             setN(Y);
         });
     }
 
-    function LSR_ACC() {
-        return implied(function() {
+    function newLSR_ACC() {
+        return implied(function LSR_ACC() {
             C = A & 0x01;
             A >>>= 1;
             setZ(A);
@@ -983,14 +983,14 @@ jt.M6502 = function() {
         });
     }
 
-    function NOP() {
-        return implied(function() {
+    function newNOP() {
+        return implied(function NOP() {
             // nothing
         });
     }
 
-    function ROL_ACC() {
-        return implied(function() {
+    function newROL_ACC() {
+        return implied(function ROL_ACC() {
             var newC = A > 127;
             A = ((A << 1) | C) & 255;
             setC(newC);
@@ -999,8 +999,8 @@ jt.M6502 = function() {
         });
     }
 
-    function ROR_ACC() {
-        return implied(function() {
+    function newROR_ACC() {
+        return implied(function ROR_ACC() {
             var newC = A & 0x01;
             A = (A >>> 1) | (C << 7);
             setC(newC);
@@ -1009,71 +1009,71 @@ jt.M6502 = function() {
         });
     }
 
-    function SEC() {
-        return implied(function() {
+    function newSEC() {
+        return implied(function SEC() {
             C = 1;
         });
     }
 
-    function SED() {
-        return implied(function() {
+    function newSED() {
+        return implied(function SED() {
             D = 1;
         });
     }
 
-    function SEI() {
-        return implied(function() {
+    function newSEI() {
+        return implied(function SEI() {
             I = 1;
         });
     }
 
-    function TAX() {
-        return implied(function() {
+    function newTAX() {
+        return implied(function TAX() {
             X = A;
             setZ(X);
             setN(X);
         });
     }
 
-    function TAY() {
-        return implied(function() {
+    function newTAY() {
+        return implied(function TAY() {
             Y = A;
             setZ(Y);
             setN(Y);
         });
     }
 
-    function TSX() {
-        return implied(function() {
+    function newTSX() {
+        return implied(function TSX() {
             X = SP;
             setZ(X);
             setN(X);
         });
     }
 
-    function TXA() {
-        return implied(function() {
+    function newTXA() {
+        return implied(function TXA() {
             A = X;
             setZ(A);
             setN(A);
         });
     }
 
-    function TXS() {
-        return implied(function() {
+    function newTXS() {
+        return implied(function TXS() {
             SP = X;
         });
     }
 
-    function TYA() {
-        return implied(function() {
+    function newTYA() {
+        return implied(function TYA() {
             A = Y;
             setZ(A);
             setN(A);
         });
     }
 
-    function uKIL() {
+    function newuKIL() {
         return [
             fetchOpcodeAndDecodeInstruction,
             function() {
@@ -1085,8 +1085,8 @@ jt.M6502 = function() {
         ];
     }
 
-    function uNOP(addressing) {
-        return addressing(function() {
+    function newuNOP(addressing) {
+        return addressing(function uNOP() {
             illegalOpcode("NOP/DOP");
             // nothing
         });
@@ -1095,8 +1095,8 @@ jt.M6502 = function() {
 
     // Internal Execution on Memory Data
 
-    function ADC(addressing) {
-        return addressing(function() {
+    function newADC(addressing) {
+        return addressing(function ADC() {
             if (D) {
                 var operand = data;
                 var AL = (A & 15) + (operand & 15) + C;
@@ -1119,16 +1119,16 @@ jt.M6502 = function() {
         });
     }
 
-    function AND(addressing) {
-        return addressing(function() {
+    function newAND(addressing) {
+        return addressing(function AND() {
             A &= data;
             setZ(A);
             setN(A);
         });
     }
 
-    function BIT(addressing) {
-        return addressing(function() {
+    function newBIT(addressing) {
+        return addressing(function BIT() {
             var par = data;
             setZ(A & par);
             setV(par & 0x40);
@@ -1136,8 +1136,8 @@ jt.M6502 = function() {
         });
     }
 
-    function CMP(addressing) {
-        return addressing(function() {
+    function newCMP(addressing) {
+        return addressing(function CMP() {
             var val = (A - data) & 255;
             setC(A >= data);
             setZ(val);
@@ -1145,8 +1145,8 @@ jt.M6502 = function() {
         });
     }
 
-    function CPX(addressing) {
-        return addressing(function() {
+    function newCPX(addressing) {
+        return addressing(function CPX() {
             var val = (X - data) & 255;
             setC(X >= data);
             setZ(val);
@@ -1154,8 +1154,8 @@ jt.M6502 = function() {
         });
     }
 
-    function CPY(addressing) {
-        return addressing(function() {
+    function newCPY(addressing) {
+        return addressing(function CPY() {
             var val = (Y - data) & 255;
             setC(Y >= data);
             setZ(val);
@@ -1163,48 +1163,48 @@ jt.M6502 = function() {
         });
     }
 
-    function EOR(addressing) {
-        return addressing(function() {
+    function newEOR(addressing) {
+        return addressing(function EOR() {
             A ^= data;
             setZ(A);
             setN(A);
         });
     }
 
-    function LDA(addressing) {
-        return addressing(function() {
+    function newLDA(addressing) {
+        return addressing(function LDA() {
             A = data;
             setZ(A);
             setN(A);
         });
     }
 
-    function LDX(addressing) {
-        return addressing(function() {
+    function newLDX(addressing) {
+        return addressing(function LDX() {
             X = data;
             setZ(X);
             setN(X);
         });
     }
 
-    function LDY(addressing) {
-        return addressing(function() {
+    function newLDY(addressing) {
+        return addressing(function LDY() {
             Y = data;
             setZ(Y);
             setN(Y);
         });
     }
 
-    function ORA(addressing) {
-        return addressing(function() {
+    function newORA(addressing) {
+        return addressing(function ORA() {
             A |= data;
             setZ(A);
             setN(A);
         });
     }
 
-    function SBC(addressing) {
-        return addressing(function() {
+    function newSBC(addressing) {
+        return addressing(function SBC() {
             if (D) {
                 var operand = data;
                 var AL = (A & 15) - (operand & 15) - (1-C);
@@ -1229,8 +1229,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uANC(addressing) {
-        return addressing(function() {
+    function newuANC(addressing) {
+        return addressing(function uANC() {
             illegalOpcode("ANC");
             A &= data;
             setZ(A);
@@ -1238,16 +1238,16 @@ jt.M6502 = function() {
         });
     }
 
-    function uANE(addressing) {
-        return addressing(function() {
+    function newuANE(addressing) {
+        return addressing(function uANE() {
             illegalOpcode("ANE");
             // Exact operation unknown. Do nothing
         });
     }
 
-    function uARR(addressing) {
+    function newuARR(addressing) {
         // Some sources say flags are affected per ROR, others say its more complex. The complex one is chosen
-        return addressing(function() {
+        return addressing(function uARR() {
             illegalOpcode("ARR");
             var val = A & data;
             var oldC = C ? 0x80 : 0;
@@ -1263,8 +1263,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uASR(addressing) {
-        return addressing(function() {
+    function newuASR(addressing) {
+        return addressing(function uASR() {
             illegalOpcode("ASR");
             var val = A & data;
             C = (val & 0x01);		// bit 0
@@ -1275,8 +1275,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uLAS(addressing) {
-        return addressing(function() {
+    function newuLAS(addressing) {
+        return addressing(function uLAS() {
             illegalOpcode("LAS");
             var val = SP & data;
             A = val;
@@ -1287,8 +1287,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uLAX(addressing) {
-        return addressing(function() {
+    function newuLAX(addressing) {
+        return addressing(function uLAX() {
             illegalOpcode("LAX");
             var val = data;
             A = val;
@@ -1298,8 +1298,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uLXA(addressing) {
-        return addressing(function() {
+    function newuLXA(addressing) {
+        return addressing(function uLXA() {
             // Some sources say its an OR with $EE then AND with IMM, others exclude the OR,
             // others exclude both the OR and the AND. Excluding just the OR...
             illegalOpcode("LXA");
@@ -1311,8 +1311,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uSBX(addressing) {
-        return addressing(function() {
+    function newuSBX(addressing) {
+        return addressing(function uSBX() {
             illegalOpcode("SBX");
             var par = A & X;
             var val = data;
@@ -1327,42 +1327,42 @@ jt.M6502 = function() {
 
     // Store operations
 
-    function STA(addressing) {
-        return addressing(function() {
+    function newSTA(addressing) {
+        return addressing(function STA() {
             data = A;
         });
     }
 
-    function STX(addressing) {
-        return addressing(function() {
+    function newSTX(addressing) {
+        return addressing(function STX() {
             data = X;
         });
     }
 
-    function STY(addressing) {
-        return addressing(function() {
+    function newSTY(addressing) {
+        return addressing(function STY() {
             data = Y;
         });
     }
 
-    function uSAX(addressing) {
-        return addressing(function() {
+    function newuSAX(addressing) {
+        return addressing(function uSAX() {
             // Some sources say it would affect N and Z flags, some say it wouldn't. Chose not to affect
             illegalOpcode("SAX");
             data = A & X;
         });
     }
 
-    function uSHA(addressing) {
-        return addressing(function() {
+    function newuSHA(addressing) {
+        return addressing(function uSHA() {
             illegalOpcode("SHA");
             data = A & X & ((BA >>> 8) + 1) & 255; // A & X & (High byte of effective address + 1) !!!
             // data would also be stored BAH if page boundary is crossed. Unobservable, not needed here
         });
     }
 
-    function uSHS(addressing) {
-        return addressing(function() {
+    function newuSHS(addressing) {
+        return addressing(function uSHS() {
             illegalOpcode("SHS");
             var val = A & X;
             SP = val;
@@ -1371,16 +1371,16 @@ jt.M6502 = function() {
         });
     }
 
-    function uSHX(addressing) {
-        return addressing(function() {
+    function newuSHX(addressing) {
+        return addressing(function uSHX() {
             illegalOpcode("SHX");
             data = X & ((BA >>> 8) + 1) & 255; // X & (High byte of effective address + 1) !!!
             // data would also be stored BAH if page boundary is crossed. Unobservable, not needed here
         });
     }
 
-    function uSHY(addressing) {
-        return addressing(function() {
+    function newuSHY(addressing) {
+        return addressing(function uSHY() {
             illegalOpcode("SHY");
             data = Y & ((BA >>> 8) + 1) & 255; // Y & (High byte of effective address + 1) !!!
             // data would also be stored BAH if page boundary is crossed. Unobservable, not needed here
@@ -1390,8 +1390,8 @@ jt.M6502 = function() {
 
     // Read-Modify-Write operations
 
-    function ASL(addressing) {
-        return addressing(function() {
+    function newASL(addressing) {
+        return addressing(function ASL() {
             setC(data > 127);
             var par = (data << 1) & 255;
             data = par;
@@ -1400,8 +1400,8 @@ jt.M6502 = function() {
         });
     }
 
-    function DEC(addressing) {
-        return addressing(function() {
+    function newDEC(addressing) {
+        return addressing(function DEC() {
             var par = (data - 1) & 255;
             data = par;
             setZ(par);
@@ -1409,8 +1409,8 @@ jt.M6502 = function() {
         });
     }
 
-    function INC(addressing) {
-        return addressing(function() {
+    function newINC(addressing) {
+        return addressing(function INC() {
             var par = (data + 1) & 255;
             data = par;
             setZ(par);
@@ -1418,8 +1418,8 @@ jt.M6502 = function() {
         });
     }
 
-    function LSR(addressing) {
-        return addressing(function() {
+    function newLSR(addressing) {
+        return addressing(function LSR() {
             C = data & 0x01;
             data >>>= 1;
             setZ(data);
@@ -1427,8 +1427,8 @@ jt.M6502 = function() {
         });
     }
 
-    function ROL(addressing) {
-        return addressing(function() {
+    function newROL(addressing) {
+        return addressing(function ROL() {
             var newC = data > 127;
             var par = ((data << 1) | C) & 255;
             data = par;
@@ -1438,8 +1438,8 @@ jt.M6502 = function() {
         });
     }
 
-    function ROR(addressing) {
-        return addressing(function() {
+    function newROR(addressing) {
+        return addressing(function ROR() {
             var newC = data & 0x01;
             var par = (data >>> 1) | (C << 7);
             data = par;
@@ -1449,8 +1449,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uDCP(addressing) {
-        return addressing(function() {
+    function newuDCP(addressing) {
+        return addressing(function uDCP() {
             illegalOpcode("DCP");
             var par = (data - 1) & 255;
             data = par;
@@ -1461,8 +1461,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uISB(addressing) {
-        return addressing(function() {
+    function newuISB(addressing) {
+        return addressing(function uISB() {
             illegalOpcode("ISB");
             data = (data + 1) & 255;    // ISB is the same as SBC but incs the operand first
             if (D) {
@@ -1489,8 +1489,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uRLA(addressing) {
-        return addressing(function() {
+    function newuRLA(addressing) {
+        return addressing(function uRLA() {
             illegalOpcode("RLA");
             var val = data;
             var oldC = C;
@@ -1503,8 +1503,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uRRA(addressing) {
-        return addressing(function() {
+    function newuRRA(addressing) {
+        return addressing(function uRRA() {
             illegalOpcode("RRA");
             var val = data;
             var oldC = C ? 0x80 : 0;
@@ -1534,8 +1534,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uSLO(addressing) {
-        return addressing(function() {
+    function newuSLO(addressing) {
+        return addressing(function uSLO() {
             illegalOpcode("SLO");
             var val = data;
             setC(val & 0x80);		// bit 7 was set
@@ -1548,8 +1548,8 @@ jt.M6502 = function() {
         });
     }
 
-    function uSRE(addressing) {
-        return addressing(function() {
+    function newuSRE(addressing) {
+        return addressing(function uSRE() {
             illegalOpcode("SRE");
             var val = data;
             setC(val & 0x01);		// bit 0 was set
@@ -1565,30 +1565,30 @@ jt.M6502 = function() {
 
     // Miscellaneous operations
 
-    function PHA() {
+    function mewPHA() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchOpcodeAndDiscard,
-            function() { pushToStack(A); },
+            function PHA() { pushToStack(A); },
             fetchNextOpcode
         ];
     }
 
-    function PHP() {
+    function newPHP() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchOpcodeAndDiscard,
-            function() { pushToStack(getStatusBits()); },
+            function PHP() { pushToStack(getStatusBits()); },
             fetchNextOpcode
         ];
     }
 
-    function PLA() {
+    function newPLA() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchOpcodeAndDiscard,
             peekFromStack,
-            function() {
+            function PLA() {
                 A = popFromStack();
                 setZ(A);
                 setN(A);
@@ -1597,101 +1597,101 @@ jt.M6502 = function() {
         ];
     }
 
-    function PLP() {
+    function newPLP() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchOpcodeAndDiscard,
             peekFromStack,
-            function() { setStatusBits(popFromStack()); },
+            function PLP() { setStatusBits(popFromStack()); },
             fetchNextOpcode
         ];
     }
 
-    function JSR() {
+    function newJSR() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchADL,
             peekFromStack,
-            function() { pushToStack((PC >>> 8)  & 0xff); },
-            function() { pushToStack(PC & 0xff); },
+            function JSR1() { pushToStack((PC >>> 8)  & 0xff); },
+            function JSR2() { pushToStack(PC & 0xff); },
             fetchADH,
-            function() { PC = AD; fetchNextOpcode(); }
+            function JSR3() { PC = AD; fetchNextOpcode(); }
         ];
     }
 
-    function BRK() {
+    function newBRK() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchDataFromImmediate,                 // For debugging purposes, use operand as an arg for BRK!
-            function() {
+            function BRK1() {
                 if (self.debug) self.breakpoint("BRK " + data);
                 pushToStack((PC >>> 8) & 0xff);
             },
-            function() { pushToStack(PC & 0xff); },
-            function() { pushToStack(getStatusBits()); },
-            function() { AD = bus.read(IRQ_VECTOR); },
-            function() { AD |= bus.read(IRQ_VECTOR + 1) << 8; },
-            function() { PC = AD; fetchNextOpcode(); }
+            function BRK2() { pushToStack(PC & 0xff); },
+            function BRK3() { pushToStack(getStatusBits()); },
+            function BRK4() { AD = bus.read(IRQ_VECTOR); },
+            function BRK5() { AD |= bus.read(IRQ_VECTOR + 1) << 8; },
+            function BRK6() { PC = AD; fetchNextOpcode(); }
         ];
     }
 
-    function RTI() {
+    function newRTI() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchOpcodeAndDiscard,
             peekFromStack,
-            function() { setStatusBits(popFromStack()); },
-            function() { AD = popFromStack(); },
-            function() { AD |= popFromStack() << 8; },
-            function() { PC = AD; fetchNextOpcode(); }
+            function RTI1() { setStatusBits(popFromStack()); },
+            function RTI2() { AD = popFromStack(); },
+            function RTI3() { AD |= popFromStack() << 8; },
+            function RTI4() { PC = AD; fetchNextOpcode(); }
         ];
     }
 
-    function RTS() {
+    function newRTS() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchOpcodeAndDiscard,
             peekFromStack,
-            function() { AD = popFromStack(); },
-            function() { AD |= popFromStack() << 8; },
-            function() { PC = AD; fetchDataFromImmediate(); },
+            function RTS1() { AD = popFromStack(); },
+            function RTS2() { AD |= popFromStack() << 8; },
+            function RTS3() { PC = AD; fetchDataFromImmediate(); },
             fetchNextOpcode
         ];
     }
 
-    function JMP_ABS() {
+    function newJMP_ABS() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchADL,
             fetchADH,
-            function() { PC = AD; fetchNextOpcode(); }
+            function JMP_ABS() { PC = AD; fetchNextOpcode(); }
         ];
     }
 
-    function JMP_IND() {
+    function newJMP_IND() {
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchIAL,                           // IAH will be zero
             fetchIAH,
             fetchBALFromIA,
-            function() {
+            function JMP_IND1() {
                 add1toIAL();
                 fetchBAHFromIA();
             },
-            function() { PC = BA; fetchNextOpcode(); }
+            function JMP_IND2() { PC = BA; fetchNextOpcode(); }
         ];
     }
 
-    function Bxx(reg, cond) {
+    function newBxx(reg, cond) {
         var branchTaken;
-        if      (reg === bZ) branchTaken = function() { return Z === cond; };
-        else if (reg === bN) branchTaken = function() { return N === cond; };
-        else if (reg === bC) branchTaken = function() { return C === cond; };
-        else                 branchTaken = function() { return V === cond; };
+        if      (reg === bZ) branchTaken = function BxxZ() { return Z === cond; };
+        else if (reg === bN) branchTaken = function BxxN() { return N === cond; };
+        else if (reg === bC) branchTaken = function BxxC() { return C === cond; };
+        else                 branchTaken = function BxxV() { return V === cond; };
         return [
             fetchOpcodeAndDecodeInstruction,
             fetchBranchOffset,
-            function() {
+            function Bxx1() {
                 if (branchTaken()) {
                     fetchOpcodeAndDiscard();
                     addBranchOffsetToPCL();
@@ -1699,7 +1699,7 @@ jt.M6502 = function() {
                     fetchNextOpcode();
                 }
             },
-            function() {
+            function Bxx2() {
                 if(branchOffsetCrossAdjust) {
                     fetchOpcodeAndDiscard();
                     adjustPCHForBranchOffsetCross();

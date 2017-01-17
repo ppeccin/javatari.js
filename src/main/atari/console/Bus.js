@@ -61,17 +61,16 @@ jt.Bus = function(pCpu, pTia, pPia, pRam) {
         if (cartridgeNeedsBusMonitoring) cartridge.monitorBusBeforeRead(address, data);
 
         if ((address & CART_MASK) === CART_SELECT) {
-            if (cartridge) data = cartridge.read(address);
+            if (cartridge) return data = cartridge.read(address);
+            else return data;
         } else if ((address & RAM_MASK) === RAM_SELECT) {
-            data = ram.read(address);
+            return data = ram.read(address);
         } else if ((address & PIA_MASK) === PIA_SELECT) {
-            data = pia.read(address);
+            return data = pia.read(address);
         } else {
             // Only bit 7 and 6 are connected to TIA read registers.
-            data = data & 0x3f | tia.read(address);		// Use the retained data for bits 5-0
+            return data = data & 0x3f | tia.read(address);		// Use the retained data for bits 5-0
         }
-
-        return data;
     };
 
     this.write = function(address, val) {

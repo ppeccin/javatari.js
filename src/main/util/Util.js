@@ -151,6 +151,15 @@ jt.Util = new function() {
         return outer;
     };
 
+    this.reverseInt = function(val, bits) {
+        var res = 0;
+        for (var d = 0, e = bits - 1, s = e; s > 0; ++d, --e, s -= 2) {
+            res += (val & (1 << d)) << s;
+            res += (val & (1 << e)) >> s;
+        }
+        return res;
+    };
+
     this.browserInfo = function() {
         if (this.browserInfoAvailable) return this.browserInfoAvailable;
 
