@@ -25,6 +25,13 @@ jt.Util = new function() {
         return arr;
     };
 
+    this.arrayFillFunc = function(arr, func) {
+        var i = arr.length;
+        while(i--)
+            arr[i] = func(i);
+        return arr;
+    };
+
     this.arrayFillWithArrayClone = function(arr, val) {
         var i = arr.length;
         while(i--)
@@ -154,10 +161,14 @@ jt.Util = new function() {
     this.reverseInt = function(val, bits) {
         var res = 0;
         for (var d = 0, e = bits - 1, s = e; s > 0; ++d, --e, s -= 2) {
-            res += (val & (1 << d)) << s;
-            res += (val & (1 << e)) >> s;
+            res |= (val & (1 << d)) << s;
+            res |= (val & (1 << e)) >> s;
         }
         return res;
+    };
+
+    this.reverseInt8 = function(val) {
+        return ((val & 0x01) << 7) | ((val & 0x02) << 5) | ((val & 0x04) << 3) | ((val & 0x08) << 1) | ((val & 0x10) >> 1) | ((val & 0x20) >> 3) | ((val & 0x40) >> 5) | ((val & 0x80) >> 7);
     };
 
     this.browserInfo = function() {

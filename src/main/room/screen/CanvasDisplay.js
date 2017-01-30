@@ -190,14 +190,14 @@ jt.CanvasDisplay = function(mainElement) {
     function updateImageSmoothing() {
         canvas.style.imageRendering = crtFilter ? "initial" : canvasImageRenderingValue;
 
-        //var smoothing = !!crtFilter;
-        //if (canvasContext.imageSmoothingEnabled !== undefined)
-        //    canvasContext.imageSmoothingEnabled = smoothing;
-        //else {
-        //    canvasContext.webkitImageSmoothingEnabled = smoothing;
-        //    canvasContext.mozImageSmoothingEnabled = smoothing;
-        //    canvasContext.msImageSmoothingEnabled = smoothing;
-        //}
+        var smoothing = !!crtFilter;
+        if (context.imageSmoothingEnabled !== undefined)
+            context.imageSmoothingEnabled = smoothing;
+        else {
+            context.webkitImageSmoothingEnabled = smoothing;
+            context.mozImageSmoothingEnabled = smoothing;
+            context.msImageSmoothingEnabled = smoothing;
+        }
     }
 
     var drawLogo = function () {

@@ -167,6 +167,7 @@ jt.AtariConsole = function() {
         cpu = new jt.M6502();
         pia = new jt.Pia();
         tia = new jt.Tia(cpu, pia);
+        self.tia = tia;
         ram = new jt.Ram();
         bus = new jt.Bus(cpu, tia, pia, ram);
         mainClock = new jt.Clock(self, jt.VideoStandard.NTSC.fps);
@@ -488,7 +489,7 @@ jt.AtariConsole = function() {
             self.clockPulse();
         var duration = performance.now() - start;
         jt.Util.log("Done running " + frames + " in " + duration + " ms");
-        jt.Util.log(frames / (duration/1000) + "frames/sec");
+        jt.Util.log((frames / (duration/1000)).toFixed(2) + " frames/sec");
         go();
     };
 
