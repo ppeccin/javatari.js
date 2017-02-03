@@ -1,6 +1,7 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 // TODO Audio problem in PAL (skipping forward)
+// TODO First Scan after RES consider HMOVE and NUSIZ changes while in special
 
 jt.Tia = function(pCpu, pPia) {
     "use strict";
@@ -9,6 +10,7 @@ jt.Tia = function(pCpu, pPia) {
 
     function init() {
         generateObjectsLineSprites();
+        generateObjectsRecentPositionControl();
     }
 
     this.powerOn = function() {
@@ -40,7 +42,6 @@ jt.Tia = function(pCpu, pPia) {
             renderClock = HBLANK_DURATION;
             changeClock = -1;
             checkLateHMOVE();
-            adjustObjectsScan();
             // Send the first clock/3 pulse to the CPU and PIA, perceived by TIA at clock 0 before releasing halt, then release halt
             bus.clockPulse();
             cpu.setRDY(true);
@@ -130,7 +131,14 @@ jt.Tia = function(pCpu, pPia) {
             case 0x27: if (VDELBL !== (i  & 1)) { VDELBL = i & 1; if (ENABL !== ENABLd) { changeAtClock(); ballSetEnabled(VDELBL ? ENABL : ENABLd); } } return;
 
             // Player0
-            case 0x04: if (NUSIZ0 !== i) { NUSIZ0 = i; player0UpdateSprite(0); missile0UpdateSprite(); } return;
+            case 0x04: if (NUSIZ0 !== i) { NUSIZ0 = i;
+                if (debug) debugPixel(DEBUG_ALT_COLOR);
+                //if (player0RecentCopyPixel > 0) {
+                //    changeAtClock();
+                //    player0RecentLineControl = playerRecentPositionControl[NUSIZ0 & 7][player0RecentCopyPixel];
+                //}
+                player0UpdateSprite(0); missile0UpdateSprite();
+            } return;
             case 0x06: if (COLUP0 !== i && !debug) { COLUP0 = i; if (player0Enabled || missile0Enabled) changeAtClock(); player0Color = missile0Color = palette[i]; } return;
             case 0x0B: if (REFP0 !== ((i >> 3) & 1)) { REFP0 = (i >> 3) & 1; player0UpdateSprite(0); } return;
             case 0x10: hitRESP0(); return;
@@ -182,7 +190,7 @@ jt.Tia = function(pCpu, pPia) {
 
     // caution: endClock can exceed but never wrap end of line!
     function renderLineTo(endClock) {
-        var p, linePixel = renderClock, finalPixel = (endClock > LINE_WIDTH ? LINE_WIDTH : endClock) - HBLANK_DURATION;
+        var p, f, on, linePixel = renderClock, finalPixel = (endClock > LINE_WIDTH ? LINE_WIDTH : endClock) - HBLANK_DURATION;
 
         for (var pixel = linePixel - HBLANK_DURATION; pixel < finalPixel; ++pixel) {
 
@@ -195,7 +203,7 @@ jt.Tia = function(pCpu, pPia) {
                 // Ball
                 if (ballEnabled) {
                     p = pixel - ballPixel; if (p < 0) p += 160;
-                    if ((missileBallLineSprites[ballLineSpritePointer + (p >> 5)] >> (p & 0x1f)) & 1) {
+                    if ((missileBallLineSprites[ballLineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1) {
                         color = ballColor;
                     } else collis &= BLC;
                 }
@@ -210,7 +218,21 @@ jt.Tia = function(pCpu, pPia) {
             // Player0
             if (player0Enabled) {
                 p = pixel - player0Pixel; if (p < 0) p += 160;
-                if ((playerLineSprites[player0LineSpritePointer + (p >> 5)] >> (p & 0x1f)) & 1) {
+                if (player0RecentCopyPixel >= 0) {
+                    f = player0RecentLineControl[p];
+                    if (f === 1) {
+                        // Copy active
+                        p += player0RecentCopyPixel; if (p >= 160) p -= 160;
+                        on = (playerLineSprites[player0LineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1;
+                    } else {
+                        // Copy inactive
+                        on = 0;
+                        if (f & 0x80) player0RecentCopyPixel = -1;      // Disarm
+                    }
+                } else {
+                    on = (playerLineSprites[player0LineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1;
+                }
+                if (on) {
                     if (!color) color = player0Color;
                 } else collis &= P0C;
             }
@@ -218,7 +240,7 @@ jt.Tia = function(pCpu, pPia) {
             // Missile0
             if (missile0Enabled) {
                 p = pixel - missile0Pixel; if (p < 0) p += 160;
-                if ((missileBallLineSprites[missile0LineSpritePointer + (p >> 5)] >> (p & 0x1f)) & 1) {
+                if ((missileBallLineSprites[missile0LineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1) {
                     if (!color) color = missile0Color;
                 } else collis &= M0C;
             }
@@ -226,7 +248,7 @@ jt.Tia = function(pCpu, pPia) {
             // Player1
             if (player1Enabled) {
                 p = pixel - player1Pixel; if (p < 0) p += 160;
-                if ((playerLineSprites[player1LineSpritePointer + (p >> 5)] >> (p & 0x1f)) & 1) {
+                if ((playerLineSprites[player1LineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1) {
                     if (!color) color = player1Color;
                 } else collis &= P1C;
             }
@@ -234,7 +256,7 @@ jt.Tia = function(pCpu, pPia) {
             // Missile1
             if (missile1Enabled) {
                 p = pixel - missile1Pixel; if (p < 0) p += 160;
-                if ((missileBallLineSprites[missile1LineSpritePointer + (p >> 5)] >> (p & 0x1f)) & 1) {
+                if ((missileBallLineSprites[missile1LineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1) {
                     if (!color) color = missile1Color;
                 } else collis &= M1C;
             }
@@ -243,7 +265,7 @@ jt.Tia = function(pCpu, pPia) {
                 // Ball
                 if (ballEnabled) {
                     p = pixel - ballPixel; if (p < 0) p += 160;
-                    if ((missileBallLineSprites[ballLineSpritePointer + (p >> 5)] >> (p & 0x1f)) & 1) {
+                    if ((missileBallLineSprites[ballLineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1) {
                         if (!color) color = ballColor;
                     } else collis &= BLC;
                 }
@@ -287,19 +309,6 @@ jt.Tia = function(pCpu, pPia) {
 
     function changeAtClockPlus(add) {
         changeAt(clock + add);                      // Renders "add" pixels forward, for changes that are only effective after "add" clocks
-    }
-
-    function adjustObjectsScan() {
-        if (player0RecentReset) {
-            if (player0Enabled) changeAtClock();
-            player0RecentReset = 0;
-            player0LineSpritePointer -= 1 * 5;
-        }
-        if (player1RecentReset) {
-            if (player1Enabled) changeAtClock();
-            player1RecentReset = 0;
-            player1LineSpritePointer -= 1 * 5;
-        }
     }
 
     function changePlayfieldAtClock() {
@@ -376,7 +385,7 @@ jt.Tia = function(pCpu, pPia) {
         v = i & 0x30;
         if (v !== (CTRLPF & 0x30)) {
             if (ballEnabled) changeAtClock();
-            ballLineSpritePointer = (v >> 4) * 5;
+            ballLineSpritePointer = (v >> 4) * 20;
         }
 
         CTRLPF = i;
@@ -419,7 +428,7 @@ jt.Tia = function(pCpu, pPia) {
     function player0UpdateSprite(clockPlus) {
         var sprite = VDELP0 ? GRP0 : GRP0d;
         if (sprite) {
-            var p = (NUSIZ0 & 0x07) * 2 * 256 * 2 * 5 + REFP0 * 256 * 2 * 5 + sprite * 2 * 5 + player0RecentReset * 5;
+            var p = (NUSIZ0 & 0x07) * 2 * 256 * 20 + REFP0 * 256 * 20 + sprite * 20;
             if (!player0Enabled || player0LineSpritePointer !== p) {
                 changeAtClockPlus(clockPlus);
                 player0LineSpritePointer = p;
@@ -455,7 +464,7 @@ jt.Tia = function(pCpu, pPia) {
     function player1UpdateSprite(clockPlus) {
         var sprite = VDELP1 ? GRP1 : GRP1d;
         if (sprite) {
-            var p = (NUSIZ1 & 0x07) * 2 * 256 * 2 * 5 + REFP1 * 256 * 2 * 5 + sprite * 2 * 5 + player1RecentReset * 5;
+            var p = (NUSIZ1 & 0x07) * 2 * 256 * 20 + REFP1 * 256 * 20 + sprite * 20;
             if (!player1Enabled || player1LineSpritePointer !== p) {
                 changeAtClockPlus(clockPlus);
                 player1LineSpritePointer = p;
@@ -472,7 +481,7 @@ jt.Tia = function(pCpu, pPia) {
     }
 
     function missile0UpdateSprite() {
-        var p = (NUSIZ0 & 0x07) * 4 * 5 + ((NUSIZ0 & 0x30) >> 4) * 5;
+        var p = (NUSIZ0 & 0x07) * 4 * 20 + ((NUSIZ0 & 0x30) >> 4) * 20;
         if (missile0Enabled && missile0LineSpritePointer !== p) changeAtClock();
         missile0LineSpritePointer = p;
     }
@@ -500,7 +509,7 @@ jt.Tia = function(pCpu, pPia) {
     }
 
     function missile1UpdateSprite() {
-        var p = (NUSIZ1 & 0x07) * 4 * 5 + ((NUSIZ1 & 0x30) >> 4) * 5;
+        var p = (NUSIZ1 & 0x07) * 4 * 20 + ((NUSIZ1 & 0x30) >> 4) * 20;
         if (missile1Enabled && missile1LineSpritePointer !== p) changeAtClock();
         missile1LineSpritePointer = p;
     }
@@ -550,12 +559,12 @@ jt.Tia = function(pCpu, pPia) {
 
         if (player0Pixel !== p) {
             if (player0Enabled) changeAtClock();
-            if (!player0RecentReset) {                  // TODO Recent RESET and while copy is being scanned
-                player0RecentReset = 1;
-                player0LineSpritePointer += 1 * 5;
-            }
+            var into = p - player0Pixel; if (into < 0) into += 160;
+            player0RecentLineControl = playerRecentPositionControl[NUSIZ0 & 7][into];
+            player0RecentCopyPixel = into & playerRecentCopyShapeMask[NUSIZ0 & 7];
             player0Pixel = p;
-        }
+        } else
+            player0RecentCopyPixel = -1;
 
         //player0Counter = 157 - d;
         //player0RecentReset = player0Counter <= 155;
@@ -584,10 +593,6 @@ jt.Tia = function(pCpu, pPia) {
 
         if (player1Pixel !== p) {
             if (player1Enabled) changeAtClock();
-            if (!player1RecentReset) {
-                player1RecentReset = 1;
-                player1LineSpritePointer += 1 * 5;
-            }
             player1Pixel = p;
         }
     };
@@ -759,7 +764,6 @@ jt.Tia = function(pCpu, pPia) {
     var vBlankSet = function(blank) {
         var v = (blank & 0x02) !== 0;
         if (vBlankOn !== v) {
-            if (debug) debugPixel(DEBUG_ALT_COLOR);
             changeVBlankAtClockPlus1();
             //changeAtClockPlus(1);
             vBlankOn = v;
@@ -848,30 +852,24 @@ jt.Tia = function(pCpu, pPia) {
             for (var pattern = 0; pattern < 256; ++pattern) {
                 var sprite = !mirror ? jt.Util.reverseInt8(pattern) : pattern;
                 // 1 copy
-                                                  addPlayerSprite(0, mirror, pattern, 1, line);
-                paintSprite(line, sprite, 4 + 1); addPlayerSprite(0, mirror, pattern, 0, line);                   // 4 + 1 means player is delayed 4 + 1 pixels
+                paintSprite(line, sprite, 4 + 1); addPlayerSprite(0, mirror, pattern, line);                   // 4 + 1 means player is delayed 4 + 1 pixels
                 // 2 copies close
-                paintSprite(line, sprite, 4 + 16 + 1); addPlayerSprite(1, mirror, pattern, 0, line);
-                paintSprite(line, 0, 4 + 1);           addPlayerSprite(1, mirror, pattern, 1, line);
+                paintSprite(line, sprite, 4 + 16 + 1); addPlayerSprite(1, mirror, pattern, line);
                 // 3 copies close
-                paintSprite(line, sprite, 4 + 32 + 1); addPlayerSprite(3, mirror, pattern, 1, line);
-                paintSprite(line, sprite, 4 + 1);      addPlayerSprite(3, mirror, pattern, 0, line);
+                paintSprite(line, sprite, 4 + 32 + 1); addPlayerSprite(3, mirror, pattern, line);
                 // 2 copies medium
-                paintSprite(line, 0, 4 + 16 + 1); addPlayerSprite(2, mirror, pattern, 0, line);                   // erase close copy
-                paintSprite(line, 0, 4 + 1);      addPlayerSprite(2, mirror, pattern, 1, line);
+                paintSprite(line, 0, 4 + 16 + 1); addPlayerSprite(2, mirror, pattern, line);                   // erase close copy
                 // 3 copies medium
-                paintSprite(line, sprite, 4 + 64 + 1); addPlayerSprite(6, mirror, pattern, 1, line);
-                paintSprite(line, sprite, 4 + 1);      addPlayerSprite(6, mirror, pattern, 0, line);
+                paintSprite(line, sprite, 4 + 64 + 1); addPlayerSprite(6, mirror, pattern, line);
                 // 2 copies wide
-                paintSprite(line, 0, 4 + 32 + 1); addPlayerSprite(4, mirror, pattern, 0, line);                   // erase medium copy
-                paintSprite(line, 0, 4 + 1);      addPlayerSprite(4, mirror, pattern, 1, line);
+                paintSprite(line, 0, 4 + 32 + 1); addPlayerSprite(4, mirror, pattern, line);                   // erase medium copy
                 // 1 copy double
-                paintSprite(line, 0, 4 + 64 + 1);           addPlayerSprite(5, mirror, pattern, 1, line);         // erase wide copy
-                paintSpriteDouble(line, sprite, 4 + 1 + 1); addPlayerSprite(5, mirror, pattern, 0, line);         // 4 + 1 + 1 means Double and Quad are delayed 1 extra pixel
+                paintSprite(line, 0, 4 + 64 + 1); line[4 + 1] = 0;                                             // erase wide copy and first pixel of fisrt copy
+                paintSpriteDouble(line, sprite, 4 + 1 + 1); addPlayerSprite(5, mirror, pattern, line);         // 4 + 1 + 1 means Double and Quad are delayed 1 extra pixel
                 // 1 copy quad
-                paintSpriteQuad(line, sprite, 4 + 1 + 1); addPlayerSprite(7, mirror, pattern, 0, line);
-                paintSpriteQuad(line, 0, 4 + 1 + 1);      addPlayerSprite(7, mirror, pattern, 1, line);
-                // line here is empty!
+                paintSpriteQuad(line, sprite, 4 + 1 + 1); addPlayerSprite(7, mirror, pattern, line);
+                // empty line
+                paintSpriteQuad(line, 0, 4 + 1 + 1);
             }
         }
 
@@ -907,20 +905,94 @@ jt.Tia = function(pCpu, pPia) {
         function paintSpriteQuad(line, pat, pos) {
             for (var b = 0; b < 8; ++b) line[pos + b*4] = line[pos + b*4 + 1] = line[pos + b*4 + 2] = line[pos + b*4 + 3] = (pat >> b) & 1;
         }
-        function addPlayerSprite(variation, mirror, pattern, scan, line) {
-            var pos = variation * 2 * 256 * 2 * 5 + mirror * 256 * 2 * 5 + pattern * 2 * 5 + scan * 5;
-            for (var i = 0; i < 5; ++i)
-                for (var b = 0; b < 32; ++b)
-                    if (line[i * 32 + b]) playerLineSprites[pos + i] |= 1 << b;
+        function addPlayerSprite(variation, mirror, pattern, line) {
+            var pos = variation * 2 * 256 * 20 + mirror * 256 * 20 + pattern * 20;
+            for (var i = 0; i < 20; ++i)
+                for (var b = 0; b < 8; ++b)
+                    if (line[i * 8 + b]) playerLineSprites[pos + i] |= 1 << b;
 
         }
         function addMissileBallSprite(variation, size, line) {
-            var pos = variation * 4 * 5 + size * 5;
-            for (var i = 0; i < 5; ++i)
-                for (var b = 0; b < 32; ++b)
-                    if (line[i * 32 + b]) missileBallLineSprites[pos + i] |= 1 << b;
+            var pos = variation * 4 * 20 + size * 20;
+            for (var i = 0; i < 20; ++i)
+                for (var b = 0; b < 8; ++b)
+                    if (line[i * 8 + b]) missileBallLineSprites[pos + i] |= 1 << b;
 
         }
+    }
+
+    function generateObjectsRecentPositionControl() {
+        var allDisarm = jt.Util.arrayFill(new Uint8Array(160), 0x80);    // All with DISARM flag
+
+        var normal = new Array(14);                                      // 14 possible patterns
+        //normal[0] = allDisarm;                                           // Set position 0 pattern to all DISARM
+        var line = jt.Util.arrayFill(new Uint8Array(160), 0x80);
+        jt.Util.arrayFillSegment(line, 0, 13, 0);                        // N flags
+        for (var p = 1; p < 14; p++) {
+            var newLine = new Uint8Array(160);
+            jt.Util.arrayCopy(line, 0, newLine, 0, 160);
+            for (var x = 12 - p, q = 0; x >= 0 && q < 8; x--, q++)
+                newLine[x] = 1;                                          // X flags
+            normal[p] = newLine;
+        }
+
+        var double = new Array(23);                                      // 23 possible patterns
+        //double[0] = allDisarm;                                           // Set position 0 pattern to all DISARM
+        line = jt.Util.arrayFill(new Uint8Array(160), 0x80);
+        jt.Util.arrayFillSegment(line, 0, 22, 0);                        // N flags
+        for (p = 1; p < 23; p++) {
+            newLine = new Uint8Array(160);
+            jt.Util.arrayCopy(line, 0, newLine, 0, 160);
+            for (x = 21 - p, q = 0; x >= 0 && q < 16; x--, q++)
+                newLine[x] = 1;                                          // X flags
+            double[p] = newLine;
+        }
+
+        var quad = new Array(39);                                        // 38 possible patterns
+        //quad[0] = allDisarm;                                             // Set position 0 pattern to all DISARM
+        line = jt.Util.arrayFill(new Uint8Array(160), 0x80);
+        jt.Util.arrayFillSegment(line, 0, 38, 0);                        // N flags
+        for (p = 1; p < 39; p++) {
+            newLine = new Uint8Array(160);
+            jt.Util.arrayCopy(line, 0, newLine, 0, 160);
+            for (x = 37 - p, q = 0; x >= 0 && q < 32; x--, q++)
+                newLine[x] = 1;                                          // X flags
+            quad[p] = newLine;
+        }
+
+        // Each varitaion has a Position Control Line with 160 positions, each pointing to a Control Pattern Line with 160 positions (defined above)
+
+        // Normal Variations
+        jt.Util.arrayFill(playerRecentPositionControl[0], normal[13]);   // 1 copy              & 255
+        //playerRecentPositionControl[0][0] = allDisarm;
+        jt.Util.arrayFill(playerRecentPositionControl[1], normal[13]);   // 2 copies close      & 15
+        //playerRecentPositionControl[1][0] = allDisarm;
+        jt.Util.arrayFill(playerRecentPositionControl[2], normal[13]);   // 2 copies medium     & 31
+        //playerRecentPositionControl[2][0] = allDisarm;
+        jt.Util.arrayFill(playerRecentPositionControl[3], normal[13]);   // 3 copies close
+        //playerRecentPositionControl[3][0] = allDisarm;
+        jt.Util.arrayFill(playerRecentPositionControl[4], normal[13]);   // 2 copies wide       & 63
+        //playerRecentPositionControl[4][0] = allDisarm;
+        jt.Util.arrayFill(playerRecentPositionControl[6], normal[13]);   // 3 copies medium
+        //playerRecentPositionControl[6][0] = allDisarm;
+        for (p = 1; p < 13; p++) {
+            playerRecentPositionControl[0][p] = normal[p];
+            playerRecentPositionControl[1][p] = normal[p];  playerRecentPositionControl[1][p + 16] = normal[p];
+            playerRecentPositionControl[2][p] = normal[p];  playerRecentPositionControl[2][p + 32] = normal[p];
+            playerRecentPositionControl[3][p] = normal[p];  playerRecentPositionControl[3][p + 16] = normal[p]; playerRecentPositionControl[3][p + 32] = normal[p];
+            playerRecentPositionControl[4][p] = normal[p];  playerRecentPositionControl[2][p + 64] = normal[p];
+            playerRecentPositionControl[6][p] = normal[p];  playerRecentPositionControl[6][p + 32] = normal[p]; playerRecentPositionControl[6][p + 64] = normal[p];
+        }
+
+        // Double Variation
+        jt.Util.arrayFill(playerRecentPositionControl[5], double[22]);
+        //playerRecentPositionControl[5][0] = allDisarm;
+        for (p = 1; p < 23; p++) playerRecentPositionControl[5][p] = double[p];
+
+        // Wide Variation
+        jt.Util.arrayFill(playerRecentPositionControl[7], quad[38]);
+        //playerRecentPositionControl[7][0] = allDisarm;
+        for (p = 1; p < 38; p++) playerRecentPositionControl[7][p] = quad[p];
     }
 
 
@@ -1155,11 +1227,10 @@ jt.Tia = function(pCpu, pPia) {
     var ballColor = 0xff000000;
 
     var player0Enabled = false, player0Pixel = 0, player0LineSpritePointer = 0;
-    var player0RecentReset = 0;
+    var player0RecentCopyPixel = -1, player0RecentLineControl;
     var player0Color = 0xff000000;
 
     var player1Enabled = false, player1Pixel = 0, player1LineSpritePointer = 0;
-    var player1RecentReset = 0;
     var player1Color = 0xff000000;
 
     var missile0Enabled = false, missile0Pixel = 0, missile0LineSpritePointer = 0;
@@ -1201,8 +1272,11 @@ jt.Tia = function(pCpu, pPia) {
     var paddle1Position = -1;
     var paddle1CapacitorCharge = 0;
 
-    var playerLineSprites = new Uint32Array(8 * 2 * 256 * 2 * 5);           // 8 Variations * 2 Mirrors * 256 Patterns * 2 scan rules * 5 32Bits line data
-    var missileBallLineSprites = new Uint32Array(8 * 4 * 5);            // 8 Variations * 4 Sizes * 5 32Bits line data
+    var playerLineSprites = new Uint8Array(8 * 2 * 256 * 20);               // 8 Variations * 2 Mirrors * 256 Patterns * 20 8Bits line data, specifying 1bit pixels
+    var missileBallLineSprites = new Uint8Array(8 * 4 * 20);                // 8 Variations * 4 Sizes * 20 8Bits line data, specifying 1bit pixels
+
+    var playerRecentPositionControl = jt.Util.arrayFillWithArrayClone(new Array(8), new Array(160));    // 8 Variations, pointing to Position Control line Array with 160 positions, each poiting to a Control Pattern array
+    var playerRecentCopyShapeMask = [ 15, 15, 15, 15, 15, 31 , 15, 63 ];
 
     var videoSignal = new jt.TiaVideoSignal();
     var palette;
