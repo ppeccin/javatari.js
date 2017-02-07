@@ -132,14 +132,7 @@ jt.Tia = function(pCpu, pPia) {
             case 0x27: if (VDELBL !== (i  & 1)) { VDELBL = i & 1; if (ENABL !== ENABLd) { changeAtClock(); ballSetEnabled(VDELBL ? ENABL : ENABLd); } } return;
 
             // Player0
-            case 0x04: if (NUSIZ0 !== i) { NUSIZ0 = i;
-                if (debug) debugPixel(DEBUG_ALT_COLOR);
-                //if (player0RecentCopyPixel > 0) {
-                //    changeAtClock();
-                //    player0RecentLineControl = playerAltPositionControl[NUSIZ0 & 7][player0RecentCopyPixel];
-                //}
-                player0UpdateSprite(0); missile0UpdateSprite();
-            } return;
+            case 0x04: if (NUSIZ0 !== i) { NUSIZ0 = i; player0UpdateSprite(0); missile0UpdateSprite();} return;
             case 0x06: if (COLUP0 !== i && !debug) { COLUP0 = i; if (player0Enabled || missile0Enabled) changeAtClock(); player0Color = missile0Color = palette[i]; } return;
             case 0x0B: if (REFP0 !== ((i >> 3) & 1)) { REFP0 = (i >> 3) & 1; player0UpdateSprite(0); } return;
             case 0x10: hitRESP0(); return;
@@ -221,9 +214,6 @@ jt.Tia = function(pCpu, pPia) {
                 p = pixel - player0Pixel; if (p < 0) p += 160;
 
                 if (player0ChangeToNewIntoPixel >= 0 && p >= player0ChangeToNewIntoPixel) {
-
-                    //debugInfo("DISARM p: " + p);
-
                     player0ChangeToNewIntoPixel = -1;
                     x = player0Pixel + player0NewPixelDelta; if (x >= 160) x -= 160;
                     player0Pixel = x; player0LineSpritePointer = player0NewLineSpritePointer;
@@ -246,6 +236,14 @@ jt.Tia = function(pCpu, pPia) {
             // Player1
             if (player1Enabled) {
                 p = pixel - player1Pixel; if (p < 0) p += 160;
+
+                if (player1ChangeToNewIntoPixel >= 0 && p >= player1ChangeToNewIntoPixel) {
+                    player1ChangeToNewIntoPixel = -1;
+                    x = player1Pixel + player1NewPixelDelta; if (x >= 160) x -= 160;
+                    player1Pixel = x; player1LineSpritePointer = player1NewLineSpritePointer;
+                    p = pixel - player1Pixel; if (p < 0) p += 160;
+                }
+
                 if ((playerLineSprites[player1LineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1) {
                     if (!color) color = player1Color;
                 } else collis &= P1C;
@@ -441,9 +439,11 @@ jt.Tia = function(pCpu, pPia) {
             if (!player0Enabled) {
                 player0Enabled = true; augmentCollisionsAll();
             }
-            player0NewLineSpritePointer = p;
-            if (player0ChangeToNewIntoPixel < 0)
-                player0LineSpritePointer = p;
+            player0LineSpritePointer = player0NewLineSpritePointer = p;
+            if (player0ChangeToNewIntoPixel >= 0) {
+                player0LineSpritePointer -= playerAltLineSpritePointerDeltaPerShape[NUSIZ0 & 7];
+                //player0ChangeToNewIntoPixel = playerAltDurationPerShape[NUSIZ0 & 7]
+            }
         } else {
             if (player0Enabled) {
                 changeAtClockPlus(clockPlus);
@@ -475,10 +475,14 @@ jt.Tia = function(pCpu, pPia) {
             var p = REFP1 * 256 * 8 * 20 + sprite * 8 * 20 + (NUSIZ1 & 0x07) * 20;
             if (!player1Enabled || player1LineSpritePointer !== p) {
                 changeAtClockPlus(clockPlus);
-                player1LineSpritePointer = p;
             }
             if (!player1Enabled) {
                 player1Enabled = true; augmentCollisionsAll();
+            }
+            player1LineSpritePointer = player1NewLineSpritePointer = p;
+            if (player1ChangeToNewIntoPixel >= 0) {
+                player1LineSpritePointer -= playerAltLineSpritePointerDeltaPerShape[NUSIZ1 & 7];
+                //player1ChangeToNewIntoPixel = playerAltDurationPerShape[NUSIZ1 & 7]
             }
         } else {
             if (player1Enabled) {
@@ -566,19 +570,19 @@ jt.Tia = function(pCpu, pPia) {
         }
 
         if (player0Pixel !== p) {
-            player0HitLine = line;
             if (player0Enabled) changeAtClock();
             //player0Pixel = p;
 
+            var nusiz = (NUSIZ0 & 7);
             player0NewLineSpritePointer = player0LineSpritePointer;
-            player0LineSpritePointer -= playerAltLineSpritePointerDeltaPerShape[NUSIZ0 & 7];
+            player0LineSpritePointer -= playerAltLineSpritePointerDeltaPerShape[nusiz];
             var into = p - player0Pixel; if (into < 0) into += 160;
-            var e = playerAltPositionControl[NUSIZ0 & 7][into];
-            player0Pixel = p - e; if (player0Pixel < 0) { player0Pixel += 160; player0HitLine-- }
+            var e = playerAltPositionControl[nusiz][into];
+            player0Pixel = p - e; if (player0Pixel < 0) { player0Pixel += 160; player0HitLine = line - 1; } else player0HitLine = line;
             player0NewPixelDelta = p - player0Pixel; if (player0NewPixelDelta < 0) player0NewPixelDelta += 160;
-            player0ChangeToNewIntoPixel = e + playerAltDurationPerShape[NUSIZ0 & 7]; if (player0ChangeToNewIntoPixel >= 160) player0ChangeToNewIntoPixel -= 160;
+            player0ChangeToNewIntoPixel = e + playerAltDurationPerShape[nusiz]; if (player0ChangeToNewIntoPixel >= 160) player0ChangeToNewIntoPixel -= 160;
 
-             //debugInfo(e + ", " + player0ChangeToNewIntoPixel);
+            //debugInfo(e + ", " + player0ChangeToNewIntoPixel);
         }
 
         //player0Counter = 157 - d;
@@ -608,7 +612,16 @@ jt.Tia = function(pCpu, pPia) {
 
         if (player1Pixel !== p) {
             if (player1Enabled) changeAtClock();
-            player1Pixel = p;
+            //player1Pixel = p;
+
+            var nusiz = (NUSIZ1 & 7);
+            player1NewLineSpritePointer = player1LineSpritePointer;
+            player1LineSpritePointer -= playerAltLineSpritePointerDeltaPerShape[nusiz];
+            var into = p - player1Pixel; if (into < 0) into += 160;
+            var e = playerAltPositionControl[nusiz][into];
+            player1Pixel = p - e; if (player1Pixel < 0) { player1Pixel += 160; player1HitLine = line - 1; } else player1HitLine = line;
+            player1NewPixelDelta = p - player1Pixel; if (player1NewPixelDelta < 0) player1NewPixelDelta += 160;
+            player1ChangeToNewIntoPixel = e + playerAltDurationPerShape[nusiz]; if (player1ChangeToNewIntoPixel >= 160) player1ChangeToNewIntoPixel -= 160;
         }
     };
 
@@ -767,13 +780,23 @@ jt.Tia = function(pCpu, pPia) {
     }
 
     function updateObjectAltStatus() {
+        var x;
         if (player0ChangeToNewIntoPixel >= 0) {
             if ((160 - player0Pixel) >= player0ChangeToNewIntoPixel || line > player0HitLine) {
                 player0ChangeToNewIntoPixel = -1;
-                var x = player0Pixel + player0NewPixelDelta;
+                x = player0Pixel + player0NewPixelDelta;
                 if (x >= 160) x -= 160;
                 player0Pixel = x;
                 player0LineSpritePointer = player0NewLineSpritePointer;
+            }
+        }
+        if (player1ChangeToNewIntoPixel >= 0) {
+            if ((160 - player1Pixel) >= player1ChangeToNewIntoPixel || line > player1HitLine) {
+                player1ChangeToNewIntoPixel = -1;
+                x = player1Pixel + player1NewPixelDelta;
+                if (x >= 160) x -= 160;
+                player1Pixel = x;
+                player1LineSpritePointer = player1NewLineSpritePointer;
             }
         }
     }
@@ -1208,7 +1231,7 @@ jt.Tia = function(pCpu, pPia) {
     var player0Color = 0xff000000;
 
     var player1Enabled = false, player1Pixel = 0, player1LineSpritePointer = 0;
-    var player1AltPixel = -1, player1AltLineSpritePointer = 0;
+    var player1ChangeToNewIntoPixel = -1, player1NewPixelDelta = 0, player1NewLineSpritePointer = 0, player1HitLine = -1;
     var player1Color = 0xff000000;
 
     var missile0Enabled = false, missile0Pixel = 0, missile0LineSpritePointer = 0;
