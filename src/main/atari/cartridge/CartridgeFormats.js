@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-    jt.CartridgeFormats = {
+jt.CartridgeFormats = {
 
     "4K": {
         name: "4K",

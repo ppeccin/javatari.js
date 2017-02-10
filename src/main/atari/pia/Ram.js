@@ -1,6 +1,7 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 jt.Ram = function() {
+"use strict";
 
     function init() {
         // RAM comes totally random at creation

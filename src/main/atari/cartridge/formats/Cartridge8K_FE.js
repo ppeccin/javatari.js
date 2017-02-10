@@ -3,6 +3,7 @@
 // Implements the 8K "FE" Robotank/Decathlon format
 
 jt.Cartridge8K_FE = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

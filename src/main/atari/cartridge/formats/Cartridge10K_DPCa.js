@@ -3,6 +3,7 @@
 // Implements the 8K + 2K "DPCa" (Pitfall2) format, enhanced version with TIA audio updates every DPC audio clock!
 
 jt.Cartridge10K_DPCa = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

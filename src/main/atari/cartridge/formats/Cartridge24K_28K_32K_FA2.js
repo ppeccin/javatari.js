@@ -4,6 +4,8 @@
 // Also supports SC RAM Saving on Harmony Flash memory (emulated to a "savestate" file)
 
 jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
+"use strict";
+
     var self = this;
 
     function init(self) {

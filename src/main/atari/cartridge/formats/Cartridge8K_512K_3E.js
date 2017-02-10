@@ -3,6 +3,7 @@
 // Implements the 8K-512K "3E" Tigervision (+RAM) format
 
 jt.Cartridge8K_512K_3E = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

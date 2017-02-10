@@ -3,6 +3,7 @@
 // Implements the 16K "E7" M-Network format
 
 jt.Cartridge16K_E7 = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

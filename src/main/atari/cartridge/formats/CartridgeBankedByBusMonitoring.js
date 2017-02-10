@@ -3,6 +3,7 @@
 // Implements generic bank switching using unmasked address access via bus monitoring (outside Cart area)
 
 jt.CartridgeBankedByBusMonitoring = function(rom, format) {
+"use strict";
 
     this.needsBusMonitoring = function() {
         return true;

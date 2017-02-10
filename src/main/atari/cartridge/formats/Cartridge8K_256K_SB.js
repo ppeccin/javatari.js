@@ -3,6 +3,7 @@
 // Implements the 8K-256K "SB" Superbanking format
 
 jt.Cartridge8K_256K_SB = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

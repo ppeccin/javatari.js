@@ -3,6 +3,7 @@
 // Implements the 8K "UA" UA Limited format
 
 jt.Cartridge8K_UA = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

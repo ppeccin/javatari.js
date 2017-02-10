@@ -7,6 +7,7 @@
  */
 
 jt.CartridgeBankedByMaskedRange = function(rom, format, pBaseBankSwitchAddress, superChip, pExtraRAMSize) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

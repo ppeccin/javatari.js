@@ -3,6 +3,7 @@
 // Implements the 64K "X07" AtariAge format
 
 jt.Cartridge64K_X07 = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

@@ -1,6 +1,8 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 Javatari.start = function () {
+"use strict";
+
     // Init preferences
     Javatari.preferences.load();
     // Get container elements
@@ -22,7 +24,7 @@ Javatari.start = function () {
     Javatari.shutdown = function () {
         if (Javatari.room) Javatari.room.powerOff();
         jt.Util.log("shutdown");
-        delete Javatari;
+        delete window.Javatari;
     };
 
     // Emulator can only be started once
@@ -35,6 +37,8 @@ Javatari.start = function () {
 
 // Pre-load images and start emulator as soon as all are loaded and DOM is ready
 Javatari.preLoadImagesAndStart = function() {
+"use strict";
+
     var images = [ "sprites.png", "logo.png", "screenborder.png" ];
     var numImages = images.length;
 

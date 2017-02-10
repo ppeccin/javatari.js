@@ -3,6 +3,7 @@
 // Implements the n * 8448 byte "AR" Arcadia/Starpath/Supercharger tape format
 
 jt.Cartridge8K_64K_AR = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

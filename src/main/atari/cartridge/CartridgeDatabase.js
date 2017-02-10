@@ -1,6 +1,7 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 jt.CartridgeDatabase = function() {
+"use strict";
 
     this.createCartridgeFromRom = function(rom) {
         // Try to build the Cartridge if a supported format is found

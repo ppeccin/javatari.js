@@ -3,6 +3,7 @@
 // Implements the 4K unbanked format. Smaller ROMs will be copied multiple times to fill the entire 4K
 
 jt.Cartridge4K = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

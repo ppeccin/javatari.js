@@ -3,6 +3,7 @@
 // Implements the 8K "E0" Parker Bros. format
 
 jt.Cartridge8K_E0 = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

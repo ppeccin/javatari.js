@@ -3,6 +3,7 @@
 // Implements the 8K "0840" Econobanking format
 
 jt.Cartridge8K_0840 = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

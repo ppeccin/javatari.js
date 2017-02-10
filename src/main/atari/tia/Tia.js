@@ -4,7 +4,7 @@
 // TODO RESx during HBLANK position problem
 
 jt.Tia = function(pCpu, pPia) {
-    "use strict";
+"use strict";
 
     var self = this;
 
@@ -186,11 +186,11 @@ jt.Tia = function(pCpu, pPia) {
 
     // caution: endClock can exceed but never wrap end of line!
     function renderLineTo(endClock) {
-        var p, x, on, linePixel = renderClock, finalPixel = (endClock > LINE_WIDTH ? LINE_WIDTH : endClock) - HBLANK_DURATION;
+        var p, linePixel = renderClock, finalPixel = (endClock > LINE_WIDTH ? LINE_WIDTH : endClock) - HBLANK_DURATION;
 
         for (var pixel = linePixel - HBLANK_DURATION; pixel < finalPixel; ++pixel) {
 
-            if (vBlankOn) { linePixels[linePixel++] = vBlankColor; continue }
+            if (vBlankOn) { linePixels[linePixel] = vBlankColor; ++linePixel; continue }
 
             // Pixel color and Flags for Collision latches
             var color = 0, collis = collisionsPossible;
@@ -271,11 +271,9 @@ jt.Tia = function(pCpu, pPia) {
                 }
             }
 
-            // Background
-            if (!color) color = playfieldBackground;
-
-            // Set pixel color
-            linePixels[linePixel++] = color;
+            // Set pixel color, or background
+            linePixels[linePixel] = color || playfieldBackground;
+            ++linePixel;
 
             // Update collision latches
             if (!debugNoCollisions) collisions |= collis;

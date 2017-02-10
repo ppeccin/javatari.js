@@ -3,6 +3,7 @@
 // Implements the 2K "CV" Commavid + 1K RAM format
 
 jt.Cartridge2K_CV = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

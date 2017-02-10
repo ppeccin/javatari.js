@@ -1,6 +1,7 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 jt.Util = new function() {
+"use strict";
 
     this.log = function(str) {
         console.log(">> Javatari: " + str);
@@ -22,13 +23,6 @@ jt.Util = new function() {
         var i = arr.length;
         while(i--)
             arr[i] = val;
-        return arr;
-    };
-
-    this.arrayFillFunc = function(arr, func) {
-        var i = arr.length;
-        while(i--)
-            arr[i] = func(i);
         return arr;
     };
 
@@ -156,15 +150,6 @@ jt.Util = new function() {
             outer.push(inner);
         }
         return outer;
-    };
-
-    this.reverseInt = function(val, bits) {
-        var res = 0;
-        for (var d = 0, e = bits - 1, s = e; s > 0; ++d, --e, s -= 2) {
-            res |= (val & (1 << d)) << s;
-            res |= (val & (1 << e)) >> s;
-        }
-        return res;
     };
 
     this.reverseInt8 = function(val) {

@@ -2,6 +2,7 @@
 
 // TODO Implement phosphor and other CRT modes
 jt.CanvasDisplay = function(mainElement) {
+"use strict";
 
     function init(self) {
         setupProperties();

@@ -3,6 +3,7 @@
 // Implements the 64K "F0" Dynacom Megaboy format
 
 jt.Cartridge64K_F0 = function(rom, format) {
+"use strict";
 
     function init(self) {
         self.rom = rom;

@@ -1,6 +1,7 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 jt.ROM = function(source, content, info) {
+"use strict";
 
     this.source = source;
     this.content = content;
@@ -21,5 +22,6 @@ jt.ROM = function(source, content, info) {
 };
 
 jt.ROM.loadState = function(state) {
+"use strict";
     return new jt.ROM(state.s, null, state.i);
 };
