@@ -41,18 +41,18 @@ jt.Tia = function(pCpu, pPia) {
             if (debugLevel >= 4) jt.Util.arrayFill(linePixels, 0xff000000);
 
             // Begin line
+            clock = 0;
             renderClock = HBLANK_DURATION; changeClock = -1;
             checkLateHMOVE();
             // Send the first clock/3 pulse to the CPU and PIA, perceived by TIA at clock 0 before releasing halt, then release halt
-            clock = 0;
             bus.clockPulse();
             cpu.setRDY(true);
-            for (clock = 3; clock < 69; clock += 3) bus.clockPulse();
+            for (var x = 0; x < 22; ++x) { clock += 3; bus.clockPulse(); }      // TIA 3..66     CPU 1..22
             updateExtendedHBLANK();
-            for (clock = 69; clock < 150; clock += 3) bus.clockPulse();
+            for (var y = 0; y < 27; ++y) { clock += 3; bus.clockPulse(); }      // TIA 69..147   CPU 23..49
             endObjectsAltStatusMidLine();
             audioSignal.audioClockPulse();
-            for (clock = 150; clock < 228; clock += 3) bus.clockPulse();
+            for (var z = 0; z < 26; ++z) { clock += 3; bus.clockPulse(); }      // TIA 150..225  CPU 50..75
             audioSignal.audioClockPulse();
             finishLine();
         } while(!videoSignal.nextLine(linePixels, vSyncOn));
@@ -687,7 +687,7 @@ jt.Tia = function(pCpu, pPia) {
         if (player0AltControl[controlPointer] === control) return;
 
         var basePointer = player0LineSpritePointer - 20;
-        for (var b = (player0AltFrom + player0AltLength) >> 3; b < 20; ++b) playerLineSprites[player0LineSpritePointer + b] = playerLineSprites[basePointer + b];
+        for (var b = (player0AltFrom + player0AltLength) >> 3; b < 14; ++b) playerLineSprites[player0LineSpritePointer + b] = playerLineSprites[basePointer + b];
 
         if (player0AltCopyOffset & 0xc0) {
             // Just clear bits
@@ -748,7 +748,7 @@ jt.Tia = function(pCpu, pPia) {
         if (player1AltControl[controlPointer] === control) return;
 
         var basePointer = player1LineSpritePointer - 40;
-        for (var b = (player1AltFrom + player1AltLength) >> 3; b < 20; ++b) playerLineSprites[player1LineSpritePointer + b] = playerLineSprites[basePointer + b];
+        for (var b = (player1AltFrom + player1AltLength) >> 3; b < 14; ++b) playerLineSprites[player1LineSpritePointer + b] = playerLineSprites[basePointer + b];
 
         if (player1AltCopyOffset & 0xc0) {
             // Just clear bits
@@ -808,7 +808,7 @@ jt.Tia = function(pCpu, pPia) {
         if (missile0AltControl[controlPointer] === control) return;
 
         var basePointer = missile0LineSpritePointer - 20;
-        for (var b = (missile0AltFrom + missile0AltLength) >> 3; b < 20; ++b) missileBallLineSprites[missile0LineSpritePointer + b] = missileBallLineSprites[basePointer + b];
+        for (var b = (missile0AltFrom + missile0AltLength) >> 3; b < 14; ++b) missileBallLineSprites[missile0LineSpritePointer + b] = missileBallLineSprites[basePointer + b];
 
         if (missile0AltCopyOffset & 0xc0) {
             // Just clear bits
@@ -868,7 +868,7 @@ jt.Tia = function(pCpu, pPia) {
         if (missile1AltControl[controlPointer] === control) return;
 
         var basePointer = missile1LineSpritePointer - 40;
-        for (var b = (missile1AltFrom + missile1AltLength) >> 3; b < 20; ++b) missileBallLineSprites[missile1LineSpritePointer + b] = missileBallLineSprites[basePointer + b];
+        for (var b = (missile1AltFrom + missile1AltLength) >> 3; b < 14; ++b) missileBallLineSprites[missile1LineSpritePointer + b] = missileBallLineSprites[basePointer + b];
 
         if (missile1AltCopyOffset & 0xc0) {
             // Just clear bits
