@@ -687,7 +687,7 @@ jt.Tia = function(pCpu, pPia) {
         if (player0AltControl[controlPointer] === control) return;
 
         var basePointer = player0LineSpritePointer - 20;
-        for (var b = (player0AltFrom + player0AltLength) >> 3; b <= 20; ++b) playerLineSprites[player0LineSpritePointer + b] = playerLineSprites[basePointer + b];
+        for (var b = (player0AltFrom + player0AltLength) >> 3; b < 20; ++b) playerLineSprites[player0LineSpritePointer + b] = playerLineSprites[basePointer + b];
 
         if (player0AltCopyOffset & 0xc0) {
             // Just clear bits
@@ -745,15 +745,10 @@ jt.Tia = function(pCpu, pPia) {
     function player1DefineAlt() {
         var control = (player1AltFrom << 16) | (player1AltLength << 8) | player1AltCopyOffset;
         var controlPointer = (player1LineSpritePointer - 40) >> 6;
-        if (player1AltControl[controlPointer] === control) {
-            debugInfo("Sprite: " + GRP1d.toString(16) + ", SAME: " + control.toString(16));
-            return;
-        } else {
-            debugInfo("Sprite: " + GRP1d.toString(16) + ", FROM " + player1AltControl[controlPointer].toString(16) + ", TO: " + control.toString(16));
-        }
+        if (player1AltControl[controlPointer] === control) return;
 
         var basePointer = player1LineSpritePointer - 40;
-        for (var b = (player1AltFrom + player1AltLength) >> 3; b <= 20; ++b) playerLineSprites[player1LineSpritePointer + b] = playerLineSprites[basePointer + b];
+        for (var b = (player1AltFrom + player1AltLength) >> 3; b < 20; ++b) playerLineSprites[player1LineSpritePointer + b] = playerLineSprites[basePointer + b];
 
         if (player1AltCopyOffset & 0xc0) {
             // Just clear bits
@@ -813,7 +808,7 @@ jt.Tia = function(pCpu, pPia) {
         if (missile0AltControl[controlPointer] === control) return;
 
         var basePointer = missile0LineSpritePointer - 20;
-        for (var b = (missile0AltFrom + missile0AltLength) >> 3; b <= 20; ++b) missileBallLineSprites[missile0LineSpritePointer + b] = missileBallLineSprites[basePointer + b];
+        for (var b = (missile0AltFrom + missile0AltLength) >> 3; b < 20; ++b) missileBallLineSprites[missile0LineSpritePointer + b] = missileBallLineSprites[basePointer + b];
 
         if (missile0AltCopyOffset & 0xc0) {
             // Just clear bits
@@ -873,7 +868,7 @@ jt.Tia = function(pCpu, pPia) {
         if (missile1AltControl[controlPointer] === control) return;
 
         var basePointer = missile1LineSpritePointer - 40;
-        for (var b = (missile1AltFrom + missile1AltLength) >> 3; b <= 20; ++b) missileBallLineSprites[missile1LineSpritePointer + b] = missileBallLineSprites[basePointer + b];
+        for (var b = (missile1AltFrom + missile1AltLength) >> 3; b < 20; ++b) missileBallLineSprites[missile1LineSpritePointer + b] = missileBallLineSprites[basePointer + b];
 
         if (missile1AltCopyOffset & 0xc0) {
             // Just clear bits
