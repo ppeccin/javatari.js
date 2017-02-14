@@ -1,9 +1,8 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 // TODO Audio problem in PAL (skipping forward)
-// TODO RESx during HBLANK position problem
 // TODO NUSIZ during copy shorten/stretch not implemented
-// TODO Alt definition control problem (Beamrider P1 re-trigger when lives = 3)
+// TODO Re-trigger right displacement is wrong (Meltdown, Beanrider)
 
 jt.Tia = function(pCpu, pPia) {
     "use strict";
@@ -646,24 +645,7 @@ jt.Tia = function(pCpu, pPia) {
     var hitRESP0 = function() {
         if (debug) debugPixel(DEBUG_P0_RES_COLOR);
 
-        var p;
-        // Hit in last pixel of HBLANK or after
-        if (clock >= HBLANK_DURATION + (hMoveHitBlank ? 8-1 : 0)) {
-            p = clock - HBLANK_DURATION;
-        } else {
-            // Hit before last pixel of HBLANK
-            var d = 0;									// No HMOVE, displacement = 0
-            if (hMoveHitBlank) {						// With HMOVE
-                if (clock >= HBLANK_DURATION)			// During extended HBLANK
-                    d = (HBLANK_DURATION - clock) + 8;
-                else {
-                    d = (clock - hMoveHitClock - 4) >> 2;
-                    if (d > 8) d = 8;
-                }
-            }
-            p = -2 + d; if (p < 0) p += 160; else if (p >= 160) p -= 160;
-        }
-
+        var p = getRESxPixel();
         if (player0Pixel !== p) {
             if (player0Enabled) changeAtClock();
             if (!player0Alt) { player0LineSpritePointer += 20; }
@@ -710,24 +692,7 @@ jt.Tia = function(pCpu, pPia) {
     var hitRESP1 = function() {
         if (debug) debugPixel(DEBUG_P1_RES_COLOR);
 
-        var p;
-        // Hit in last pixel of HBLANK or after
-        if (clock >= HBLANK_DURATION + (hMoveHitBlank ? 8-1 : 0)) {
-            p = clock - HBLANK_DURATION;
-        } else {
-            // Hit before last pixel of HBLANK
-            var d = 0;									// No HMOVE, displacement = 0
-            if (hMoveHitBlank) {						// With HMOVE
-                if (clock >= HBLANK_DURATION)			// During extended HBLANK
-                    d = (HBLANK_DURATION - clock) + 8;
-                else {
-                    d = (clock - hMoveHitClock - 4) >> 2;
-                    if (d > 8) d = 8;
-                }
-            }
-            p = -2 + d; if (p < 0) p += 160; else if (p >= 160) p -= 160;
-        }
-
+        var p = getRESxPixel();
         if (player1Pixel !== p) {
             if (player1Enabled) changeAtClock();
             if (!player1Alt) { player1LineSpritePointer += 40; }
@@ -771,24 +736,7 @@ jt.Tia = function(pCpu, pPia) {
     var hitRESM0 = function() {
         if (debug) debugPixel(DEBUG_M0_COLOR);
 
-        var p;
-        // Hit in last pixel of HBLANK or after
-        if (clock >= HBLANK_DURATION + (hMoveHitBlank ? 8-1 : 0)) {
-            p = clock - HBLANK_DURATION;
-        } else {
-            // Hit before last pixel of HBLANK
-            var d = 0;									// No HMOVE, displacement = 0
-            if (hMoveHitBlank) {						// With HMOVE
-                if (clock >= HBLANK_DURATION)			// During extended HBLANK
-                    d = (HBLANK_DURATION - clock) + 8;
-                else {
-                    d = (clock - hMoveHitClock - 4) >> 2;
-                    if (d > 8) d = 8;
-                }
-            }
-            p = -2 + d; if (p < 0) p += 160; else if (p >= 160) p -= 160;
-        }
-
+        var p = getRESxPixel();
         if (missile0Pixel !== p) {
             if (missile0Enabled) changeAtClock();
             if (!missile0Alt) { missile0LineSpritePointer += 20; }
@@ -830,25 +778,7 @@ jt.Tia = function(pCpu, pPia) {
 
     var hitRESM1 = function() {
         if (debug) debugPixel(DEBUG_M1_COLOR);
-
-        var p;
-        // Hit in last pixel of HBLANK or after
-        if (clock >= HBLANK_DURATION + (hMoveHitBlank ? 8-1 : 0)) {
-            p = clock - HBLANK_DURATION;
-        } else {
-            // Hit before last pixel of HBLANK
-            var d = 0;									// No HMOVE, displacement = 0
-            if (hMoveHitBlank) {						// With HMOVE
-                if (clock >= HBLANK_DURATION)			// During extended HBLANK
-                    d = (HBLANK_DURATION - clock) + 8;
-                else {
-                    d = (clock - hMoveHitClock - 4) >> 2;
-                    if (d > 8) d = 8;
-                }
-            }
-            p = -2 + d; if (p < 0) p += 160; else if (p >= 160) p -= 160;
-        }
-
+        var p = getRESxPixel();
         if (missile1Pixel !== p) {
             if (missile1Enabled) changeAtClock();
             if (!missile1Alt) { missile1LineSpritePointer += 40; }
@@ -891,24 +821,7 @@ jt.Tia = function(pCpu, pPia) {
     var hitRESBL = function() {
         if (debug) debugPixel(DEBUG_BL_COLOR);
 
-        var p;
-        // Hit in last pixel of HBLANK or after
-        if (clock >= HBLANK_DURATION + (hMoveHitBlank ? 8-1 : 0)) {
-            p = clock - HBLANK_DURATION;
-        } else {
-            // Hit before last pixel of HBLANK
-            var d = 0;									// No HMOVE, displacement = 0
-            if (hMoveHitBlank) {						// With HMOVE
-                if (clock >= HBLANK_DURATION)			// During extended HBLANK
-                    d = (HBLANK_DURATION - clock) + 8;
-                else {
-                    d = (clock - hMoveHitClock - 4) >> 2;
-                    if (d > 8) d = 8;
-                }
-            }
-            p = - 2 + d; if (p < 0) p += 160; else if (p >= 160) p -= 160;
-        }
-
+        var p = getRESxPixel();
         if (ballPixel !== p) {
             if (ballEnabled) changeAtClock();
             ballPixel = p;
@@ -964,6 +877,26 @@ jt.Tia = function(pCpu, pPia) {
 
         if (changed) changeClock = hMoveHitBlank ? HBLANK_DURATION + 8 : HBLANK_DURATION;
     };
+
+    function getRESxPixel() {
+        // Hit after complete HBLANK or last pixel of Extended HBLANK
+        if (clock >= HBLANK_DURATION + (hMoveHitBlank ? 8 - 1 : 0)) {
+            return clock - HBLANK_DURATION;
+        } else {
+            // Hit during HBLANK
+            if (hMoveHitBlank) {
+                if (clock >= HBLANK_DURATION) {
+                    return 6;
+                } else {
+                    var d = (clock - hMoveHitClock - 4) >> 2;   // Shift right proportionally to distance from HMOVE, up to 8 pixels
+                    if (d > 8) return 6;
+                    else if (d > 1) return d - 2;
+                    else return 158 + d;
+                }
+            } else
+                return 158;
+        }
+    }
 
     function checkLateHMOVE() {
         if (hMoveLateHit) {
