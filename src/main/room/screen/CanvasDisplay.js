@@ -38,9 +38,9 @@ jt.CanvasDisplay = function(mainElement) {
         mainElement.style.display = "none";
     };
 
-    this.refresh = function(image, iWidth, iHeight) {
+    this.refresh = function(image, iOriginX, iOriginY, iWidth, iHeight) {
         signalIsOn = true;
-        context.drawImage(image, 0, 0, iWidth, iHeight, 0, 0, canvas.width, canvas.height);
+        context.drawImage(image, iOriginX, iOriginY, iWidth, iHeight, 0, 0, canvas.width, canvas.height);
     };
 
     this.adjustToVideoSignalOff = function() {

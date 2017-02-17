@@ -22,7 +22,6 @@ jt.Tia = function(pCpu, pPia) {
         initLatchesAtPowerOn();
         hMoveLateHit = false;
         changeClock = changeClockPrevLine = -1;
-        line = 0;
         audioSignal.signalOn();
         powerOn = true;
     };
@@ -36,12 +35,18 @@ jt.Tia = function(pCpu, pPia) {
 
     this.frame = function() {
         if (debugPause && debugPauseMoreFrames-- <= 0) return;
-        do {
-            if (debugLevel >= 4) jt.Util.arrayFill(linePixels, 0xff000000);
 
+        do {
             // Begin line
             clock = 0;
-            renderClock = HBLANK_DURATION; changeClock = -1;
+            changeClock = -1;
+            renderClock = HBLANK_DURATION;
+
+            if (debug) {
+                if (debugLevel >= 4) jt.Util.arrayFill(linePixels, 0xff000000);     // clear line
+                else if (debugLevel >= 2 && debugLevel < 4) changeClock = 0;        // force entire line render
+            }
+
             checkLateHMOVE();
             // Send the first clock/3 pulse to the CPU and PIA, perceived by TIA at clock 0 before releasing halt, then release halt
             bus.clockPulse();
@@ -49,12 +54,13 @@ jt.Tia = function(pCpu, pPia) {
             for (var x = 0; x < 22; ++x) { clock += 3; bus.clockPulse(); }      // TIA 3..66     CPU 1..22
             updateExtendedHBLANK();
             for (var y = 0; y < 27; ++y) { clock += 3; bus.clockPulse(); }      // TIA 69..147   CPU 23..49
-            endObjectsAltStatusMidLine();
             audioSignal.audioClockPulse();
+            endObjectsAltStatusMidLine();
             for (var z = 0; z < 26; ++z) { clock += 3; bus.clockPulse(); }      // TIA 150..225  CPU 50..75
             audioSignal.audioClockPulse();
             finishLine();
         } while(!videoSignal.nextLine(linePixels, vSyncOn));
+
         // Ask for a refresh of the frame
         audioSignal.finishFrame();
         videoSignal.finishFrame();
@@ -186,11 +192,16 @@ jt.Tia = function(pCpu, pPia) {
 
     // caution: endClock can exceed but never wrap end of line!
     function renderLineTo(endClock) {
-        var p, linePixel = renderClock, finalPixel = (endClock > LINE_WIDTH ? LINE_WIDTH : endClock) - HBLANK_DURATION;
+        var p, finalClock = (endClock > LINE_WIDTH ? LINE_WIDTH : endClock);
 
-        for (var pixel = linePixel - HBLANK_DURATION; pixel < finalPixel; ++pixel) {
+        if (vBlankOn) {
+            // No collisions will be detected during VBLANK
+            for (var bPixel = renderClock; bPixel < finalClock; ++bPixel) linePixels[bPixel] = vBlankColor;
+            return;
+        }
 
-            if (vBlankOn) { linePixels[linePixel] = vBlankColor; ++linePixel; continue }
+        var newCollisions = collisions;
+        for (var pixel = renderClock - HBLANK_DURATION, finalPixel = finalClock - HBLANK_DURATION; pixel < finalPixel; ++pixel) {
 
             // Pixel color and Flags for Collision latches
             var color = 0, collis = collisionsPossible;
@@ -266,12 +277,12 @@ jt.Tia = function(pCpu, pPia) {
             }
 
             // Set pixel color, or background
-            linePixels[linePixel] = color || playfieldBackground;
-            ++linePixel;
+            linePixels[pixel + HBLANK_DURATION] = color || playfieldBackground;
 
             // Update collision latches
-            if (!debugNoCollisions) collisions |= collis;
+            newCollisions |= collis;
         }
+        if (!debugNoCollisions) collisions = newCollisions;
     }
 
     function changeAt(atClock) {
@@ -345,8 +356,6 @@ jt.Tia = function(pCpu, pPia) {
 
         // Inject debugging information in the line if needed
         if (debugLevel >= 1) processDebugPixelsInLine();
-
-        ++line;
     };
 
     function augmentCollisionsPossible() {
@@ -691,9 +700,6 @@ jt.Tia = function(pCpu, pPia) {
             player0AltCopyOffset = playerCopyOffsetsReset[nusiz * 160 + into];
             if (player0Enabled) player0DefineAlt();
         }
-
-        //player0Counter = 157 - d;
-        //player0RecentReset = player0Counter <= 155;
     };
 
     function player0DefineAlt() {
@@ -1014,7 +1020,8 @@ jt.Tia = function(pCpu, pPia) {
     };
 
     var processDebugPixelsInLine = function() {
-        jt.Util.arrayFillSegment(linePixels, 0, HBLANK_DURATION, hBlankColor);
+        jt.Util.arrayFillSegment(linePixels, 0, HBLANK_DURATION + (hMoveHitBlank ? 8 : 0), hBlankColor);
+        // Marks
         if (debugLevel >= 3 && videoSignal.monitor.currentLine() % 10 == 0) {
             for (var i = 0; i < LINE_WIDTH; i++) {
                 if (debugPixels[i]) continue;
@@ -1027,6 +1034,7 @@ jt.Tia = function(pCpu, pPia) {
                 }
             }
         }
+        // Debug Pixels
         if (debugLevel >= 2) {
             for (i = 0; i < LINE_WIDTH; i++) {
                 if (debugPixels[i]) {
@@ -1402,7 +1410,6 @@ jt.Tia = function(pCpu, pPia) {
     var bus;
 
     var powerOn = false;
-    var line = 0;
 
     var clock, changeClock, changeClockPrevLine, renderClock;
     var linePixels = new Uint32Array(LINE_WIDTH);

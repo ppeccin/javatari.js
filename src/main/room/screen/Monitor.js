@@ -40,12 +40,8 @@ jt.Monitor = function() {
         var vSynched = false;
         if (line < signalHeight) {
             // Copy to the back buffer only contents that will be displayed
-            if (line >= displayOriginY && line < displayOriginY + displayHeight) {
-                if (backBuffer)
-                    jt.Util.arrayCopy2(pixels, displayOriginX, backBuffer, (line - displayOriginY) * signalWidth, displayWidth);
-                else
-                    jt.Util.uInt32ArrayCopyToUInt8Array(pixels, displayOriginX, backData, (line - displayOriginY) * signalWidth, displayWidth);
-            }
+            if (line >= displayOriginY && line < displayOriginY + displayHeight)
+                backBuffer.set(pixels, (line - displayOriginY) * signalWidth);
         } else
             vSynched = maxLineExceeded();
         line++;
@@ -234,7 +230,7 @@ jt.Monitor = function() {
         // First paint the offscreen canvas with new frame data
         offContext.putImageData(offImageData, 0, 0);
         // Then refresh display with the new image (canvas) and correct dimensions
-        display.refresh(offCanvas, displayWidth, displayHeight);
+        display.refresh(offCanvas, displayOriginX, 0, displayWidth, displayHeight);
 
         if (debug > 0) cleanBackBuffer();
     };
@@ -267,12 +263,7 @@ jt.Monitor = function() {
         offContext.globalCompositeOperation = "copy";
         offContext.globalAlpha = 1;
         offImageData = offContext.getImageData(0, 0, offCanvas.width, offCanvas.height);
-        if (offImageData.data.buffer)
-            backBuffer = new Uint32Array(offImageData.data.buffer);
-        else {
-            // Needed for IE compatibility, which has no underlying buffer
-            backData = offImageData.data;
-        }
+        backBuffer = new Uint32Array(offImageData.data.buffer);
     };
 
     var cleanBackBuffer = function() {
@@ -377,7 +368,6 @@ jt.Monitor = function() {
     var offImageData;
 
     var backBuffer;
-    var backData;       // Needed for IE compatibility, which has no underlying buffer
 
     var signalOn = false;
     var signalStandard;
