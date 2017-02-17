@@ -125,7 +125,7 @@ jt.Tia = function(pCpu, pPia) {
             case 0x0F: if (PF2 !== i) { changePlayfieldAtClock(); PF2 = i; playfieldUpdateSprite(); } return;
 
             // Playfield & Ball
-            case 0x08: if (COLUPF !== i && !debug) { if ((playfieldEnabled && !playfieldScoreMode) || ballEnabled) changeAtClock(); COLUPF = i; ballColor = palette[i]; if (!playfieldScoreMode) playfieldLeftColor = playfieldRightColor = ballColor } return;
+            case 0x08: if (COLUPF !== i && !debug) { if ((playfieldEnabled && !playfieldScoreMode) || ballEnabled) changeAtClock(); COLUPF = i; ballColor = palette[i]; if (!playfieldScoreMode) playfieldColor = playfieldLeftColor = playfieldRightColor = ballColor } return;
             case 0x0A: if (CTRLPF !== i) { playfieldSetShape(i); } return;
 
             // Ball
@@ -206,7 +206,7 @@ jt.Tia = function(pCpu, pPia) {
                 // Playfield
                 if (playfieldEnabled) {
                     if ((pixel < 80 ? (playfieldPatternL >> (pixel >> 2)) : (playfieldPatternR >> ((pixel - 80) >> 2))) & 1) {
-                        if (!color) color = ballColor;
+                        if (!color) color = playfieldColor;     // ignore score mode
                     } else collis &= PFC;
                 }
             }
@@ -367,7 +367,7 @@ jt.Tia = function(pCpu, pPia) {
             if (playfieldScoreMode !== v) {
                 playfieldScoreMode = v;
                 if (v) { playfieldLeftColor = player0Color; playfieldRightColor = player1Color }
-                else playfieldLeftColor = playfieldRightColor = palette[COLUPF];
+                else playfieldColor = playfieldLeftColor = playfieldRightColor = palette[COLUPF];
             }
 
             playfieldPriority = (i & 0x04) !== 0;
@@ -1034,7 +1034,7 @@ jt.Tia = function(pCpu, pPia) {
         missile0Color = DEBUG_M0_COLOR;
         missile1Color = DEBUG_M1_COLOR;
         ballColor = DEBUG_BL_COLOR;
-        playfieldLeftColor = playfieldRightColor = DEBUG_PF_COLOR;
+        playfieldColor = playfieldLeftColor = playfieldRightColor = DEBUG_PF_COLOR;
         playfieldBackground = DEBUG_BK_COLOR;
         hBlankColor = debugLevel >= 1 ? DEBUG_HBLANK_COLOR : HBLANK_COLOR;
         vBlankColor = debugLevel >= 1 ? DEBUG_VBLANK_COLOR : VBLANK_COLOR;
@@ -1404,7 +1404,7 @@ jt.Tia = function(pCpu, pPia) {
     var hBlankColor = HBLANK_COLOR;
 
     var playfieldEnabled = false, playfieldPatternL = 0, playfieldPatternR = 0;
-    var playfieldLeftColor = 0xff000000, playfieldRightColor = 0xff000000;
+    var playfieldColor = 0xff000000, playfieldLeftColor = 0xff000000, playfieldRightColor = 0xff000000;
     var playfieldBackground = 0xff000000;
     var playfieldReflected = false;
     var playfieldScoreMode = false;
