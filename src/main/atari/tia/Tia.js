@@ -92,14 +92,14 @@ jt.Tia = function(pCpu, pPia) {
             // P0P1, P0M0, P0M1, P0PF,     P0BL, P1M0, P1M1, P1PF,     P1BL, M0M1, M0PF, M0BL,     M1PF, M1BL, PFBL, XXXX
             //  15    14    13    12        11    10    9     8         7     6     5     4         3     2     1     0
 
-            case 0x00: changeAtClock(); return ((collisions & 0x0400) >> 3) | ((collisions & 0x4000) >> 8);          // CXM0P
-            case 0x01: changeAtClock(); return ((collisions & 0x2000) >> 6) | ((collisions & 0x0200) >> 3);          // CXM1P
-            case 0x02: changeAtClock(); return ((collisions & 0x1000) >> 5) | ((collisions & 0x0800) >> 5);          // CXP0FB
-            case 0x03: changeAtClock(); return ((collisions & 0x0100) >> 1) | ((collisions & 0x0080) >> 1);          // CXP1FB
-            case 0x04: changeAtClock(); return ((collisions & 0x0020) << 2) | ((collisions & 0x0010) << 2);          // CXM0FB
-            case 0x05: changeAtClock(); return ((collisions & 0x0008) << 4) | ((collisions & 0x0004) << 4);          // CXM1FB
-            case 0x06: changeAtClock(); return ((collisions & 0x0002) << 6);                                         // CXBLPF
-            case 0x07: changeAtClock(); return ((collisions & 0x8000) >> 8) | (collisions & 0x0040);                 // CXPPMM
+            case 0x00: updateToClock(); return ((collisions & 0x0400) >> 3) | ((collisions & 0x4000) >> 8);          // CXM0P
+            case 0x01: updateToClock(); return ((collisions & 0x2000) >> 6) | ((collisions & 0x0200) >> 3);          // CXM1P
+            case 0x02: updateToClock(); return ((collisions & 0x1000) >> 5) | ((collisions & 0x0800) >> 5);          // CXP0FB
+            case 0x03: updateToClock(); return ((collisions & 0x0100) >> 1) | ((collisions & 0x0080) >> 1);          // CXP1FB
+            case 0x04: updateToClock(); return ((collisions & 0x0020) << 2) | ((collisions & 0x0010) << 2);          // CXM0FB
+            case 0x05: updateToClock(); return ((collisions & 0x0008) << 4) | ((collisions & 0x0004) << 4);          // CXM1FB
+            case 0x06: updateToClock(); return ((collisions & 0x0002) << 6);                                         // CXBLPF
+            case 0x07: updateToClock(); return ((collisions & 0x8000) >> 8) | (collisions & 0x0040);                 // CXPPMM
 
             case 0x08: return INPT0;
             case 0x09: return INPT1;
@@ -309,6 +309,15 @@ jt.Tia = function(pCpu, pPia) {
             renderClock = atClock;
         }
         changeClock = renderClock;
+    }
+
+    function updateToClock() {    // does not trigger change
+        if (vBlankOn) return;
+
+        if (clock > renderClock) {
+            if (changeClock >= 0 || changeClockPrevLine >= 0) renderLineTo(clock);
+            renderClock = clock;
+        }
     }
 
     var finishLine = function() {
