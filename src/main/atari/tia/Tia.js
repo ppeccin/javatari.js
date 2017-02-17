@@ -1,7 +1,7 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
 // TODO Audio problem in PAL (skipping forward)
-// TODO NUSIZ during copy shorten/stretch not implemented
+// TODO NUSIZ during scan with HMOVE not correct. Will kill the scan in progress
 // TODO Starfield Effect not implemented
 
 jt.Tia = function(pCpu, pPia) {
@@ -413,22 +413,30 @@ jt.Tia = function(pCpu, pPia) {
         var newShape = (i & 7);
         var c = clock < HBLANK_DURATION ? 2 : clock - HBLANK_DURATION + 2;
 
+        //if (debug) debugPixel(DEBUG_ALT_COLOR);
+
         if (dif & 0x07) {
             // Enter Alt mode?
             if (!player0Alt) {
                 var into = c - player0Pixel; if (into < 0) into += 160; else if (into >= 160) into -= 160;
-                var oldScan = playerCopiesOffsetsShape[(oldNUSIZ0 & 7) * 160 + into];
-                var newScan = playerCopiesOffsetsShape[newShape * 160 + into];
+                var oldScan = playerScanOffsetsShape[(oldNUSIZ0 & 7) * 160 + into];
+                var newScan = playerScanOffsetsShape[newShape * 160 + into];
                 if (newScan !== oldScan) {
                     if (player0Enabled) changeAtClockPlus(2);
-                    player0Alt = player0Pixel >= 80 ? 1 : 2; player0LineSpritePointer -= 20;
+                    player0Alt = player0Pixel >= 80 ? 1 : 2; player0LineSpritePointer += 20;
                     player0AltFrom = into;
                     player0AltLength = playerCopyLengthPerShape[newShape];
-                    player0AltCopyOffset = oldScan & 0xc0
-                        ? oldScan & 0xbf                                            // Scan about to start
-                        : clock < HBLANK_DURATION && hMoveHitBlank                  // Scan in progress
-                            ? 0x80
-                            : playerScanStartPerShape[newShape] + oldScan * playerPixelSizePerShape[newShape] + (into & 1);
+                    if (oldScan & 0xc0)
+                        player0AltCopyOffset = oldScan & 0xbf;              // Scan about to start or in empty area
+                    else if (clock < HBLANK_DURATION && hMoveHitBlank)
+                        player0AltCopyOffset = 0x80;                        // Middle of scan during HBLANK, kill scan
+                    else {
+                        var pixelSize = playerPixelSizePerShape[newShape];
+                        player0AltCopyOffset = playerScanStartPerShape[newShape] + oldScan * pixelSize + (into & 1);
+                        player0AltLength -= (newScan & 0xc0 ? 0 : newScan) * pixelSize;
+                    }
+
+                    //if (debug && videoSignal.monitor.currentLine() === 65) debugInfo("oldScan: " + oldScan.toString(16) + ", newScan: " + newScan.toString(16) + ", len: " + player0AltLength);
                 }
             }
             player0UpdateSprite(2);
@@ -438,17 +446,25 @@ jt.Tia = function(pCpu, pPia) {
             // Enter Alt mode?
             if (!missile0Alt) {
                 into = c - missile0Pixel; if (into < 0) into += 160; else if (into >= 160) into -= 160;
-                oldScan = missileCopiesOffsetsShape[(((oldNUSIZ0 & 0x30) >> 1) | (oldNUSIZ0 & 7)) * 160 + into];
-                newScan = missileCopiesOffsetsShape[(((i & 0x30) >> 1) | newShape) * 160 + into];
+                oldScan = missileScanOffsetsShape[(((oldNUSIZ0 & 0x30) >> 1) | (oldNUSIZ0 & 7)) * 160 + into];
+                newScan = missileScanOffsetsShape[(((i & 0x30) >> 1) | newShape) * 160 + into];
                 if (newScan !== oldScan) {
                     if (missile0Enabled) changeAtClockPlus(2);
-                    missile0Alt = missile0Pixel >= 80 ? 1 : 2; missile0LineSpritePointer -= 40;
+                    missile0Alt = missile0Pixel >= 80 ? 1 : 2; missile0LineSpritePointer += 20;
                     missile0AltFrom = into;
-                    missile0AltLength = missileCopyLengthPerSize[(i & 0x30) >> 4];
-                    missile0AltCopyOffset = oldScan;
+                    var size = (i & 0x30) >> 4;
+                    missile0AltLength = 4 + (1 << size);
+                    if (oldScan & 0xc0)
+                        missile0AltCopyOffset = oldScan & 0xbf;              // Scan about to start or in empty area
+                    else if (clock < HBLANK_DURATION && hMoveHitBlank)
+                        missile0AltCopyOffset = 0x80;                        // Middle of scan during HBLANK, kill scan
+                    else {
+                        missile0AltCopyOffset = 4 + (oldScan << size) + (into & 1);
+                        missile0AltLength -= (newScan & 0xc0 ? 0 : newScan) << size;
+                    }
                 }
             }
-            missile0UpdateSprite();  // TODO + 2
+            missile0UpdateSprite(2);
         }
     }
 
@@ -493,27 +509,25 @@ jt.Tia = function(pCpu, pPia) {
         var newShape = (i & 7);
         var c = clock < HBLANK_DURATION ? 2 : clock - HBLANK_DURATION + 2;
 
-        if (debug) debugPixel(DEBUG_ALT_COLOR);
-
         if (dif & 0x07) {
             // Enter Alt mode?
             if (!player1Alt) {
                 var into = c - player1Pixel; if (into < 0) into += 160; else if (into >= 160) into -= 160;
-                var oldScan = playerCopiesOffsetsShape[(oldNUSIZ1 & 7) * 160 + into];
-                var newScan = playerCopiesOffsetsShape[newShape * 160 + into];
+                var oldScan = playerScanOffsetsShape[(oldNUSIZ1 & 7) * 160 + into];
+                var newScan = playerScanOffsetsShape[newShape * 160 + into];
                 if (newScan !== oldScan) {
                     if (player1Enabled) changeAtClockPlus(2);
-                    player1Alt = player1Pixel >= 80 ? 1 : 2; player1LineSpritePointer -= 20;
+                    player1Alt = player1Pixel >= 80 ? 1 : 2; player1LineSpritePointer += 40;
                     player1AltFrom = into;
                     player1AltLength = playerCopyLengthPerShape[newShape];
-                    player1AltCopyOffset = oldScan & 0xc0
-                        ? oldScan & 0xbf                                            // Scan about to start
-                        : clock < HBLANK_DURATION && hMoveHitBlank                  // Scan in progress
-                            ? 0x80
-                            : playerScanStartPerShape[newShape] + oldScan * playerPixelSizePerShape[newShape] + (into & 1);
-
-                    if (debug && videoSignal.monitor.currentLine() === 75) debugInfo("OldScan: " + oldScan.toString(16) + ", NewScan: " + newScan.toString(16));
-
+                    if (oldScan & 0xc0)
+                        player1AltCopyOffset = oldScan & 0xbf;              // Scan about to start or in empty area
+                    else if (clock < HBLANK_DURATION && hMoveHitBlank)
+                        player1AltCopyOffset = 0x80;                        // Middle of scan during HBLANK, kill scan
+                    else {
+                        player1AltCopyOffset = playerScanStartPerShape[newShape] + oldScan * playerPixelSizePerShape[newShape] + (into & 1);
+                        player1AltLength -= (newScan & 0xc0 ? 0 : newScan) * playerPixelSizePerShape[newShape];
+                    }
                 }
             }
             player1UpdateSprite(2);
@@ -523,17 +537,25 @@ jt.Tia = function(pCpu, pPia) {
             // Enter Alt mode?
             if (!missile1Alt) {
                 into = c - missile1Pixel; if (into < 0) into += 160; else if (into >= 160) into -= 160;
-                oldScan = missileCopiesOffsetsShape[(((oldNUSIZ1 & 0x30) >> 1) | (oldNUSIZ1 & 7)) * 160 + into];
-                newScan = missileCopiesOffsetsShape[(((i & 0x30) >> 1) | newShape) * 160 + into];
+                oldScan = missileScanOffsetsShape[(((oldNUSIZ1 & 0x30) >> 1) | (oldNUSIZ1 & 7)) * 160 + into];
+                newScan = missileScanOffsetsShape[(((i & 0x30) >> 1) | newShape) * 160 + into];
                 if (newScan !== oldScan) {
                     if (missile1Enabled) changeAtClockPlus(2);
-                    missile1Alt = missile1Pixel >= 80 ? 1 : 2; missile1LineSpritePointer -= 40;
+                    missile1Alt = missile1Pixel >= 80 ? 1 : 2; missile1LineSpritePointer += 40;
                     missile1AltFrom = into;
-                    missile1AltLength = missileCopyLengthPerSize[(i & 0x30) >> 4];
-                    missile1AltCopyOffset = oldScan;
+                    var size = (i & 0x30) >> 4;
+                    missile1AltLength = 4 + (1 << size);
+                    if (oldScan & 0xc0)
+                        missile1AltCopyOffset = oldScan & 0xbf;              // Scan about to start or in empty area
+                    else if (clock < HBLANK_DURATION && hMoveHitBlank)
+                        missile1AltCopyOffset = 0x80;                        // Middle of scan during HBLANK, kill scan
+                    else {
+                        missile1AltCopyOffset = 4 + (oldScan << size) + (into & 1);
+                        missile1AltLength -= (newScan & 0xc0 ? 0 : newScan) << size;
+                    }
                 }
             }
-            missile1UpdateSprite();  // TODO + 2
+            missile1UpdateSprite(2);
         }
     }
 
@@ -574,11 +596,11 @@ jt.Tia = function(pCpu, pPia) {
         }
     }
 
-    function missile0UpdateSprite() {
+    function missile0UpdateSprite(clockPlus) {
         var p = ((((NUSIZ0 & 0x30) >> 1) | (NUSIZ0 & 7)) << 6) + (missile0Alt ? 20 : 0);
         if (missile0LineSpritePointer !== p) {
             if (missile0Enabled) {
-                changeAtClock();
+                changeAtClockPlus(clockPlus);
                 missile0LineSpritePointer = p;
                 if (missile0Alt) missile0DefineAlt();
             } else
@@ -609,11 +631,11 @@ jt.Tia = function(pCpu, pPia) {
         }
     }
 
-    function missile1UpdateSprite() {
+    function missile1UpdateSprite(clockPlus) {
         var p = ((((NUSIZ1 & 0x30) >> 1) | (NUSIZ1 & 7)) << 6) + (missile1Alt ? 40 : 0);
         if (missile1LineSpritePointer !== p) {
             if (missile1Enabled) {
-                changeAtClock();
+                changeAtClockPlus(clockPlus);
                 missile1LineSpritePointer = p;
                 if (missile1Alt) missile1DefineAlt();
             } else
@@ -657,7 +679,7 @@ jt.Tia = function(pCpu, pPia) {
             var nusiz = (NUSIZ0 & 7);
             player0AltFrom = 0;
             player0AltLength = playerCopyLengthPerShape[nusiz];
-            player0AltCopyOffset = playerCopiesOffsetsReset[nusiz * 160 + into];
+            player0AltCopyOffset = playerCopyOffsetsReset[nusiz * 160 + into];
             if (player0Enabled) player0DefineAlt();
         }
 
@@ -704,7 +726,7 @@ jt.Tia = function(pCpu, pPia) {
             var nusiz = NUSIZ1 & 7;
             player1AltFrom = 0;
             player1AltLength = playerCopyLengthPerShape[nusiz];
-            player1AltCopyOffset = playerCopiesOffsetsReset[nusiz * 160 + into];
+            player1AltCopyOffset = playerCopyOffsetsReset[nusiz * 160 + into];
             if (player1Enabled) player1DefineAlt();
         }
     };
@@ -746,8 +768,8 @@ jt.Tia = function(pCpu, pPia) {
             var into = p - missile0Pixel; if (into < 0) into += 160;
             missile0Pixel = p;
             missile0AltFrom = 0;
-            missile0AltLength = missileCopyLengthPerSize[(NUSIZ0 & 0x30) >> 4];
-            missile0AltCopyOffset = missileCopiesOffsetsReset[(((NUSIZ0 & 0x30) >> 1) | (NUSIZ0 & 7)) * 160 + into];
+            missile0AltLength = 4 + (1 << ((NUSIZ0 & 0x30) >> 4));
+            missile0AltCopyOffset = missileCopyOffsetsReset[(((NUSIZ0 & 0x30) >> 1) | (NUSIZ0 & 7)) * 160 + into];
             if (missile0Enabled) missile0DefineAlt();
         }
     };
@@ -788,8 +810,8 @@ jt.Tia = function(pCpu, pPia) {
             var into = p - missile1Pixel; if (into < 0) into += 160;
             missile1Pixel = p;
             missile1AltFrom = 0;
-            missile1AltLength = missileCopyLengthPerSize[(NUSIZ1 & 0x30) >> 4];
-            missile1AltCopyOffset = missileCopiesOffsetsReset[(((NUSIZ1 & 0x30) >> 1) | (NUSIZ1 & 7)) * 160 + into];
+            missile1AltLength = 4 + (1 << ((NUSIZ1 & 0x30) >> 4));
+            missile1AltCopyOffset = missileCopyOffsetsReset[(((NUSIZ1 & 0x30) >> 1) | (NUSIZ1 & 7)) * 160 + into];
             if (missile1Enabled) missile1DefineAlt();
         }
     };
@@ -1116,68 +1138,68 @@ jt.Tia = function(pCpu, pPia) {
         delays[0] = 0; delays[1] = 1; delays[2] = 2; delays[3] = 3;
 
         // Players
-        jt.Util.arrayFill(playerCopiesOffsetsReset, 0x80);
-        jt.Util.arrayFill(playerCopiesOffsetsShape, 0x80);
+        jt.Util.arrayFill(playerCopyOffsetsReset, 0x80);
+        jt.Util.arrayFill(playerScanOffsetsShape, 0x80);
         // Normal Variations
         for (var p = 0; p < 13; ++p) {
             // Apply delays for Reset start signal
             var v = p - delays[p];
-            playerCopiesOffsetsReset[0*160 + p] = v;
-            playerCopiesOffsetsReset[1*160 + p] = v;  playerCopiesOffsetsReset[1*160 + p + 16] = v;
-            playerCopiesOffsetsReset[2*160 + p] = v;  playerCopiesOffsetsReset[2*160 + p + 32] = v;
-            playerCopiesOffsetsReset[3*160 + p] = v;  playerCopiesOffsetsReset[3*160 + p + 16] = v; playerCopiesOffsetsReset[3*160 + p + 32] = v;
-            playerCopiesOffsetsReset[4*160 + p] = v;  playerCopiesOffsetsReset[4*160 + p + 64] = v;
-            playerCopiesOffsetsReset[6*160 + p] = v;  playerCopiesOffsetsReset[6*160 + p + 32] = v; playerCopiesOffsetsReset[6*160 + p + 64] = v;
+            playerCopyOffsetsReset[0*160 + p] = v;
+            playerCopyOffsetsReset[1*160 + p] = v;  playerCopyOffsetsReset[1*160 + p + 16] = v;
+            playerCopyOffsetsReset[2*160 + p] = v;  playerCopyOffsetsReset[2*160 + p + 32] = v;
+            playerCopyOffsetsReset[3*160 + p] = v;  playerCopyOffsetsReset[3*160 + p + 16] = v; playerCopyOffsetsReset[3*160 + p + 32] = v;
+            playerCopyOffsetsReset[4*160 + p] = v;  playerCopyOffsetsReset[4*160 + p + 64] = v;
+            playerCopyOffsetsReset[6*160 + p] = v;  playerCopyOffsetsReset[6*160 + p + 32] = v; playerCopyOffsetsReset[6*160 + p + 64] = v;
             // Start signal and pixel scan info
             v = p < 5 ? p | 0x40 : p - 5;
-            playerCopiesOffsetsShape[0*160 + p] = v;
-            playerCopiesOffsetsShape[1*160 + p] = v;  playerCopiesOffsetsShape[1*160 + p + 16] = v;
-            playerCopiesOffsetsShape[2*160 + p] = v;  playerCopiesOffsetsShape[2*160 + p + 32] = v;
-            playerCopiesOffsetsShape[3*160 + p] = v;  playerCopiesOffsetsShape[3*160 + p + 16] = v; playerCopiesOffsetsShape[3*160 + p + 32] = v;
-            playerCopiesOffsetsShape[4*160 + p] = v;  playerCopiesOffsetsShape[4*160 + p + 64] = v;
-            playerCopiesOffsetsShape[6*160 + p] = v;  playerCopiesOffsetsShape[6*160 + p + 32] = v; playerCopiesOffsetsShape[6*160 + p + 64] = v;
+            playerScanOffsetsShape[0*160 + p] = v;
+            playerScanOffsetsShape[1*160 + p] = v;  playerScanOffsetsShape[1*160 + p + 16] = v;
+            playerScanOffsetsShape[2*160 + p] = v;  playerScanOffsetsShape[2*160 + p + 32] = v;
+            playerScanOffsetsShape[3*160 + p] = v;  playerScanOffsetsShape[3*160 + p + 16] = v; playerScanOffsetsShape[3*160 + p + 32] = v;
+            playerScanOffsetsShape[4*160 + p] = v;  playerScanOffsetsShape[4*160 + p + 64] = v;
+            playerScanOffsetsShape[6*160 + p] = v;  playerScanOffsetsShape[6*160 + p + 32] = v; playerScanOffsetsShape[6*160 + p + 64] = v;
         }
 
         // Double Variation
         for (p = 0; p < 22; p++) {
             v = p - delays[p];
-            playerCopiesOffsetsReset[5 * 160 + p] = v;
+            playerCopyOffsetsReset[5 * 160 + p] = v;
             v = p < 6 ? p | 0x40 : (p - 6) >> 1;
-            playerCopiesOffsetsShape[5 * 160 + p] = v;
+            playerScanOffsetsShape[5 * 160 + p] = v;
         }
         // Quad Variation
         for (p = 0; p < 38; p++) {
             v = p - delays[p];
-            playerCopiesOffsetsReset[7 * 160 + p] = v;
+            playerCopyOffsetsReset[7 * 160 + p] = v;
             v = p < 6 ? p | 0x40 : (p - 6) >> 2;
-            playerCopiesOffsetsShape[7 * 160 + p] = v;
+            playerScanOffsetsShape[7 * 160 + p] = v;
         }
 
         // Missiles
-        jt.Util.arrayFill(missileCopiesOffsetsReset, 0x80);
-        jt.Util.arrayFill(missileCopiesOffsetsShape, 0x80);
+        jt.Util.arrayFill(missileCopyOffsetsReset, 0x80);
+        jt.Util.arrayFill(missileScanOffsetsShape, 0x80);
         // All Size * Variations
         for (var s = 0; s <= 3; ++s) {
-            var d = missileCopyLengthPerSize[s];
+            var d = 4 + (1 << s);
             for (p = 0; p < d; ++p) {
                 v = p - delays[p];
-                missileCopiesOffsetsReset[s*8*160 + 0*160 + p] = v;
-                missileCopiesOffsetsReset[s*8*160 + 1*160 + p] = v;  missileCopiesOffsetsReset[s*8 + 1*160 + p + 16] = v;
-                missileCopiesOffsetsReset[s*8*160 + 2*160 + p] = v;  missileCopiesOffsetsReset[s*8 + 2*160 + p + 32] = v;
-                missileCopiesOffsetsReset[s*8*160 + 3*160 + p] = v;  missileCopiesOffsetsReset[s*8 + 3*160 + p + 16] = v; missileCopiesOffsetsReset[s*8*160 + 3*160 + p + 32] = v;
-                missileCopiesOffsetsReset[s*8*160 + 4*160 + p] = v;  missileCopiesOffsetsReset[s*8 + 4*160 + p + 64] = v;
-                missileCopiesOffsetsReset[s*8*160 + 5*160 + p] = v;
-                missileCopiesOffsetsReset[s*8*160 + 6*160 + p] = v;  missileCopiesOffsetsReset[s*8 + 6*160 + p + 32] = v; missileCopiesOffsetsReset[s*8*160 + 6*160 + p + 64] = v;
-                missileCopiesOffsetsReset[s*8*160 + 7*160 + p] = v;
+                missileCopyOffsetsReset[s*8*160 + 0*160 + p] = v;
+                missileCopyOffsetsReset[s*8*160 + 1*160 + p] = v;  missileCopyOffsetsReset[s*8 + 1*160 + p + 16] = v;
+                missileCopyOffsetsReset[s*8*160 + 2*160 + p] = v;  missileCopyOffsetsReset[s*8 + 2*160 + p + 32] = v;
+                missileCopyOffsetsReset[s*8*160 + 3*160 + p] = v;  missileCopyOffsetsReset[s*8 + 3*160 + p + 16] = v; missileCopyOffsetsReset[s*8*160 + 3*160 + p + 32] = v;
+                missileCopyOffsetsReset[s*8*160 + 4*160 + p] = v;  missileCopyOffsetsReset[s*8 + 4*160 + p + 64] = v;
+                missileCopyOffsetsReset[s*8*160 + 5*160 + p] = v;
+                missileCopyOffsetsReset[s*8*160 + 6*160 + p] = v;  missileCopyOffsetsReset[s*8 + 6*160 + p + 32] = v; missileCopyOffsetsReset[s*8*160 + 6*160 + p + 64] = v;
+                missileCopyOffsetsReset[s*8*160 + 7*160 + p] = v;
                 v = p < 4 ? p | 0x40 : (p - 4) >> s;
-                missileCopiesOffsetsShape[s*8*160 + 0*160 + p] = v;
-                missileCopiesOffsetsShape[s*8*160 + 1*160 + p] = v;  missileCopiesOffsetsShape[s*8 + 1*160 + p + 16] = v;
-                missileCopiesOffsetsShape[s*8*160 + 2*160 + p] = v;  missileCopiesOffsetsShape[s*8 + 2*160 + p + 32] = v;
-                missileCopiesOffsetsShape[s*8*160 + 3*160 + p] = v;  missileCopiesOffsetsShape[s*8 + 3*160 + p + 16] = v; missileCopiesOffsetsShape[s*8*160 + 3*160 + p + 32] = v;
-                missileCopiesOffsetsShape[s*8*160 + 4*160 + p] = v;  missileCopiesOffsetsShape[s*8 + 4*160 + p + 64] = v;
-                missileCopiesOffsetsShape[s*8*160 + 5*160 + p] = v;
-                missileCopiesOffsetsShape[s*8*160 + 6*160 + p] = v;  missileCopiesOffsetsShape[s*8 + 6*160 + p + 32] = v; missileCopiesOffsetsShape[s*8*160 + 6*160 + p + 64] = v;
-                missileCopiesOffsetsShape[s*8*160 + 7*160 + p] = v;
+                missileScanOffsetsShape[s*8*160 + 0*160 + p] = v;
+                missileScanOffsetsShape[s*8*160 + 1*160 + p] = v;  missileScanOffsetsShape[s*8 + 1*160 + p + 16] = v;
+                missileScanOffsetsShape[s*8*160 + 2*160 + p] = v;  missileScanOffsetsShape[s*8 + 2*160 + p + 32] = v;
+                missileScanOffsetsShape[s*8*160 + 3*160 + p] = v;  missileScanOffsetsShape[s*8 + 3*160 + p + 16] = v; missileScanOffsetsShape[s*8*160 + 3*160 + p + 32] = v;
+                missileScanOffsetsShape[s*8*160 + 4*160 + p] = v;  missileScanOffsetsShape[s*8 + 4*160 + p + 64] = v;
+                missileScanOffsetsShape[s*8*160 + 5*160 + p] = v;
+                missileScanOffsetsShape[s*8*160 + 6*160 + p] = v;  missileScanOffsetsShape[s*8 + 6*160 + p + 32] = v; missileScanOffsetsShape[s*8*160 + 6*160 + p + 64] = v;
+                missileScanOffsetsShape[s*8*160 + 7*160 + p] = v;
             }
         }
     }
@@ -1439,15 +1461,14 @@ jt.Tia = function(pCpu, pPia) {
     var missileBallLineSprites = new Uint8Array(4 * 8 * 64);                // 4 Sizes * 8 Variations * (1 base + 2 alts) * 20 8Bits line data specifying 1bit pixels + 4 bytes spare
 
     var playerCopyLengthPerShape = new Uint8Array([13, 13, 13, 13, 13, 22, 13, 38]);
-    var playerPixelSizePerShape = new Uint8Array([1, 1, 1, 1, 1, 2, 1, 4]);
-    var playerScanStartPerShape = new Uint8Array([5, 5, 5, 5, 5, 6, 5, 6]);
+    var playerScanStartPerShape =  new Uint8Array([5, 5, 5, 5, 5, 6, 5, 6]);
+    var playerPixelSizePerShape =  new Uint8Array([1, 1, 1, 1, 1, 2, 1, 4]);
 
-    var missileCopyLengthPerSize = new Uint8Array([5, 6, 8, 12 ]);
+    var playerCopyOffsetsReset = new Uint8Array(8 * 160);                  // 8 Variations * 160 1 byte data with copy pixel position
+    var playerScanOffsetsShape = new Uint8Array(8 * 160);                  // 8 Variations * 160 1 byte data with copy pixel position
 
-    var playerCopiesOffsetsReset = new Uint8Array(8 * 160);                 // 8 Variations * 160 1 byte data with copy pixel position
-    var playerCopiesOffsetsShape = new Uint8Array(8 * 160);                 // 8 Variations * 160 1 byte data with copy pixel position
-    var missileCopiesOffsetsReset = new Uint8Array(4 * 8 * 160);            // 4 Sizes * 8 Variations * 160 1 byte data with copy pixel position
-    var missileCopiesOffsetsShape = new Uint8Array(4 * 8 * 160);            // 4 Sizes * 8 Variations * 160 1 byte data with copy pixel position
+    var missileCopyOffsetsReset = new Uint8Array(4 * 8 * 160);             // 4 Sizes * 8 Variations * 160 1 byte data with copy pixel position
+    var missileScanOffsetsShape = new Uint8Array(4 * 8 * 160);             // 4 Sizes * 8 Variations * 160 1 byte data with copy pixel position
 
     var objectsLineSpritePointerDeltaToSingleCopy = new Uint16Array([0 * 64, 1 * 64, 2 * 64, 3 * 64, 4 * 64, 0 * 64, 6 * 64, 0 * 64]);
 
