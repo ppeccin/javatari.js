@@ -47,23 +47,6 @@ jt.Util = new function() {
             dest[destPos++] = src[srcPos++];
     };
 
-    this.arrayCopy2 = function(src, srcPos, dest, destPos, length) {
-        for (var i = length - 1; i >= 0; --i)
-        dest[destPos + i] = src[srcPos + i];
-    };
-
-    this.uInt32ArrayCopyToUInt8Array = function(src, srcPos, dest, destPos, length) {
-        var finalSrcPos = srcPos + length;
-        destPos *= 4;
-        while(srcPos < finalSrcPos) {
-            var val =  src[srcPos++];
-            dest[destPos++] = val & 255;
-            dest[destPos++] = (val >> 8) & 255;
-            dest[destPos++] = (val >> 16) & 255;
-            dest[destPos++] = val >>> 24;
-        }
-    };
-
     this.arrayCopyCircularSourceWithStep = function(src, srcPos, srcLength, srcStep, dest, destPos, destLength) {
         var s = srcPos;
         var d = destPos;
@@ -82,20 +65,6 @@ jt.Util = new function() {
         arr.splice(i, 1);
     };
 
-    this.booleanArrayToByteString = function(boos) {
-        var str = "";
-        for(var i = 0, len = boos.length; i < len; i++)
-            str += boos[i] ? "1" : "0";
-        return str;
-    };
-
-    this.byteStringToBooleanArray = function(str) {
-        var boos = [];
-        for(var i = 0, n = str.length; i < n; i++)
-            boos.push(str.charAt(i) === "1");
-        return boos;
-    };
-
     // Only 8 bit values
     this.uInt8ArrayToByteString = function(ints) {
         var str = "";
@@ -111,49 +80,42 @@ jt.Util = new function() {
         return ints;
     };
 
+    this.reverseInt8 = function(val) {
+        return ((val & 0x01) << 7) | ((val & 0x02) << 5) | ((val & 0x04) << 3) | ((val & 0x08) << 1) | ((val & 0x10) >> 1) | ((val & 0x20) >> 3) | ((val & 0x40) >> 5) | ((val & 0x80) >> 7);
+    };
+
     // Only 32 bit values
-    this.uInt32ArrayToByteString = function(ints) {
+    this.int32BitArrayToByteString = function(ints, start, length) {
+        if (ints === null || ints == undefined) return ints;
+        if (start === undefined) start = 0;
+        if (length === undefined) length = ints.length - start;
         var str = "";
-        for(var i = 0, len = ints.length; i < len; i++) {
-            var val = ints[i];
-            str += String.fromCharCode((val & 0xff000000) >>> 24);
-            str += String.fromCharCode((val & 0xff0000) >>> 16);
-            str += String.fromCharCode((val & 0xff00) >>> 8);
-            str += String.fromCharCode(val & 0xff);
-        }
+        for(var i = start, finish = start + length; i < finish; i = i + 1)
+            str += String.fromCharCode(ints[i] & 0xff) + String.fromCharCode((ints[i] >> 8) & 0xff) + String.fromCharCode((ints[i] >> 16) & 0xff) + String.fromCharCode((ints[i] >> 24) & 0xff);
         return str;
     };
 
-    this.byteStringToUInt32Array = function(str) {
-        var ints = [];
-        for(var i = 0, len = str.length; i < len;)
-            ints.push((str.charCodeAt(i++) * (1 << 24)) + (str.charCodeAt(i++) << 16) + (str.charCodeAt(i++) << 8) + str.charCodeAt(i++));
+    this.byteStringToInt32BitArray = function(str, dest) {
+        if (str === null || str === undefined) return str;
+        if (str == "null") return null; if (str == "undefined") return undefined;
+        var len = (str.length / 4) | 0;
+        var ints = (dest && dest.length === len) ? dest : new (dest ? dest.constructor : Array)(len);      // Preserve dest type
+        for(var i = 0, s = 0; i < len; i = i + 1, s = s + 4)
+            ints[i] = (str.charCodeAt(s) & 0xff) | ((str.charCodeAt(s + 1) & 0xff) << 8) | ((str.charCodeAt(s + 2) & 0xff) << 16) | ((str.charCodeAt(s + 3) & 0xff) << 24);
         return ints;
     };
 
-    // Only 8 bit values, inner arrays of the same length
-    this.uInt8BiArrayToByteString = function(ints) {
-        var str = "";
-        for(var a = 0, lenA = ints.length; a < lenA; a++)
-            for(var b = 0, lenB = ints[a].length; b < lenB; b++)
-                str += String.fromCharCode(ints[a][b] & 0xff);
-        return str;
+    this.storeInt32BitArrayToStringBase64 = function(arr) {
+        if (arr === null || arr === undefined) return arr;
+        if (arr.length === 0) return "";
+        return btoa(this.int32BitArrayToByteString(arr));
     };
 
-    // only inner arrays of the same length
-    this.byteStringToUInt8BiArray = function(str, innerLength) {
-        var outer = [];
-        for(var a = 0, len = str.length; a < len;) {
-            var inner = new Array(innerLength);
-            for(var b = 0; b < innerLength; b++)
-                inner[b] = str.charCodeAt(a++) & 0xff;
-            outer.push(inner);
-        }
-        return outer;
-    };
-
-    this.reverseInt8 = function(val) {
-        return ((val & 0x01) << 7) | ((val & 0x02) << 5) | ((val & 0x04) << 3) | ((val & 0x08) << 1) | ((val & 0x10) >> 1) | ((val & 0x20) >> 3) | ((val & 0x40) >> 5) | ((val & 0x80) >> 7);
+    this.restoreStringBase64ToInt32BitArray = function(str, dest) {
+        if (str === null || str === undefined) return str;
+        if (str == "null") return null; if (str == "undefined") return undefined;
+        if (str == "") return [];
+        return this.byteStringToInt32BitArray(atob(str), dest);
     };
 
     this.browserInfo = function() {

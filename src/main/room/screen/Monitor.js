@@ -5,8 +5,8 @@ jt.Monitor = function() {
 
     function init(self) {
         prepareResources();
-        adjustToVideoStandard(jt.VideoStandard.NTSC);
         setDisplayDefaultSize();
+        adjustToVideoStandard(jt.VideoStandard.NTSC);
         controls = new jt.DOMMonitorControls(self);
     }
 
@@ -197,6 +197,9 @@ jt.Monitor = function() {
         displayHeight = (displayHeightPct / 100 * (signalHeight + videoStandardDetectionAdtLinesPerFrame)) | 0;
         if (displayHeight > signalHeight) displayHeight = signalHeight;
 
+        offCanvas.width = displayWidth;
+        offCanvas.height = displayHeight;
+
         setDisplayOrigin(displayOriginX, displayOriginYPct);
         displayUpdateSize();
     };
@@ -228,9 +231,9 @@ jt.Monitor = function() {
         if (!signalOn) return;
 
         // First paint the offscreen canvas with new frame data
-        offContext.putImageData(offImageData, 0, 0);
+        offContext.putImageData(offImageData, -displayOriginX, 0, displayOriginX, 0, displayWidth, displayHeight);
         // Then refresh display with the new image (canvas) and correct dimensions
-        display.refresh(offCanvas, displayOriginX, 0, displayWidth, displayHeight);
+        display.refresh(offCanvas, offImageData, displayOriginX, displayWidth, displayHeight);
 
         if (debug > 0) cleanBackBuffer();
     };
@@ -257,12 +260,12 @@ jt.Monitor = function() {
 
     var prepareResources = function() {
         offCanvas = document.createElement('canvas');
-        offCanvas.width = jt.VideoStandard.PAL.width;
-        offCanvas.height = jt.VideoStandard.PAL.height;
+        offCanvas.width = jt.Monitor.DEFAULT_STARTING_WIDTH;
+        offCanvas.height = jt.Monitor.DEFAULT_STARTING_HEIGHT;
         offContext = offCanvas.getContext("2d", { alpha: false, antialias: false });
         offContext.globalCompositeOperation = "copy";
         offContext.globalAlpha = 1;
-        offImageData = offContext.getImageData(0, 0, offCanvas.width, offCanvas.height);
+        offImageData = offContext.createImageData(jt.VideoStandard.PAL.width, jt.VideoStandard.PAL.height);
         backBuffer = new Uint32Array(offImageData.data.buffer);
     };
 
@@ -428,3 +431,6 @@ jt.Monitor.Controls = {
     DEBUG: 41, STATS: 42,
     EXIT: 51
 };
+
+jt.Monitor.DEFAULT_STARTING_WIDTH = 160;
+jt.Monitor.DEFAULT_STARTING_HEIGHT = 213;

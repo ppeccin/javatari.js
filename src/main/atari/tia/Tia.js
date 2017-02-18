@@ -1288,76 +1288,219 @@ jt.Tia = function(pCpu, pPia) {
 
     this.saveState = function() {
         return {
-            lp:     btoa(jt.Util.uInt32ArrayToByteString(linePixels)),
-            vs:     vSyncOn | 0,
-            vb:     vBlankOn | 0,
-            f:      jt.Util.booleanArrayToByteString(playfieldPatternL),
-            fc:     playfieldLeftColor,
-            fb:     playfieldBackground,
-            fr:     playfieldReflected | 0,
-            fs:     playfieldScoreMode | 0,
-            ft:     playfieldPriority | 0,
-            p0c:    player0Color,
-            p1c:    player1Color,
-            m0:     missile0Enabled | 0,
-            m0c:    missile0Color,
-            m1:     missile1Enabled | 0,
-            m1c:    missile1Color,
-            b:      ballEnabled | 0,
-            bc:     ballColor,
-            hb:     hMoveHitBlank | 0,
-            hc:     hMoveHitClock,
-            PF0:    PF0,
-            PF1:    PF1,
-            PF2:    PF2,
-            AC0:    AUDC0,
-            AC1:    AUDC1,
-            AF0:    AUDF0,
-            AF1:    AUDF1,
-            AV0:    AUDV0,
-            AV1:    AUDV1,
-            HP0:    HMP0,
-            HP1:    HMP1,
-            HM0:    HMM0,
-            HM1:    HMM1,
-            HB:     HMBL
+            ccp: changeClockPrevLine,
+            lpx: jt.Util.storeInt32BitArrayToStringBase64(linePixels),
+
+            vs: vSyncOn,
+            vb: vBlankOn,
+
+            pfe: playfieldEnabled,
+            pfl: playfieldPatternL,
+            pfr: playfieldPatternR,
+            pfc: playfieldColor,
+            pflc: playfieldLeftColor,
+            pfrc: playfieldRightColor,
+            pfb: playfieldBackground,
+            pfrl: playfieldReflected,
+            pfsc: playfieldScoreMode,
+            pfp: playfieldPriority,
+
+            be: ballEnabled,
+            bx: ballPixel,
+            blp: ballLineSpritePointer,
+            bc: ballColor,
+
+            p0e: player0Enabled,
+            p0x: player0Pixel,
+            p0lp: player0LineSpritePointer,
+            p0a: player0Alt,
+            p0af: player0AltFrom,
+            p0al: player0AltLength,
+            p0ao: player0AltCopyOffset,
+            p0c: player0Color,
+
+            p1e: player1Enabled,
+            p1x: player1Pixel,
+            p1lp: player1LineSpritePointer,
+            p1a: player1Alt,
+            p1af: player1AltFrom,
+            p1al: player1AltLength,
+            p1ao: player1AltCopyOffset,
+            p1c: player1Color,
+
+            m0e: missile0Enabled,
+            m0x: missile0Pixel,
+            m0lp: missile0LineSpritePointer,
+            m0a: missile0Alt,
+            m0af: missile0AltFrom,
+            m0al: missile0AltLength,
+            m0ao: missile0AltCopyOffset,
+            m0c: missile0Color,
+
+            m1e: missile1Enabled,
+            m1x: missile1Pixel,
+            m1lp: missile1LineSpritePointer,
+            m1a: missile1Alt,
+            m1af: missile1AltFrom,
+            m1al: missile1AltLength,
+            m1ao: missile1AltCopyOffset,
+            m1c: missile1Color,
+
+            hmh: hMoveHitBlank,
+            hmc: hMoveHitClock,
+            hmlh: hMoveLateHit,
+            hmlb: hMoveLateHitBlank,
+
+            co: collisions,
+            cop: collisionsPossible,
+
+            CTRLPF: CTRLPF,
+            COLUPF: COLUPF,
+            COLUBK: COLUBK,
+            PF0: PF0,
+            PF1: PF1,
+            PF2: PF2,
+            ENABL: ENABL,
+            ENABLd: ENABLd,
+            VDELBL: VDELBL,
+            NUSIZ0: NUSIZ0,
+            COLUP0: COLUP0,
+            REFP0: REFP0,
+            GRP0: GRP0,
+            GRP0d: GRP0d,
+            VDELP0: VDELP0,
+            NUSIZ1: NUSIZ1,
+            COLUP1: COLUP1,
+            REFP1: REFP1,
+            GRP1: GRP1,
+            GRP1d: GRP1d,
+            VDELP1: VDELP1,
+            ENAM0: ENAM0,
+            RESMP0: RESMP0,
+            ENAM1: ENAM1,
+            RESMP1: RESMP1,
+            HMP0: HMP0,
+            HMP1: HMP1,
+            HMM0: HMM0,
+            HMM1: HMM1,
+            HMBL: HMBL,
+            AUDC0: AUDC0,
+            AUDC1: AUDC1,
+            AUDF0: AUDF0,
+            AUDF1: AUDF1,
+            AUDV0: AUDV0,
+            AUDV1: AUDV1
         };
     };
 
-    this.loadState = function(state) {
-        linePixels						 =  jt.Util.byteStringToUInt32Array(atob(state.lp));
-        vSyncOn                     	 =  !!state.vs;
-        vBlankOn                    	 =  !!state.vb;
-        playfieldPatternL            	 =  jt.Util.byteStringToBooleanArray(state.f);      // TODO Migration
-        playfieldLeftColor              	 =  state.fc;
-        playfieldBackground         	 =  state.fb;
-        playfieldReflected          	 =  !!state.fr;
-        playfieldScoreMode          	 =  !!state.fs;
-        playfieldPriority           	 =  !!state.ft;
-        player0Color                	 =  state.p0c;
-        player1Color                	 =  state.p1c;
-        missile0Enabled             	 =  !!state.m0;
-        missile0Color               	 =  state.m0c;
-        missile1Enabled             	 =  !!state.m1;
-        missile1Color               	 =  state.m1c;
-        ballEnabled                 	 =  !!state.b;
-        ballColor                   	 =  state.bc;
-        hMoveHitBlank					 =  !!state.hb;
-        hMoveHitClock					 =  state.hc;
-        PF0								 =  state.PF0;
-        PF1								 =  state.PF1;
-        PF2								 =  state.PF2;
-        AUDC0							 =  state.AC0; audioSignal.getChannel0().setControl(AUDC0 & 0x0f);		// Also update the Audio Generator
-        AUDC1							 =  state.AC1; audioSignal.getChannel1().setControl(AUDC1 & 0x0f);
-        AUDF0							 =  state.AF0; audioSignal.getChannel0().setDivider((AUDF0 & 0x1f) + 1);
-        AUDF1							 =  state.AF1; audioSignal.getChannel1().setDivider((AUDF1 & 0x1f) + 1);
-        AUDV0							 =  state.AV0; audioSignal.getChannel0().setVolume(AUDV0 & 0x0f);
-        AUDV1							 =  state.AV1; audioSignal.getChannel1().setVolume(AUDV1 & 0x0f);
-        HMP0							 =  state.HP0;
-        HMP1							 =  state.HP1;
-        HMM0							 =  state.HM0;
-        HMM1							 =  state.HM1;
-        HMBL							 =  state.HB;
+    this.loadState = function(s) {
+        changeClockPrevLine = s.ccp;
+        jt.Util.restoreStringBase64ToInt32BitArray(s.lpx, linePixels);
+
+        vSyncOn = s.vs;
+        vBlankOn = s.vb;
+
+        playfieldEnabled = s.pfe;
+        playfieldPatternL = s.pfl | 0;
+        playfieldPatternR = s.pfr | 0;
+        playfieldColor = s.pfc | 0;
+        playfieldLeftColor = s.pflc | 0;
+        playfieldRightColor = s.pfrc | 0;
+        playfieldBackground = s.pfb | 0;
+        playfieldReflected = s.pfrl;
+        playfieldScoreMode = s.pfsc;
+        playfieldPriority = s.pfp;
+
+        ballEnabled = s.be;
+        ballPixel = s.bx | 0;
+        ballLineSpritePointer = s.blp | 0;
+        ballColor = s.bc | 0;
+
+        player0Enabled = s.p0e;
+        player0Pixel = s.p0x | 0;
+        player0LineSpritePointer = s.p0lp | 0;
+        player0Alt = s.p0a | 0;
+        player0AltFrom = s.p0af | 0;
+        player0AltLength = s.p0al | 0;
+        player0AltCopyOffset = s.p0ao | 0;
+        jt.Util.arrayFill(player0AltControl, 0);
+        player0Color = s.p0c | 0;
+
+        player1Enabled = s.p1e;
+        player1Pixel = s.p1x | 0;
+        player1LineSpritePointer = s.p1lp | 0;
+        player1Alt = s.p1a | 0;
+        player1AltFrom = s.p1af | 0;
+        player1AltLength = s.p1al | 0;
+        player1AltCopyOffset = s.p1ao | 0;
+        jt.Util.arrayFill(player1AltControl, 0);
+        player1Color = s.p1c | 0;
+
+        missile0Enabled = s.m0e;
+        missile0Pixel = s.m0x | 0;
+        missile0LineSpritePointer = s.m0lp | 0;
+        missile0Alt = s.m0a | 0;
+        missile0AltFrom = s.m0af | 0;
+        missile0AltLength = s.m0al | 0;
+        missile0AltCopyOffset = s.m0ao | 0;
+        jt.Util.arrayFill(missile0AltControl, 0);
+        missile0Color = s.m0c | 0;
+
+        missile1Enabled = s.m1e;
+        missile1Pixel = s.m1x | 0;
+        missile1LineSpritePointer = s.m1lp | 0;
+        missile1Alt = s.m1a | 0;
+        missile1AltFrom = s.m1af | 0;
+        missile1AltLength = s.m1al | 0;
+        missile1AltCopyOffset = s.m1ao | 0;
+        jt.Util.arrayFill(missile1AltControl, 0);
+        missile1Color = s.m1c | 0;
+
+        hMoveHitBlank = s.hmh;
+        hMoveHitClock = s.hmc | 0;
+        hMoveLateHit = s.hmlh;
+        hMoveLateHitBlank = s.hmlb;
+
+        collisions = s.co | 0;
+        collisionsPossible = s.cop | 0;
+
+        CTRLPF = s.CTRLPF | 0;
+        COLUPF = s.COLUPF | 0;
+        COLUBK = s.COLUBK | 0;
+        PF0 = s.PF0 | 0;
+        PF1 = s.PF1 | 0;
+        PF2 = s.PF2 | 0;
+        ENABL = s.ENABL | 0;
+        ENABLd = s.ENABLd | 0;
+        VDELBL = s.VDELBL | 0;
+        NUSIZ0 = s.NUSIZ0 | 0;
+        COLUP0 = s.COLUP0 | 0;
+        REFP0 = s.REFP0 | 0;
+        GRP0 = s.GRP0 | 0;
+        GRP0d = s.GRP0d | 0;
+        VDELP0 = s.VDELP0 | 0;
+        NUSIZ1 = s.NUSIZ1 | 0;
+        COLUP1 = s.COLUP1 | 0;
+        REFP1 = s.REFP1 | 0;
+        GRP1 = s.GRP1 | 0;
+        GRP1d = s.GRP1d | 0;
+        VDELP1 = s.VDELP1 | 0;
+        ENAM0 = s.ENAM0 | 0;
+        RESMP0 = s.RESMP0 | 0;
+        ENAM1 = s.ENAM1 | 0;
+        RESMP1 = s.RESMP1 | 0;
+        HMP0 = s.HMP0 | 0;
+        HMP1 = s.HMP1 | 0;
+        HMM0 = s.HMM0 | 0;
+        HMM1 = s.HMM1 | 0;
+        HMBL = s.HMBL | 0;
+        AUDC0 = s.AUDC0 | 0; audioSignal.getChannel0().setControl(AUDC0 & 0x0f);		// Also update the Audio Generator
+        AUDC1 = s.AUDC1 | 0; audioSignal.getChannel1().setControl(AUDC1 & 0x0f);
+        AUDF0 = s.AUDF0 | 0; audioSignal.getChannel0().setDivider((AUDF0 & 0x1f) + 1);
+        AUDF1 = s.AUDF1 | 0; audioSignal.getChannel1().setDivider((AUDF1 & 0x1f) + 1);
+        AUDV0 = s.AUDV0 | 0; audioSignal.getChannel0().setVolume(AUDV0 & 0x0f);
+        AUDV1 = s.AUDV1 | 0; audioSignal.getChannel1().setVolume(AUDV1 & 0x0f);
+
         if (debug) debugSetColors();						// IF debug is on, ensure debug colors are used
     };
 
@@ -1473,6 +1616,7 @@ jt.Tia = function(pCpu, pPia) {
     var paddle1Position = -1;
     var paddle1CapacitorCharge = 0;
 
+
     var playerLineSprites = new Uint8Array(2 * 256 * 8 * 64);               // 2 Mirrors * 256 Patterns * 8 Variations * (1 base + 2 alts) * 20 8Bits line data specifying 1bit pixels + 4 bytes spare
     var missileBallLineSprites = new Uint8Array(4 * 8 * 64);                // 4 Sizes * 8 Variations * (1 base + 2 alts) * 20 8Bits line data specifying 1bit pixels + 4 bytes spare
 
@@ -1480,11 +1624,11 @@ jt.Tia = function(pCpu, pPia) {
     var playerScanStartPerShape =  new Uint8Array([5, 5, 5, 5, 5, 6, 5, 6]);
     var playerPixelSizePerShape =  new Uint8Array([1, 1, 1, 1, 1, 2, 1, 4]);
 
-    var playerCopyOffsetsReset = new Uint8Array(8 * 160);                  // 8 Variations * 160 1 byte data with copy pixel position
-    var playerScanOffsetsShape = new Uint8Array(8 * 160);                  // 8 Variations * 160 1 byte data with copy pixel position
+    var playerCopyOffsetsReset = new Uint8Array(8 * 160);                   // 8 Variations * 160 1 byte data with copy pixel position
+    var playerScanOffsetsShape = new Uint8Array(8 * 160);                   // 8 Variations * 160 1 byte data with copy pixel position
 
-    var missileCopyOffsetsReset = new Uint8Array(4 * 8 * 160);             // 4 Sizes * 8 Variations * 160 1 byte data with copy pixel position
-    var missileScanOffsetsShape = new Uint8Array(4 * 8 * 160);             // 4 Sizes * 8 Variations * 160 1 byte data with copy pixel position
+    var missileCopyOffsetsReset = new Uint8Array(4 * 8 * 160);              // 4 Sizes * 8 Variations * 160 1 byte data with copy pixel position
+    var missileScanOffsetsShape = new Uint8Array(4 * 8 * 160);              // 4 Sizes * 8 Variations * 160 1 byte data with copy pixel position
 
     var objectsLineSpritePointerDeltaToSingleCopy = new Uint16Array([0 * 64, 1 * 64, 2 * 64, 3 * 64, 4 * 64, 0 * 64, 6 * 64, 0 * 64]);
 

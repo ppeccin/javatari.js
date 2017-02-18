@@ -38,9 +38,10 @@ jt.CanvasDisplay = function(mainElement) {
         mainElement.style.display = "none";
     };
 
-    this.refresh = function(image, iOriginX, iOriginY, iWidth, iHeight) {
+    this.refresh = function(image, offImageData, displayOriginX, displayWidth, displayHeight) {
         signalIsOn = true;
-        context.drawImage(image, iOriginX, iOriginY, iWidth, iHeight, 0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        //context.putImageData(offImageData, -displayOriginX, 0, displayOriginX, 0, displayWidth, displayHeight);
     };
 
     this.adjustToVideoSignalOff = function() {
@@ -271,7 +272,7 @@ jt.CanvasDisplay = function(mainElement) {
             default:        canvasImageRenderingValue = "pixelated";
         }
 
-        setElementsSizes(jt.CanvasDisplay.DEFAULT_STARTING_WIDTH, jt.CanvasDisplay.DEFAULT_STARTING_HEIGHT, 1, 1);
+        setElementsSizes(jt.Monitor.DEFAULT_STARTING_WIDTH, jt.Monitor.DEFAULT_STARTING_HEIGHT, 1, 1);
 
         mainElement.appendChild(borderElement);
     };
@@ -468,6 +469,3 @@ jt.CanvasDisplay = function(mainElement) {
     init(this);
 
 };
-
-jt.CanvasDisplay.DEFAULT_STARTING_WIDTH = 160;
-jt.CanvasDisplay.DEFAULT_STARTING_HEIGHT = 213;
