@@ -690,13 +690,18 @@ jt.Tia = function(pCpu, pPia) {
         var p = getRESxPixel();
         if (player0Pixel !== p) {
             if (player0Enabled) changeAtClock();
-            if (!player0Alt) { player0LineSpritePointer += 20; }
-            player0Alt = p >= 80 ? 1 : 2;
             var into = p - player0Pixel; if (into < 0) into += 160;
             player0Pixel = p;
             var nusiz = NUSIZ0 & 7;
+
+            if (player0Alt) {
+                if (into <= playerCopyLengthPerShape[nusiz]) return;                  // Keep current Alt def if still in first copy
+            } else
+                player0LineSpritePointer += 20;
+
+            player0Alt = p >= 80 ? 1 : 2;
             player0AltFrom = clock < HBLANK_DURATION ? 158 : 0;
-            player0AltLength = playerCopyLengthPerShape[nusiz] + 2;      // +2 for the special case from last line
+            player0AltLength = playerCopyLengthPerShape[nusiz] + 2;                   // +2 for the special case from last line
             player0AltCopyOffset = playerCopyOffsetsReset[nusiz * 160 + into];
             if (player0Enabled) player0DefineAlt();
 
@@ -740,13 +745,18 @@ jt.Tia = function(pCpu, pPia) {
         var p = getRESxPixel();
         if (player1Pixel !== p) {
             if (player1Enabled) changeAtClock();
-            if (!player1Alt) { player1LineSpritePointer += 40; }
-            player1Alt = p >= 80 ? 1 : 2;
             var into = p - player1Pixel; if (into < 0) into += 160;
             player1Pixel = p;
             var nusiz = NUSIZ1 & 7;
+
+            if (player1Alt) {
+                if (into <= playerCopyLengthPerShape[nusiz]) return;                  // Keep current Alt def if still in first copy
+            } else
+                player1LineSpritePointer += 40;
+
+            player1Alt = p >= 80 ? 1 : 2;
             player1AltFrom = clock < HBLANK_DURATION ? 158 : 0;
-            player1AltLength = playerCopyLengthPerShape[nusiz] + 2;      // +2 for the special case from last line
+            player1AltLength = playerCopyLengthPerShape[nusiz] + 2;                   // +2 for the special case from last line
             player1AltCopyOffset = playerCopyOffsetsReset[nusiz * 160 + into];
             if (player1Enabled) player1DefineAlt();
         }
@@ -788,12 +798,17 @@ jt.Tia = function(pCpu, pPia) {
         var p = getRESxPixel();
         if (missile0Pixel !== p) {
             if (missile0Enabled) changeAtClock();
-            if (!missile0Alt) { missile0LineSpritePointer += 20; }
-            missile0Alt = p >= 80 ? 1 : 2;
             var into = p - missile0Pixel; if (into < 0) into += 160;
             missile0Pixel = p;
+
+            if (missile0Alt) {
+                if (into <= 4 + (1 << ((NUSIZ0 & 0x30) >> 4))) return;                // Keep current Alt def if still in first copy
+            } else
+                missile0LineSpritePointer += 20;
+
+            missile0Alt = p >= 80 ? 1 : 2;
             missile0AltFrom = clock < HBLANK_DURATION ? 158 : 0;
-            missile0AltLength = 4 + (1 << ((NUSIZ0 & 0x30) >> 4)) + 2;      // +2 for the special case from last line
+            missile0AltLength = 4 + (1 << ((NUSIZ0 & 0x30) >> 4)) + 2;                // +2 for the special case from last line
             missile0AltCopyOffset = missileCopyOffsetsReset[(((NUSIZ0 & 0x30) >> 1) | (NUSIZ0 & 7)) * 160 + into];
             if (missile0Enabled) missile0DefineAlt();
         }
@@ -835,12 +850,17 @@ jt.Tia = function(pCpu, pPia) {
         var p = getRESxPixel();
         if (missile1Pixel !== p) {
             if (missile1Enabled) changeAtClock();
-            if (!missile1Alt) { missile1LineSpritePointer += 40; }
-            missile1Alt = p >= 80 ? 1 : 2;
             var into = p - missile1Pixel; if (into < 0) into += 160;
             missile1Pixel = p;
+
+            if (missile1Alt) {
+                if (into <= 4 + (1 << ((NUSIZ1 & 0x30) >> 4))) return;                // Keep current Alt def if still in first copy
+            } else
+                missile1LineSpritePointer += 40;
+
+            missile1Alt = p >= 80 ? 1 : 2;
             missile1AltFrom = clock < HBLANK_DURATION ? 158 : 0;
-            missile1AltLength = 4 + (1 << ((NUSIZ1 & 0x30) >> 4)) + 2;      // +2 for the special case from last line
+            missile1AltLength = 4 + (1 << ((NUSIZ1 & 0x30) >> 4)) + 2;                // +2 for the special case from last line
             missile1AltCopyOffset = missileCopyOffsetsReset[(((NUSIZ1 & 0x30) >> 1) | (NUSIZ1 & 7)) * 160 + into];
             if (missile1Enabled) missile1DefineAlt();
         }
