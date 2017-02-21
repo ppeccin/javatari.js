@@ -3,6 +3,7 @@
 // TODO Audio problem in PAL (skipping forward)
 // TODO NUSIZ during scan with HMOVE not correct. Will kill the scan in progress
 // TODO Starfield Effect not implemented
+// TODO PAL Sinch too aggressive
 
 jt.Tia = function(pCpu, pPia) {
     "use strict";
@@ -207,18 +208,18 @@ jt.Tia = function(pCpu, pPia) {
             var color = 0, collis = collisionsPossible;
 
             if (playfieldPriority) {
+                // Playfield
+                if (playfieldEnabled) {
+                    if ((pixel < 80 ? (playfieldPatternL >> (pixel >> 2)) : (playfieldPatternR >> ((pixel - 80) >> 2))) & 1) {
+                        color = playfieldColor;     // ignore score mode
+                    } else collis &= PFC;
+                }
                 // Ball
                 if (ballEnabled) {
                     p = pixel - ballPixel; if (p < 0) p += 160;
                     if ((missileBallLineSprites[ballLineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1) {
-                        color = ballColor;
+                        if (!color) color = ballColor;
                     } else collis &= BLC;
-                }
-                // Playfield
-                if (playfieldEnabled) {
-                    if ((pixel < 80 ? (playfieldPatternL >> (pixel >> 2)) : (playfieldPatternR >> ((pixel - 80) >> 2))) & 1) {
-                        if (!color) color = playfieldColor;     // ignore score mode
-                    } else collis &= PFC;
                 }
             }
 
@@ -255,13 +256,6 @@ jt.Tia = function(pCpu, pPia) {
             }
 
             if (!playfieldPriority) {
-                // Ball
-                if (ballEnabled) {
-                    p = pixel - ballPixel; if (p < 0) p += 160;
-                    if ((missileBallLineSprites[ballLineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1) {
-                        if (!color) color = ballColor;
-                    } else collis &= BLC;
-                }
                 // Playfield
                 if (playfieldEnabled) {
                     if (pixel < 80) {
@@ -273,6 +267,13 @@ jt.Tia = function(pCpu, pPia) {
                             if (!color) color = playfieldRightColor;
                         } else collis &= PFC;
                     }
+                }
+                // Ball
+                if (ballEnabled) {
+                    p = pixel - ballPixel; if (p < 0) p += 160;
+                    if ((missileBallLineSprites[ballLineSpritePointer + (p >> 3)] >> (p & 0x07)) & 1) {
+                        if (!color) color = ballColor;
+                    } else collis &= BLC;
                 }
             }
 
@@ -384,8 +385,10 @@ jt.Tia = function(pCpu, pPia) {
             v = (i & 0x02) !== 0;
             if (playfieldScoreMode !== v) {
                 playfieldScoreMode = v;
-                if (v) { playfieldLeftColor = player0Color; playfieldRightColor = player1Color }
-                else playfieldColor = playfieldLeftColor = playfieldRightColor = palette[COLUPF];
+                if (!debug) {
+                    if (v) { playfieldLeftColor = player0Color; playfieldRightColor = player1Color }
+                    else playfieldColor = playfieldLeftColor = playfieldRightColor = ballColor;
+                }
             }
 
             playfieldPriority = (i & 0x04) !== 0;
@@ -687,10 +690,12 @@ jt.Tia = function(pCpu, pPia) {
     var hitRESP0 = function() {
         if (debug) debugPixel(DEBUG_P0_RES_COLOR);
 
-        var p = getRESxPixel();
+        var r = getRESxPixel();
+        var p = r >= 0 ? r : -r;
         if (player0Pixel !== p) {
             if (player0Enabled) changeAtClock();
-            var into = p - player0Pixel; if (into < 0) into += 160;
+            var pStart = (r >= 0 ? p : 0);
+            var into = pStart - player0Pixel; if (into < 0) into += 160;
             player0Pixel = p;
             var nusiz = NUSIZ0 & 7;
 
@@ -699,13 +704,14 @@ jt.Tia = function(pCpu, pPia) {
             } else
                 player0LineSpritePointer += 20;
 
+            var delta = pStart - p; if (delta < -100) delta += 160;
             player0Alt = p >= 80 ? 1 : 2;
-            player0AltFrom = clock < HBLANK_DURATION ? 158 : 0;
-            player0AltLength = playerCopyLengthPerShape[nusiz] + 2;                   // +2 for the special case from last line
+            player0AltFrom = delta >= 0 ? delta : 160 + delta;
+            player0AltLength = playerCopyLengthPerShape[nusiz] - delta;
             player0AltCopyOffset = playerCopyOffsetsReset[nusiz * 160 + into];
             if (player0Enabled) player0DefineAlt();
 
-            //if (debug && videoSignal.monitor.currentLine() === 150) debugInfo("player0Pixel: " + player0Pixel + ", into: " + into);
+            //if (debug && videoSignal.monitor.currentLine() === 80) debugInfo("player0Pixel: " + player0Pixel + ", into: " + into + ", delta: " + delta + ", from: " + player0AltFrom + ", len: " + player0AltLength + ", off: " + player0AltCopyOffset);
         }
     };
 
@@ -742,10 +748,12 @@ jt.Tia = function(pCpu, pPia) {
     var hitRESP1 = function() {
         if (debug) debugPixel(DEBUG_P1_RES_COLOR);
 
-        var p = getRESxPixel();
+        var r = getRESxPixel();
+        var p = r >= 0 ? r : -r;
         if (player1Pixel !== p) {
             if (player1Enabled) changeAtClock();
-            var into = p - player1Pixel; if (into < 0) into += 160;
+            var pStart = (r >= 0 ? p : 0);
+            var into = pStart - player1Pixel; if (into < 0) into += 160;
             player1Pixel = p;
             var nusiz = NUSIZ1 & 7;
 
@@ -754,9 +762,10 @@ jt.Tia = function(pCpu, pPia) {
             } else
                 player1LineSpritePointer += 40;
 
+            var delta = pStart - p; if (delta < -100) delta += 160;
             player1Alt = p >= 80 ? 1 : 2;
-            player1AltFrom = clock < HBLANK_DURATION ? 158 : 0;
-            player1AltLength = playerCopyLengthPerShape[nusiz] + 2;                   // +2 for the special case from last line
+            player1AltFrom = delta >= 0 ? delta : 160 + delta;
+            player1AltLength = playerCopyLengthPerShape[nusiz] - delta;
             player1AltCopyOffset = playerCopyOffsetsReset[nusiz * 160 + into];
             if (player1Enabled) player1DefineAlt();
         }
@@ -795,10 +804,12 @@ jt.Tia = function(pCpu, pPia) {
     var hitRESM0 = function() {
         if (debug) debugPixel(DEBUG_M0_COLOR);
 
-        var p = getRESxPixel();
+        var r = getRESxPixel();
+        var p = r >= 0 ? r : -r;
         if (missile0Pixel !== p) {
             if (missile0Enabled) changeAtClock();
-            var into = p - missile0Pixel; if (into < 0) into += 160;
+            var pStart = (r >= 0 ? p : 0);
+            var into = pStart - missile0Pixel; if (into < 0) into += 160;
             missile0Pixel = p;
 
             if (missile0Alt) {
@@ -806,9 +817,10 @@ jt.Tia = function(pCpu, pPia) {
             } else
                 missile0LineSpritePointer += 20;
 
+            var delta = pStart - p; if (delta < -100) delta += 160;
             missile0Alt = p >= 80 ? 1 : 2;
-            missile0AltFrom = clock < HBLANK_DURATION ? 158 : 0;
-            missile0AltLength = 4 + (1 << ((NUSIZ0 & 0x30) >> 4)) + 2;                // +2 for the special case from last line
+            missile0AltFrom = delta >= 0 ? delta : 160 + delta;
+            missile0AltLength = 4 + (1 << ((NUSIZ0 & 0x30) >> 4)) - delta;
             missile0AltCopyOffset = missileCopyOffsetsReset[(((NUSIZ0 & 0x30) >> 1) | (NUSIZ0 & 7)) * 160 + into];
             if (missile0Enabled) missile0DefineAlt();
         }
@@ -847,10 +859,12 @@ jt.Tia = function(pCpu, pPia) {
     var hitRESM1 = function() {
         if (debug) debugPixel(DEBUG_M1_COLOR);
 
-        var p = getRESxPixel();
+        var r = getRESxPixel();
+        var p = r >= 1 ? r : -r;
         if (missile1Pixel !== p) {
             if (missile1Enabled) changeAtClock();
-            var into = p - missile1Pixel; if (into < 0) into += 160;
+            var pStart = (r >= 0 ? p : 0);
+            var into = pStart - missile1Pixel; if (into < 0) into += 160;
             missile1Pixel = p;
 
             if (missile1Alt) {
@@ -858,9 +872,10 @@ jt.Tia = function(pCpu, pPia) {
             } else
                 missile1LineSpritePointer += 40;
 
+            var delta = pStart - p; if (delta < -100) delta += 160;
             missile1Alt = p >= 80 ? 1 : 2;
-            missile1AltFrom = clock < HBLANK_DURATION ? 158 : 0;
-            missile1AltLength = 4 + (1 << ((NUSIZ1 & 0x30) >> 4)) + 2;                // +2 for the special case from last line
+            missile1AltFrom = delta >= 0 ? delta : 160 + delta;
+            missile1AltLength = 4 + (1 << ((NUSIZ1 & 0x30) >> 4)) - delta;
             missile1AltCopyOffset = missileCopyOffsetsReset[(((NUSIZ1 & 0x30) >> 1) | (NUSIZ1 & 7)) * 160 + into];
             if (missile1Enabled) missile1DefineAlt();
         }
@@ -899,7 +914,8 @@ jt.Tia = function(pCpu, pPia) {
     var hitRESBL = function() {
         if (debug) debugPixel(DEBUG_BL_COLOR);
 
-        var p = getRESxPixel();
+        var r = getRESxPixel();
+        var p = r >= 0 ? r : -r;
         if (ballPixel !== p) {
             if (ballEnabled) changeAtClock();
             ballPixel = p;
@@ -956,6 +972,7 @@ jt.Tia = function(pCpu, pPia) {
         if (changed) changeClock = hMoveHitBlank ? HBLANK_DURATION + 8 : HBLANK_DURATION;
     };
 
+    // Negative values mean hit during HBLANK. Invert negative values to get object position, then Alt must be defined considering starting from pixel 0
     function getRESxPixel() {
         // Hit after complete HBLANK or last pixel of Extended HBLANK
         if (clock >= HBLANK_DURATION + (hMoveHitBlank ? 8 - 1 : 0)) {
@@ -964,15 +981,15 @@ jt.Tia = function(pCpu, pPia) {
             // Hit during HBLANK
             if (hMoveHitBlank) {
                 if (clock >= HBLANK_DURATION) {
-                    return 6;
+                    return -6;
                 } else {
                     var d = (clock - hMoveHitClock - 4) >> 2;   // Shift right proportionally to distance from HMOVE, up to 8 pixels
-                    if (d > 8) return 6;
-                    else if (d > 1) return d - 2;
-                    else return 158 + d;
+                    if (d > 8) return -6;
+                    else if (d > 1) return -(d - 2);
+                    else return -(158 + d);
                 }
             } else
-                return 158;
+                return -158;
         }
     }
 

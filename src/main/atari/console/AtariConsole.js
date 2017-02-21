@@ -469,7 +469,7 @@ jt.AtariConsole = function() {
 
 
         var media;
-        var VERSION = 1;
+        var VERSION = 2;
 
     }
 
