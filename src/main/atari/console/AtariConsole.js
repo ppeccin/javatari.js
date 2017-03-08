@@ -8,40 +8,93 @@ jt.AtariConsole = function() {
     function init() {
         mainComponentsCreate();
         socketsCreate();
-        setVideoStandardAuto();
+        self.setDefaults();
+        setVSynchMode(Javatari.SCREEN_VSYNCH_MODE);
     }
 
-    this.powerOn = function(paused) {
+    this.powerOn = function() {
         if (this.powerIsOn) this.powerOff();
         bus.powerOn();
         this.powerIsOn = true;
-        controlsSocket.controlsStatesRedefined();
+        consoleControlsSocket.controlsStatesRedefined();
+        updateVideoSynchronization();
         videoStandardAutoDetectionStart();
-        if (!paused) go();
+        consoleControlsSocket.firePowerAndUserPauseStateUpdate();
+        if (!mainVideoClock.isRunning()) mainVideoClock.go();
     };
 
     this.powerOff = function() {
-        pause();
         bus.powerOff();
         this.powerIsOn = false;
-        controlsSocket.controlsStatesRedefined();
+        consoleControlsSocket.releaseControllers();
+        consoleControlsSocket.controlsStatesRedefined();
+        if (userPaused) this.userPause(false);
+        else consoleControlsSocket.firePowerAndUserPauseStateUpdate();
     };
 
-    this.clockPulse = function() {
-        if (videoStandardAutoDetectionInProgress)
-            videoStandardAutoDetectionTry();
+    this.userPowerOn = function(evenWithNoCartridge) {
+        if (isLoading) return;
+        if (evenWithNoCartridge || getCartridge()) this.powerOn();
+    };
 
-        controlsSocket.clockPulse();
-        tia.frame();
-        this.framesGenerated++;
+    this.setLoading = function(state) {
+        isLoading = state;
+    };
+
+    this.userPause = function(pause, keepAudio) {
+        var prev = userPaused;
+        if (userPaused !== pause) {
+            userPaused = !!pause; userPauseMoreFrames = -1;
+            if (userPaused && !keepAudio) audioSocket.muteAudio();
+            else audioSocket.unMuteAudio();
+            consoleControlsSocket.firePowerAndUserPauseStateUpdate();
+        }
+        return prev;
+    };
+
+    this.systemPause = function(val) {
+        var prev = systemPaused;
+        if (systemPaused !== val) {
+            systemPaused = !!val;
+            if (systemPaused) audioSocket.pauseAudio();
+            else audioSocket.unpauseAudio();
+        }
+        return prev;
+    };
+
+    this.isSystemPaused = function() {
+        return systemPaused;
+    };
+
+    this.videoClockPulse = function() {
+        if (systemPaused) return;
+
+        consoleControlsSocket.controlsClockPulse();
+
+        if (!self.powerIsOn) return;
+
+        var pulls = videoPulldown.cadence[--videoPulldownStep];
+        if (videoPulldownStep === 0) videoPulldownStep = videoPulldown.steps;
+
+        while(pulls > 0) {
+            pulls--;
+            if (userPaused && userPauseMoreFrames-- <= 0) return;
+
+            if (videoStandardAutoDetectionInProgress) videoStandardAutoDetectionTry();
+
+            tia.frame();
+        }
+
+        // Finish audio signal (generate any missing samples to adjust to sample rate)
+        audioSocket.audioFinishFrame();
     };
 
     this.getCartridgeSocket = function() {
         return cartridgeSocket;
     };
 
-    this.getControlsSocket = function() {
-        return controlsSocket;
+    this.getConsoleControlsSocket = function() {
+        return consoleControlsSocket;
     };
 
     this.getVideoOutput = function() {
@@ -56,16 +109,12 @@ jt.AtariConsole = function() {
         return saveStateSocket;
     };
 
+    this.getAudioSocket = function() {
+        return audioSocket;
+    };
+
     this.showOSD = function(message, overlap) {
         this.getVideoOutput().showOSD(message, overlap);
-    };
-
-    var go = function() {
-        mainClock.go();
-    };
-
-    var pause = function() {
-        mainClock.pauseOnNextPulse();
     };
 
     var setCartridge = function(cartridge) {
@@ -83,7 +132,7 @@ jt.AtariConsole = function() {
         if (videoStandard !== pVideoStandard) {
             videoStandard = pVideoStandard;
             tia.setVideoStandard(videoStandard);
-            mainClockAdjustToNormal();
+            updateVideoSynchronization();
         }
         self.showOSD((videoStandardIsAuto ? "AUTO: " : "") + videoStandard.name, false);
     };
@@ -124,6 +173,28 @@ jt.AtariConsole = function() {
         setVideoStandard(forcedVideoStandard);
     };
 
+    function setVSynchMode(mode) {
+        if (vSynchMode === mode) return;
+        if (vSynchMode !== -1) vSynchMode = mode % 2;
+        updateVideoSynchronization();
+    }
+
+    function updateVideoSynchronization() {
+        // According to the native video frequency detected, target Video Standard and vSynchMode, use a specific pulldown configuration
+        if (vSynchMode === 1) {    // ON
+            // Will V-synch to host freq if detected and supported, or use optimal timer configuration)
+            videoPulldown = videoStandard.pulldowns[jt.Clock.HOST_NATIVE_FPS] || videoStandard.pulldowns.TIMER;
+        } else {                  // OFF, DISABLED
+            // No V-synch. Always use the optimal timer configuration)
+            videoPulldown = videoStandard.pulldowns.TIMER;
+        }
+
+        videoPulldownStep = videoPulldown.steps;
+        mainVideoClockUpdateSpeed();
+
+        //console.error("Update Synchronization: " + videoPulldown.frequency);
+    }
+
     var powerFry = function() {
         ram.powerFry();
     };
@@ -143,73 +214,88 @@ jt.AtariConsole = function() {
     };
 
     var loadState = function(state) {
-        if (!self.powerIsOn) self.powerOn();
+        mainVideoClockUpdateSpeed();
         tia.loadState(state.t);
         pia.loadState(state.p);
         ram.loadState(state.r);
         cpu.loadState(state.c);
-        setCartridge(state.ca && jt.CartridgeDatabase.createCartridgeFromSaveState(state.ca));
+        setCartridge(state.ca && jt.CartridgeDatabase.recreateCartridgeFromSaveState(state.ca, getCartridge()));
         setVideoStandard(jt.VideoStandard[state.vs]);
-        controlsSocket.controlsStatesRedefined();
+        consoleControlsSocket.controlsStatesRedefined();
     };
 
-    var mainClockAdjustToNormal = function() {
-        var freq = videoStandard.fps;
-        mainClock.setFrequency(freq);
-        tia.getAudioOutput().setFps(freq);
+    this.setDefaults = function() {
+        setVideoStandardAuto();
+        speedControl = 1;
+        alternateSpeed = null;
+        mainVideoClockUpdateSpeed();
+        tia.debug(0);
     };
 
-    var mainClockAdjustToFast    = function() {
-        var freq = 600;     // About 10x faster
-        mainClock.setFrequency(freq);
-        tia.getAudioOutput().setFps(freq);
-    };
+    function mainVideoClockUpdateSpeed() {
+        var freq = videoPulldown.frequency;
+        mainVideoClock.setVSynch(vSynchMode > 0);
+        mainVideoClock.setFrequency((freq * (alternateSpeed || speedControl)) | 0);
+        audioSocket.setFps(freq);
+    }
 
     var mainComponentsCreate = function() {
+        // Main clock will be the Tia Frame VideoClock (60Hz/50Hz)
+        // CPU and other clocks (Pia, Audio) will be sent by the Tia
+        self.mainVideoClock = mainVideoClock = new jt.Clock(self.videoClockPulse);
+
         cpu = new jt.M6502();
         pia = new jt.Pia();
         tia = new jt.Tia(cpu, pia);
         self.tia = tia;
         ram = new jt.Ram();
         bus = new jt.Bus(cpu, tia, pia, ram);
-        mainClock = new jt.Clock(self, jt.VideoStandard.NTSC.fps);
     };
 
     var socketsCreate = function() {
-        controlsSocket = new ControlsSocket();
-        controlsSocket.addForwardedInput(self);
-        controlsSocket.addForwardedInput(tia);
-        controlsSocket.addForwardedInput(pia);
+        consoleControlsSocket = new ConsoleControlsSocket();
         cartridgeSocket = new CartridgeSocket();
-        cartridgeSocket.addInsertionListener(tia.getAudioOutput());
-        cartridgeSocket.addInsertionListener(controlsSocket);
         saveStateSocket = new SaveStateSocket();
-        cartridgeSocket.addInsertionListener(saveStateSocket);
+        audioSocket = new AudioSocket();
+        tia.getAudioOutput().connectAudioSocket(audioSocket);
     };
 
 
     this.powerIsOn = false;
 
-    this.framesGenerated = 0;
+    var isLoading = false;
+    var userPaused = false;
+    var userPauseMoreFrames = 0;
+    var systemPaused = false;
 
+    var speedControl = 1;
+    var alternateSpeed = false;
+
+    var mainVideoClock;
     var cpu;
     var pia;
     var tia;
     var ram;
     var bus;
-    var mainClock;
 
     var videoStandard;
-    var controlsSocket;
+    var videoPulldown, videoPulldownStep;
+
+    var consoleControlsSocket;
     var cartridgeSocket;
     var saveStateSocket;
+    var audioSocket;
 
     var videoStandardIsAuto = false;
     var videoStandardAutoDetectionInProgress = false;
     var videoStandardAutoDetectionTries = 0;
 
+    var vSynchMode = Javatari.SCREEN_VSYNCH_MODE;
 
     var VIDEO_STANDARD_AUTO_DETECTION_FRAMES = 90;
+
+    var SPEEDS = [ 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 2, 3, 5, 10 ];
+    var SPEED_FAST = 10, SPEED_SLOW = 0.3;
 
 
     // Controls interface  --------------------------------------------
@@ -218,13 +304,27 @@ jt.AtariConsole = function() {
 
     this.controlStateChanged = function (control, state) {
         // Normal state controls
-        if (control == controls.FAST_SPEED) {
-            if (state) {
+        if (control === controls.FAST_SPEED) {
+            if (state && alternateSpeed !== SPEED_FAST) {
+                alternateSpeed = SPEED_FAST;
+                mainVideoClockUpdateSpeed();
                 self.showOSD("FAST FORWARD", true);
-                mainClockAdjustToFast();
-            } else {
+            } else if (!state && alternateSpeed === SPEED_FAST) {
+                alternateSpeed = null;
+                mainVideoClockUpdateSpeed();
                 self.showOSD(null, true);
-                mainClockAdjustToNormal();
+            }
+            return;
+        }
+        if (control === controls.SLOW_SPEED) {
+            if (state && alternateSpeed !== SPEED_SLOW) {
+                alternateSpeed = SPEED_SLOW;
+                mainVideoClockUpdateSpeed();
+                self.showOSD("SLOW MOTION", true);
+            } else if (!state && alternateSpeed === SPEED_SLOW) {
+                alternateSpeed = null;
+                mainVideoClockUpdateSpeed();
+                self.showOSD(null, true);
             }
             return;
         }
@@ -233,7 +333,7 @@ jt.AtariConsole = function() {
         switch (control) {
             case controls.POWER:
                 if (self.powerIsOn) self.powerOff();
-                else self.powerOn();
+                else self.userPowerOn(true);
                 break;
             case controls.POWER_OFF:
                 if (self.powerIsOn) self.powerOff();
@@ -241,58 +341,62 @@ jt.AtariConsole = function() {
             case controls.POWER_FRY:
                 powerFry();
                 break;
-            case controls.SAVE_STATE_0:
-            case controls.SAVE_STATE_1:
-            case controls.SAVE_STATE_2:
-            case controls.SAVE_STATE_3:
-            case controls.SAVE_STATE_4:
-            case controls.SAVE_STATE_5:
-            case controls.SAVE_STATE_6:
-            case controls.SAVE_STATE_7:
-            case controls.SAVE_STATE_8:
-            case controls.SAVE_STATE_9:
-            case controls.SAVE_STATE_10:
-            case controls.SAVE_STATE_11:
-            case controls.SAVE_STATE_12:
+            case controls.PAUSE:
+                self.userPause(!userPaused, false);
+                self.getVideoOutput().showOSD(userPaused ? "PAUSE" : "RESUME", true);
+                return;
+            case controls.PAUSE_AUDIO_ON:
+                self.userPause(!userPaused, true);
+                self.getVideoOutput().showOSD(userPaused ? "PAUSE with AUDIO ON" : "RESUME", true);
+                return;
+            case controls.FRAME:
+                if (userPaused) userPauseMoreFrames = 1;
+                return;
+            case controls.INC_SPEED: case controls.DEC_SPEED: case controls.NORMAL_SPEED: case controls.MIN_SPEED:
+                var speedIndex = SPEEDS.indexOf(speedControl);
+                if (control === controls.INC_SPEED && speedIndex < SPEEDS.length - 1) ++speedIndex;
+                else if (control === controls.DEC_SPEED && speedIndex > 0) --speedIndex;
+                else if (control === controls.MIN_SPEED) speedIndex = 0;
+                else if (control === controls.NORMAL_SPEED) speedIndex = SPEEDS.indexOf(1);
+                speedControl = SPEEDS[speedIndex];
+                self.showOSD("Speed: " + ((speedControl * 100) | 0) + "%", true);
+                mainVideoClockUpdateSpeed();
+                break;
+            case controls.SAVE_STATE_0: case controls.SAVE_STATE_1: case controls.SAVE_STATE_2: case controls.SAVE_STATE_3: case controls.SAVE_STATE_4: case controls.SAVE_STATE_5:
+            case controls.SAVE_STATE_6: case controls.SAVE_STATE_7: case controls.SAVE_STATE_8: case controls.SAVE_STATE_9: case controls.SAVE_STATE_10: case controls.SAVE_STATE_11: case controls.SAVE_STATE_12:
+                var wasPaused = self.systemPause(true);
                 saveStateSocket.saveState(control.to);
+                if (!wasPaused) self.systemPause(false);
                 break;
             case controls.SAVE_STATE_FILE:
+                wasPaused = self.systemPause(true);
                 saveStateSocket.saveStateFile();
+                if (!wasPaused) self.systemPause(false);
                 break;
-            case controls.LOAD_STATE_0:
-            case controls.LOAD_STATE_1:
-            case controls.LOAD_STATE_2:
-            case controls.LOAD_STATE_3:
-            case controls.LOAD_STATE_4:
-            case controls.LOAD_STATE_5:
-            case controls.LOAD_STATE_6:
-            case controls.LOAD_STATE_7:
-            case controls.LOAD_STATE_8:
-            case controls.LOAD_STATE_9:
-            case controls.LOAD_STATE_10:
-            case controls.LOAD_STATE_11:
-            case controls.LOAD_STATE_12:
+            case controls.LOAD_STATE_0: case controls.LOAD_STATE_1: case controls.LOAD_STATE_2: case controls.LOAD_STATE_3: case controls.LOAD_STATE_4: case controls.LOAD_STATE_5:
+            case controls.LOAD_STATE_6: case controls.LOAD_STATE_7: case controls.LOAD_STATE_8: case controls.LOAD_STATE_9: case controls.LOAD_STATE_10: case controls.LOAD_STATE_11: case controls.LOAD_STATE_12:
+                wasPaused = self.systemPause(true);
                 saveStateSocket.loadState(control.from);
-                break;
+                if (!wasPaused) self.systemPause(false);
+            break;
             case controls.VIDEO_STANDARD:
                 self.showOSD(null, true);	// Prepares for the upcoming "AUTO" OSD to always show
                 if (videoStandardIsAuto) setVideoStandardForced(jt.VideoStandard.NTSC);
                 else if (videoStandard == jt.VideoStandard.NTSC) setVideoStandardForced(jt.VideoStandard.PAL);
                 else setVideoStandardAuto();
                 break;
+            case controls.VSYNCH:
+                if (vSynchMode === -1 || jt.Clock.HOST_NATIVE_FPS === -1) {
+                    self.showOSD("V-Synch is disabled / unsupported", true, true);
+                } else {
+                    setVSynchMode(vSynchMode + 1);
+                    self.showOSD("V-Synch: " + (vSynchMode === 1 ? "ON" : vSynchMode === 0 ? "OFF" : "DISABLED"), true);
+                }
+                break;
             case controls.CARTRIDGE_FORMAT:
                 cycleCartridgeFormat();
                 break;
-            case controls.CARTRIDGE_REMOVE:
-                if (Javatari.CARTRIDGE_CHANGE_DISABLED)
-                    self.showOSD("Cartridge change is disabled", true);
-                else
-                    cartridgeSocket.insert(null, false);
         }
-    };
-
-    this.controlValueChanged = function (control, position) {
-        // No positional controls here
     };
 
     this.controlsStateReport = function (report) {
@@ -316,84 +420,82 @@ jt.AtariConsole = function() {
         };
 
         this.cartridgeInserted = function (cartridge, removedCartridge) {
-            for (var i = 0; i < insertionListeners.length; i++)
-                insertionListeners[i].cartridgeInserted(cartridge, removedCartridge);
+            tia.getAudioOutput().cartridgeInserted(cartridge, removedCartridge);
+            consoleControlsSocket.cartridgeInserted(cartridge, removedCartridge);
+            saveStateSocket.cartridgeInserted(cartridge, removedCartridge);
+            tia.getVideoOutput().monitor.cartridgeInserted(cartridge, removedCartridge);
         };
 
-        this.addInsertionListener = function (listener) {
-            if (insertionListeners.indexOf(listener) < 0) {
-                insertionListeners.push(listener);
-                listener.cartridgeInserted(this.inserted());		// Fire a insertion event
-            }
+        // Data operations unavailable
+        this.loadCartridgeData = function (port, name, arrContent) {
         };
-
-        this.removeInsertionListener = function (listener) {
-            jt.Util.arrayRemove(insertionListeners, listener);
+        this.saveCartridgeDataFile = function (port) {
         };
-
-        var insertionListeners = [];
 
     }
 
-    // ControlsSocket  -----------------------------------------
 
-    function ControlsSocket() {
+    // ConsoleControlsSocket  -----------------------------------------
+
+    function ConsoleControlsSocket() {
+
+        this.setDefaults = function() {
+            self.setDefaults();
+        };
 
         this.connectControls = function(pControls) {
             controls = pControls;
         };
 
         this.cartridgeInserted = function(cartridge, removedCartridge) {
-            if (removedCartridge) controlsSocket.removeForwardedInput(removedCartridge);
-            if (cartridge) controlsSocket.addForwardedInput(cartridge);
-        };
-
-        this.clockPulse = function() {
-            controls.clockPulse();
+            if (controls) controls.cartridgeInserted(cartridge, removedCartridge);
         };
 
         this.controlStateChanged = function(control, state) {
-            for (var i = 0; i < forwardedInputsCount; i++)
-                forwardedInputs[i].controlStateChanged(control, state);
+            self.controlStateChanged(control, state);
+            pia.controlStateChanged(control, state);
+            tia.controlStateChanged(control, state);
+            tia.getVideoOutput().monitor.controlStateChanged(control, state);
         };
 
         this.controlValueChanged = function(control, position) {
-            for (var i = 0; i < forwardedInputsCount; i++)
-                forwardedInputs[i].controlValueChanged(control, position);
+            tia.controlValueChanged(control, position);
         };
 
         this.controlsStateReport = function(report) {
-            for (var i = 0; i < forwardedInputsCount; i++)
-                forwardedInputs[i].controlsStateReport(report);
-        };
-
-        this.addForwardedInput = function(input) {
-            forwardedInputs.push(input);
-            forwardedInputsCount = forwardedInputs.length;
-        };
-
-        this.removeForwardedInput = function(input) {
-            jt.Util.arrayRemove(forwardedInputs, input);
-            forwardedInputsCount = forwardedInputs.length;
-        };
-
-        this.addRedefinitionListener = function(listener) {
-            if (redefinitionListeners.indexOf(listener) < 0) {
-                redefinitionListeners.push(listener);
-                listener.controlsStatesRedefined();		// Fire a redefinition event
-            }
+            self.controlsStateReport(report);
+            pia.controlsStateReport(report);
         };
 
         this.controlsStatesRedefined = function() {
-            for (var i = 0; i < redefinitionListeners.length; i++)
-                redefinitionListeners[i].controlsStatesRedefined();
+            tia.getVideoOutput().monitor.controlsStatesRedefined();
+        };
+
+        this.firePowerAndUserPauseStateUpdate = function() {
+            controls.consolePowerAndUserPauseStateUpdate(self.powerIsOn, userPaused);
+            tia.getVideoOutput().monitor.consolePowerAndUserPauseStateUpdate(self.powerIsOn, userPaused);
+        };
+
+        this.releaseControllers = function() {
+            controls.releaseControllers();
+        };
+
+        this.controlsClockPulse = function() {
+            controls.controlsClockPulse();
+        };
+
+        this.getControlReport = function(control) {
+            switch(control) {
+                case jt.ConsoleControls.VIDEO_STANDARD:
+                    return { label: videoStandardIsAuto ? "Auto" : videoStandard.name, active: !videoStandardIsAuto };
+                case jt.ConsoleControls.NO_COLLISIONS:
+                    return { label: tia.getDebugNoCollisions() ? "OFF" : "ON", active: tia.getDebugNoCollisions() };
+                default:
+                    return { label: "Unknown", active: false };
+            }
         };
 
         var controls;
-        var forwardedInputs = [];
-        var forwardedInputsCount = 0;
-        var redefinitionListeners = [];
-
     }
 
 
@@ -414,11 +516,11 @@ jt.AtariConsole = function() {
         };
 
         this.externalStateChange = function() {
-            // Nothing
+            // Nothing (no Multiplayer yet)
         };
 
         this.saveState = function(slot) {
-            if (!self.powerIsOn || !media) return;
+            if (!self.powerIsOn) return;
             var state = saveState();
             state.v = VERSION;
             if (media.saveState(slot, state))
@@ -428,7 +530,6 @@ jt.AtariConsole = function() {
         };
 
         this.loadState = function(slot) {
-            if (!media) return;
             var state = media.loadState(slot);
             if (!state) {
                 self.showOSD("State " + slot + " not found", true);
@@ -438,12 +539,13 @@ jt.AtariConsole = function() {
                 self.showOSD("State " + slot + " load failed, wrong version", true);
                 return;
             }
+            if (!self.powerIsOn) self.powerOn();
             loadState(state);
             self.showOSD("State " + slot + " loaded", true);
         };
 
         this.saveStateFile = function() {
-            if (!self.powerIsOn || !media) return;
+            if (!self.powerIsOn) return;
             // Use Cartrige label as file name
             var fileName = cartridgeSocket.inserted() && cartridgeSocket.inserted().rom.info.l;
             var state = saveState();
@@ -451,48 +553,105 @@ jt.AtariConsole = function() {
             if (media.saveStateFile(fileName, state))
                 self.showOSD("State Cartridge saved", true);
             else
-                self.showOSD("State Cartridge save failed", true);
+                self.showOSD("State file save failed", true);
         };
 
         this.loadStateFile = function(data) {       // Return true if data was indeed a SaveState
-            if (!media) return;
             var state = media.loadStateFile(data);
             if (!state) return;
             if (state.v !== VERSION) {
-                self.showOSD("State Cartridge load failed, wrong version", true);
+                self.showOSD("State file load failed, wrong version", true);
                 return true;
             }
             loadState(state);
-            self.showOSD("State Cartridge loaded", true);
+            self.showOSD("State file loaded", true);
             return true;
         };
 
-
         var media;
         var VERSION = 2;
+    }
 
+
+    // Audio Socket  ---------------------------------------------
+
+    function AudioSocket() {
+
+        this.connectMonitor = function (pMonitor) {
+            monitor = pMonitor;
+            for (var i = signals.length - 1; i >= 0; i--) monitor.connectAudioSignal(signals[i]);
+        };
+
+        this.connectAudioSignal = function(signal) {
+            if (signals.indexOf(signal) >= 0) return;
+            jt.Util.arrayAdd(signals, signal);
+            this.flushAllSignals();                            // To always keep signals in synch
+            signal.setFps(fps);
+            if (monitor) monitor.connectAudioSignal(signal);
+        };
+
+        this.disconnectAudioSignal = function(signal) {
+            jt.Util.arrayRemoveAllElement(signals, signal);
+            if (monitor) monitor.disconnectAudioSignal(signal);
+        };
+
+        this.audioClockPulse = function() {
+            for (var i = signals.length - 1; i >= 0; --i) signals[i].audioClockPulse();
+        };
+
+        this.audioFinishFrame = function() {
+            for (var i = signals.length - 1; i >= 0; --i) signals[i].audioFinishFrame();
+        };
+
+        this.muteAudio = function() {
+            if (monitor) monitor.mute();
+        };
+
+        this.unMuteAudio = function() {
+            if (monitor) monitor.unMute();
+        };
+
+        this.setFps = function(pFps) {
+            fps = pFps;
+            for (var i = signals.length - 1; i >= 0; --i) signals[i].setFps(fps);
+        };
+
+        this.pauseAudio = function() {
+            if (monitor) monitor.pause();
+        };
+
+        this.unpauseAudio = function() {
+            if (monitor) monitor.unpause();
+        };
+
+        this.flushAllSignals = function() {
+            for (var i = signals.length - 1; i >= 0; --i) signals[i].flush();
+        };
+
+        var signals = [];
+        var monitor;
+        var fps;
     }
 
 
     // Debug methods  ------------------------------------------------------
 
-    this.startProfiling = function() {
-        var lastFrameCount = this.framesGenerated;
-        setInterval(function() {
-            jt.Util.log(self.framesGenerated - lastFrameCount);
-            lastFrameCount = self.framesGenerated;
-        }, 1000);
+    this.runFramesAtTopSpeed = function(frames) {
+        mainVideoClock.pause();
+        var start = jt.Util.performanceNow();
+        for (var i = 0; i < frames; i++) {
+            //var pulseTime = jt.Util.performanceNow();
+            self.videoClockPulse();
+            //console.log(jt.Util.performanceNow() - pulseTime);
+        }
+        var duration = jt.Util.performanceNow() - start;
+        jt.Util.log("Done running " + frames + " frames in " + (duration | 0) + " ms");
+        jt.Util.log((frames / (duration/1000)).toFixed(2) + "  frames/sec");
+        mainVideoClock.go();
     };
 
-    this.runFramesAtTopSpeed = function(frames) {
-        pause();
-        var start = performance.now();
-        for (var i = 0; i < frames; i++)
-            self.clockPulse();
-        var duration = performance.now() - start;
-        jt.Util.log("Done running " + frames + " in " + duration + " ms");
-        jt.Util.log((frames / (duration/1000)).toFixed(2) + " frames/sec");
-        go();
+    this.eval = function(str) {
+        return eval(str);
     };
 
 

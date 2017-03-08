@@ -42,16 +42,16 @@ jt.Cartridge2K_CV = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
-            ra: btoa(jt.Util.uInt8ArrayToByteString(extraRAM))
+            b:  jt.Util.compressInt8BitArrayToStringBase64(bytes),
+            ra: jt.Util.compressInt8BitArrayToStringBase64(extraRAM)
         };
     };
 
     this.loadState = function(state) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
-        extraRAM = jt.Util.byteStringToUInt8Array(atob(state.ra));
+        bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
+        extraRAM = jt.Util.uncompressStringBase64ToInt8BitArray(state.ra, extraRAM);
     };
 
 
@@ -67,8 +67,8 @@ jt.Cartridge2K_CV = function(rom, format) {
 
 jt.Cartridge2K_CV.prototype = jt.Cartridge.base;
 
-jt.Cartridge2K_CV.createFromSaveState = function(state) {
-    var cart = new jt.Cartridge2K_CV();
+jt.Cartridge2K_CV.recreateFromSaveState = function(state, prevCart) {
+    var cart = prevCart || new jt.Cartridge2K_CV();
     cart.loadState(state);
     return cart;
 };

@@ -62,28 +62,28 @@ jt.CartridgeBankedByMaskedRange = function(rom, format, pBaseBankSwitchAddress, 
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
+            b: jt.Util.compressInt8BitArrayToStringBase64(bytes),
             bo: bankAddressOffset,
             bb: baseBankSwitchAddress,
             es: extraRAMSize,
             tb: topBankSwitchAddress,
             s: superChipMode | 0,
             sa: superChipAutoDetect | 0,
-            e: extraRAM && btoa(jt.Util.uInt8ArrayToByteString(extraRAM))
+            e: extraRAM && jt.Util.compressInt8BitArrayToStringBase64(extraRAM)
         };
     };
 
     this.loadState = function(state) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
         bankAddressOffset = state.bo;
         baseBankSwitchAddress = state.bb;
         extraRAMSize = state.es;
         topBankSwitchAddress =  state.tb;
         superChipMode = !!state.s;
         superChipAutoDetect = !!state.sa;
-        extraRAM = state.e && jt.Util.byteStringToUInt8Array(atob(state.e));
+        extraRAM = state.e && jt.Util.uncompressStringBase64ToInt8BitArray(state.e, extraRAM);
     };
 
 
@@ -109,8 +109,8 @@ jt.CartridgeBankedByMaskedRange = function(rom, format, pBaseBankSwitchAddress, 
 
 jt.CartridgeBankedByMaskedRange.prototype = jt.Cartridge.base;
 
-jt.CartridgeBankedByMaskedRange.createFromSaveState = function(state) {
-    var cart = new jt.CartridgeBankedByMaskedRange();
+jt.CartridgeBankedByMaskedRange.recreateFromSaveState = function(state, prevCart) {
+    var cart = prevCart || new jt.CartridgeBankedByMaskedRange();
     cart.loadState(state);
     return cart;
 };

@@ -205,50 +205,34 @@ jt.Cartridge10K_DPCa = function(rom, format) {
     };
 
 
-    // Controls interface  ---------------------------------
-
-    this.controlStateChanged = function(control, state) {
-        if (!state) return;
-        switch (control) {
-            case jt.ConsoleControls.CARTRIDGE_CLOCK_DEC:
-                if (audioClockStep < 1) audioClockStep += 0.01;
-                jt.Util.log("DPC audio clock factor: " + audioClockStep);
-                break;
-            case jt.ConsoleControls.CARTRIDGE_CLOCK_INC:
-                if (audioClockStep > 0.3) audioClockStep -= 0.01;
-                jt.Util.log("DPC audio clock factor: " + audioClockStep);
-        }
-    };
-
-
     // Savestate  -------------------------------------------
 
     this.saveState = function() {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
+            b: jt.Util.compressInt8BitArrayToStringBase64(bytes),
             bo: bankAddressOffset,
             rn: randomNumber,
-            fp: btoa(jt.Util.uInt8ArrayToByteString(fetcherPointer)),
-            fs: btoa(jt.Util.uInt8ArrayToByteString(fetcherStart)),
-            fe: btoa(jt.Util.uInt8ArrayToByteString(fetcherEnd)),
-            fm: btoa(jt.Util.uInt8ArrayToByteString(fetcherMask)),
-            a: btoa(jt.Util.uInt8ArrayToByteString(audioMode))
+            fp: jt.Util.compressInt8BitArrayToStringBase64(fetcherPointer),
+            fs: jt.Util.compressInt8BitArrayToStringBase64(fetcherStart),
+            fe: jt.Util.compressInt8BitArrayToStringBase64(fetcherEnd),
+            fm: jt.Util.compressInt8BitArrayToStringBase64(fetcherMask),
+            a:  jt.Util.compressInt8BitArrayToStringBase64(audioMode)
         };
     };
 
     this.loadState = function(state) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
         bankAddressOffset = state.bo;
         randomNumber = state.rn;
-        fetcherPointer = jt.Util.byteStringToUInt8Array(atob(state.fp));
-        fetcherStart = jt.Util.byteStringToUInt8Array(atob(state.fs));
-        fetcherEnd = jt.Util.byteStringToUInt8Array(atob(state.fe));
-        fetcherMask = jt.Util.byteStringToUInt8Array(atob(state.fm));
-        audioMode = jt.Util.byteStringToUInt8Array(atob(state.a));
+        fetcherPointer = jt.Util.uncompressStringBase64ToInt8BitArray(state.fp, fetcherPointer);
+        fetcherStart = jt.Util.uncompressStringBase64ToInt8BitArray(state.fs, fetcherStart);
+        fetcherEnd = jt.Util.uncompressStringBase64ToInt8BitArray(state.fe, fetcherEnd);
+        fetcherMask = jt.Util.uncompressStringBase64ToInt8BitArray(state.fm, fetcherMask);
+        audioMode = jt.Util.uncompressStringBase64ToInt8BitArray(state.a, audioMode);
     };
 
 
@@ -281,8 +265,8 @@ jt.Cartridge10K_DPCa = function(rom, format) {
 
 jt.Cartridge10K_DPCa.prototype = jt.Cartridge.base;
 
-jt.Cartridge10K_DPCa.createFromSaveState = function(state) {
-    var cart = new jt.Cartridge10K_DPCa();
+jt.Cartridge10K_DPCa.recreateFromSaveState = function(state, prevCart) {
+    var cart = prevCart || new jt.Cartridge10K_DPCa();
     cart.loadState(state);
     return cart;
 };

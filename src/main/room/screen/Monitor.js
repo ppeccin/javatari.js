@@ -1,91 +1,43 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.Monitor = function() {
+jt.Monitor = function(display) {
 "use strict";
 
-    function init(self) {
+    var self = this;
+
+    function init() {
         prepareResources();
         setDisplayDefaultSize();
-        adjustToVideoStandard(jt.VideoStandard.NTSC);
-        controls = new jt.DOMMonitorControls(self);
+        self.setVideoStandard(videoStandard);
     }
 
-    this.connectDisplay = function(monitorDisplay) {
-        display = monitorDisplay;
-        var scX = display.displayDefaultOpeningScaleX(displayWidth, displayHeight);
-        setDisplayScale(scX, scX / DEFAULT_SCALE_ASPECT_X);
-        displayCenter();
-    };
-
-    this.connectPeripherals = function(pROMLoader) {
-        romLoader = pROMLoader;
-    };
-
-    this.connect = function(pVideoSignal, pCartridgeSocket) {
-        pCartridgeSocket.addInsertionListener(this);
+    this.connect = function(pVideoSignal) {
         videoSignal = pVideoSignal;
         videoSignal.connectMonitor(this);
-        adjustToVideoSignal();
-    };
-
-    this.addControlInputElements = function(elements) {
-        controls.addInputElements(elements);
     };
 
     this.nextLine = function(pixels, vSynchSignal) {
-        // Adjusts to the new signal state (on or off) as necessary
-        if (!signalState(pixels !== null))		// If signal is off, we are done
-            return false;
         // Process new line received
         var vSynched = false;
         if (line < signalHeight) {
             // Copy to the back buffer only contents that will be displayed
-            if (line >= displayOriginY && line < displayOriginY + displayHeight)
-                backBuffer.set(pixels, (line - displayOriginY) * signalWidth);
+            if (line >= viewportOriginY && line < viewportOriginY + viewportHeight)
+                backBuffer.set(pixels, (line - viewportOriginY) * signalWidth);
         } else
             vSynched = maxLineExceeded();
         line++;
         if (!videoStandardDetected) videoStandardDetectionFrameLineCount++;
         if (vSynchSignal) {
             if (!videoStandardDetected) videoStandardDetectionNewFrame();
-            vSynched = newFrame() || vSynched;
+            vSynched |= newFrame();
         }
         return vSynched;
     };
 
-    this.synchOutput = function() {
-        refresh();
-    };
-
-    this.currentLine = function() {
-        return line;
-    };
-
-    this.showOSD = function(message, overlap) {
-        display.showOSD(message, overlap);
-    };
-
-    this.videoStandardDetectionStart = function() {
-        videoStandardDetected = null;
-        videoStandardDetectionFrameCount = 0;
-        videoStandardDetectionFrameLineCount = 0;
-    };
-
-    this.getVideoStandardDetected = function() {
-        return videoStandardDetected;
-    };
-
-    this.cartridgeInserted = function(cartridge) {
-        // Only change mode if not forced
-        if (CRT_MODE >= 0) return;
-        if (crtMode === 0 || crtMode === 1)
-            setCrtMode(!cartridge ? 0 : cartridge.rom.info.c || 0);
-    };
-
     var newFrame = function() {
-        if (line < signalHeight - VSYNC_TOLERANCE) return false;
+        if (line < minLinesToSync) return false;
 
-        if (showStats) display.showOSD(videoSignal.standard.name + "  " + line + " lines" /* ,  CRT mode: " + crtModeNames[crtMode] */, true);
+        if (showInfo) display.showOSD(videoStandard.name + "  " + line + " lines" /* ,  CRT mode: " + crtModeNames[crtMode] */, true);
 
         // Start a new frame
         line = 0;
@@ -94,30 +46,25 @@ jt.Monitor = function() {
     };
 
     var maxLineExceeded = function() {
-        if (line > signalHeight + VSYNC_TOLERANCE + EXTRA_UPPER_VSYNC_TOLERANCE) {
+        if (line > maxLinesToSync) {
             //if (debug > 0) Util.log("Display maximum scanlines exceeded: " + line);
             return newFrame();
-        }
-        return false;
+        } else
+            return false;
     };
 
-    var signalState = function(state) {
-        if (state) {
-            signalOn = true;
-            adjustToVideoSignal();
-        } else {
-            signalOn = false;
-            adjustToVideoSignalOff();
+    this.setVideoStandard = function(standard) {
+        videoStandard = standard;
+        signalWidth = standard.totalWidth;
+        signalHeight = standard.totalHeight;
+        minLinesToSync = signalHeight - VSYNC_TOLERANCE;
+        maxLinesToSync = signalHeight + VSYNC_TOLERANCE + EXTRA_UPPER_VSYNC_TOLERANCE;
+        if (isDefaultViewport) {
+            viewportHeightPct = videoStandard.defaultHeightPct;
+            viewportOriginYPct = videoStandard.defaultOriginYPct;
         }
-        return state;
-    };
-
-    var adjustToVideoStandard = function(videoStandard) {
-        signalStandard = videoStandard;
-        signalWidth = videoStandard.width;
-        signalHeight = videoStandard.height;
-        setDisplaySize(displayWidth, displayHeightPct);
-        setDisplayOrigin(displayOriginX, displayOriginYPct);
+        setViewportSize(viewportWidth, viewportHeightPct);
+        setViewportOrigin(viewportOriginX, viewportOriginYPct);
     };
 
     var videoStandardDetectionNewFrame = function() {
@@ -136,254 +83,242 @@ jt.Monitor = function() {
         // Compute an additional number of lines to make the display bigger, if needed
         // Only used when the detected number of lines per frame is bigger than standard by a reasonable amount
         var prevAdd = videoStandardDetectionAdtLinesPerFrame;
-        var newAdd = linesCount - videoStandardDetected.height;
+        var newAdd = linesCount - videoStandardDetected.totalHeight;
         if (newAdd > 2) newAdd = (newAdd > 6 ? 6 : newAdd) - 2;
         else newAdd = 0;
 
         // Only sets size now if additional lines changed
         if (newAdd != prevAdd) {
             videoStandardDetectionAdtLinesPerFrame = newAdd;
-            adjustToVideoStandard(videoStandardDetected);
+            self.setVideoStandard(videoStandardDetected);
         }
     };
 
-    var adjustToVideoSignal = function() {
-        if (signalStandard != videoSignal.standard)
-            adjustToVideoStandard(videoSignal.standard);
-    };
-
-    var adjustToVideoSignalOff = function() {
+    this.videoSignalOff = function() {
         line = 0;
-        display.adjustToVideoSignalOff();
+        display.videoSignalOff();
     };
 
-    var setDisplayDefaultSize = function() {
-        setDisplaySize(DEFAULT_WIDTH, DEFAULT_HEIGHT_PCT);
-        setDisplayOrigin(DEFAULT_ORIGIN_X, DEFAULT_ORIGIN_Y_PCT);
-        if (display != null) {
-            var scX = display.displayDefaultOpeningScaleX(displayWidth, displayHeight);
-            setDisplayScale(scX, scX / DEFAULT_SCALE_ASPECT_X);
-        } else
-            setDisplayScale(DEFAULT_SCALE_X, DEFAULT_SCALE_Y);
-        displayCenter();
-    };
+    var setViewportOrigin = function(x, yPct) {
+        viewportOriginX = x;
+        if (viewportOriginX < 0) viewportOriginX = 0;
+        else if (viewportOriginX > signalWidth - viewportWidth) viewportOriginX = signalWidth - viewportWidth;
 
-    var setDisplayOrigin = function(x, yPct) {
-        displayOriginX = x;
-        if (displayOriginX < 0) displayOriginX = 0;
-        else if (displayOriginX > signalWidth - displayWidth) displayOriginX = signalWidth - displayWidth;
-
-        displayOriginYPct = yPct;
-        if (displayOriginYPct < 0) displayOriginYPct = 0;
-        else if ((displayOriginYPct / 100 * signalHeight) > signalHeight - displayHeight)
-            displayOriginYPct = (signalHeight - displayHeight) / signalHeight * 100;
+        viewportOriginYPct = yPct;
+        if (viewportOriginYPct < 0) viewportOriginYPct = 0;
+        else if ((viewportOriginYPct / 100 * signalHeight) > signalHeight - viewportHeight)
+            viewportOriginYPct = (signalHeight - viewportHeight) / signalHeight * 100;
 
         // Compute final display originY, adding a little for additional lines as discovered in last video standard detection
         var adtOriginY = videoStandardDetectionAdtLinesPerFrame / 2;
-        displayOriginY = ((displayOriginYPct / 100 * signalHeight) + adtOriginY) | 0;
-        if ((displayOriginY + displayHeight) > signalHeight) displayOriginY = signalHeight - displayHeight;
+        viewportOriginY = ((viewportOriginYPct / 100 * signalHeight) + adtOriginY) | 0;
+        if ((viewportOriginY + viewportHeight) > signalHeight) viewportOriginY = signalHeight - viewportHeight;
     };
 
-    var setDisplaySize = function(width, heightPct) {
-        displayWidth = width;
-        if (displayWidth < 10) displayWidth = 10;
-        else if (displayWidth > signalWidth) displayWidth = signalWidth;
+    var setViewportSize = function(width, heightPct) {
+        viewportWidth = width;
+        if (viewportWidth < 10) viewportWidth = 10;
+        else if (viewportWidth > signalWidth) viewportWidth = signalWidth;
 
-        displayHeightPct = heightPct;
-        if (displayHeightPct < 10) displayHeightPct = 10;
-        else if (displayHeightPct > 100) displayHeightPct = 100;
+        viewportHeightPct = heightPct;
+        if (viewportHeightPct < 10) viewportHeightPct = 10;
+        else if (viewportHeightPct > 100) viewportHeightPct = 100;
 
         // Compute final display height, considering additional lines as discovered in last video standard detection
-        displayHeight = (displayHeightPct / 100 * (signalHeight + videoStandardDetectionAdtLinesPerFrame)) | 0;
-        if (displayHeight > signalHeight) displayHeight = signalHeight;
+        viewportHeight = (viewportHeightPct / 100 * (signalHeight + videoStandardDetectionAdtLinesPerFrame)) | 0;
+        if (viewportHeight > signalHeight) viewportHeight = signalHeight;
 
-        offCanvas.width = displayWidth;
-        offCanvas.height = displayHeight;
+        offCanvas.width = viewportWidth;
+        offCanvas.height = viewportHeight;
 
-        setDisplayOrigin(displayOriginX, displayOriginYPct);
+        setViewportOrigin(viewportOriginX, viewportOriginYPct);
         displayUpdateSize();
     };
 
     var displayUpdateSize = function() {
         if (!display) return;
-        display.displaySize(displayWidth, displayHeight, displayScaleX, displayScaleY);
+        display.displayMetrics(viewportWidth, viewportHeight);
     };
 
-    var setDisplayScale = function(x, y) {
-        displayScaleX = x;
-        if (displayScaleX < 1) displayScaleX = 1;
-        displayScaleY = y;
-        if (displayScaleY < 1) displayScaleY = 1;
-        displayUpdateSize();
-    };
-
-    var setDisplayScaleDefaultAspect = function(y) {
-        var scaleY = y | 0;
-        if (scaleY < 1) scaleY = 1;
-        setDisplayScale(scaleY * DEFAULT_SCALE_ASPECT_X, scaleY);
-    };
-
-    var displayCenter = function() {
-        if (display) display.displayCenter();
-    };
-
-    var refresh = function() {
-        if (!signalOn) return;
-
-        // First paint the offscreen canvas with new frame data
-        offContext.putImageData(offImageData, -displayOriginX, 0, displayOriginX, 0, displayWidth, displayHeight);
-        // Then refresh display with the new image (canvas) and correct dimensions
-        display.refresh(offCanvas, offImageData, displayOriginX, displayWidth, displayHeight);
-
-        if (debug > 0) cleanBackBuffer();
-    };
-
-    var toggleFullscreen = function() {
-        display.displayToggleFullscreen();
-    };
-
-    var crtModeToggle = function() {
-        return display.showOSD("Not yet supported!", true);
-        //setCrtMode(crtMode + 1);
-    };
-
-    var setCrtMode = function(mode) {
-        var newMode = mode > 4 || mode < 0 ? 0 : mode;
-        if (crtMode === newMode) return;
-        crtMode = newMode;
-        display.showOSD("CRT mode: " + CRT_MODE_NAMES[crtMode], true);
-    };
-
-    var exit = function() {
-        display.exit();
+    var setDisplayDefaultSize = function() {
+        isDefaultViewport = true;
+        viewportOriginX = DEFAULT_ORIGIN_X;
+        viewportOriginYPct = videoStandard.defaultOriginYPct;
+        setViewportSize(DEFAULT_WIDTH, videoStandard.defaultHeightPct);
     };
 
     var prepareResources = function() {
         offCanvas = document.createElement('canvas');
-        offCanvas.width = jt.Monitor.DEFAULT_STARTING_WIDTH;
-        offCanvas.height = jt.Monitor.DEFAULT_STARTING_HEIGHT;
+        offCanvas.width = DEFAULT_WIDTH;
+        offCanvas.height = DEFAULT_HEIGHT;
         offContext = offCanvas.getContext("2d", { alpha: false, antialias: false });
         offContext.globalCompositeOperation = "copy";
         offContext.globalAlpha = 1;
-        offImageData = offContext.createImageData(jt.VideoStandard.PAL.width, jt.VideoStandard.PAL.height);
+        offImageData = offContext.createImageData(jt.VideoStandard.PAL.totalWidth, jt.VideoStandard.PAL.totalHeight);
         backBuffer = new Uint32Array(offImageData.data.buffer);
     };
 
-    var cleanBackBuffer = function() {
-        // Put a nice green for detection of undrawn lines, for debug purposes
-        if (backBuffer) jt.Util.arrayFill(backBuffer, 0xff00ff00);
+    this.currentLine = function() {
+        return line;
     };
 
-    var cartridgeChangeDisabledWarning = function() {
-        if (Javatari.CARTRIDGE_CHANGE_DISABLED) {
-            display.showOSD("Cartridge change is disabled", true);
-            return true;
-        }
-        return false;
+    this.refresh = function() {
+        // First paint the offscreen canvas with new frame data
+        offContext.putImageData(offImageData, -viewportOriginX, 0, viewportOriginX, 0, viewportWidth, viewportHeight);
+
+        // Then refresh display with the new image (canvas) and correct dimensions
+        display.refresh(offCanvas, viewportWidth, viewportHeight);
+
+        //if (debug > 0) cleanBackBuffer();
     };
 
-
-    // Controls Interface  -----------------------------------------
-
-    var monControls = jt.Monitor.Controls;
-
-    this.controlActivated = function(control) {
-        // All controls are Press-only and repeatable
-        switch(control) {
-            case monControls.LOAD_CARTRIDGE_FILE:
-                if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog(true);
-                break;
-            case monControls.LOAD_CARTRIDGE_FILE_NO_AUTO_POWER:
-                if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog(false);
-                break;
-            case monControls.LOAD_CARTRIDGE_URL:
-                if (!cartridgeChangeDisabledWarning()) romLoader.openURLChooserDialog(true);
-                break;
-            case monControls.LOAD_CARTRIDGE_URL_NO_AUTO_POWER:
-                if (!cartridgeChangeDisabledWarning()) romLoader.openURLChooserDialog(false);
-                break;
-            // TODO Maybe get URL from clipboard?
-            //case monControls.LOAD_CARTRIDGE_PASTE:
-            //    if (!cartridgeChangeDisabledWarning()) romLoader.openFileChooserDialog();
-            //    break;
-            case monControls.CRT_MODES:
-                crtModeToggle(); break;
-            case monControls.CRT_FILTER:
-                display.toggleCRTFilter(); break;
-            case monControls.STATS:
-                showStats = !showStats; display.showOSD(null, true); break;
-            case monControls.DEBUG:
-                debug++;
-                if (debug > 4) debug = 0;
-                break;
-            case monControls.ORIGIN_X_MINUS:
-                setDisplayOrigin(displayOriginX + 1, displayOriginYPct); break;
-            case monControls.ORIGIN_X_PLUS:
-                setDisplayOrigin(displayOriginX - 1, displayOriginYPct); break;
-            case monControls.ORIGIN_Y_MINUS:
-                setDisplayOrigin(displayOriginX, displayOriginYPct + 0.5); break;
-            case monControls.ORIGIN_Y_PLUS:
-                setDisplayOrigin(displayOriginX, displayOriginYPct - 0.5); break;
-            case monControls.SIZE_DEFAULT:
-                setDisplayDefaultSize(); break;
-            case monControls.FULLSCREEN:
-                toggleFullscreen(); break;
-            case monControls.EXIT:
-                exit(); break;
-        }
-        if (fixedSizeMode) return;
-        switch(control) {
-            case monControls.WIDTH_MINUS:
-                setDisplaySize(displayWidth - 1, displayHeightPct); break;
-            case monControls.WIDTH_PLUS:
-                setDisplaySize(displayWidth + 1, displayHeightPct); break;
-            case monControls.HEIGHT_MINUS:
-                setDisplaySize(displayWidth, displayHeightPct - 0.5); break;
-            case monControls.HEIGHT_PLUS:
-                setDisplaySize(displayWidth, displayHeightPct + 0.5); break;
-            case monControls.SCALE_X_MINUS:
-                setDisplayScale(displayScaleX - 0.5, displayScaleY); break;
-            case monControls.SCALE_X_PLUS:
-                setDisplayScale(displayScaleX + 0.5, displayScaleY); break;
-            case monControls.SCALE_Y_MINUS:
-                setDisplayScale(displayScaleX, displayScaleY - 0.5); break;
-            case monControls.SCALE_Y_PLUS:
-                setDisplayScale(displayScaleX, displayScaleY + 0.5); break;
-            case monControls.SIZE_MINUS:
-                setDisplayScaleDefaultAspect(displayScaleY - 1); break;
-            case monControls.SIZE_PLUS:
-                setDisplayScaleDefaultAspect(displayScaleY + 1); break;
-        }
+    this.videoStandardDetectionStart = function() {
+        videoStandardDetected = null;
+        videoStandardDetectionFrameCount = 0;
+        videoStandardDetectionFrameLineCount = 0;
     };
 
+    this.getVideoStandardDetected = function() {
+        return videoStandardDetected;
+    };
 
-    var display;
-    var romLoader;
+    this.toggleShowInfo = function() {
+        showInfo = !showInfo;
+        if (!showInfo) display.showOSD(null, true);
+    };
 
-    var videoSignal;
-    var controls;
+    this.signalOff = function() {
+        display.videoSignalOff();
+    };
 
-    var line = 0;
-    var frame = 0;
+    this.showOSD = function(message, overlap, error) {
+        display.showOSD(message, overlap, error);
+    };
+
+    this.setDefaults = function() {
+        setDisplayDefaultSize();
+        display.crtModeSetDefault();
+        display.crtFilterSetDefault();
+        display.requestReadjust(true);
+    };
+
+    this.setDebugMode = function(boo) {
+        display.setDebugMode(boo);
+    };
+
+    this.crtModeToggle = function() {
+        display.crtModeToggle();
+    };
+
+    this.crtFilterToggle = function() {
+        display.crtFilterToggle();
+    };
+
+    this.fullscreenToggle = function() {
+        display.displayToggleFullscreen();
+    };
+
+    this.displayAspectDecrease = function() {
+        this.displayScale(normalizeAspectX(displayAspectX - SCALE_STEP), displayScaleY);
+        this.showOSD("Display Aspect: " + displayAspectX.toFixed(2) + "x", true);
+    };
+
+    this.displayAspectIncrease = function() {
+        this.displayScale(normalizeAspectX(displayAspectX + SCALE_STEP), displayScaleY);
+        this.showOSD("Display Aspect: " + displayAspectX.toFixed(2) + "x", true);
+    };
+
+    this.displayScaleDecrease = function() {
+        this.displayScale(displayAspectX, normalizeScaleY(displayScaleY - SCALE_STEP));
+        this.showOSD("Display Size: " + displayScaleY.toFixed(2) + "x", true);
+    };
+
+    this.displayScaleIncrease = function() {
+        this.displayScale(displayAspectX, normalizeScaleY(displayScaleY + SCALE_STEP));
+        this.showOSD("Display Size: " + displayScaleY.toFixed(2) + "x", true);
+    };
+
+    this.viewportOriginDecrease = function() {
+        isDefaultViewport = false;
+        setViewportOrigin(viewportOriginX, viewportOriginYPct + ORIGIN_Y_STEP);
+        this.showOSD("Viewport Origin: " + viewportOriginY, true);
+    };
+
+    this.viewportOriginIncrease = function() {
+        isDefaultViewport = false;
+        setViewportOrigin(viewportOriginX, viewportOriginYPct - ORIGIN_Y_STEP);
+        this.showOSD("Viewport Origin: " + viewportOriginY, true);
+    };
+
+    this.viewportSizeDecrease = function() {
+        setDisplayDefaultSize();
+        this.showOSD("Viewport Size: Standard", true);
+    };
+
+    this.viewportSizeIncrease = function() {
+        isDefaultViewport = false;
+        setViewportSize(signalWidth, 100);
+        this.showOSD("Viewport Size: Full Signal", true);
+    };
+
+    this.displayScale = function(aspectX, scaleY) {
+        displayAspectX = aspectX;
+        displayScaleY = scaleY;
+        display.displayScale(displayAspectX, displayScaleY);
+    };
+
+    function normalizeAspectX(aspectX) {
+        var ret = aspectX < 0.5 ? 0.5 : aspectX > 2.5 ? 2.5 : aspectX;
+        return Math.round(ret * 10) / 10;
+    }
+
+    function normalizeScaleY(scaleY) {
+        var ret = scaleY < 0.5 ? 0.5 : scaleY;
+        return Math.round(ret * 10) / 10;
+    }
+
+    this.controlStateChanged = function(control, state) {
+        display.controlStateChanged(control, state);
+    };
+
+    this.controlsStatesRedefined = function() {
+        display.controlsStatesRedefined();
+    };
+
+    this.consolePowerAndUserPauseStateUpdate = function(power, paused) {
+        display.consolePowerAndUserPauseStateUpdate(power, paused);
+    };
+
+    this.cartridgeInserted = function(cart) {
+        display.cartridgeInserted(cart);
+    };
+
 
     var offCanvas;
     var offContext;
     var offImageData;
-
     var backBuffer;
 
-    var signalOn = false;
-    var signalStandard;
+    var videoSignal;
     var signalWidth;
     var signalHeight;
+    var videoStandard = jt.VideoStandard.NTSC;
 
-    var displayWidth;
-    var displayHeight;
-    var displayHeightPct;
-    var displayOriginX;
-    var displayOriginY;
-    var displayOriginYPct;
-    var displayScaleX;
+    var minLinesToSync;
+    var maxLinesToSync;
+
+    var line = 0;
+    var frame = 0;
+
+    var viewportWidth;
+    var viewportHeight;
+    var viewportHeightPct;
+    var viewportOriginX;
+    var viewportOriginY;
+    var viewportOriginYPct;
+    var isDefaultViewport = true;
+
+    var displayAspectX;
     var displayScaleY;
 
     var videoStandardDetected;
@@ -391,46 +326,20 @@ jt.Monitor = function() {
     var videoStandardDetectionFrameLineCount = 0;
     var videoStandardDetectionAdtLinesPerFrame = 0;
 
-    var debug = 0;
-    var showStats = false;
-    var fixedSizeMode = Javatari.SCREEN_RESIZE_DISABLED;
+    var showInfo = false;
 
-    var DEFAULT_ORIGIN_X = 68;
-    var DEFAULT_ORIGIN_Y_PCT = 12.4;		// Percentage of height
     var DEFAULT_WIDTH = 160;
-    var DEFAULT_HEIGHT_PCT = 81.5;	        // Percentage of height
-    var DEFAULT_SCALE_X = 4;
-    var DEFAULT_SCALE_ASPECT_X = 2;
-    var DEFAULT_SCALE_Y = 2;
+    var DEFAULT_HEIGHT = 213;
+    var DEFAULT_ORIGIN_X = 68;
     var VSYNC_TOLERANCE = 16;
     var EXTRA_UPPER_VSYNC_TOLERANCE = 5;
-    var CRT_MODE = 0;
-    var CRT_MODE_NAMES = [ "OFF", "Phosphor", "Phosphor Scanlines", "RGB", "RGB Phosphor" ];
 
-    var crtMode = CRT_MODE < 0 ? 0 : CRT_MODE;
+    var SCALE_STEP = 0.1;
+    var ORIGIN_Y_STEP = 0.4;
 
 
-    init(this);
+    init();
 
 };
 
-jt.Monitor.Controls = {
-    WIDTH_PLUS: 1, HEIGHT_PLUS: 2,
-    WIDTH_MINUS: 3, HEIGHT_MINUS: 4,
-    ORIGIN_X_PLUS: 5, ORIGIN_Y_PLUS: 6,
-    ORIGIN_X_MINUS: 7, ORIGIN_Y_MINUS: 8,
-    SCALE_X_PLUS: 9, SCALE_Y_PLUS: 10,
-    SCALE_X_MINUS: 11, SCALE_Y_MINUS: 12,
-    SIZE_PLUS: 13, SIZE_MINUS: 14,
-    SIZE_DEFAULT: 15,
-    FULLSCREEN: 16,
-    LOAD_CARTRIDGE_FILE: 21, LOAD_CARTRIDGE_FILE_NO_AUTO_POWER: 22,
-    LOAD_CARTRIDGE_URL: 23, LOAD_CARTRIDGE_URL_NO_AUTO_POWER: 24,
-    LOAD_CARTRIDGE_PASTE: 25,
-    CRT_FILTER: 31, CRT_MODES: 32,
-    DEBUG: 41, STATS: 42,
-    EXIT: 51
-};
 
-jt.Monitor.DEFAULT_STARTING_WIDTH = 160;
-jt.Monitor.DEFAULT_STARTING_HEIGHT = 213;

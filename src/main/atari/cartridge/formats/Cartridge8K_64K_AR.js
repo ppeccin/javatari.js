@@ -186,7 +186,7 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
     };
 
     var loadBIOS = function() {
-        var bios = JSZip.compressions.DEFLATE.uncompress(jt.Util.byteStringToUInt8Array(atob(STARPATH_BIOS)));
+        var bios = jt.Util.uncompressStringBase64ToInt8BitArray(STARPATH_BIOS);
         jt.Util.arrayCopy(bios, 0, bytes, BIOS_BANK_OFFSET, BANK_SIZE);
     };
 
@@ -245,14 +245,14 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes))
+            b: jt.Util.compressInt8BitArrayToStringBase64(bytes)
         };
     };
 
     this.loadState = function(state) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
     };
 
 
@@ -262,8 +262,8 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
 
 jt.Cartridge8K_64K_AR.prototype = jt.CartridgeBankedByBusMonitoring.base;
 
-jt.Cartridge8K_64K_AR.createFromSaveState = function(state) {
-    var cart = new jt.Cartridge8K_64K_AR();
+jt.Cartridge8K_64K_AR.recreateFromSaveState = function(state, prevCart) {
+    var cart = prevCart || new jt.Cartridge8K_64K_AR();
     cart.loadState(state);
     return cart;
 };
@@ -278,11 +278,10 @@ jt.Cartridge8K_64K_AR.peekPartNoOnTape = function(tapeContent, tapeOffset) {
 };
 
 jt.Cartridge8K_64K_AR.checkTape = function(rom) {
-    if (jt.Cartridge8K_64K_AR.peekPartNoOnTape(rom.content, 0) != 0) {
-        var ex = new Error("Wrong Supercharger Tape Part ROM!\nPlease load a Full Tape ROM file.");
-        ex.formatDenial = true;
-        throw ex;
-    }
+    if (jt.Cartridge8K_64K_AR.peekPartNoOnTape(rom.content, 0) === 0) return true;
+
+    jt.Util.warning("Wrong Supercharger Tape Part ROM! Please load a Full Tape ROM file");
+    return false;
 };
 
 

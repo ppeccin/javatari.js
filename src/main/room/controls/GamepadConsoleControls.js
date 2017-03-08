@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.GamepadConsoleControls = function(domControls) {
+jt.GamepadConsoleControls = function(consoleControls) {
 "use strict";
 
     this.connect = function(pConsoleControlsSocket) {
@@ -15,7 +15,7 @@ jt.GamepadConsoleControls = function(domControls) {
         supported = !!navigator.getGamepads;
         if (!supported) return;
         this.applyPreferences();
-        initStates();
+        resetStates();
     };
 
     this.powerOff = function() {
@@ -23,10 +23,24 @@ jt.GamepadConsoleControls = function(domControls) {
     };
 
     this.toggleMode = function() {
-        if (!supported) return;
-        initStates();
-        swappedMode = !swappedMode;
-        screen.getMonitor().showOSD("Gamepad input " + (swappedMode ? "Swapped" : "Normal"), true);
+        if (!supported) {
+            screen.showOSD("Joysticks unavailable (not supported by browser)", true, true);
+            return;
+        }
+        ++mode; if (mode > 0) mode = -2;
+
+        if (mode === -2) {
+            joystick0 = joystick1 = null;
+        } else if (mode === -1) {
+            gamepadsDetectionDelay = 60;
+            this.controlsClockPulse();
+        }
+
+        swappedMode = mode === 0;
+        this.applyPreferences();
+        resetStates();
+
+        screen.showOSD("Gamepads " + this.getModeDesc(), true);
     };
 
     this.setPaddleMode = function(state) {
@@ -37,10 +51,11 @@ jt.GamepadConsoleControls = function(domControls) {
 
     this.setP1ControlsMode = function(state) {
         p1ControlsMode = state;
+        this.applyPreferences();
     };
 
-    this.clockPulse = function() {
-        if (!supported) return;
+    this.controlsClockPulse = function() {
+        if (!supported || mode === -2) return;
 
         // Try to avoid polling at gamepads if none are present, as it may be expensive
         // Only try to detect connected gamepads once each 60 clocks (frames)
@@ -52,7 +67,7 @@ jt.GamepadConsoleControls = function(domControls) {
         if (joystick0) {
             if (joystick0.update(gamepads)) {
                 if (joystick0.hasMoved())
-                    update(joystick0, joy0State, joy0Prefs, !swappedMode);
+                    update(joystick0, joy0State, joy0Prefs, joy0Keys);
             } else {
                 joystick0 = null;
                 joystickConnectionMessage(true, false);
@@ -67,7 +82,7 @@ jt.GamepadConsoleControls = function(domControls) {
         if (joystick1) {
             if (joystick1.update(gamepads)) {
                 if (joystick1.hasMoved())
-                    update(joystick1, joy1State, joy1Prefs, swappedMode);
+                    update(joystick1, joy1State, joy1Prefs, joy1Keys);
             } else {
                 joystick1 = null;
                 joystickConnectionMessage(false, false);
@@ -81,34 +96,35 @@ jt.GamepadConsoleControls = function(domControls) {
     };
 
     var joystickConnectionMessage = function (joy0, conn) {
-        screen.getMonitor().showOSD((joy0 ^ p1ControlsMode ^ swappedMode ? "P1" : "P2") + " Gamepad " + (conn ? "connected" : "disconnected"), joy0);
+        screen.showOSD((joy0 ^ p1ControlsMode ^ swappedMode ? "P1" : "P2") + " Gamepad " + (conn ? "connected" : "disconnected"), joy0);
     };
 
     var detectNewJoystick = function(prefs, notPrefs, gamepads) {
         if (!gamepads || gamepads.length === 0) return;
-        // Fixed index detection. Also allow the same gamepad to control both  players
-        if (prefs.device >= 0)   // pref.device == -1 means "auto"
-            return gamepads[prefs.device] ? new Joystick(prefs.device, prefs) : null;
+        // Fixed index detection. Also allow the same gamepad to control both players
+        var device = prefs.device;
+        if (device >= 0)   // pref.device == -1 means "auto"
+            return gamepads[device] && gamepads[device].buttons.length > 0 ? new Joystick(device, prefs) : null;
         // Auto detection
         for (var i = 0, len = gamepads.length; i < len; i++)
-            if (gamepads[i])
+            if (gamepads[i] && gamepads[i].buttons.length > 0)
                 if (i !== notPrefs.device && (!joystick0 || joystick0.index !== i) && (!joystick1 || joystick1.index !== i))
                     // New Joystick found!
                     return new Joystick(i, prefs);
     };
 
-    var initStates = function() {
+    var resetStates = function() {
         joy0State = newControllerState();
         joy1State = newControllerState();
     };
 
-    var update = function(joystick, joyState, joyPrefs, player0) {
+    var update = function (joystick, joyState, joyPrefs, joyKeys) {
         // Paddle Analog
         if (paddleMode && joyPrefs.paddleSens !== 0) {
             var newPosition = joystick.getPaddlePosition();
             if (newPosition !== joyState.xPosition) {
                 joyState.xPosition = newPosition;
-                consoleControlsSocket.controlValueChanged(player0 ^ p1ControlsMode ? controls.PADDLE0_POSITION : controls.PADDLE1_POSITION, newPosition);
+                consoleControlsSocket.controlValueChanged(joyPrefs.player ? controls.PADDLE1_POSITION : controls.PADDLE0_POSITION, newPosition);
             }
         }
         // Joystick direction (Analog or POV) and Paddle Digital (Analog or POV)
@@ -116,105 +132,88 @@ jt.GamepadConsoleControls = function(domControls) {
         if (newDirection === -1 && (!paddleMode || joyPrefs.paddleSens === 0))
             newDirection = joystick.getStickDirection();
         if (newDirection !== joyState.direction) {
-            var newUP = newDirection === 7 || newDirection === 0 || newDirection == 1;
-            var newRIGHT = newDirection === 1 || newDirection === 2 || newDirection === 3;
-            var newDOWN = newDirection === 3 || newDirection === 4 || newDirection === 5;
-            var newLEFT = newDirection === 5 || newDirection === 6 || newDirection === 7;
-            if (player0) {
-                domControls.processKeyEvent(Javatari.preferences.KP0UP, newUP, 0);
-                domControls.processKeyEvent(Javatari.preferences.KP0RIGHT, newRIGHT, 0);
-                domControls.processKeyEvent(Javatari.preferences.KP0DOWN, newDOWN, 0);
-                domControls.processKeyEvent(Javatari.preferences.KP0LEFT, newLEFT, 0);
-            } else {
-                domControls.processKeyEvent(Javatari.preferences.KP1UP, newUP, 0);
-                domControls.processKeyEvent(Javatari.preferences.KP1RIGHT, newRIGHT, 0);
-                domControls.processKeyEvent(Javatari.preferences.KP1DOWN, newDOWN, 0);
-                domControls.processKeyEvent(Javatari.preferences.KP1LEFT, newLEFT, 0);
+            var newUp = false, newRight = false, newDown = false, newLeft = false;
+            switch (newDirection) {
+                case 0: newUp = true; break;
+                case 1: newUp = newRight = true; break;
+                case 2: newRight = true; break;
+                case 3: newDown = newRight = true; break;
+                case 4: newDown = true; break;
+                case 5: newDown = newLeft = true; break;
+                case 6: newLeft = true; break;
+                case 7: newUp = newLeft = true; break;
             }
+            consoleControls.processKey(joyKeys.up.c, newUp);
+            consoleControls.processKey(joyKeys.right.c, newRight);
+            consoleControls.processKey(joyKeys.down.c, newDown);
+            consoleControls.processKey(joyKeys.left.c, newLeft);
             joyState.direction = newDirection;
         }
-        // Joystick button
-        if (joyButtonDetection === joystick) {
-            detectButton();
-            return;
-        } else {
-            var newButton = joystick.getButtonDigital(joyPrefs.button) || joystick.getButtonDigital(joyPrefs.button2);
-            if (newButton !== joyState.button) {
-                domControls.processKeyEvent(player0 ? Javatari.preferences.KP0BUT : Javatari.preferences.KP1BUT, newButton, 0);
-                joyState.button = newButton;
-            }
+        // Joystick Normal Button
+        var newButton = joystick.getButtonDigital(joyPrefs.button);
+        if (newButton !== joyState.button) {
+            consoleControls.processKey(joyKeys.button.c, newButton);
+            joyState.button = newButton;
+        }
+        // Joystick Turbo Button
+        newButton = joystick.getButtonDigital(joyPrefs.buttonT);
+        if (newButton !== joyState.buttonT) {
+            consoleControls.processKey(joyKeys.buttonT.c, newButton);
+            joyState.buttonT = newButton;
         }
         // Other Console controls
         var newSelect = joystick.getButtonDigital(joyPrefs.select);
         if (newSelect !== joyState.select) {
-            domControls.processKeyEvent(jt.DOMConsoleControls.KEY_SELECT, newSelect, 0);
+            consoleControlsSocket.controlStateChanged(controls.SELECT, newSelect);
             joyState.select = newSelect;
         }
         var newReset = joystick.getButtonDigital(joyPrefs.reset);
         if (newReset !== joyState.reset) {
-            domControls.processKeyEvent(jt.DOMConsoleControls.KEY_RESET, newReset, 0);
+            consoleControlsSocket.controlStateChanged(controls.RESET, newReset);
             joyState.reset = newReset;
         }
         var newPause = joystick.getButtonDigital(joyPrefs.pause);
         if (newPause !== joyState.pause) {
-            domControls.processKeyEvent(jt.DOMConsoleControls.KEY_PAUSE, newPause, jt.DOMConsoleControls.KEY_ALT_MASK);
+            consoleControlsSocket.controlStateChanged(controls.PAUSE, newPause);
             joyState.pause = newPause;
         }
         var newFastSpeed = joystick.getButtonDigital(joyPrefs.fastSpeed);
         if (newFastSpeed !== joyState.fastSpeed) {
-            domControls.processKeyEvent(jt.DOMConsoleControls.KEY_FAST_SPEED, newFastSpeed, 0);
+            consoleControlsSocket.controlStateChanged(controls.FAST_SPEED, newFastSpeed);
             joyState.fastSpeed = newFastSpeed;
+        }
+        var newSlowSpeed = joystick.getButtonDigital(joyPrefs.slowSpeed);
+        if (newSlowSpeed !== joyState.slowSpeed) {
+            consoleControlsSocket.controlStateChanged(controls.SLOW_SPEED, newSlowSpeed);
+            joyState.slowSpeed = newSlowSpeed;
         }
     };
 
     var newControllerState = function() {
         return {
             direction: -1,         // CENTER
-            button: false, select: false, reset: false, fastSpeed: false, pause: false,
+            button: false, buttonT: false, select: false, reset: false, fastSpeed: false, pause: false,
             xPosition: -1          // PADDLE POSITION
         }
     };
 
-    var detectButton = function() {
+    this.getModeDesc = function() {
+        switch (mode) {
+            case -1: return "AUTO";
+            case 0:  return "AUTO (swapped)";
+            default: return !supported ? "NOT SUPPORTED" : "DISABLED";
+        }
     };
 
     this.applyPreferences = function() {
-        joy0Prefs = {
-            device         : Javatari.preferences.JP0DEVICE,
-            xAxis          : Javatari.preferences.JP0XAXIS,
-            xAxisSig       : Javatari.preferences.JP0XAXISSIG,
-            yAxis          : Javatari.preferences.JP0YAXIS,
-            yAxisSig       : Javatari.preferences.JP0YAXISSIG,
-            paddleAxis     : Javatari.preferences.JP0PAXIS,
-            paddleAxisSig  : Javatari.preferences.JP0PAXISSIG,
-            button         : Javatari.preferences.JP0BUT,
-            button2        : Javatari.preferences.JP0BUT2,
-            select         : Javatari.preferences.JP0SELECT,
-            reset          : Javatari.preferences.JP0RESET,
-            pause          : Javatari.preferences.JP0PAUSE,
-            fastSpeed      : Javatari.preferences.JP0FAST,
-            paddleCenter   : Javatari.preferences.JP0PCENTER * -190 + 190 - 5,
-            paddleSens     : Javatari.preferences.JP0PSENS * -190,
-            deadzone       : Javatari.preferences.JP0DEADZONE
-        };
-        joy1Prefs = {
-            device         : Javatari.preferences.JP1DEVICE,
-            xAxis          : Javatari.preferences.JP1XAXIS,
-            xAxisSig       : Javatari.preferences.JP1XAXISSIG,
-            yAxis          : Javatari.preferences.JP1YAXIS,
-            yAxisSig       : Javatari.preferences.JP1YAXISSIG,
-            paddleAxis     : Javatari.preferences.JP1PAXIS,
-            paddleAxisSig  : Javatari.preferences.JP1PAXISSIG,
-            button         : Javatari.preferences.JP1BUT,
-            button2        : Javatari.preferences.JP1BUT2,
-            select         : Javatari.preferences.JP1SELECT,
-            reset          : Javatari.preferences.JP1RESET,
-            pause          : Javatari.preferences.JP1PAUSE,
-            fastSpeed      : Javatari.preferences.JP1FAST,
-            paddleCenter   : Javatari.preferences.JP1PCENTER * -190 + 190 - 5,
-            paddleSens     : Javatari.preferences.JP1PSENS * -190,
-            deadzone       : Javatari.preferences.JP1DEADZONE
-        };
+        var p0 = swappedMode ? 1 : 0;
+        var p1 = p0 ? 0 : 1;
+        joy0Prefs = prefs.joystickGamepads[p0];
+        joy0Prefs.player = p1ControlsMode ^ swappedMode? 1 : 0;
+        joy1Prefs = prefs.joystickGamepads[p1];
+        joy1Prefs.player = p1ControlsMode ^ swappedMode ? 0 : 1;
+        joy0Keys = prefs.joystickKeys[p0];
+        joy1Keys = prefs.joystickKeys[p1];
     };
 
 
@@ -225,6 +224,7 @@ jt.GamepadConsoleControls = function(domControls) {
     var consoleControlsSocket;
     var screen;
 
+    var mode = -1;
     var paddleMode = false;
     var swappedMode = false;
     var p1ControlsMode = false;
@@ -235,8 +235,12 @@ jt.GamepadConsoleControls = function(domControls) {
     var joy1State;
     var joy0Prefs;
     var joy1Prefs;
+    var joy0Keys;
+    var joy1Keys;
 
     var joyButtonDetection = null;
+
+    var prefs = Javatari.userPreferences.current;
 
 
     function Joystick(index, prefs) {
@@ -304,11 +308,11 @@ jt.GamepadConsoleControls = function(domControls) {
         var yAxis = prefs.yAxis;
         var xAxisSig = prefs.xAxisSig;
         var yAxisSig = prefs.yAxisSig;
-        var deadzone = prefs.deadzone;
         var paddleAxis = prefs.paddleAxis;
         var paddleAxisSig = prefs.paddleAxisSig;
-        var paddleSens = prefs.paddleSens;
-        var paddleCenter = prefs.paddleCenter;
+        var paddleSens = prefs.paddleSens * -190;
+        var paddleCenter = prefs.paddleCenter * -190 + 190 - 5;
+        var deadzone = prefs.deadzone;
 
         var lastTimestamp = Number.MIN_VALUE;
 

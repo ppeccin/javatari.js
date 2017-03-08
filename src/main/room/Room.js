@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.Room = function(screenElement, consolePanelElement, cartridgeProvided) {
+jt.Room = function(screenElement, consoleStartPowerOn) {
 "use strict";
 
     var self = this;
@@ -10,69 +10,90 @@ jt.Room = function(screenElement, consolePanelElement, cartridgeProvided) {
         buildAndPlugConsole();
     }
 
-    this.powerOn = function(paused) {
-        setPageVisibilityHandling();
+    this.powerOn = function() {
         self.screen.powerOn();
-        if (self.consolePanel) this.consolePanel.powerOn();
         self.speaker.powerOn();
-        self.controls.powerOn();
-        insertCartridgeProvidedIfNoneInserted();
-        if (self.console.getCartridgeSocket().inserted() && !self.console.powerIsOn) self.console.powerOn(paused);
+        self.consoleControls.powerOn();
+        self.setLoading(true);
+        roomPowerOnTime = Date.now();
     };
 
     this.powerOff = function() {
         self.console.powerOff();
-        self.controls.powerOff();
+        self.consoleControls.powerOff();
         self.speaker.powerOff();
         self.screen.powerOff();
-        if (self.consolePanel) this.consolePanel.powerOff();
     };
 
-    var insertCartridgeProvidedIfNoneInserted = function() {
-        if (self.console.getCartridgeSocket().inserted()) return;
-        if (cartridgeProvided) self.console.getCartridgeSocket().insert(cartridgeProvided, false);
+    this.setLoading = function(boo) {
+        if (this.isLoading === boo) return;
+        this.isLoading = boo;
+        this.console.setLoading(this.isLoading);
+        this.screen.setLoading(this.isLoading);
     };
 
-    var buildPeripherals = function() {
+    this.start = function(startAction) {
+        jt.Clock.detectHostNativeFPSAndCallback(function() {
+            afterPowerONDelay(function () {
+                self.setLoading(false);
+                self.screen.start(startAction || consolePowerOnStartAction);
+            });
+        });
+    };
+
+    function afterPowerONDelay(func) {
+        var wait = Javatari.AUTO_POWER_ON_DELAY;
+        if (wait >= 0 && JavatariFullScreenSetup.shouldStartInFullScreen()) wait += 1400;   // Wait a bit more
+        wait -= (Date.now() - roomPowerOnTime);
+        if (wait < 1) wait = 1;
+        setTimeout(func, wait);
+    }
+
+    function consolePowerOnStartAction() {
+        if (consoleStartPowerOn) self.console.userPowerOn(false);
+    }
+
+    function buildPeripherals() {
+        self.peripheralControls = new jt.DOMPeripheralControls();
+        self.consoleControls = new jt.DOMConsoleControls(self.peripheralControls);
+        self.fileDownloader = new jt.FileDownloader();
         self.stateMedia = new jt.LocalStorageSaveStateMedia();
-        self.romLoader = new jt.ROMLoader();
+        self.fileLoader = new jt.FileLoader();
+        self.speaker = new jt.WebAudioSpeaker(screenElement);
         self.screen = new jt.CanvasDisplay(screenElement);
-        self.screen.connectPeripherals(self.romLoader, self.stateMedia);
-        if (consolePanelElement) {
-            self.consolePanel = new jt.ConsolePanel(consolePanelElement);
-            self.consolePanel.connectPeripherals(self.screen, self.romLoader);
-        }
-        self.speaker = new jt.WebAudioSpeaker();
-        self.controls = new jt.DOMConsoleControls();
-        self.controls.connectPeripherals(self.screen, self.consolePanel);
-    };
 
-    var buildAndPlugConsole = function() {
+        self.fileDownloader.connectPeripherals(self.screen);
+        self.screen.connectPeripherals(self.fileLoader, self.fileDownloader, self.consoleControls, self.peripheralControls, self.stateMedia);
+        self.speaker.connectPeripherals(self.screen);
+        self.consoleControls.connectPeripherals(self.screen);
+        self.stateMedia.connectPeripherals(self.fileDownloader);
+        self.peripheralControls.connectPeripherals(self.screen, self.speaker, self.consoleControls, self.fileLoader);
+    }
+
+    function buildAndPlugConsole() {
         self.console = new jt.AtariConsole();
         self.stateMedia.connect(self.console.getSavestateSocket());
-        self.romLoader.connect(self.console.getCartridgeSocket(), self.console.getSavestateSocket());
-        self.screen.connect(self.console.getVideoOutput(), self.console.getControlsSocket(), self.console.getCartridgeSocket());
-        if (self.consolePanel) self.consolePanel.connect(self.console.getControlsSocket(), self.console.getCartridgeSocket(), self.controls);
-        self.speaker.connect(self.console.getAudioOutput());
-        self.controls.connect(self.console.getControlsSocket(), self.console.getCartridgeSocket());
-    };
-
-    var setPageVisibilityHandling = function() {
-        function visibilityChange() {
-            if (document.hidden) self.speaker.mute();
-            else self.speaker.play();
-        }
-        document.addEventListener("visibilitychange", visibilityChange);
-    };
+        self.fileLoader.connect(self.console);
+        self.screen.connect(self.console);
+        self.speaker.connect(self.console.getAudioSocket());
+        self.consoleControls.connect(self.console.getConsoleControlsSocket());
+        self.peripheralControls.connect(self.console.getConsoleControlsSocket(), self.console.getCartridgeSocket());
+        // Cartridge Data operations unavailable self.console.getCartridgeSocket().connectFileDownloader(self.fileDownloader);
+    }
 
 
-    this.screen = null;
-    this.consolePanel = null;
-    this.speaker = null;
-    this.controls = null;
     this.console = null;
+    this.screen = null;
+    this.speaker = null;
+    this.consoleControls = null;
+    this.fileDownloader = null;
     this.stateMedia = null;
-    this.romLoader = null;
+    this.fileLoader = null;
+    this.peripheralControls = null;
+
+    this.isLoading = false;
+
+    var roomPowerOnTime;
 
 
     init();

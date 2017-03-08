@@ -57,22 +57,22 @@ jt.Cartridge16K_E7 = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
+            b: jt.Util.compressInt8BitArrayToStringBase64(bytes),
             bo: bankAddressOffset,
             rs: extraRAMSlice0Active,
             ro: extraRAMSlice1Offset,
-            ra: btoa(jt.Util.uInt8ArrayToByteString(extraRAM))
+            ra: jt.Util.compressInt8BitArrayToStringBase64(extraRAM)
         };
     };
 
     this.loadState = function(state) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
         bankAddressOffset = state.bo;
         extraRAMSlice0Active = state.rs;
         extraRAMSlice1Offset = state.ro;
-        extraRAM = jt.Util.byteStringToUInt8Array(atob(state.ra));
+        extraRAM = jt.Util.uncompressStringBase64ToInt8BitArray(state.ra, extraRAM);
     };
 
 
@@ -99,8 +99,8 @@ jt.Cartridge16K_E7 = function(rom, format) {
 
 jt.Cartridge16K_E7.prototype = jt.Cartridge.base;
 
-jt.Cartridge16K_E7.createFromSaveState = function(state) {
-    var cart = new jt.Cartridge16K_E7();
+jt.Cartridge16K_E7.recreateFromSaveState = function(state, prevCart) {
+    var cart = prevCart || new jt.Cartridge16K_E7();
     cart.loadState(state);
     return cart;
 };

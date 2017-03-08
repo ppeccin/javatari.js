@@ -4,32 +4,30 @@ jt.Util = new function() {
 "use strict";
 
     this.log = function(str) {
-        console.log(">> Javatari: " + str);
+        console.log(">> jt: " + str);
+    };
+    this.warning = function(str) {
+        console.warn(">> jt Warning: " + str);
+    };
+    this.error = function(str) {
+        console.error(">> jt Error: " + str);
     };
 
     this.message = function(str) {
+        console.info(str);
         alert(str);
     };
 
-    this.arraysEqual = function(a, b) {
-        var i = a.length;
-        if (i !== b.length) return false;
-        while (i--)
-            if (a[i] !== b[i]) return false;
-        return true;
+    this.asNormalArray = function(arr) {
+        if (arr instanceof Array) return arr;
+        return this.arrayCopy(arr, 0, new Array(arr.length));
     };
 
-    this.arrayFill = function(arr, val) {
-        var i = arr.length;
-        while(i--)
+    this.arrayFill = function(arr, val, from, to) {
+        if (arr.fill) return arr.fill(val, from, to);       // polyfill for TypedArrays or Arrays with native fill
+        if (from === undefined) from = 0;
+        for (var i = (to === undefined ? arr.length : to) - 1; i >= from; i = i - 1)
             arr[i] = val;
-        return arr;
-    };
-
-    this.arrayFillWithArrayClone = function(arr, val) {
-        var i = arr.length;
-        while(i--)
-            arr[i] = val.slice(0);
         return arr;
     };
 
@@ -42,21 +40,36 @@ jt.Util = new function() {
     };
 
     this.arrayCopy = function(src, srcPos, dest, destPos, length) {
-        var finalSrcPos = srcPos + length;
+        destPos = destPos || 0;
+        var finalSrcPos = length ? srcPos + length : src.length;
         while(srcPos < finalSrcPos)
             dest[destPos++] = src[srcPos++];
+        return dest;
     };
 
-    this.arrayCopyCircularSourceWithStep = function(src, srcPos, srcLength, srcStep, dest, destPos, destLength) {
-        var s = srcPos;
-        var d = destPos;
-        var destEnd = destPos + destLength;
-        while (d < destEnd) {
-            dest[d] = src[s | 0];   // as integer
-            d++;
-            s += srcStep;
-            if (s >= srcLength) s -= srcLength;
+    this.arrayAdd = function(arr, element) {
+        arr[arr.length] = element;
+        return arr;
+    };
+
+    this.arrayRemoveAllElement = function(arr, element) {
+        var i;
+        while ((i = arr.indexOf(element)) >= 0) {
+            arr.splice(i, 1);
         }
+        return arr;
+    };
+
+    this.arraysConcatAll = function(arrs) {
+        var len = 0;
+        for (var i = 0; i < arrs.length; ++i) len += arrs[i].length;
+        var res = new (arrs[0].constructor)(len);   // Same type as the first array
+        var pos = 0;
+        for (i = 0; i < arrs.length; ++i) {
+            this.arrayCopy(arrs[i], 0, res, pos);
+            pos += arrs[i].length;
+        }
+        return res;
     };
 
     this.arrayRemove = function(arr, element) {
@@ -65,23 +78,39 @@ jt.Util = new function() {
         arr.splice(i, 1);
     };
 
+    this.arraysEqual = function(a, b) {
+        var i = a.length;
+        if (i !== b.length) return false;
+        while (i--)
+            if (a[i] !== b[i]) return false;
+        return true;
+    };
+
+
     // Only 8 bit values
-    this.uInt8ArrayToByteString = function(ints) {
+
+    this.reverseInt8 = function(val) {
+        return ((val & 0x01) << 7) | ((val & 0x02) << 5) | ((val & 0x04) << 3) | ((val & 0x08) << 1) | ((val & 0x10) >> 1) | ((val & 0x20) >> 3) | ((val & 0x40) >> 5) | ((val & 0x80) >> 7);
+    };
+
+    this.int8BitArrayToByteString = function(ints, start, length) {
+        if (ints === null || ints == undefined) return ints;
+        if (start === undefined) start = 0;
+        if (length === undefined) length = ints.length - start;
         var str = "";
-        for(var i = 0, len = ints.length; i < len; i++)
+        for(var i = start, finish = start + length; i < finish; i = i + 1)
             str += String.fromCharCode(ints[i] & 0xff);
         return str;
     };
 
-    this.byteStringToUInt8Array = function(str) {
-        var ints = [];
-        for(var i = 0, len = str.length; i < len; i++)
-            ints.push(str.charCodeAt(i) & 0xff);
+    this.byteStringToInt8BitArray = function(str, dest) {
+        if (str === null || str === undefined) return str;
+        if (str == "null") return null; if (str == "undefined") return undefined;
+        var len = str.length;
+        var ints = (dest && dest.length === len) ? dest : new (dest ? dest.constructor : Array)(len);      // Preserve dest type
+        for(var i = 0; i < len; i = i + 1)
+            ints[i] = (str.charCodeAt(i) & 0xff);
         return ints;
-    };
-
-    this.reverseInt8 = function(val) {
-        return ((val & 0x01) << 7) | ((val & 0x02) << 5) | ((val & 0x04) << 3) | ((val & 0x08) << 1) | ((val & 0x10) >> 1) | ((val & 0x20) >> 3) | ((val & 0x40) >> 5) | ((val & 0x80) >> 7);
     };
 
     // Only 32 bit values
@@ -105,6 +134,39 @@ jt.Util = new function() {
         return ints;
     };
 
+    this.storeInt8BitArrayToStringBase64 = function(arr) {
+        if (arr === null || arr === undefined) return arr;
+        if (arr.length === 0) return "";
+        return btoa(this.int8BitArrayToByteString(arr));
+    };
+
+    this.restoreStringBase64ToInt8BitArray = function(str, dest) {
+        if (str === null || str === undefined) return str;
+        if (str == "null") return null; if (str == "undefined") return undefined;
+        if (str == "") return [];
+        return this.byteStringToInt8BitArray(atob(str), dest);
+    };
+
+    this.compressInt8BitArrayToStringBase64 = function(arr, length) {
+        if (arr === null || arr === undefined) return arr;
+        if (arr.length === 0) return "";
+        if (length < arr.length)
+            return this.storeInt8BitArrayToStringBase64(JSZip.compressions.DEFLATE.compress(arr.slice(0, length)));
+        else
+            return this.storeInt8BitArrayToStringBase64(JSZip.compressions.DEFLATE.compress(arr));
+    };
+
+    this.uncompressStringBase64ToInt8BitArray = function(str, dest, diffSize) {
+        if (str === null || str === undefined) return str;
+        if (str == "null") return null; if (str == "undefined") return undefined;
+        if (str == "") return [];
+        var res = JSZip.compressions.DEFLATE.uncompress(atob(str));
+        if (dest && (diffSize || dest.length === res.length))
+            return this.arrayCopy(res, 0, dest);                                                        // Preserve dest
+        else
+            return this.arrayCopy(res, 0, new (dest ? dest.constructor : Array)(res.length));      // Preserve dest type
+    };
+
     this.storeInt32BitArrayToStringBase64 = function(arr) {
         if (arr === null || arr === undefined) return arr;
         if (arr.length === 0) return "";
@@ -116,6 +178,180 @@ jt.Util = new function() {
         if (str == "null") return null; if (str == "undefined") return undefined;
         if (str == "") return [];
         return this.byteStringToInt32BitArray(atob(str), dest);
+    };
+
+    this.compressStringToStringBase64 = function(str) {
+        if (str === null || str === undefined) return str;
+        if (str.length === 0) return str;
+        return this.storeInt8BitArrayToStringBase64(JSZip.compressions.DEFLATE.compress(str));
+    };
+
+    this.uncompressStringBase64ToString = function(str) {
+        if (str === null || str === undefined) return str;
+        if (str == "null") return null; if (str == "undefined") return undefined;
+        if (str == "") return str;
+        return this.int8BitArrayToByteString(JSZip.compressions.DEFLATE.uncompress(atob(str)));
+    };
+
+    this.toHex2 = function(num) {
+        if (num === null || num === undefined) return num;
+        var res = num.toString(16).toUpperCase();
+        if (num >= 0 && (res.length % 2)) return "0" + res;
+        else return res;
+    };
+
+    this.toHex4 = function(num) {
+        if (num === null || num === undefined) return num;
+        var res = num.toString(16).toUpperCase();
+        if (num < 0) return res;
+        switch (res.length) {
+            case 4:
+                return res;
+            case 3:
+                return "0" + res;
+            case 2:
+                return "00" + res;
+            case 1:
+                return "000" + res;
+            default:
+                return res;
+        }
+    };
+
+    this.escapeHtml = function(html) {
+        return html
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;")
+            .replace(/\//g,"&#047;")
+            .replace(/\?/g,"&#063;")
+            .replace(/\-/g, "&#045;")
+            .replace(/\|/g, "&#0124;");
+    };
+
+    this.arrayFind = function(arr, pred) {
+        if (arr.find) return arr.find(pred);
+        for (var i = 0, len = arr.length; i < len; ++i)
+            if (pred(arr[i], i, arr)) return arr[i];
+    };
+
+    this.arrayFindIndex = function(arr, pred) {
+        if (arr.findIndex) return arr.findIndex(pred);
+        for (var i = 0, len = arr.length; i < len; ++i)
+            if (pred(arr[i], i, arr)) return i;
+        return -1;
+    };
+
+    this.arrayIndexOfSubArray = function(arr, subarr, fromIndex, step) {
+        var subLen = subarr.length;
+        var len = arr.length;
+        var st = step || 1;
+
+        Loop: for (var i = fromIndex; (i >= 0) && (i < len); i += st) {
+            for (var j = 0; j < subLen; j = j + 1)
+                if (arr[i + j] !== subarr[j])
+                    continue Loop;
+            return i;
+        }
+        return -1;
+    };
+
+    this.stringCountOccurrences = function(str, char) {
+        var total = 0;
+        for (var i = 0, len = str.length; i < len; ++i)
+            if (str[i] == char) ++total;
+        return total;
+    };
+
+    this.stringStartsWith = function(str, start) {
+        if (str.startsWith) return str.startsWith(start);
+        else return str.substr(0, start.length) === start;
+    };
+
+    this.stringEndsWith = function(str, end) {
+        if (str.endsWith) return str.endsWith(end);
+        else return str.substr(str.length - end.length) === end;
+    };
+
+    this.checkContentIsZIP = function(content) {
+        if (content && content[0] === 0x50 && content[1] === 0x4b)      // PK signature
+            try {
+                return new JSZip(content);
+            } catch(ez) {
+                // Error decompressing files. Abort
+            }
+        return null;
+    };
+
+    this.getZIPFilesSorted = function(zip) {
+        var files = zip.file(/.+/);
+        files.sort(sortByName);
+        return files;
+    };
+
+    this.checkContentIsGZIP = function(content) {
+        if (!content || content[0] !== 0x1f || content[1] !== 0x8b || content[2] !== 0x08) return null;      // GZ Deflate signature
+
+        try {
+            var flags = content[3];
+            var fHCRC =    flags & 0x02;
+            var fEXTRA =   flags & 0x04;
+            var fNAME =    flags & 0x08;
+            var fCOMMENT = flags & 0x10;
+
+            // Skip MTIME, XFL and OS fields, no use...
+            var pos = 10;
+
+            // Skip bytes of optional content
+            if (fEXTRA) {
+                var xLEN = content[pos++] | (content[pos++] << 8);
+                pos += xLEN;
+            }
+            if (fNAME) while (content[pos++] !== 0);
+            if (fCOMMENT) while (content[pos++] !== 0);
+            if (fHCRC) pos += 2;
+
+            return JSZip.compressions.DEFLATE.uncompress(content.slice(pos, content.length - 8));
+        } catch (ez) {
+            return null;      // Error decompressing file. Abort
+        }
+    };
+
+    this.leafFilename = function(fileName) {
+        return (((fileName && fileName.indexOf("/") >= 0) ? fileName.split("/").pop() : fileName) || "").trim();
+    };
+
+    this.leafFilenameNoExtension = function(fileName) {
+        var name = this.leafFilename(fileName);
+        var period = name.lastIndexOf(".");
+        return period <= 0 ? name : name.substr(0, period).trim();
+    };
+
+    this.leafFilenameOnlyExtension = function(fileName) {
+        var name = this.leafFilename(fileName);
+        var period = name.lastIndexOf(".");
+        return period <= 0 ? "" : name.substr(period + 1).trim();
+    };
+
+    function sortByName(a, b) {
+        return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    }
+
+    this.dump = function(arr, from, chunk, quant) {
+        var res = "";
+        var p = from || 0;
+        quant = quant || 1;
+        for(var i = 0; i < quant; i++) {
+            for(var c = 0; c < chunk; c++) {
+                var val = arr[p++];
+                res = res + (val != undefined ? val.toString(16, 2) + " " : "? ");
+            }
+            res = res + "   ";
+        }
+
+        console.log(res);
     };
 
     this.browserInfo = function() {
@@ -140,6 +376,104 @@ jt.Util = new function() {
         };
     };
 
+    this.userLanguage = function() {
+        return ((navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage || "en-US").trim();
+    };
+
+    this.isOfficialHomepage = function () {
+        var loc = window.location;
+        return loc
+            && (loc.hostname.toLowerCase() === "javatari.org")
+            && (loc.port === "" || loc.port === "80");
+    };
+
+    this.isTouchDevice = function() {
+        return ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+    };
+
+    this.isMobileDevice = function() {
+        return this.isTouchDevice() && (/android|blackberry|iemobile|ipad|iphone|ipod|opera mini|webos/i).test(navigator.userAgent);
+    };
+
+    this.isIOSDevice = function() {
+        return (/ipad|iphone|ipod/i).test(navigator.userAgent);
+    };
+
+    this.isBrowserStandaloneMode = function() {
+        return navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
+    };
+
+    this.onTapOrMouseDown = function(element, handler) {
+        this.addEventsListener(element, this.isTouchDevice() ? "touchstart mousedown" : "mousedown", handler);
+    };
+
+    this.onTapOrMouseDownWithBlock = function(element, handler) {
+        function onTapOrMouseDown(e) {
+            handler(e);
+            return blockEvent(e);
+        }
+        this.addEventsListener(element, this.isTouchDevice() ? "touchstart mousedown" : "mousedown", onTapOrMouseDown);
+    };
+
+    this.onTapOrMouseUpWithBlock = function(element, handler) {
+        function onTapOrMouseUp(e) {
+            handler(e);
+            return blockEvent(e);
+        }
+        this.addEventsListener(element, this.isTouchDevice() ? "touchstart mouseup" : "mouseup", onTapOrMouseUp);
+    };
+
+    this.onTapOrMouseDownWithBlockUIG = function(element, handler) {
+        function onTapOrMouseDownUIG(e) {
+            // If not User Initiated Gesture needed on the event TARGET handle only on touchstart,
+            // otherwise handle only touchend or mousedown if no touch events fired
+            if (e.type === "touchstart" && e.target.jtNeedsUIG) return;
+            if (e.type === "touchend" && !e.target.jtNeedsUIG) return;
+            // Fire original event and block
+            handler(e);
+            return blockEvent(e);
+        }
+        this.addEventsListener(element, this.isTouchDevice() ? "touchstart touchend mousedown" : "mousedown", onTapOrMouseDownUIG);
+    };
+
+    function blockEvent(e) {
+        e.stopPropagation();
+        if (e.cancelable) e.preventDefault();
+        return false;
+    }
+    this.blockEvent = blockEvent;
+
+    this.addEventsListener = function(element, events, handler, capture) {
+        events = events.split(" ");
+        for (var i = 0; i < events.length; ++i)
+            if (events[i]) element.addEventListener(events[i], handler, capture);
+    };
+
+    this.removeEventsListener = function(element, events, handler, capture) {
+        events = events.split(" ");
+        for (var i = 0; i < events.length; ++i)
+            if (events[i]) element.removeEventListener(events[i], handler, capture);
+    };
+
+    this.insertCSS = function(css) {
+        var style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = css;
+        document.head.appendChild(style);
+    };
+
+    this.log2 = function(x) {
+        return Math.log(x) / Math.log(2);
+    };
+
+    this.exp2 = function(x) {
+        return Math.pow(2, x);
+    };
+
+    this.performanceNow = function() {
+        return this.performanceNow.startOffset ? Date.now() - this.performanceNow.startOffset : window.performance.now();
+    };
+
 };
 
-
+if (!window.performance || !window.performance.now) jt.Util.performanceNow.startOffset = Date.now();

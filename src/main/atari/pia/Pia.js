@@ -114,10 +114,6 @@ jt.Pia = function() {
         }
     };
 
-    this.controlValueChanged = function(control, position) {
-        // No positional controls here
-    };
-
     this.controlsStateReport = function(report) {
         //  Only Panel Controls are visible from outside
         report[controls.BLACK_WHITE] = (SWCHB & 0x08) === 0;

@@ -63,24 +63,24 @@ jt.Cartridge8K_512K_3E = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
+            b: jt.Util.compressInt8BitArrayToStringBase64(bytes),
             bo: bankAddressOffset,
             sm: selectableSliceMaxBank,
             fo: fixedSliceAddressOffset,
             ro: extraRAMBankAddressOffset,
-            ra: btoa(jt.Util.uInt8ArrayToByteString(extraRAM))
+            ra: jt.Util.compressInt8BitArrayToStringBase64(extraRAM)
         };
     };
 
     this.loadState = function(state) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
         bankAddressOffset = state.bo;
         selectableSliceMaxBank = state.sm;
         fixedSliceAddressOffset = state.fo;
         extraRAMBankAddressOffset = state.ro;
-        extraRAM = jt.Util.byteStringToUInt8Array(atob(state.ra));
+        extraRAM = jt.Util.uncompressStringBase64ToInt8BitArray(state.ra, extraRAM);
     };
 
 
@@ -106,8 +106,8 @@ jt.Cartridge8K_512K_3E = function(rom, format) {
 
 jt.Cartridge8K_512K_3E.prototype = jt.CartridgeBankedByBusMonitoring.base;
 
-jt.Cartridge8K_512K_3E.createFromSaveState = function(state) {
-    var cart = new jt.Cartridge8K_512K_3E();
+jt.Cartridge8K_512K_3E.recreateFromSaveState = function(state, prevCart) {
+    var cart = prevCart || new jt.Cartridge8K_512K_3E();
     cart.loadState(state);
     return cart;
 };

@@ -51,7 +51,7 @@ jt.Cartridge8K_E0 = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
+            b: jt.Util.compressInt8BitArrayToStringBase64(bytes),
             s0: slice0AddressOffset,
             s1: slice1AddressOffset,
             s2: slice2AddressOffset
@@ -61,7 +61,7 @@ jt.Cartridge8K_E0 = function(rom, format) {
     this.loadState = function(state) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
         slice0AddressOffset = state.s0;
         slice1AddressOffset = state.s1;
         slice2AddressOffset = state.s2;
@@ -84,8 +84,8 @@ jt.Cartridge8K_E0 = function(rom, format) {
 
 jt.Cartridge8K_E0.prototype = jt.Cartridge.base;
 
-jt.Cartridge8K_E0.createFromSaveState = function(state) {
-    var cart = new jt.Cartridge8K_E0();
+jt.Cartridge8K_E0.recreateFromSaveState = function(state, prevCart) {
+    var cart = prevCart || new jt.Cartridge8K_E0();
     cart.loadState(state);
     return cart;
 };

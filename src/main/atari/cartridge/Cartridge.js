@@ -22,6 +22,10 @@ jt.Cartridge = function() {
         // Writing to ROMs is possible, but nothing is changed
     };
 
+    this.getDataDesc = function() {
+        return null;
+    };
+
     this.needsBusMonitoring = function() {
         return false;
     };
@@ -37,18 +41,6 @@ jt.Cartridge = function() {
     };
 
     this.audioClockPulse = function() {
-    };
-
-
-     // Controls interface  ---------------------------------
-
-    this.controlStateChanged = function(control, state) {
-    };
-
-    this.controlValueChanged = function(control, position) {
-    };
-
-    this.controlsStateReport = function(report) {
     };
 
 

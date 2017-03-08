@@ -7,8 +7,12 @@ jt.LocalStorageSaveStateMedia = function() {
         socket.connectMedia(this);
     };
 
-    this.registerForDownloadElement = function (element) {
-        downloadLinkElementParent = element;
+    this.connectPeripherals = function(pFileDownloader) {
+        fileDownloader = pFileDownloader;
+    };
+
+    this.isSlotUsed = function(slot) {
+        return localStorage["javatarisave" + slot] !== undefined;
     };
 
     this.saveState = function(slot, state) {
@@ -23,25 +27,25 @@ jt.LocalStorageSaveStateMedia = function() {
 
     this.saveStateFile = function(fileName, state) {
         var data = buildDataFromState(state);
-        return data && startDownload(fileName || "JavatariSave", data);
+        if (data) fileDownloader.startDownloadBinary((fileName || "Javatari SaveState") + SAVE_STATE_FILE_EXTENSION, data, "System State file");
     };
 
     this.loadStateFile = function(data) {
         return buildStateFromData(data);
     };
 
-    this.saveResourceToFile = function(entry, data) {
+    this.saveResource = function(entry, data) {
         try {
             var res = data && JSON.stringify(data);
-            return saveToLocalStorage(entry, res);
+            return saveToLocalStorage("res" + entry, res);
         } catch(ex) {
             // give up
         }
     };
 
-    this.loadResourceFromFile = function(entry) {
+    this.loadResource = function(entry) {
         try {
-            var res = loadFromLocalStorage(entry);
+            var res = loadFromLocalStorage("res" + entry);
             return res && JSON.parse(res);
         } catch(ex) {
             // give up
@@ -52,7 +56,8 @@ jt.LocalStorageSaveStateMedia = function() {
         try {
             localStorage["javatari" + entry] = data;
             return true;
-        } catch (e) {
+        } catch (ex) {
+            jt.Util.error(ex);
             return false;
         }
     };
@@ -60,7 +65,8 @@ jt.LocalStorageSaveStateMedia = function() {
     var loadFromLocalStorage = function(entry) {
         try {
             return localStorage["javatari" + entry];
-        } catch (e) {
+        } catch (ex) {
+            jt.Util.warning(ex);
             // give up
         }
     };
@@ -69,6 +75,7 @@ jt.LocalStorageSaveStateMedia = function() {
         try {
             return SAVE_STATE_IDENTIFIER + JSON.stringify(state);
         } catch(ex) {
+            jt.Util.error(ex);
             // give up
         }
     };
@@ -76,50 +83,31 @@ jt.LocalStorageSaveStateMedia = function() {
     var buildStateFromData = function (data) {
         try {
             var id;
-            if (data instanceof Array)
-                id = jt.Util.uInt8ArrayToByteString(data.slice(0, SAVE_STATE_IDENTIFIER.length));
-            else
+            if (typeof data == "string")
                 id = data.substr(0, SAVE_STATE_IDENTIFIER.length);
+            else
+                id = jt.Util.int8BitArrayToByteString(data, 0, SAVE_STATE_IDENTIFIER.length);
 
             // Check for the identifier
-            if (id !== SAVE_STATE_IDENTIFIER) return;
+            if (id !== SAVE_STATE_IDENTIFIER && id !== SAVE_STATE_IDENTIFIER_OLD) return;
 
-            var stateData = data.slice(SAVE_STATE_IDENTIFIER.length);
-            if (stateData instanceof Array)
-                stateData = jt.Util.uInt8ArrayToByteString(stateData);
+            var stateData;
+            if (typeof data == "string")
+                stateData = data.slice(SAVE_STATE_IDENTIFIER.length);
+            else
+                stateData = jt.Util.int8BitArrayToByteString(data, SAVE_STATE_IDENTIFIER.length);
 
             return stateData && JSON.parse(stateData);
-        } catch(e) {
+        } catch(ex) {
+            jt.Util.error(ex);
         }
     };
 
-    var startDownload = function (fileName, data) {
-        if (!downloadLinkElement) createDownloadLinkElement();
 
-        // Release previous URL
-        if (downloadLinkElement.href) (window.URL || window.webkitURL).revokeObjectURL(downloadLinkElement.href);
+    var fileDownloader;
 
-        if (fileName) fileName = fileName + SAVE_STATE_FILE_EXTENSION;
-        var blob = new Blob([data], {type: "data:application/octet-stream"});
-        downloadLinkElement.download = fileName.trim();
-        downloadLinkElement.href = (window.URL || window.webkitURL).createObjectURL(blob);
-        downloadLinkElement.click();
-
-        return true;
-    };
-
-    var createDownloadLinkElement = function () {
-        downloadLinkElement = document.createElement('a');
-        downloadLinkElement.style.display = "none";
-        downloadLinkElement.href = "#";
-        downloadLinkElementParent.appendChild(downloadLinkElement);
-    };
-
-
-    var downloadLinkElement;
-    var downloadLinkElementParent;
-
-    var SAVE_STATE_IDENTIFIER = "javatarijsstate!";
+    var SAVE_STATE_IDENTIFIER = String.fromCharCode(0, 0) + "javataristate!";     // char 0 so browsers like Safari think the file is binary...  :-(
+    var SAVE_STATE_IDENTIFIER_OLD = "javatarijsstate!";
     var SAVE_STATE_FILE_EXTENSION = ".jst";
 
 };

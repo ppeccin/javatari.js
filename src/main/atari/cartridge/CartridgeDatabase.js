@@ -14,14 +14,11 @@ jt.CartridgeDatabase = function() {
         return bestOption.createCartridgeFromRom(rom);
     };
 
-    this.createCartridgeFromSaveState = function(saveState) {
+    this.recreateCartridgeFromSaveState = function(saveState, cartridge) {
         var cartridgeFormat = jt.CartridgeFormats[saveState.f];
-        if (!cartridgeFormat) {
-            var ex = new Error ("Unsupported ROM Format: " + saveState.f);
-            ex.javatari = true;
-            throw ex;
-        }
-        return cartridgeFormat.createCartridgeFromSaveState(saveState);
+        if (!cartridgeFormat) throw new Error ("Unsupported ROM Format: " + saveState.f);
+        if (cartridge && cartridge.format !== cartridgeFormat) cartridge = null;       // Only possible to reuse cartridge if the format is the same!
+        return cartridgeFormat.recreateCartridgeFromSaveState(saveState, cartridge);
     };
 
     this.produceInfo = function(rom) {
@@ -59,12 +56,6 @@ jt.CartridgeDatabase = function() {
             }
         }
 
-        // If no Format could be found, throw error
-        if (formatOptions.length === 0) {
-            var ex = denialEx || new Error ("Unsupported ROM Format. Size: " + rom.content.length);
-            ex.javatari = true;
-            throw ex;
-        }
         // Sort according to priority
         formatOptions.sort(function formatOptionComparator(a, b) {
            return (a.priorityBoosted || a.priority) - (b.priorityBoosted || b.priority);
@@ -151,7 +142,7 @@ jt.CartridgeDatabase = function() {
     };
 
     var produceCartridgeLabel = function(name) {
-        return name.split(/(\(|\[)/)[0].trim();   //  .toUpperCase();   // TODO Validade
+        return name.split(/(\(|\[)/)[0].trim();   //  .toUpperCase();   // TODO Validate
     };
 
     var formatMatchesByHint = function(formatName, hint) {

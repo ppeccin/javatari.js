@@ -1,41 +1,72 @@
-<!-- THIS IS ONLY FOR DEVELOPMENT AND TESTING PURPOSES -->
-<!-- DO NOT USE FOR PRODUCTION! PLEASE SEE /release IN THE PROJECT ROOT -->
-
 <!DOCTYPE html>
 <html>
 
     <head lang="en">
+
+        <!-- DEBUG -->
+        <!--<script src="http://10.42.10.128:9090/target/target-script-min.js#Javatari"></script>-->
+
         <meta charset="UTF-8">
-        <title>Javatari.js Test</title>
+        <meta name="viewport" content="width = device-width, user-scalable = yes">
+
+        <title>Javatari New</title>
+        <meta name="description" content="Javatari - The online Atari 2600 emulator">
+        <link rel="icon" type="image/png" sizes="192x192" href="../src/runtime/images/files/logo-icon192.png">
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <link rel="manifest" href="manifest.webapp">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="apple-touch-icon" sizes="512x512" href="../src/runtime/images/files/logo-icon512.png">
+        
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                background: #f4f4f4;
+            }
+            @media only screen and (orientation: landscape) and (max-device-width: 767px) {
+                #javatari {
+                    max-width: 75%;
+                }
+            }
+        </style>
+
+        <script src="../src/main/room/screen/FullScreenSetup.js"></script>
+
     </head>
 
-    <body style="background: #e0e0d0">
-
-        <div style="margin: 10px auto 0; min-height: 594px;">
-            <div id="javatari-screen" style="margin: 0 auto; box-shadow: 2px 2px 10px rgb(60, 60, 60);"></div>
-            <div id="javatari-console-panel" style="margin: 0 auto; box-shadow: 2px 2px 10px rgb(60, 60, 60);"></div>
-        </div>
+    <body>
 
         <script>
-            Javatari_IMAGES_PATH = "../src/main/images/";
+            JAVATARI_IMAGES_PATH = "../src/runtime/images/files/";
         </script>
 
         <script src="../src/main/Javatari.js"></script>
+        <script src="../src/main/room/screen/FullScreenSetup.js"></script>
         <script src="../src/main/util/Util.js"></script>
         <script src="../src/main/util/MD5.js"></script>
         <script src="../src/main/util/ZIP.js"></script>
+        <script src="../src/main/util/EmbeddedFiles.js"></script>
+        <script src="../src/main/util/MultiDownloader.js"></script>
+        <script src="../src/main/util/MultiFileReader.js"></script>
+        <script src="../src/main/atari/video/VideoStandard.js"></script>
+        <script src="../src/main/atari/video/VideoSignal.js"></script>
+        <script src="../src/main/atari/audio/AudioSignal.js"></script>
         <script src="../src/main/atari/cpu/M6502.js"></script>
         <script src="../src/main/atari/pia/Ram.js"></script>
         <script src="../src/main/atari/pia/Pia.js"></script>
-        <script src="../src/main/atari/tia/VideoStandard.js"></script>
-        <script src="../src/main/atari/tia/TiaVideoSignal.js"></script>
-        <script src="../src/main/atari/tia/TiaAudioSignal.js"></script>
+        <script src="../src/main/atari/tia/TiaPalettes.js"></script>
+        <script src="../src/main/atari/tia/TiaAudio.js"></script>
         <script src="../src/main/atari/tia/TiaAudioChannel.js"></script>
         <script src="../src/main/atari/tia/Tia.js"></script>
-        <script src="../src/main/atari/console/Bus.js"></script>
         <script src="../src/main/atari/console/Clock.js"></script>
-        <script src="../src/main/atari/controls/ConsoleControls.js"></script>
+        <script src="../src/main/atari/console/Bus.js"></script>
         <script src="../src/main/atari/console/AtariConsole.js"></script>
+        <script src="../src/main/atari/controls/KeyboardKeys.js"></script>
+        <script src="../src/main/atari/controls/JoystickButtons.js"></script>
+        <script src="../src/main/atari/controls/ConsoleControls.js"></script>
         <script src="../src/main/atari/cartridge/ROM.js"></script>
         <script src="../src/main/atari/cartridge/CartridgeInfoLibrary.js"></script>
         <script src="../src/main/atari/cartridge/Cartridge.js"></script>
@@ -58,21 +89,43 @@
         <script src="../src/main/atari/cartridge/formats/Cartridge8K_UA.js"></script>
         <script src="../src/main/atari/cartridge/CartridgeFormats.js"></script>
         <script src="../src/main/atari/cartridge/CartridgeDatabase.js"></script>
-        <script src="../src/main/room/controls/Keys.js"></script>
-        <script src="../src/main/room/Preferences.js"></script>
+        <script src="../src/main/images/Images.js"></script>
+        <script src="../src/main/room/files/FileLoader.js"></script>
+        <script src="../src/main/room/files/FileDownloader.js"></script>
+        <script src="../src/main/room/controls/DOMKeys.js"></script>
+        <script src="../src/main/room/controls/GamepadButtons.js"></script>
+        <script src="../src/main/room/controls/TouchControls.js"></script>
         <script src="../src/main/room/controls/GamepadConsoleControls.js"></script>
+        <script src="../src/main/room/controls/DOMTouchControls.js"></script>
         <script src="../src/main/room/controls/DOMConsoleControls.js"></script>
-        <script src="../src/main/room/screen/DOMMonitorControls.js"></script>
+        <script src="../src/main/room/screen/ScreenGUI.js"></script>
         <script src="../src/main/room/screen/Monitor.js"></script>
-        <script src="../src/main/room/screen/CanvasDisplay.js"></script>
         <script src="../src/main/room/screen/ConsolePanel.js"></script>
+        <script src="../src/main/room/screen/CanvasDisplay.js"></script>
+        <script src="../src/main/room/screen/dialogs/SaveStateDialog.js"></script>
+        <script src="../src/main/room/screen/dialogs/QuickOptionsDialog.js"></script>
+        <script src="../src/main/room/screen/settings/SettingsGUI.js"></script>
+        <script src="../src/main/room/screen/settings/Settings.js"></script>
         <script src="../src/main/room/speaker/WebAudioSpeaker.js"></script>
         <script src="../src/main/room/savestate/LocalStorageSaveStateMedia.js"></script>
-        <script src="../src/main/room/cartridge/ROMLoader.js"></script>
-        <script src="../src/main/room/settings/Settings.js"></script>
-        <script src="../src/main/room/settings/SettingsGUI.js"></script>
+        <script src="../src/main/room/controls/PeripheralControls.js"></script>
+        <script src="../src/main/room/controls/DOMPeripheralControls.js"></script>
         <script src="../src/main/room/Room.js"></script>
-        <script src="../src/main/room/Launcher.js"></script>
+        <script src="../src/main/userprefs/UserPreferences.js"></script>
+        <!--<script src="../src/runtime/images/EmbeddedImages.js"></script>-->
+        <script src="../src/main/Configurator.js"></script>
+        <script src="../src/main/Launcher.js"></script>
+
+        <div id="javatari" style="text-align: center; margin: 0 auto; padding: 2px 12px 0;">
+            <div id="javatari-screen" style="box-shadow: 2px 2px 10px rgba(0, 0, 0, .7);"></div>
+        </div>
+
+        <script>
+
+            Javatari.AUTO_POWER_ON_DELAY = 0;
+            // Javatari.CARTRIDGE_URL = "roms/Pitfall.bin";
+
+        </script>
 
     </body>
 

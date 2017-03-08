@@ -1,11 +1,11 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-// TODO Audio problem in PAL (skipping forward)
-// TODO NUSIZ during scan with HMOVE not correct. Will kill the scan in progress
+// TODO NUSIZ during scan with HMOVE not correct. We kill the scan in progress
 // TODO Starfield Effect not implemented
 // TODO PAL Sinch too aggressive
+// TODO Vsynch lines count affects vertical position!
 
-jt.Tia = function(pCpu, pPia) {
+jt.Tia = function(pCpu, pPia, audioSocket) {
     "use strict";
 
     var self = this;
@@ -23,7 +23,7 @@ jt.Tia = function(pCpu, pPia) {
         initLatchesAtPowerOn();
         hMoveLateHit = false;
         changeClock = changeClockPrevLine = -1;
-        audioSignal.signalOn();
+        audioSignal.powerOn();
         powerOn = true;
     };
 
@@ -31,12 +31,10 @@ jt.Tia = function(pCpu, pPia) {
         powerOn = false;
         // Let monitors know that the signals are off
         videoSignal.signalOff();
-        audioSignal.signalOff();
+        audioSignal.powerOff();
     };
 
     this.frame = function() {
-        if (debugPause && debugPauseMoreFrames-- <= 0) return;
-
         do {
             // Begin line
             clock = 0;
@@ -62,8 +60,6 @@ jt.Tia = function(pCpu, pPia) {
             finishLine();
         } while(!videoSignal.nextLine(linePixels, vSyncOn));
 
-        // Ask for a refresh of the frame
-        audioSignal.finishFrame();
         videoSignal.finishFrame();
     };
 
@@ -80,8 +76,8 @@ jt.Tia = function(pCpu, pPia) {
     };
 
     this.setVideoStandard = function(standard) {
-        videoSignal.standard = standard;
-        palette = standard === jt.VideoStandard.NTSC ? jt.VideoStandard.NTSC.palette : jt.VideoStandard.PAL.palette;
+        videoSignal.setVideoStandard(standard);
+        palette = jt.TiaPalettes[standard.name];
     };
 
     this.debug = function(level) {
@@ -92,6 +88,10 @@ jt.Tia = function(pCpu, pPia) {
         pia.debug = debug;
         if (debug) debugSetColors();
         else debugRestoreColors();
+    };
+
+    this.getDebugNoCollisions = function() {
+        return debugNoCollisions;
     };
 
     this.read = function(address) {
@@ -1310,19 +1310,11 @@ jt.Tia = function(pCpu, pPia) {
         switch (control) {
             case controls.DEBUG:
                 self.debug(debugLevel + 1); return;
+            case controls.SHOW_INFO:
+                videoSignal.toggleShowInfo(); return;
             case controls.NO_COLLISIONS:
                 debugNoCollisions = !debugNoCollisions;
                 videoSignal.showOSD(debugNoCollisions ? "Collisions OFF" : "Collisions ON", true);
-                return;
-            case controls.PAUSE:
-                debugPause = !debugPause; debugPauseMoreFrames = 1;
-                videoSignal.showOSD(debugPause ? "PAUSE" : "RESUME", true);
-                return;
-            case controls.FRAME:
-                if (debugPause) debugPauseMoreFrames = 1;
-                return;
-            case controls.TRACE:
-                cpu.trace = !cpu.trace; return;
         }
     };
 
@@ -1333,10 +1325,6 @@ jt.Tia = function(pCpu, pPia) {
             case controls.PADDLE1_POSITION:
                 paddle1Position = position; return;
         }
-    };
-
-    this.controlsStateReport = function(report) {
-        //  No TIA controls visible outside by now
     };
 
 
@@ -1659,8 +1647,6 @@ jt.Tia = function(pCpu, pPia) {
     var debugLevel = 0;
     var debugNoCollisions = false;
     var debugPixels = new Uint32Array(LINE_WIDTH);
-    var debugPause = false;
-    var debugPauseMoreFrames = 0;
 
     var controlsButtonsLatched = false;
     var controlsJOY0ButtonPressed = false;
@@ -1690,10 +1676,10 @@ jt.Tia = function(pCpu, pPia) {
 
     var missileCenterOffsetsPerPlayerSize = new Uint8Array([ 5, 5, 5, 5, 5, 10, 5, 18 ]);
 
-    var videoSignal = new jt.TiaVideoSignal();
+    var videoSignal = new jt.VideoSignal();
     var palette;
 
-    var audioSignal = new jt.TiaAudioSignal();
+    var audioSignal = new jt.TiaAudio(audioSocket);
 
 
     // Read registers -------------------------------------------

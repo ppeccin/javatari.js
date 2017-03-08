@@ -32,7 +32,7 @@ jt.Cartridge8K_0840 = function(rom, format) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
+            b: jt.Util.compressInt8BitArrayToStringBase64(bytes),
             bo: bankAddressOffset
         };
     };
@@ -40,7 +40,7 @@ jt.Cartridge8K_0840 = function(rom, format) {
     this.loadState = function(state) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
         bankAddressOffset = state.bo;
     };
 
@@ -58,8 +58,8 @@ jt.Cartridge8K_0840 = function(rom, format) {
 
 jt.Cartridge8K_0840.prototype = jt.CartridgeBankedByBusMonitoring.base;
 
-jt.Cartridge8K_0840.createFromSaveState = function(state) {
-    var cart = new jt.Cartridge8K_0840();
+jt.Cartridge8K_0840.recreateFromSaveState = function(state, prevCart) {
+    var cart = prevCart || new jt.Cartridge8K_0840();
     cart.loadState(state);
     return cart;
 };

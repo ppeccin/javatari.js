@@ -82,17 +82,17 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
     var readMemoryFromFlash = function() {
         bus.getTia().getVideoOutput().showOSD("Reading from Cartridge Flash Memory...", true);
         if (saveStateSocket) {
-            var data = saveStateSocket.getMedia().loadResourceFromFile(flashMemoryResourceName());
-            if (data) harmonyFlashMemory = jt.Util.byteStringToUInt8Array(atob(data));
+            var data = saveStateSocket.getMedia().loadResource(flashMemoryResourceName());
+            if (data) harmonyFlashMemory = jt.Util.uncompressStringBase64ToInt8BitArray(data, harmonyFlashMemory);
         }
-        extraRAM = harmonyFlashMemory.slice(0);
+        jt.Util.arrayCopy(harmonyFlashMemory, 0, extraRAM);
     };
 
     var saveMemoryToFlash = function() {
         bus.getTia().getVideoOutput().showOSD("Writing to Cartridge Flash Memory...", true);
-        harmonyFlashMemory = extraRAM.slice(0);
+        jt.Util.arrayCopy(extraRAM, 0, harmonyFlashMemory);
         if (saveStateSocket)
-            saveStateSocket.getMedia().saveResourceToFile(flashMemoryResourceName(), btoa(jt.Util.uInt8ArrayToByteString(harmonyFlashMemory)));
+            saveStateSocket.getMedia().saveResource(flashMemoryResourceName(), jt.Util.compressInt8BitArrayToStringBase64(harmonyFlashMemory));
     };
 
     var detectFlashOperationCompletion = function() {
@@ -119,11 +119,11 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
         return {
             f: this.format.name,
             r: this.rom.saveState(),
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes)),
+            b: jt.Util.compressInt8BitArrayToStringBase64(bytes),
             rs: romStartAddress,
             bo: bankAddressOffset,
             tb: topBankSwitchAddress,
-            e: btoa(jt.Util.uInt8ArrayToByteString(extraRAM)),
+            e: jt.Util.compressInt8BitArrayToStringBase64(extraRAM),
             ho: harmonyFlashOpInProgress,
             ht: harmonyFlashOpStartTime
         };
@@ -132,11 +132,11 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
     this.loadState = function(state) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
         romStartAddress = state.rs || 0;
         bankAddressOffset = state.bo;
         topBankSwitchAddress =  state.tb;
-        extraRAM = jt.Util.byteStringToUInt8Array(atob(state.e));
+        extraRAM = jt.Util.uncompressStringBase64ToInt8BitArray(state.e, extraRAM);
         harmonyFlashOpInProgress = state.ho || 0;
         harmonyFlashOpStartTime = Date.now();   // Always as if operation just started
     };
@@ -168,8 +168,8 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
 
 jt.Cartridge24K_28K_32K_FA2.prototype = jt.Cartridge.base;
 
-jt.Cartridge24K_28K_32K_FA2.createFromSaveState = function(state) {
-    var cart = new jt.Cartridge24K_28K_32K_FA2();
+jt.Cartridge24K_28K_32K_FA2.recreateFromSaveState = function(state, prevCart) {
+    var cart = prevCart || new jt.Cartridge24K_28K_32K_FA2();
     cart.loadState(state);
     return cart;
 };

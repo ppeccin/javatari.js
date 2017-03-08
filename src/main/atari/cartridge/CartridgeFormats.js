@@ -12,8 +12,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function (rom) {
             return new jt.Cartridge4K(rom, this);
         },
-        createCartridgeFromSaveState: function (state) {
-            return jt.Cartridge4K.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge4K.recreateFromSaveState(state, cart);
         }
     },
 
@@ -27,8 +27,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function (rom) {
             return new jt.Cartridge2K_CV(rom, this);
         },
-        createCartridgeFromSaveState: function (state) {
-            return jt.Cartridge2K_CV.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge2K_CV.recreateFromSaveState(state, cart);
         }
     },
 
@@ -42,8 +42,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function (rom) {
             return new jt.Cartridge8K_E0(rom, this);
         },
-        createCartridgeFromSaveState: function (state) {
-            return jt.Cartridge8K_E0.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge8K_E0.recreateFromSaveState(state, cart);
         }
     },
 
@@ -57,8 +57,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function (rom) {
             return new jt.Cartridge64K_F0(rom, this);
         },
-        createCartridgeFromSaveState: function (state) {
-            return jt.Cartridge64K_F0.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge64K_F0.recreateFromSaveState(state, cart);
         }
     },
 
@@ -72,8 +72,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function (rom) {
             return new jt.Cartridge8K_FE(rom, this);
         },
-        createCartridgeFromSaveState: function (state) {
-            return jt.Cartridge8K_FE.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge8K_FE.recreateFromSaveState(state, cart);
         }
     },
 
@@ -87,8 +87,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function (rom) {
             return new jt.Cartridge16K_E7(rom, this);
         },
-        createCartridgeFromSaveState: function (state) {
-            return jt.Cartridge16K_E7.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge16K_E7.recreateFromSaveState(state, cart);
         }
     },
 
@@ -102,8 +102,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0ff8, null, 128);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.CartridgeBankedByMaskedRange.recreateFromSaveState(state, cart);
         }
     },
 
@@ -117,8 +117,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0ff6, null, 128);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.CartridgeBankedByMaskedRange.recreateFromSaveState(state, cart);
         }
     },
 
@@ -132,8 +132,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0ff4, null, 128);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.CartridgeBankedByMaskedRange.recreateFromSaveState(state, cart);
         }
     },
 
@@ -154,8 +154,8 @@ jt.CartridgeFormats = {
             // ROM is only 28K. The first 1024 bytes are custom ARM content. ROM begins after that
             return new jt.Cartridge24K_28K_32K_FA2(rom, this, 1024);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge24K_28K_32K_FA2.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge24K_28K_32K_FA2.recreateFromSaveState(state, cart);
         },
         cuMagicWord: [0x1e, 0xab, 0xad, 0x10]
     },
@@ -170,8 +170,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge24K_28K_32K_FA2(rom, this);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge24K_28K_32K_FA2.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge24K_28K_32K_FA2.recreateFromSaveState(state, cart);
         }
     },
 
@@ -185,8 +185,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0ff8, true, 256);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.CartridgeBankedByMaskedRange.recreateFromSaveState(state, cart);
         }
     },
 
@@ -200,8 +200,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0fe0, null, 128);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.CartridgeBankedByMaskedRange.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.CartridgeBankedByMaskedRange.recreateFromSaveState(state, cart);
         }
     },
 
@@ -215,8 +215,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge10K_DPCa(rom, this);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge10K_DPCa.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge10K_DPCa.recreateFromSaveState(state, cart);
         }
     },
 
@@ -230,8 +230,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge8K_512K_3F(rom, this);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge8K_512K_3F.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge8K_512K_3F.recreateFromSaveState(state, cart);
         }
     },
 
@@ -245,8 +245,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge8K_512K_3E(rom, this);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge8K_512K_3E.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge8K_512K_3E.recreateFromSaveState(state, cart);
         }
     },
 
@@ -260,8 +260,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge64K_X07(rom, this);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge64K_X07.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge64K_X07.recreateFromSaveState(state, cart);
         }
     },
 
@@ -275,8 +275,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge8K_0840(rom, this);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge8K_0840.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge8K_0840.recreateFromSaveState(state, cart);
         }
     },
 
@@ -290,8 +290,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge8K_UA(rom, this);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge8K_UA.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge8K_UA.recreateFromSaveState(state, cart);
         }
     },
 
@@ -305,8 +305,8 @@ jt.CartridgeFormats = {
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge8K_256K_SB(rom, this);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge8K_256K_SB.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge8K_256K_SB.recreateFromSaveState(state, cart);
         }
     },
 
@@ -319,15 +319,14 @@ jt.CartridgeFormats = {
             if (rom.content.length % jt.Cartridge8K_64K_AR.PART_SIZE === 0 && rom.content.length / jt.Cartridge8K_64K_AR.PART_SIZE >= 1
                 && rom.content.length / jt.Cartridge8K_64K_AR.PART_SIZE <= 8) {
                 // Check if the content starts with Part 0
-                jt.Cartridge8K_64K_AR.checkTape(rom);      // Will throw exception if not a Tape Start or Full Tape
-                return this;
+                if (jt.Cartridge8K_64K_AR.checkTape(rom)) return this;       // Accepts only a Tape Start or Full Tape
             }
         },
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge8K_64K_AR(rom, this);
         },
-        createCartridgeFromSaveState: function(state) {
-            return jt.Cartridge8K_64K_AR.createFromSaveState(state);
+        recreateCartridgeFromSaveState: function(state, cart) {
+            return jt.Cartridge8K_64K_AR.recreateFromSaveState(state, cart);
         }
     }
 

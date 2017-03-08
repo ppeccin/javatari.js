@@ -41,12 +41,12 @@ jt.Ram = function() {
 
     this.saveState = function() {
         return {
-            b: btoa(jt.Util.uInt8ArrayToByteString(bytes))
+            b: jt.Util.storeInt8BitArrayToStringBase64(bytes)
         };
     };
 
     this.loadState = function(state) {
-        bytes = jt.Util.byteStringToUInt8Array(atob(state.b));
+        bytes = jt.Util.restoreStringBase64ToInt8BitArray(state.b, bytes);
     };
 
 
