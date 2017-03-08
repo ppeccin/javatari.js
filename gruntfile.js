@@ -4,88 +4,36 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON("package.json"),
 
         clean: {
-            init: ["temp", "release"],
+            init: ["temp", "release/alpha/4.0"],
             finish: ["temp"]
         },
 
-        copy: {
-            main: {
-                files: [
-                    {src: ["src/release/*"], dest: "release/", expand: true, flatten: true, filter: "isFile"},
-                    {src: ["src/main/images/*"], dest: "release/javatari/", expand: true, flatten: true, filter: "isFile"}
-                ]
-            }
-        },
-
         concat: {
-            part: {
+            emuPart: {
                 src: [
-                    "src/main/util/Util.js",
-                    "src/main/atari/cpu/M6502.js",
-                    "src/main/atari/pia/Ram.js",
-                    "src/main/atari/pia/Pia.js",
-                    "src/main/atari/tia/VideoStandard.js",
-                    "src/main/atari/tia/TiaVideoSignal.js",
-                    "src/main/atari/tia/TiaAudioSignal.js",
-                    "src/main/atari/tia/TiaAudioChannel.js",
-                    "src/main/atari/tia/Tia.js",
-                    "src/main/atari/console/Bus.js",
-                    "src/main/atari/console/Clock.js",
-                    "src/main/atari/controls/ConsoleControls.js",
-                    "src/main/atari/console/AtariConsole.js",
-                    "src/main/atari/cartridge/ROM.js",
-                    "src/main/atari/cartridge/CartridgeInfoLibrary.js",
-                    "src/main/atari/cartridge/Cartridge.js",
-                    "src/main/atari/cartridge/formats/Cartridge4K.js",
-                    "src/main/atari/cartridge/formats/Cartridge2K_CV.js",
-                    "src/main/atari/cartridge/formats/CartridgeBankedByMaskedRange.js",
-                    "src/main/atari/cartridge/formats/Cartridge8K_E0.js",
-                    "src/main/atari/cartridge/formats/Cartridge64K_F0.js",
-                    "src/main/atari/cartridge/formats/Cartridge8K_FE.js",
-                    "src/main/atari/cartridge/formats/Cartridge16K_E7.js",
-                    "src/main/atari/cartridge/formats/Cartridge10K_DPCa.js",
-                    "src/main/atari/cartridge/formats/Cartridge24K_28K_32K_FA2.js",
-                    "src/main/atari/cartridge/formats/CartridgeBankedByBusMonitoring.js",
-                    "src/main/atari/cartridge/formats/Cartridge8K_512K_3F.js",
-                    "src/main/atari/cartridge/formats/Cartridge8K_512K_3E.js",
-                    "src/main/atari/cartridge/formats/Cartridge8K_256K_SB.js",
-                    "src/main/atari/cartridge/formats/Cartridge8K_64K_AR.js",
-                    "src/main/atari/cartridge/formats/Cartridge64K_X07.js",
-                    "src/main/atari/cartridge/formats/Cartridge8K_0840.js",
-                    "src/main/atari/cartridge/formats/Cartridge8K_UA.js",
-                    "src/main/atari/cartridge/CartridgeFormats.js",
-                    "src/main/atari/cartridge/CartridgeDatabase.js",
-                    "src/main/util/MD5.js",
-                    "src/main/util/ZIP.js",
-                    "src/main/room/controls/Keys.js",
-                    "src/main/room/Preferences.js",
-                    "src/main/room/controls/GamepadConsoleControls.js",
-                    "src/main/room/controls/DOMConsoleControls.js",
-                    "src/main/room/screen/DOMMonitorControls.js",
-                    "src/main/room/screen/Monitor.js",
-                    "src/main/room/screen/CanvasDisplay.js",
-                    "src/main/room/screen/ConsolePanel.js",
-                    "src/main/room/speaker/WebAudioSpeaker.js",
-                    "src/main/room/savestate/LocalStorageSaveStateMedia.js",
-                    "src/main/room/cartridge/ROMLoader.js",
-                    "src/main/room/settings/Settings.js",
-                    "src/main/room/settings/SettingsGUI.js",
-                    "src/main/room/Room.js",
-                    "src/main/room/Launcher.js"
+                    "src/main/room/screen/FullScreenSetup.js"
                 ],
-                dest: "temp/javatari.part.concat.js"
+                dest: "temp/javatari.part.js"
             },
-            final: {
+            emuFinal: {
                 src: [
                     "src/main/Javatari.js",
                     "temp/javatari.part.min.js"
                 ],
-                dest: "release/javatari/javatari.js"
+                dest: "temp/javatari.js"
+            },
+           standalone: {
+                src: [
+                    "src/runtime/standalone/index.part1.html",
+                    "temp/javatari.js",
+                    "src/runtime/standalone/index.part2.html"
+                ],
+                dest: "temp/index.html"
             }
         },
 
         uglify: {
-            part: {
+            emuPart: {
                 options: {
                     maxLineLen: 7900,
                     mangle: {
@@ -111,8 +59,26 @@ module.exports = function (grunt) {
                     }
                 },
                 files: {
-                    "temp/javatari.part.min.js": ["temp/javatari.part.concat.js"]
+                    "temp/javatari.part.min.js": ["temp/javatari.part.js"]
                 }
+            }
+        },
+
+        copy: {
+            standalone: {
+                files: [
+                    {src: "temp/index.html", dest: "release/alpha/4.0/standalone", expand: true, flatten: true, filter: "isFile"},
+                    {src: "src/runtime/standalone/cache.manifest", dest: "release/alpha/4.0/standalone", expand: true, flatten: true, filter: "isFile"},
+                    {src: "src/runtime/standalone/manifest.webapp", dest: "release/alpha/4.0/standalone", expand: true, flatten: true, filter: "isFile"},
+                    {src: "src/runtime/images/files/logo-icon192.png", dest: "release/alpha/4.0/standalone/images", expand: true, flatten: true, filter: "isFile"},
+                    {src: "src/runtime/images/files/logo-icon512.png", dest: "release/alpha/4.0/standalone/images", expand: true, flatten: true, filter: "isFile"}
+                ]
+            },
+            embedded: {
+                files: [
+                    {src: "src/runtime/embedded/index.html", dest: "release/alpha/4.0/embedded", expand: true, flatten: true, filter: "isFile"},
+                    {src: "temp/javatari.js", dest: "release/alpha/4.0/embedded", expand: true, flatten: true, filter: "isFile"}
+                ]
             }
         }
     });
@@ -121,5 +87,15 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-copy");
-    grunt.registerTask("default", ["clean:init", "copy:main", "concat:part", "uglify:part", "concat:final", "clean:finish"]);
+    grunt.registerTask("default", [
+        "clean:init",
+        "concat:emuPart",
+        "uglify:emuPart",
+        "concat:emuFinal",
+        "concat:standalone",
+        "copy:standalone",
+        "copy:embedded",
+        "clean:finish"
+    ]);
+
 };

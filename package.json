@@ -1,7 +1,7 @@
 {
-  "name" : "Javatari.js",
-  "title" : "Javatari.js",
-  "version" : "1.0.0",
+  "name" : "Javatari",
+  "title" : "Javatari - The online Atari 2600 emulator",
+  "version" : "4.0.900",
   "devDependencies": {
     "grunt": "",
     "grunt-contrib-clean" : "",
