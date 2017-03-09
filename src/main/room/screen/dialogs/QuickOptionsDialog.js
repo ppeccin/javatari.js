@@ -15,6 +15,11 @@ jt.QuickOptionsDialog = function(mainElement, consoleControls, peripheralControl
         visible = true;
         dialog.classList.add("jt-show");
         dialog.focus();
+
+        var availHeight = mainElement.clientHeight - jt.ScreenGUI.BAR_HEIGHT - 20;      //  bar - tolerance
+        var height = dialog.clientHeight;
+        var scale = height < availHeight ? 1 : availHeight / height;
+        dialog.style.transform = "translateY(-" + ((jt.ScreenGUI.BAR_HEIGHT / 2) | 0) + "px) scale(" + scale.toFixed(4) + ")";
     };
 
     this.hide = function() {

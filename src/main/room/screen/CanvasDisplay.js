@@ -90,9 +90,11 @@ jt.CanvasDisplay = function(mainElement) {
         if (!canvasContext) createCanvasContext();
         canvasContext.drawImage(
             image,
-            0, 0, sourceWidth, sourceHeight,
-            0, 0, targetWidth, targetHeight
+            0, 0,
+            canvas.width, canvas.height
         );
+
+        //console.log("" + sourceWidth + "x" + sourceHeight + " > " + targetWidth + "x" + targetHeight);
     };
 
     this.videoSignalOff = function() {
@@ -131,7 +133,7 @@ jt.CanvasDisplay = function(mainElement) {
 
     this.openQuickOptionsDialog = function() {
         closeAllOverlays();
-        if (!quickOtionsDialog) quickOtionsDialog = new jt.QuickOptionsDialog(canvasOuter, consoleControlsSocket, peripheralControls);
+        if (!quickOtionsDialog) quickOtionsDialog = new jt.QuickOptionsDialog(fsElementCenter, consoleControlsSocket, peripheralControls);
         quickOtionsDialog.show();
     };
 
@@ -170,7 +172,7 @@ jt.CanvasDisplay = function(mainElement) {
     };
 
     this.displayScale = function(pAspectX, pScaleY) {
-        aspectX = pAspectX;
+        aspectX = pAspectX * 2;   // Fixed internal aspectX of 2
         scaleY = pScaleY;
         updateScale();
     };
@@ -423,8 +425,8 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function updateCanvasContentSize() {
-        canvas.width = targetWidth;
-        canvas.height = targetHeight;
+        canvas.width = targetWidth * CANVAS_SIZE_FACTOR;
+        canvas.height = targetHeight * CANVAS_SIZE_FACTOR;
         canvasContext = null;
     }
 
@@ -438,7 +440,7 @@ jt.CanvasDisplay = function(mainElement) {
         // Use mode 1 by default (canvas imageSmoothing OFF and CSS image-rendering set to smooth)
         // iOS browser bug: freezes after some time if imageSmoothing = true. OK if we use the setting above
         // Firefox on Android bug: image looks terrible if imageSmoothing = false. Lets use mode 2 or 3, or let browser default
-        return isMobileDevice && !isIOSDevice && browserName === "FIREFOX" ? 0 : 0;
+        return isMobileDevice && !isIOSDevice && browserName === "FIREFOX" ? 0 : 1;
     }
 
     function setCRTMode(mode) {
@@ -1288,7 +1290,7 @@ jt.CanvasDisplay = function(mainElement) {
     var debugMode = false;
     var isLoading = false;
 
-    var aspectX = Javatari.SCREEN_DEFAULT_ASPECT;
+    var aspectX = Javatari.SCREEN_DEFAULT_ASPECT * 2;   // Fixed internal aspectX of 2
     var scaleY = 1.0;
 
     var mousePointerLocked = false;
@@ -1309,6 +1311,8 @@ jt.CanvasDisplay = function(mainElement) {
     var settingsButton;
 
     var mediaButtonBackYOffsets = [ -138 -25 -25, -138 -25, -138 ];             //[ -51, -26, -1 ];
+
+    var CANVAS_SIZE_FACTOR = 1;
 
     var OSD_TIME = 3000;
     var CURSOR_HIDE_FRAMES = 180;

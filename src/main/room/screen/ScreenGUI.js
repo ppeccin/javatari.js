@@ -133,17 +133,13 @@ html.jt-started #` + Javatari.SCREEN_ELEMENT_ID + ` {
 
 #jt-screen-scroll-message {
     position: absolute;
-    left: 0;
-    right: 0;
     top: -50%;
-    width: 0;
+    left: 50%;
     height: 0;
     padding: 0;
-    margin: 0 auto;
     font-size: 16px;
     line-height: 28px;
     color: hsl(0, 0%, 4%);
-    white-space: nowrap;
     background: hsl(0, 0%, 92%);
     border-radius: 15px;
     box-shadow: 2px 2px 9px rgba(0, 0, 0, 0.7);
@@ -153,7 +149,11 @@ html.jt-started #` + Javatari.SCREEN_ELEMENT_ID + ` {
 }
 html.jt-full-screen-scroll-hack #jt-screen-fs.jt-scroll-message #jt-screen-scroll-message {
     opacity: 1;
+    right: 0;
+    width: 0;
     bottom: 23%;
+    margin: 0 auto;
+    white-space: nowrap;
     width: 215px;
     height: 56px;
     padding: 13px 20px;
@@ -392,8 +392,8 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
 
 
 #jt-console-panel {
+   display: none;
    position: absolute;
-   visibility: hidden;
    bottom: -` + (jt.ConsolePanel.DEFAULT_HEIGHT + 1) + `px;
    left: 50%;
    transform: translate(-` + ((jt.ConsolePanel.DEFAULT_WIDTH / 2) | 0) + `px, 0);
@@ -402,7 +402,7 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
 }
 
 html.jt-show-console-panel #jt-console-panel {
-    visibility: visible;
+    display: block;
 }
 html.jt-full-screen #jt-console-panel {
     visibility: hidden;
@@ -982,7 +982,7 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
 }
 
 .jt-console-panel-cart-file {
-    left: 171px;
+    left: 173px;
     bottom: 5px;
     width: 31px;
     height: 30px;
