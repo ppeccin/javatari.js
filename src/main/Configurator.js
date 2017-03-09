@@ -44,6 +44,7 @@ jt.Configurator = {
             Javatari.SCREEN_CRT_MODE |= 0;
             Javatari.SCREEN_DEFAULT_SCALE = parseFloat(Javatari.SCREEN_DEFAULT_SCALE);
             Javatari.SCREEN_DEFAULT_ASPECT = parseFloat(Javatari.SCREEN_DEFAULT_ASPECT);
+            Javatari.SCREEN_CANVAS_SIZE = Javatari.SCREEN_CANVAS_SIZE | 0;
             Javatari.SCREEN_CONTROL_BAR |= 0;
             Javatari.SCREEN_FORCE_HOST_NATIVE_FPS |= 0;
             Javatari.SCREEN_VSYNCH_MODE |= 0;

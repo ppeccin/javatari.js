@@ -73,21 +73,28 @@ jt.AtariConsole = function() {
 
         if (!self.powerIsOn) return;
 
-        var pulls = videoPulldown.cadence[--videoPulldownStep];
-        if (videoPulldownStep === 0) videoPulldownStep = videoPulldown.steps;
-
-        while(pulls > 0) {
-            pulls--;
-            if (userPaused && userPauseMoreFrames-- <= 0) return;
-
-            if (videoStandardAutoDetectionInProgress) videoStandardAutoDetectionTry();
-
-            tia.frame();
+        if (videoPulldown.steps === 1) {
+            // Simple pulldown with 1:1 cadence
+            videoFrame();
+        } else {
+            // Complex pulldown
+            var pulls = videoPulldown.cadence[--videoPulldownStep];
+            if (videoPulldownStep === 0) videoPulldownStep = videoPulldown.steps;
+            while(pulls > 0) {
+                pulls--;
+                videoFrame();
+            }
         }
 
         // Finish audio signal (generate any missing samples to adjust to sample rate)
         audioSocket.audioFinishFrame();
     };
+
+    function videoFrame() {
+        if (userPaused && userPauseMoreFrames-- <= 0) return;
+        if (videoStandardAutoDetectionInProgress) videoStandardAutoDetectionTry();
+        tia.frame();
+    }
 
     this.getCartridgeSocket = function() {
         return cartridgeSocket;

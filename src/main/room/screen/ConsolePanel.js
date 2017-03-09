@@ -1,15 +1,8 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.ConsolePanel = function(screen) {
+jt.ConsolePanel = function(panelElement) {
 "use strict";
 
-    function init() {
-        setupMain();
-        setupButtons();
-        setupCartridgeLabel();
-    }
-
-    var visibleControls;
     this.connectPeripherals = function(pFileLoader, pPeripheralControls) {
         peripheralControls = pPeripheralControls;
         pFileLoader.registerForDnD(panelElement);
@@ -19,20 +12,21 @@ jt.ConsolePanel = function(screen) {
         controlsSocket = pControlsSocket;
     };
 
-    this.powerOn = function() {
-        panelElement.style.visibility = "visible";
-        refreshControls();
-        refreshCartridge()
+    this.setActive = function(pActive) {
+        active = pActive;
+        if (active) {
+            if (!powerButton) create();
+            refreshCartridge();
+            updateVisibleControlsState();
+        }
+        document.documentElement.classList.toggle("jt-console-panel-active", active);
     };
 
-    this.powerOff = function() {
-        panelElement.style.visibility = "hidden";
-        panelElement.style.display = "none";
-    };
-
-    this.keyControlsInputElements = function() {
-        return [panelElement];
-    };
+    function create() {
+        setupMain();
+        setupButtons();
+        setupCartridgeLabel();
+    }
 
     var refreshControls = function() {
         // Controls State
@@ -70,11 +64,9 @@ jt.ConsolePanel = function(screen) {
     };
 
     var setupMain = function () {
-        panelElement = document.getElementById("jt-console-panel");
         panelElement.innerHTML = jt.ScreenGUI.htmlConsolePanel;
         delete jt.ScreenGUI.htmlConsolePanel;
 
-        document.documentElement.classList.add("jt-show-console-panel");
         var screenElement = document.getElementById(Javatari.SCREEN_ELEMENT_ID);
         if (screenElement.style.boxShadow) panelElement.style.boxShadow = screenElement.style.boxShadow;     // Use same shadow as main screen :-)
     };
@@ -167,11 +159,11 @@ jt.ConsolePanel = function(screen) {
     var controls = jt.ConsoleControls;
 
     this.controlStateChanged = function(control, state) {
-        if (visibleControls[control]) updateVisibleControlsState();
+        if (active && visibleControls[control]) updateVisibleControlsState();
     };
 
     this.controlsStatesRedefined = function () {
-        updateVisibleControlsState();
+        if (active) updateVisibleControlsState();
     };
 
 
@@ -179,17 +171,14 @@ jt.ConsolePanel = function(screen) {
 
     this.cartridgeInserted = function(cartridge) {
         cartridgeInserted = cartridge;
-        refreshCartridge();
+        if (active) refreshCartridge();
     };
 
 
-    var panelElement;
+    var active = false;
 
     var peripheralControls;
-
-    var controlsSocket;
-    var controlsStateReport = {};
-
+    var controlsSocket, controlsStateReport = {};
     var cartridgeInserted;
 
     var powerButton;
@@ -205,7 +194,7 @@ jt.ConsolePanel = function(screen) {
 
     var cartLabel;
 
-    visibleControls = {};
+    var visibleControls = {};
     visibleControls[controls.POWER] = 1;
     visibleControls[controls.BLACK_WHITE] = 1;
     visibleControls[controls.SELECT] = 1;
@@ -219,10 +208,11 @@ jt.ConsolePanel = function(screen) {
     var	DEFAULT_CARTRIDGE_BACK_COLOR =   "#101010";
     var	DEFAULT_CARTRIDGE_BORDER_COLOR = "transparent";
 
-
-    init();
-
 };
 
 jt.ConsolePanel.DEFAULT_WIDTH = 465;
 jt.ConsolePanel.DEFAULT_HEIGHT = 137;
+
+jt.ConsolePanel.shouldStartActive = function() {
+    return !Javatari.SCREEN_CONSOLE_PANEL_DISABLED && (Javatari.CONSOLE_PANEL_ELEMENT_ID === -1 || document.getElementById(Javatari.CONSOLE_PANEL_ELEMENT_ID));
+};

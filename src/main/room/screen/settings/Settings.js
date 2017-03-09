@@ -294,8 +294,6 @@ jt.SettingsDialog = function(parentElement, consoleControls) {
     var page = "CONSOLE";
     var visible = false;
 
-    var keyboardConfigurator, portsConfigurator;
-
     var prefs = Javatari.userPreferences.current;
 
     var KEY_ESC = jt.DOMKeys.VK_ESCAPE.c;

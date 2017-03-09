@@ -13,9 +13,9 @@ jt.CanvasDisplay = function(mainElement) {
         jt.Util.insertCSS(jt.ScreenGUI.css());
         delete jt.ScreenGUI.css;
         setupMain();
-        setupConsolePanel();
         setupBar();
         setupFullscreen();
+        consolePanel = new jt.ConsolePanel(consolePanelElement);
         monitor = new jt.Monitor(self);
     }
 
@@ -24,19 +24,19 @@ jt.CanvasDisplay = function(mainElement) {
         monitor.connect(atariConsole.getVideoOutput());
         consoleControlsSocket = atariConsole.getConsoleControlsSocket();
         cartridgeSocket = atariConsole.getCartridgeSocket();
-        if (consolePanel) consolePanel.connect(atariConsole.getConsoleControlsSocket());
+        consolePanel.connect(consoleControlsSocket);
     };
 
-    this.connectPeripherals = function(fileLoader, pFileDownloader, pConsoleControls, pPeripheralControls, pStateMedia) {
-        fileLoader.registerForDnD(fsElement);
-        fileLoader.registerForFileInputElement(fsElement);
+    this.connectPeripherals = function(pFileLoader, pFileDownloader, pConsoleControls, pPeripheralControls, pStateMedia) {
+        pFileLoader.registerForDnD(fsElement);
+        pFileLoader.registerForFileInputElement(fsElement);
         fileDownloader = pFileDownloader;
         fileDownloader.registerForDownloadElement(fsElement);
         peripheralControls = pPeripheralControls;
         consoleControls = pConsoleControls;
         consoleControls.addKeyInputElement(fsElement);
         stateMedia = pStateMedia;
-        if (consolePanel) consolePanel.connectPeripherals(fileLoader, pPeripheralControls);
+        consolePanel.connectPeripherals(pFileLoader, peripheralControls);
     };
 
     this.powerOn = function() {
@@ -49,11 +49,13 @@ jt.CanvasDisplay = function(mainElement) {
             setFullscreenState(true);
             setEnterFullscreenByAPIOnFirstTouch();
         }
-        if (consolePanel) consolePanel.powerOn();
+        if (jt.ConsolePanel.shouldStartActive()) {
+            consolePanelActive = true;
+            consolePanel.setActive(true);
+        }
     };
 
     this.powerOff = function() {
-        if (consolePanel) consolePanel.powerOff();
         document.documentElement.remove("jt-started");
     };
 
@@ -140,6 +142,15 @@ jt.CanvasDisplay = function(mainElement) {
     this.openLoadFileDialog = function() {
         peripheralControls.controlActivated(jt.PeripheralControls.AUTO_LOAD_FILE);
         return false;
+    };
+
+    this.toggleConsolePanel = function() {
+        consolePanelActive = !consolePanelActive;
+        consolePanel.setActive(consolePanelActive);
+        if (isFullscreen) this.requestReadjust(true);
+        else updateScale();
+        if (consolePanelActive) showBar();
+        else cursorHideFrameCountdown = CURSOR_HIDE_FRAMES;
     };
 
     this.toggleMenuByKey = function() {
@@ -284,7 +295,7 @@ jt.CanvasDisplay = function(mainElement) {
     };
 
     this.cartridgeInserted = function(cart) {
-        if (consolePanel) consolePanel.cartridgeInserted(cart);
+        consolePanel.cartridgeInserted(cart);
     };
 
     this.controlsModeStateUpdate = function () {
@@ -302,11 +313,11 @@ jt.CanvasDisplay = function(mainElement) {
     };
 
     this.controlStateChanged = function(control, state) {
-        if (consolePanel) consolePanel.controlStateChanged(control, state);
+        consolePanel.controlStateChanged(control, state);
     };
 
     this.controlsStatesRedefined = function() {
-        if (consolePanel) consolePanel.controlsStatesRedefined();
+        consolePanel.controlsStatesRedefined();
     };
 
     this.setLoading = function(state) {
@@ -407,6 +418,8 @@ jt.CanvasDisplay = function(mainElement) {
         updateBarWidth(canvasWidth);
         if (!signalIsOn) updateLogoScale();
         if (settingsDialog && settingsDialog.isVisible()) settingsDialog.position();
+        if (consolePanelActive) updateConsolePanelScale(canvasWidth);
+
     }
 
     function updateBarWidth(canvasWidth) {
@@ -415,13 +428,14 @@ jt.CanvasDisplay = function(mainElement) {
         buttonsBar.classList.toggle("jt-narrow", fixedWidth < NARROW_WIDTH);
     }
 
-    function updateKeyboardWidth(maxWidth) {
-        var availWidth = Math.min(1024, maxWidth);       // Limit to 1024px
-        var width = virtualKeyboardMode === 1 ? VIRTUAL_KEYBOARD_WIDE_WIDTH : VIRTUAL_KEYBOARD_NARROW_WIDTH;
-        var scale = availWidth / width;
-        virtualKeyboardElement.style.width = "" + width + "px";
-        virtualKeyboardElement.style.transform = "translateX(-50%) scale(" + scale.toFixed(8) + ")";
-        return { w: availWidth, h: Math.ceil(VIRTUAL_KEYBOARD_HEIGHT * scale) };
+    function calculateConsolePanelRect(maxWidth) {
+        var scale = Math.min(1, maxWidth / jt.ConsolePanel.DEFAULT_WIDTH);
+        return { w: Math.ceil(jt.ConsolePanel.DEFAULT_WIDTH * scale) , h: Math.ceil(jt.ConsolePanel.DEFAULT_HEIGHT * scale) };
+    }
+
+    function updateConsolePanelScale(maxWidth) {
+        var scale = Math.min(1, maxWidth / jt.ConsolePanel.DEFAULT_WIDTH);
+        consolePanelElement.style.transform = "translateX(-50%) scale(" + scale.toFixed(8) + ")";
     }
 
     function updateCanvasContentSize() {
@@ -528,6 +542,7 @@ jt.CanvasDisplay = function(mainElement) {
         logoMessageOK = document.getElementById("jt-logo-message-ok");
         logoMessageOKText = document.getElementById("jt-logo-message-ok-text");
         scrollMessage = document.getElementById("jt-screen-scroll-message");
+        consolePanelElement = document.getElementById("jt-console-panel");
 
         suppressContextMenu(mainElement);
         preventDrag(logoImage);
@@ -615,7 +630,7 @@ jt.CanvasDisplay = function(mainElement) {
             scaleDownButton.classList.add("jt-full-screen-hidden");
         }
 
-        var consolePanelButton = addBarButton("jt-bar-keyboard", -83, -25, "Toggle Console Panel", jt.PeripheralControls.SCREEN_TOGGLE_VIRTUAL_KEYBOARD);
+        var consolePanelButton = addBarButton("jt-bar-console-panel", -83, -25, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE);
         consolePanelButton.classList.add("jt-full-screen-only");
 
         logoButton = addBarButton("jt-bar-logo", -414, -162, "About Javatari", jt.PeripheralControls.SCREEN_OPEN_ABOUT);
@@ -896,7 +911,7 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function hideBar() {
-        if ((BAR_AUTO_HIDE || isFullscreen) && !barMenuActive && !virtualKeyboardMode) {
+        if ((BAR_AUTO_HIDE || isFullscreen) && !barMenuActive && !consolePanelActive) {
             hideBarMenu();
             buttonsBar.classList.add("jt-hidden");
         }
@@ -1129,11 +1144,11 @@ jt.CanvasDisplay = function(mainElement) {
         if (readjustScreeSizeChanged(force)) {
             if (isFullscreen) {
                 var isLandscape = readjustScreenSize.w > readjustScreenSize.h;
-                var keyboardRect = virtualKeyboardMode && updateKeyboardWidth(readjustScreenSize.w);
-                buttonsBarDesiredWidth = isLandscape ? virtualKeyboardMode ? keyboardRect.w : 0 : -1;
+                var consolePanelRect = consolePanelActive && calculateConsolePanelRect(readjustScreenSize.w);
+                buttonsBarDesiredWidth = isLandscape ? consolePanelActive ? consolePanelRect.w : 0 : -1;
                 var winH = readjustScreenSize.h;
-                if (!isLandscape || virtualKeyboardMode) winH -= jt.ScreenGUI.BAR_HEIGHT + 2;
-                if (virtualKeyboardMode) winH -= keyboardRect.h + 2;
+                if (!isLandscape || consolePanelActive) winH -= jt.ScreenGUI.BAR_HEIGHT + 2;
+                if (consolePanelActive) winH -= consolePanelRect.h + 2;
                 monitor.displayScale(aspectX, displayOptimalScaleY(readjustScreenSize.w, winH));
             } else {
                 buttonsBarDesiredWidth = -1;
@@ -1223,13 +1238,6 @@ jt.CanvasDisplay = function(mainElement) {
         document.addEventListener("visibilitychange", visibilityChange);
     }
 
-    function setupConsolePanel() {
-        if (Javatari.SCREEN_CONSOLE_PANEL_DISABLED
-            || (Javatari.CONSOLE_PANEL_ELEMENT_ID !== -1 && !document.getElementById(Javatari.CONSOLE_PANEL_ELEMENT_ID))) return;
-
-        consolePanel = new jt.ConsolePanel(self);
-    }
-
 
     var afterMessageAction;
 
@@ -1258,6 +1266,7 @@ jt.CanvasDisplay = function(mainElement) {
     var viewportTag, viewPortOriginalTag, viewPortOriginalContent;
 
     var consolePanel;
+    var consolePanelElement;
     var settingsDialog;
     var saveStateDialog;
     var quickOtionsDialog;
@@ -1269,8 +1278,7 @@ jt.CanvasDisplay = function(mainElement) {
     var canvasImageRenderingValue;
 
     var touchControlsActive = false, touchControlsDirBig = false;
-    var virtualKeyboardMode = 0;
-    var virtualKeyboardElement;
+    var consolePanelActive = false;
 
     var buttonsBar, buttonsBarInner, buttonsBarDesiredWidth = -1;       // 0 = same as canvas. -1 means full width mode (100%)
     var barButtonLongTouchTarget, barButtonLongTouchSelectTimeout;
@@ -1299,7 +1307,6 @@ jt.CanvasDisplay = function(mainElement) {
     var targetWidth = 160;
     var targetHeight = 213;
 
-
     var logo, logoCenter, logoImage, logoMessage, logoMessageText, logoMessageOK, logoMessageOKText, logoMessageActive = false;
     var logoLoadingIcon;
     var scrollMessage, scrollMessageActive = false;
@@ -1313,7 +1320,7 @@ jt.CanvasDisplay = function(mainElement) {
 
     var mediaButtonBackYOffsets = [ -138 -25 -25, -138 -25, -138 ];             //[ -51, -26, -1 ];
 
-    var CANVAS_SIZE_FACTOR = 2;
+    var CANVAS_SIZE_FACTOR = Javatari.SCREEN_CANVAS_SIZE;
 
     var OSD_TIME = 3000;
     var CURSOR_HIDE_FRAMES = 180;
@@ -1322,8 +1329,6 @@ jt.CanvasDisplay = function(mainElement) {
 
     var BAR_AUTO_HIDE = Javatari.SCREEN_CONTROL_BAR === 0;
     var BAR_MENU_MAX_ITEMS = 10;
-
-    var VIRTUAL_KEYBOARD_WIDE_WIDTH = 518, VIRTUAL_KEYBOARD_NARROW_WIDTH = 419, VIRTUAL_KEYBOARD_HEIGHT = 161;
 
     var NARROW_WIDTH = 450;
 

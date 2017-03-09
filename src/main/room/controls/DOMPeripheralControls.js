@@ -114,6 +114,9 @@ jt.DOMPeripheralControls = function() {
             case controls.SCREEN_OPEN_QUICK_OPTIONS:
                 screen.openQuickOptionsDialog();
                 break;
+            case controls.SCREEN_CONSOLE_PANEL_TOGGLE:
+                screen.toggleConsolePanel();
+                break;
             case controls.P1_CONTROLS_TOGGLE:
                 consoleControls.toggleP1ControlsMode(); break;
             case controls.JOYSTICKS_TOGGLE_MODE:
@@ -184,6 +187,7 @@ jt.DOMPeripheralControls = function() {
         keyCodeMap[KEY_CRT_MODE | k.ALT] 	    = controls.SCREEN_CRT_MODE;
         keyCodeMap[KEY_SETTINGS | k.ALT]    	= controls.SCREEN_OPEN_SETTINGS;
         keyCodeMap[KEY_QUICK_OPTIONS | k.ALT] 	= controls.SCREEN_OPEN_QUICK_OPTIONS;
+        keyCodeMap[KEY_CONSOLE_PANEL | k.ALT] 	= controls.SCREEN_CONSOLE_PANEL_TOGGLE;
 
         keyCodeMap[KEY_FULLSCREEN | k.ALT]  = controls.SCREEN_FULLSCREEN;
 
@@ -250,6 +254,7 @@ jt.DOMPeripheralControls = function() {
     var KEY_CRT_FILTER    = jt.DOMKeys.VK_T.c;
     var KEY_SETTINGS      = jt.DOMKeys.VK_Y.c;
     var KEY_QUICK_OPTIONS = jt.DOMKeys.VK_U.c;
+    var KEY_CONSOLE_PANEL = jt.DOMKeys.VK_S.c;
 
     var KEY_FULLSCREEN  = jt.DOMKeys.VK_ENTER.c;
 

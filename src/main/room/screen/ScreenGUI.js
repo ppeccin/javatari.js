@@ -293,13 +293,13 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
 #jt-bar-text.jt-mobile {
     margin: 0 0 0 6px;
 }
-#jt-bar-keyboard {
+#jt-bar-console-panel {
     position: absolute;
     left: 0; right: 0;
     width: 37px;
     margin: 0 auto;
 }
-#jt-bar.jt-narrow #jt-bar-keyboard {
+#jt-bar.jt-narrow #jt-bar-console-panel {
     position: static;
     float: right;
 }
@@ -401,11 +401,11 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
    z-index: 99;
 }
 
-html.jt-show-console-panel #jt-console-panel {
+html.jt-console-panel-active #jt-console-panel {
     display: block;
 }
 html.jt-full-screen #jt-console-panel {
-    visibility: hidden;
+   bottom: ` + (jt.ScreenGUI.BAR_HEIGHT + 1) + `px;
 }
 
 
@@ -1137,12 +1137,6 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
     #jt-touch-buttonT {
         bottom: 100%;
         right: 0%;
-    }
-
-    html.jt-full-screen.jt-virtual-keyboard-active #jt-touch-left,
-    html.jt-full-screen.jt-virtual-keyboard-active #jt-touch-right,
-    html.jt-full-screen.jt-virtual-keyboard-active #jt-touch-speed {
-        display: none;
     }
 
 }
