@@ -172,7 +172,7 @@ jt.CanvasDisplay = function(mainElement) {
     };
 
     this.displayScale = function(pAspectX, pScaleY) {
-        aspectX = pAspectX * 2;   // Fixed internal aspectX of 2
+        aspectX = pAspectX;
         scaleY = pScaleY;
         updateScale();
     };
@@ -400,7 +400,7 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function updateScale() {
-        var canvasWidth = Math.round(targetWidth * scaleY * aspectX);
+        var canvasWidth = Math.round(targetWidth * scaleY * aspectX * 2);    // Fixed internal aspectX of 2
         var canvasHeight = Math.round(targetHeight * scaleY);
         canvas.style.width = "" + canvasWidth + "px";
         canvas.style.height = "" + canvasHeight + "px";
@@ -1168,9 +1168,10 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function displayOptimalScaleY(maxWidth, maxHeight) {
+        var effectiveScaleX = aspectX * 2;      // Fixed internal aspectX of 2
         var scY = maxHeight / targetHeight;
-        if (targetWidth * aspectX * scY > maxWidth)
-            scY = maxWidth / (targetWidth * aspectX);
+        if (targetWidth * effectiveScaleX * scY > maxWidth)
+            scY = maxWidth / (targetWidth * effectiveScaleX);
         return scY;
     }
 
@@ -1290,7 +1291,7 @@ jt.CanvasDisplay = function(mainElement) {
     var debugMode = false;
     var isLoading = false;
 
-    var aspectX = Javatari.SCREEN_DEFAULT_ASPECT * 2;   // Fixed internal aspectX of 2
+    var aspectX = Javatari.SCREEN_DEFAULT_ASPECT;
     var scaleY = 1.0;
 
     var mousePointerLocked = false;
@@ -1312,7 +1313,7 @@ jt.CanvasDisplay = function(mainElement) {
 
     var mediaButtonBackYOffsets = [ -138 -25 -25, -138 -25, -138 ];             //[ -51, -26, -1 ];
 
-    var CANVAS_SIZE_FACTOR = 1;
+    var CANVAS_SIZE_FACTOR = 2;
 
     var OSD_TIME = 3000;
     var CURSOR_HIDE_FRAMES = 180;
