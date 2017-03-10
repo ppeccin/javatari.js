@@ -1175,5 +1175,4 @@ html.jt-full-screen .jt-console-panel {
     }
 
 }`;
-
 };

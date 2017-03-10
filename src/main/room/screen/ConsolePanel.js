@@ -218,5 +218,5 @@ jt.ConsolePanel.shouldStartActive = function() {
 
 jt.ConsolePanel.sameBoxShadowAsScreen = function() {
     var screenElement = document.getElementById(Javatari.SCREEN_ELEMENT_ID);
-    return screenElement.style.boxShadow ? screenElement.style.boxShadow : "none";
+    return screenElement ? window.getComputedStyle(screenElement, null).getPropertyValue("box-shadow") : "none";
 };

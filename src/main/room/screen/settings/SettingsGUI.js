@@ -983,5 +983,4 @@ jt.SettingsGUI.css = function() {
     clear: both;
     height: 18px;
 }`;
-
 };
