@@ -131,12 +131,12 @@ jt.SettingsGUI.html = function() {
                 </div>
                 <div class="jt-full-divider"></div>
                 <div class="jt-console-panel">
-                    <div class="jt-console-panel-cart-file jt-console-panel-sprite jt-console-panel-button"></div>
-                    <div class="jt-console-panel-cart-url jt-console-panel-sprite jt-console-panel-button"></div>
-                    <div class="jt-console-panel-p0-diff-label jt-console-panel-sprite"></div>
-                    <div class="jt-console-panel-p1-diff-label jt-console-panel-sprite"></div>
-                    <div class="jt-console-panel-power-labels jt-console-panel-sprite"></div>
-                    <div class="jt-console-panel-reset-labels jt-console-panel-sprite"></div>
+                    <div class="jt-console-panel-cart-file jt-console-panel-icon"></div>
+                    <div class="jt-console-panel-cart-url jt-console-panel-icon"></div>
+                    <div class="jt-console-panel-p0-diff-label jt-console-panel-icon"></div>
+                    <div class="jt-console-panel-p1-diff-label jt-console-panel-icon"></div>
+                    <div class="jt-console-panel-power-labels jt-console-panel-icon"></div>
+                    <div class="jt-console-panel-reset-labels jt-console-panel-icon"></div>
                 </div>
                 <div class="jt-footer">
                     Drag & Drop Files or URLs to load Cartridge ROMs and State Files
@@ -852,8 +852,8 @@ jt.SettingsGUI.css = function() {
     width: 70px;
     height: 89px;
     margin-left: 1px;
-    background: url("` + jt.Images.urls.sprites + `") no-repeat -466px 0;
-    background-size: 537px 233px;
+    background: url("` + jt.Images.urls.controllers + `") no-repeat -1px 0;
+    background-size: 73px 179px;
 }
 
 #jt-ports .jt-player .jt-key {

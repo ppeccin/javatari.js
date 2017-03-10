@@ -425,7 +425,7 @@ jt.CanvasDisplay = function(mainElement) {
     function updateBarWidth(canvasWidth) {
         var fixedWidth = buttonsBarDesiredWidth > 0 ? buttonsBarDesiredWidth : canvasWidth;
         buttonsBar.style.width = buttonsBarDesiredWidth === -1 ? "100%" : "" + fixedWidth + "px";
-        buttonsBar.classList.toggle("jt-narrow", fixedWidth < NARROW_WIDTH);
+        //buttonsBar.classList.toggle("jt-narrow", fixedWidth < NARROW_WIDTH);      // TODO Revise
     }
 
     function calculateConsolePanelRect(maxWidth) {
@@ -611,29 +611,29 @@ jt.CanvasDisplay = function(mainElement) {
             { label: "Load State",                     control: jt.PeripheralControls.MACHINE_LOAD_STATE_MENU },
             { label: "Save State",                     control: jt.PeripheralControls.MACHINE_SAVE_STATE_MENU }
         ];
-        powerButton = addBarButton("jt-bar-power", -320, -163, "System Power", null, menu, "System");
+        powerButton = addBarButton("jt-bar-power", -5, -1, "System Power", null, menu, "System");
         barMenuSystem = menu;
 
         menu = createSettingsMenuOptions();
-        settingsButton = addBarButton("jt-bar-settings", -348, -163, "Settings", null, menu, "Settings");
+        settingsButton = addBarButton("jt-bar-settings", -33, -26, "Settings", null, menu, "Settings");
 
         if (FULLSCREEN_MODE !== -2) {
-            fullscreenButton = addBarButton("jt-bar-full-screen", -418, -138, "Full Screen", jt.PeripheralControls.SCREEN_FULLSCREEN);
+            fullscreenButton = addBarButton("jt-bar-full-screen", -103, -1, "Full Screen", jt.PeripheralControls.SCREEN_FULLSCREEN);
             fullscreenButton.jtNeedsUIG = true;
             if (isMobileDevice) fullscreenButton.classList.add("jt-mobile");
         }
 
         if (!Javatari.SCREEN_RESIZE_DISABLED && !isMobileDevice) {
-            scaleUpButton = addBarButton("jt-bar-scale-plus", -48 -347, -138, "Increase Screen", jt.PeripheralControls.SCREEN_SCALE_PLUS);
+            scaleUpButton = addBarButton("jt-bar-scale-plus", -80, -1, "Increase Screen", jt.PeripheralControls.SCREEN_SCALE_PLUS);
             scaleUpButton.classList.add("jt-full-screen-hidden");
-            scaleDownButton = addBarButton("jt-bar-scale-minus", -26 -347, -138, "Decrease Screen", jt.PeripheralControls.SCREEN_SCALE_MINUS);
+            scaleDownButton = addBarButton("jt-bar-scale-minus", -58, -1, "Decrease Screen", jt.PeripheralControls.SCREEN_SCALE_MINUS);
             scaleDownButton.classList.add("jt-full-screen-hidden");
         }
 
-        var consolePanelButton = addBarButton("jt-bar-console-panel", -377, -162, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE);
+        var consolePanelButton = addBarButton("jt-bar-console-panel", -62, -25, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE);
         consolePanelButton.classList.add("jt-full-screen-only");
 
-        logoButton = addBarButton("jt-bar-logo", -414, -162, "About Javatari", jt.PeripheralControls.SCREEN_OPEN_ABOUT);
+        logoButton = addBarButton("jt-bar-logo", -99, -26, "About Javatari", jt.PeripheralControls.SCREEN_OPEN_ABOUT);
         logoButton.classList.add("jt-full-screen-hidden");
         logoButton.classList.add("jt-narrow-hidden");
 
@@ -1318,7 +1318,7 @@ jt.CanvasDisplay = function(mainElement) {
     var fullscreenButton;
     var settingsButton;
 
-    var mediaButtonBackYOffsets = [ -138 -25 -25, -138 -25, -138 ];             //[ -51, -26, -1 ];
+    var mediaButtonBackYOffsets = [-51, -26, -1];
 
     var CANVAS_SIZE_FACTOR = Javatari.SCREEN_CANVAS_SIZE;
 

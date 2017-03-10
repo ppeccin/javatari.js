@@ -65,13 +65,13 @@ jt.ScreenGUI.htmlConsolePanel =
     <div id="jt-console-panel-p1-diff" class="jt-console-panel-p1-diff jt-console-panel-switch jt-console-panel-sprite"></div>
     <div id="jt-console-panel-cart-image" class="jt-console-panel-cart-image jt-console-panel-sprite"></div>
     <div id="jt-console-panel-cart-load" class="jt-console-panel-cart-load jt-console-panel-button"></div>
-    <div id="jt-console-panel-cart-file" class="jt-console-panel-cart-file jt-console-panel-sprite jt-console-panel-button"></div>
-    <div id="jt-console-panel-cart-url" class="jt-console-panel-cart-url jt-console-panel-sprite jt-console-panel-button"></div>
+    <div id="jt-console-panel-cart-file" class="jt-console-panel-cart-file jt-console-panel-icon jt-console-panel-button"></div>
+    <div id="jt-console-panel-cart-url" class="jt-console-panel-cart-url jt-console-panel-icon jt-console-panel-button"></div>
     <div id="jt-console-panel-cart-label" class="jt-console-panel-cart-label"></div>
-    <div id="jt-console-panel-p0-diff-label" class="jt-console-panel-p0-diff-label jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-p1-diff-label" class="jt-console-panel-p1-diff-label jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-power-labels" class="jt-console-panel-power-labels jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-reset-labels" class="jt-console-panel-reset-labels jt-console-panel-sprite"></div>`
+    <div id="jt-console-panel-p0-diff-label" class="jt-console-panel-p0-diff-label jt-console-panel-icon"></div>
+    <div id="jt-console-panel-p1-diff-label" class="jt-console-panel-p1-diff-label jt-console-panel-icon"></div>
+    <div id="jt-console-panel-power-labels" class="jt-console-panel-power-labels jt-console-panel-icon"></div>
+    <div id="jt-console-panel-reset-labels" class="jt-console-panel-reset-labels jt-console-panel-icon"></div>`
 ;
 
 jt.ScreenGUI.css = function() {
@@ -252,9 +252,9 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
     width: 24px;
     height: 28px;
     margin: 0 1px;
-    background-image: url("` + jt.Images.urls.sprites + `");
+    background-image: url("` + jt.Images.urls.iconSprites + `");
     background-repeat: no-repeat;
-    background-size: 537px 233px;
+    background-size: 264px 82px;
     cursor: pointer;
 }
 /*
@@ -903,8 +903,8 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
 .jt-console-panel {
     width:` + jt.ConsolePanel.DEFAULT_WIDTH + `px;
     height:` + jt.ConsolePanel.DEFAULT_HEIGHT + `px;
-    background: black url("` + jt.Images.urls.sprites + `") no-repeat;
-    background-size: 537px 233px;
+    background: black url("` + jt.Images.urls.panel + `") no-repeat;
+    background-size: 460px 134px;
     box-shadow: ` + jt.ConsolePanel.sameBoxShadowAsScreen() + `;
     outline: none;
 }
@@ -915,8 +915,14 @@ html.jt-full-screen .jt-console-panel {
 
 .jt-console-panel-sprite {
     position: absolute;
-    background: url("` + jt.Images.urls.sprites + `") center no-repeat;
-    background-size: 537px 233px;
+    background: url("` + jt.Images.urls.panelSprites + `") center no-repeat;
+    background-size: 256px 93px;
+}
+
+.jt-console-panel-icon {
+    position: absolute;
+    background: url("` + jt.Images.urls.iconSprites + `") center no-repeat;
+    background-size: 264px 82px;
 }
 
 .jt-console-panel-button {
@@ -931,54 +937,54 @@ html.jt-full-screen .jt-console-panel {
 }
 
 .jt-console-panel-lever {
-    bottom: 36px;
-    width: 25px;
-    height: 47px;
+    bottom: 38px;
+    width: 20px;
+    height: 46px;
 }
 
 .jt-console-panel-power {
-    left: 29px;
-    background-position: 2px -141px;
+    left: 31px;
+    background-position: 0px 0px;
 }
 
 .jt-console-panel-color {
-    left: 93px;
-    background-position: -22px -141px;
+    left: 96px;
+    background-position: -21px 0px;
 }
 
 .jt-console-panel-select {
-    left: 349px;
-    background-position: -46px -141px;
+    left: 352px;
+    background-position: 0px -47px;
 }
 
 .jt-console-panel-reset {
-    left: 412px;
-    background-position: -70px -141px;
+    left: 415px;
+    background-position: -21px -47px;
 }
 
 .jt-console-panel-p0-diff {
-    left: 160px;
-    bottom: 109px;
-    width: 33px;
-    height: 22px;
-    background-position: -94px -157px;
+    left: 163px;
+    bottom: 112px;
+    width: 27px;
+    height: 16px;
+    background-position: -229px -17px;
 }
 
 .jt-console-panel-p1-diff {
-    left: 273px;
-    bottom: 109px;
-    width: 33px;
-    height: 22px;
-    background-position: -94px -137px;
+    left: 276px;
+    bottom: 112px;
+    width: 27px;
+    height: 16px;
+    background-position: -229px 0px;
 }
 
 .jt-console-panel-cart-image {
     position: absolute;
-    left: 139px;
-    bottom: 10px;
-    width: 189px;
+    left: 140px;
+    bottom: 9px;
+    width: 186px;
     height: 82px;
-    background-position: -127px -139px;
+    background-position: -42px 0px;
 }
 
 .jt-console-panel-cart-load {
@@ -993,7 +999,7 @@ html.jt-full-screen .jt-console-panel {
     bottom: 3px;
     width: 31px;
     height: 30px;
-    background-position: 3px -189px;
+    background-position: -132px -6px;
 }
 
 .jt-console-panel-cart-url {
@@ -1001,7 +1007,7 @@ html.jt-full-screen .jt-console-panel {
     bottom: 3px;
     width: 31px;
     height: 30px;
-    background-position: -93px -189px;
+    background-position: -161px -6px;
 }
 
 .jt-console-panel-cart-label {
@@ -1031,11 +1037,11 @@ html.jt-full-screen .jt-console-panel {
 }
 
 .jt-console-panel-power-labels {
-    left: 32px;
+    left: 31px;
     bottom: 9px;
-    width: 87px;
+    width: 88px;
     height: 15px;
-    background-position: -431px -197px;
+    background-position: -135px -37px;
 }
 
 .jt-console-panel-reset-labels {
@@ -1043,23 +1049,23 @@ html.jt-full-screen .jt-console-panel {
     bottom: 9px;
     width: 96px;
     height: 15px;
-    background-position: -431px -215px;
+    background-position: -135px -55px;
 }
 
 .jt-console-panel-p0-diff-label {
-    left: 129px;
+    left: 128px;
     top: 8px;
     width: 29px;
     height: 15px;
-    background-position: -398px -197px;
+    background-position: -233px -37px;
 }
 
 .jt-console-panel-p1-diff-label {
     left: 313px;
     top: 8px;
-    width: 27px;
+    width: 28px;
     height: 15px;
-    background-position: -398px -215px;
+    background-position: -233px -55px;
 }
 
 .jt-hide-labels .jt-console-panel-p0-diff-label,
