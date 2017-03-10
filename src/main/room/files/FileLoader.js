@@ -183,7 +183,7 @@ jt.FileLoader = function() {
         // Try to load as ROM (Cartridge)
         if (openType === OPEN_TYPE.ROM || openType === OPEN_TYPE.AUTO) {
             var rom = new jt.ROM(name, content);
-            var cart = jt.CartridgeDatabase.createCartridgeFromRom(rom);
+            var cart = jt.CartridgeCreator.createCartridgeFromRom(rom);
             if (cart) {
                 cartridgeSocket.insert(cart, !altPower);
                 return true;

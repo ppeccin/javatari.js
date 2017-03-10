@@ -6,7 +6,7 @@ jt.ROM = function(source, content, info) {
     this.source = source;
     this.content = content;
     if (info) this.info = info;
-    else this.info = jt.CartridgeDatabase.produceInfo(this);
+    else this.info = jt.CartridgeCreator.produceInfo(this);
 
 
     // Savestate  -------------------------------------------

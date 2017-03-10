@@ -1,7 +1,8 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
+// Many thanks to ROM Hunter for sharing the info!
 
-jt.CartridgeInfoLibrary = {
-	version: 20130406,
+jt.CartridgeDatabaseUncompressed = {
+	version: 20170310,
 	"0685BD0BCB975CEEF7041749A5454A48":{n:"11 Sprite Demo (Piero Cavina) (PD)"},
 	"1862FCA4F98E66F363308B859B5863AF":{n:"128-in-1 Junior Console (Chip 1 of 4) (1991) (Atari) (PAL)"},
 	"715DD9E0240638D441A3ADD49316C018":{n:"128-in-1 Junior Console (Chip 2 of 4) (1991) (Atari) (PAL)"},
@@ -1583,7 +1584,7 @@ jt.CartridgeInfoLibrary = {
 	"D5618464DBDC2981F6AA8B955828EEB4":{n:"Megamania (1983) (CCE)"},
 	"12937DB3D4A80DA5C4452B752891252D":{n:"Megamania (1983) (Digitel)"},
 	"1E0EF01E330E5B91387F75F700CCAF8F":{n:"Mein Weg (1983) (Quelle) (PAL)"},
-	"96E798995AF6ED9D8601166D4350F276":{n:"Meltdown (1983) (20th Century Fox) (Prototype)"},
+	"96E798995AF6ED9D8601166D4350F276":{n:"Meltdown (1983) (20th Century Fox) (Prototype)",c:1},
 	"50568C80AC61CAB789D9923C9B05B68E":{n:"Merlin's Walls - Standard Edition (1999) (Ebivision)"},
 	"8FBABAA87941CDF3A377C15E95BDB0F3":{n:"Meteor Smasher (SnailSoft)"},
 	"08BF437D012DB07B05FF57A0C745C49E":{n:"Meteoroids (1982) (Arcadia) (Prototype)",c:1},

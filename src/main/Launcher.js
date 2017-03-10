@@ -28,7 +28,7 @@ Javatari.start = function (consolePowerOn) {
     jt.Util.log("version " + Javatari.VERSION + " started");
 
     // Prepare ROM Database
-    //jt.ROMDatabase.uncompress();
+    jt.CartridgeDatabase.uncompress();
 
     // Auto-load BIOS, Expansions, State, Cartridges, Disks and Tape files if specified and downloadable
     if (Javatari.STATE_URL) {
