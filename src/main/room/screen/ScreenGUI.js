@@ -392,20 +392,24 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
 
 
 #jt-console-panel {
-   display: none;
-   position: absolute;
-   bottom: -` + (jt.ConsolePanel.DEFAULT_HEIGHT + 1) + `px;
-   left: 50%;
-   transform: translate(-` + ((jt.ConsolePanel.DEFAULT_WIDTH / 2) | 0) + `px, 0);
-   margin: 0 auto;
-   z-index: 99;
+    display: none;
+    position: absolute;
+    bottom: -` + (jt.ConsolePanel.DEFAULT_HEIGHT + 2) + `px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    transform-origin: center top;
+    margin: 0 auto;
+    border: 1px solid black;
+    z-index: 99;
 }
 
 html.jt-console-panel-active #jt-console-panel {
     display: block;
 }
 html.jt-full-screen #jt-console-panel {
-   bottom: ` + (jt.ScreenGUI.BAR_HEIGHT + 1) + `px;
+    bottom: ` + (jt.ScreenGUI.BAR_HEIGHT + 2) + `px;
+    border: none;
+    transform-origin: center bottom;
 }
 
 
@@ -899,11 +903,16 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
 
 
 .jt-console-panel {
-   width:` + jt.ConsolePanel.DEFAULT_WIDTH + `px;
-   height:` + jt.ConsolePanel.DEFAULT_HEIGHT + `px;
-   background: black url("` + jt.Images.urls.sprites + `") no-repeat;
-   background-size: 537px 233px;
-   outline: none;
+    width:` + jt.ConsolePanel.DEFAULT_WIDTH + `px;
+    height:` + jt.ConsolePanel.DEFAULT_HEIGHT + `px;
+    background: black url("` + jt.Images.urls.sprites + `") no-repeat;
+    background-size: 537px 233px;
+    box-shadow: ` + jt.ConsolePanel.sameBoxShadowAsScreen() + `;
+    outline: none;
+}
+
+html.jt-full-screen .jt-console-panel {
+    box-shadow: none;
 }
 
 .jt-console-panel-sprite {
@@ -924,42 +933,42 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
 }
 
 .jt-console-panel-lever {
-    bottom: 38px;
+    bottom: 36px;
     width: 25px;
     height: 47px;
 }
 
 .jt-console-panel-power {
-    left: 31px;
+    left: 29px;
     background-position: 2px -141px;
 }
 
 .jt-console-panel-color {
-    left: 95px;
+    left: 93px;
     background-position: -22px -141px;
 }
 
 .jt-console-panel-select {
-    left: 351px;
+    left: 349px;
     background-position: -46px -141px;
 }
 
 .jt-console-panel-reset {
-    left: 414px;
+    left: 412px;
     background-position: -70px -141px;
 }
 
 .jt-console-panel-p0-diff {
-    left: 162px;
-    bottom: 111px;
+    left: 160px;
+    bottom: 109px;
     width: 33px;
     height: 22px;
     background-position: -94px -157px;
 }
 
 .jt-console-panel-p1-diff {
-    left: 275px;
-    bottom: 111px;
+    left: 273px;
+    bottom: 109px;
     width: 33px;
     height: 22px;
     background-position: -94px -137px;
@@ -967,31 +976,31 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
 
 .jt-console-panel-cart-image {
     position: absolute;
-    left: 141px;
-    bottom: 12px;
+    left: 139px;
+    bottom: 10px;
     width: 189px;
     height: 82px;
     background-position: -127px -139px;
 }
 
 .jt-console-panel-cart-load {
-    left: 143px;
-    bottom: 38px;
+    left: 141px;
+    bottom: 36px;
     width: 184px;
     height: 55px;
 }
 
 .jt-console-panel-cart-file {
-    left: 173px;
-    bottom: 5px;
+    left: 170px;
+    bottom: 3px;
     width: 31px;
     height: 30px;
     background-position: 3px -189px;
 }
 
 .jt-console-panel-cart-url {
-    left: 267px;
-    bottom: 5px;
+    left: 265px;
+    bottom: 3px;
     width: 31px;
     height: 30px;
     background-position: -93px -189px;
@@ -999,8 +1008,8 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
 
 .jt-console-panel-cart-label {
     position: absolute;
-    top: 52px;
-    left: 158px;
+    top: 51px;
+    left: 156px;
     width: 148px;
     height: 25px;
     padding: 0px 2px;
@@ -1024,32 +1033,32 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
 }
 
 .jt-console-panel-power-labels {
-    left: 35px;
-    bottom: 10px;
+    left: 32px;
+    bottom: 9px;
     width: 87px;
     height: 15px;
     background-position: -431px -197px;
 }
 
 .jt-console-panel-reset-labels {
-    right: 18px;
-    bottom: 10px;
+    right: 16px;
+    bottom: 9px;
     width: 96px;
     height: 15px;
     background-position: -431px -215px;
 }
 
 .jt-console-panel-p0-diff-label {
-    left: 131px;
-    top: 9px;
+    left: 129px;
+    top: 8px;
     width: 29px;
     height: 15px;
     background-position: -398px -197px;
 }
 
 .jt-console-panel-p1-diff-label {
-    left: 315px;
-    top: 9px;
+    left: 313px;
+    top: 8px;
     width: 27px;
     height: 15px;
     background-position: -398px -215px;

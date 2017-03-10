@@ -67,8 +67,7 @@ jt.ConsolePanel = function(panelElement) {
         panelElement.innerHTML = jt.ScreenGUI.htmlConsolePanel;
         delete jt.ScreenGUI.htmlConsolePanel;
 
-        var screenElement = document.getElementById(Javatari.SCREEN_ELEMENT_ID);
-        if (screenElement.style.boxShadow) panelElement.style.boxShadow = screenElement.style.boxShadow;     // Use same shadow as main screen :-)
+        if (jt.Util.isMobileDevice()) panelElement.classList.add("jt-hide-labels");
     };
 
     var setupButtons = function() {
@@ -210,9 +209,14 @@ jt.ConsolePanel = function(panelElement) {
 
 };
 
-jt.ConsolePanel.DEFAULT_WIDTH = 465;
-jt.ConsolePanel.DEFAULT_HEIGHT = 137;
+jt.ConsolePanel.DEFAULT_WIDTH = 460;
+jt.ConsolePanel.DEFAULT_HEIGHT = 134;
 
 jt.ConsolePanel.shouldStartActive = function() {
     return !Javatari.SCREEN_CONSOLE_PANEL_DISABLED && (Javatari.CONSOLE_PANEL_ELEMENT_ID === -1 || document.getElementById(Javatari.CONSOLE_PANEL_ELEMENT_ID));
+};
+
+jt.ConsolePanel.sameBoxShadowAsScreen = function() {
+    var screenElement = document.getElementById(Javatari.SCREEN_ELEMENT_ID);
+    return screenElement.style.boxShadow ? screenElement.style.boxShadow : "none";
 };

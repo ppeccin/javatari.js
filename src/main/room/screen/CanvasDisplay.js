@@ -630,7 +630,7 @@ jt.CanvasDisplay = function(mainElement) {
             scaleDownButton.classList.add("jt-full-screen-hidden");
         }
 
-        var consolePanelButton = addBarButton("jt-bar-console-panel", -83, -25, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE);
+        var consolePanelButton = addBarButton("jt-bar-console-panel", -377, -162, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE);
         consolePanelButton.classList.add("jt-full-screen-only");
 
         logoButton = addBarButton("jt-bar-logo", -414, -162, "About Javatari", jt.PeripheralControls.SCREEN_OPEN_ABOUT);
