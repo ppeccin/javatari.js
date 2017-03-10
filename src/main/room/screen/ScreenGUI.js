@@ -1,7 +1,5 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-// TODO Define z-indexes
-
 jt.ScreenGUI = jt.Util.isMobileDevice()
     ? {
         BAR_HEIGHT: 29,
@@ -157,7 +155,7 @@ html.jt-full-screen-scroll-hack #jt-screen-fs.jt-scroll-message #jt-screen-scrol
     width: 215px;
     height: 56px;
     padding: 13px 20px;
-    z-index: 10;
+    z-index: 60;
     transition: none;
 }
 
@@ -214,7 +212,7 @@ html.jt-full-screen #jt-screen-fs-center {      /* Used to center and move thing
     background: hsl(0, 0%, 16%);
     overflow: visible;                    /* for the Menu to show through */
     box-sizing: content-box;
-    z-index: 5;
+    z-index: 40;
 
 }
 #jt-bar-inner {
@@ -400,7 +398,7 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
     transform-origin: center top;
     margin: 0 auto;
     border: 1px solid black;
-    z-index: 99;
+    z-index: 30;
 }
 
 html.jt-console-panel-active #jt-console-panel {
@@ -438,7 +436,7 @@ html.jt-full-screen #jt-console-panel {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: auto;
-    z-index: 4;
+    z-index: 50;
 }
 #jt-screen-fs .jt-select-dialog.jt-show {
     display: block;
@@ -704,7 +702,7 @@ html.jt-full-screen #jt-logo-image {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: auto;
-    z-index: 3;
+    z-index: 50;
 }
 #jt-quick-options.jt-show {
     display: block;

@@ -543,7 +543,7 @@ jt.SettingsGUI.css = function() {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    z-index: 9;
+    z-index: 50;
 }
 #jt-modal.jt-show {
     transform: scale(1);
