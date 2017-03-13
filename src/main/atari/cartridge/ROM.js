@@ -1,12 +1,12 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.ROM = function(source, content, info) {
+jt.ROM = function(source, content, info, formatHint) {
 "use strict";
 
     this.source = source;
     this.content = content;
     if (info) this.info = info;
-    else this.info = jt.CartridgeCreator.produceInfo(this);
+    else this.info = jt.CartridgeCreator.produceInfo(this, formatHint);
 
 
     // Savestate  -------------------------------------------

@@ -96,7 +96,7 @@ jt.Configurator = {
             Javatari.AUTODETECT_URL && {
                 url: Javatari.AUTODETECT_URL,
                 onSuccess: function (res) {
-                    Javatari.room.fileLoader.loadFromContent(res.url, res.content, OPEN_TYPE.AUTO, 0, true);
+                    Javatari.room.fileLoader.loadFromContent(res.url, res.content, OPEN_TYPE.AUTO, 0, true, false);
                 }
             },
             Javatari.CARTRIDGE_URL && {
@@ -113,6 +113,7 @@ jt.Configurator = {
         PRESET: "PRESETS",
         ROM: "CARTRIDGE_URL",
         CART: "CARTRIDGE_URL",
+        FORMAT: "CARTRIDGE_FORMAT",
         ROM_FORMAT: "CARTRIDGE_FORMAT",
         CART_FORMAT: "CARTRIDGE_FORMAT",
         ANY: "AUTODETECT_URL",

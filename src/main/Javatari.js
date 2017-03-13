@@ -14,7 +14,7 @@ Javatari = {
     STATE_URL:                      "",
 
     // Forcing ROM formats
-    CARTRIDGE_FORMAT:               "",                         // TODO Define Cartridge Formats
+    CARTRIDGE_FORMAT:               "",                         // 4K, F8, F4, FE, AR, etc...
 
     // General configuration
     AUTO_START:                     true,

@@ -21,7 +21,7 @@ jt.CartridgeCreatorImpl = function() {
         return cartridgeFormat.recreateCartridgeFromSaveState(saveState, cartridge);
     };
 
-    this.produceInfo = function(rom) {
+    this.produceInfo = function(rom, formatHint) {
         // Preserve original length as MD5 computation may increase it
         var origLen = rom.content.length;
         var hash = jt.MD5(rom.content);
@@ -36,7 +36,7 @@ jt.CartridgeCreatorImpl = function() {
             jt.Util.log("Unknown ROM: " + info.n);
         }
 
-        finishInfo(info, rom.source, hash);
+        finishInfo(info, rom.source, hash, formatHint);
         return info;
     };
 
@@ -85,7 +85,7 @@ jt.CartridgeCreatorImpl = function() {
     };
 
     // Fill absent information based on ROM name
-    var finishInfo = function(info, romSource, hash) {
+    var finishInfo = function(info, romSource, hash, formatHint) {
         // Saves the hash on the info
         info.h = hash;
         // Compute label based on name
@@ -116,11 +116,20 @@ jt.CartridgeCreatorImpl = function() {
                         break CrtMode;
                     }
         }
+        // Adjust Format information if hint passed
+        if (formatHint) {
+            formatHint = formatHint.trim().toUpperCase();
+            for (var formatName in jt.CartridgeFormats)
+                if (formatName.toUpperCase() === formatHint) {
+                    info.f = formatName;
+                    break;
+                }
+        }
         // Adjust Format information if absent
         Format: if (!info.f) {
             // First by explicit format hint
             var romURL = romSource.toUpperCase();
-            for (var formatName in jt.CartridgeFormats)
+            for (formatName in jt.CartridgeFormats)
                 if (formatMatchesByHint(formatName, name) || formatMatchesByHint(formatName, romURL)) {
                     info.f = formatName;
                     break Format;
