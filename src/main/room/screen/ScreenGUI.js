@@ -57,16 +57,16 @@ jt.ScreenGUI.html = function() {
 };
 
 jt.ScreenGUI.htmlConsolePanel =
-    `<div id="jt-console-panel-power" class="jt-console-panel-power jt-console-panel-switch jt-console-panel-lever jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-color" class="jt-console-panel-color jt-console-panel-switch jt-console-panel-lever jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-select" class="jt-console-panel-select jt-console-panel-switch jt-console-panel-lever jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-reset" class="jt-console-panel-reset jt-console-panel-switch jt-console-panel-lever jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-p0-diff" class="jt-console-panel-p0-diff jt-console-panel-switch jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-p1-diff" class="jt-console-panel-p1-diff jt-console-panel-switch jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-cart-image" class="jt-console-panel-cart-image jt-console-panel-sprite"></div>
-    <div id="jt-console-panel-cart-load" class="jt-console-panel-cart-load jt-console-panel-button"></div>
-    <div id="jt-console-panel-cart-file" class="jt-console-panel-cart-file jt-console-panel-icon jt-console-panel-button"></div>
-    <div id="jt-console-panel-cart-url" class="jt-console-panel-cart-url jt-console-panel-icon jt-console-panel-button"></div>
+    `<div id="jt-console-panel-power" class="jt-console-panel-power jt-console-panel-lever"></div>
+    <div id="jt-console-panel-color" class="jt-console-panel-color jt-console-panel-lever"></div>
+    <div id="jt-console-panel-select" class="jt-console-panel-select jt-console-panel-lever"></div>
+    <div id="jt-console-panel-reset" class="jt-console-panel-reset jt-console-panel-lever"></div>
+    <div id="jt-console-panel-p0-diff" class="jt-console-panel-p0-diff jt-console-panel-switch"></div>
+    <div id="jt-console-panel-p1-diff" class="jt-console-panel-p1-diff jt-console-panel-switch"></div>
+    <div id="jt-console-panel-cart-image" class="jt-console-panel-cart-image"></div>
+    <div id="jt-console-panel-cart-load" class="jt-console-panel-cart-load"></div>
+    <div id="jt-console-panel-cart-file" class="jt-console-panel-cart-file jt-console-panel-icon"></div>
+    <div id="jt-console-panel-cart-url" class="jt-console-panel-cart-url jt-console-panel-icon"></div>
     <div id="jt-console-panel-cart-label" class="jt-console-panel-cart-label"></div>
     <div id="jt-console-panel-p0-diff-label" class="jt-console-panel-p0-diff-label jt-console-panel-icon"></div>
     <div id="jt-console-panel-p1-diff-label" class="jt-console-panel-p1-diff-label jt-console-panel-icon"></div>
@@ -913,68 +913,88 @@ html.jt-full-screen .jt-console-panel {
     box-shadow: none;
 }
 
-.jt-console-panel-sprite {
-    position: absolute;
-    background: url("` + jt.Images.urls.panelSprites + `") center no-repeat;
-    background-size: 256px 93px;
-}
-
 .jt-console-panel-icon {
     position: absolute;
     background: url("` + jt.Images.urls.iconSprites + `") center no-repeat;
     background-size: 264px 82px;
 }
 
-.jt-console-panel-button {
-    position: absolute;
-    cursor: pointer;
-}
-
 .jt-console-panel-switch {
     position: absolute;
+    bottom: 107px;
+    width: 50px;
+    height: 26px;
     opacity: 0;
     cursor: pointer;
 }
+.jt-console-panel-switch:after {
+    content: "";
+    position: absolute;
+    left: 11px;
+    bottom: 5px;
+    width: 27px;
+    height: 16px;
+    background: url("` + jt.Images.urls.panelSprites + `") center no-repeat;
+    background-size: 256px 93px;
+}
 
 .jt-console-panel-lever {
-    bottom: 38px;
+    position: absolute;
+    bottom: 30px;
+    width: 44px;
+    height: 72px;
+    cursor: pointer;
+}
+.jt-console-panel-lever:after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    bottom: 8px;
     width: 20px;
     height: 46px;
+    background: url("` + jt.Images.urls.panelSprites + `") center no-repeat;
+    background-size: 256px 93px;
 }
 
 .jt-console-panel-power {
-    left: 31px;
+    left: 19px;
+}
+.jt-console-panel-power:after {
     background-position: 0px 0px;
 }
 
 .jt-console-panel-color {
-    left: 96px;
+    left: 84px;
+}
+.jt-console-panel-color:after {
     background-position: -21px 0px;
 }
 
 .jt-console-panel-select {
-    left: 352px;
+    left: 340px;
+}
+.jt-console-panel-select:after {
     background-position: 0px -47px;
 }
 
 .jt-console-panel-reset {
-    left: 415px;
+    left: 403px;
+}
+.jt-console-panel-reset:after {
     background-position: -21px -47px;
 }
 
 .jt-console-panel-p0-diff {
-    left: 163px;
-    bottom: 112px;
-    width: 27px;
-    height: 16px;
+    left: 152px;
+}
+.jt-console-panel-p0-diff:after {
     background-position: -229px -17px;
 }
 
 .jt-console-panel-p1-diff {
-    left: 276px;
-    bottom: 112px;
-    width: 27px;
-    height: 16px;
+    left: 265px;
+}
+.jt-console-panel-p1-diff:after {
     background-position: -229px 0px;
 }
 
@@ -984,14 +1004,18 @@ html.jt-full-screen .jt-console-panel {
     bottom: 9px;
     width: 186px;
     height: 82px;
+    background: url("` + jt.Images.urls.panelSprites + `") center no-repeat;
+    background-size: 256px 93px;
     background-position: -42px 0px;
 }
 
 .jt-console-panel-cart-load {
+    position: absolute;
     left: 141px;
     bottom: 36px;
     width: 184px;
     height: 55px;
+    cursor: pointer;
 }
 
 .jt-console-panel-cart-file {
@@ -1000,14 +1024,16 @@ html.jt-full-screen .jt-console-panel {
     width: 31px;
     height: 30px;
     background-position: -132px -6px;
+    cursor: pointer;
 }
 
 .jt-console-panel-cart-url {
-    left: 265px;
+    left: 266px;
     bottom: 3px;
     width: 31px;
     height: 30px;
     background-position: -161px -6px;
+    cursor: pointer;
 }
 
 .jt-console-panel-cart-label {
