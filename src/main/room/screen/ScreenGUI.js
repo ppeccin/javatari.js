@@ -520,10 +520,6 @@ html.jt-full-screen #jt-console-panel {
     height: 456px;
     transform: translate(-50%, -50%);
 }
-#jt-screen-fs:not(.jt-logo-message-active) #jt-logo-center {
-    max-width: 100%;
-    max-height: 100%;
-}
 
 #jt-logo-image {
     position: absolute;
@@ -536,9 +532,6 @@ html.jt-full-screen #jt-console-panel {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-}
-html.jt-full-screen #jt-logo-image {
-    max-width: 67%;
 }
 #jt-screen-fs.jt-logo-message-active #jt-logo-image {
     top: 128px;

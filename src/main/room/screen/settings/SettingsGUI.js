@@ -61,7 +61,7 @@ jt.SettingsGUI.html = function() {
                             </div>
                         </div>
                         <div class="jt-desc">
-                            P1 Expert
+                            P1 Difficulty
                         </div>
                     </div>
                 </div>
@@ -125,7 +125,7 @@ jt.SettingsGUI.html = function() {
                             </div>
                         </div>
                         <div class="jt-desc">
-                            P2 Expert
+                            P2 Difficulty
                         </div>
                     </div>
                 </div>
@@ -751,7 +751,7 @@ jt.SettingsGUI.css = function() {
 }
 
 #jt-console .jt-middle {
-    width: 209px;
+    width: 204px;
 }
 
 #jt-console .jt-right .jt-command {

@@ -1131,13 +1131,11 @@ jt.CanvasDisplay = function(mainElement) {
     };
 
     function updateLogoScale() {
-        if (logoMessageActive) {
-            var width = canvasOuter.clientWidth;
-            var scale = Math.min(width / jt.ScreenGUI.LOGO_SCREEN_WIDTH, 1);
+        var width = canvasOuter.clientWidth;
+        var scale = Math.min(width / jt.ScreenGUI.LOGO_SCREEN_WIDTH, 1);
+        if (scale < 1)
             logoCenter.style.transform = "translate(-50%, -50%) scale(" + scale.toFixed(4) + ")";
-
-            // console.error("MESSAGE SCALE width: " + width + ", scale: " + scale);
-        } else
+        else
             logoCenter.style.transform = "translate(-50%, -50%)";
     }
 
