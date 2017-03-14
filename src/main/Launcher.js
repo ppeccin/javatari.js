@@ -90,16 +90,16 @@ Javatari.preLoadImagesAndStart = function() {
     });
 };
 
-//// AppCache update control TODO Revise
-//if (window.applicationCache) {
-//    function onUpdateReady() {
-//        alert("A new version is available!\nJavatari will restart...");
-//        window.applicationCache.swapCache();
-//        window.location.reload();
-//    }
-//    if (window.applicationCache.status === window.applicationCache.UPDATEREADY) onUpdateReady();
-//    else window.applicationCache.addEventListener("updateready", onUpdateReady);
-//}
+// AppCache update control
+if (window.applicationCache) {
+    function onUpdateReady() {
+        alert("A new version is available!\nJavatari will restart...");
+        window.applicationCache.swapCache();
+        window.location.reload();
+    }
+    if (window.applicationCache.status === window.applicationCache.UPDATEREADY) onUpdateReady();
+    else window.applicationCache.addEventListener("updateready", onUpdateReady);
+}
 
 Javatari.VERSION = "4.0 alpha";
 

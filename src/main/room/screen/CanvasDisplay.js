@@ -226,7 +226,7 @@ jt.CanvasDisplay = function(mainElement) {
 
         //atariConsole.error(">>> Parent width: " + maxWidth);
 
-        return maxWidth >= 650 ? 2.0 : maxWidth >= 540 ? 1.65 : maxWidth >= 420 ? 1.25 : maxWidth >= 375 ? 1.1 : maxWidth >= 360 ? 1.05 : maxWidth >= 320 ? 0.95 : 0.8;
+        return maxWidth >= 640 ? 2.0 : maxWidth >= 540 ? 1.65 : maxWidth >= 420 ? 1.25 : maxWidth >= 355 ? 1.05 : maxWidth >= 340 ? 1 : maxWidth >= 300 ? 0.9 : 0.8;
     };
 
     function hideOSD() {
@@ -419,8 +419,7 @@ jt.CanvasDisplay = function(mainElement) {
         updateBarWidth(canvasWidth);
         if (!signalIsOn) updateLogoScale();
         if (settingsDialog && settingsDialog.isVisible()) settingsDialog.position();
-        if (consolePanelActive) updateConsolePanelScale(canvasWidth);
-
+        updateConsolePanelScale(canvasWidth);
     }
 
     function updateBarWidth(canvasWidth) {
@@ -435,9 +434,14 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function updateConsolePanelScale(maxWidth) {
-        var limit = isFullscreen ? 1 : 0.88;
-        var scale = Math.min(1, maxWidth * limit / jt.ConsolePanel.DEFAULT_WIDTH);
-        consolePanelElement.style.transform = "translateX(-50%) scale(" + scale.toFixed(8) + ")";
+        if (consolePanelActive) {
+            var limit = isFullscreen ? 1 : 0.88;
+            var scale = Math.min(1, maxWidth * limit / jt.ConsolePanel.DEFAULT_WIDTH);
+            consolePanelElement.style.transform = "translateX(-50%) scale(" + scale.toFixed(8) + ")";
+        }
+        mainElement.style.marginBottom = consolePanelActive && !isFullscreen
+            ? "" + Math.ceil(scale * jt.ConsolePanel.DEFAULT_HEIGHT + 3) + "px"
+            : "initial";
 
         //console.error("PANEL SCALE: " + scale);
     }
