@@ -15,7 +15,7 @@ jt.CanvasDisplay = function(mainElement) {
         setupMain();
         setupBar();
         setupFullscreen();
-        consolePanel = new jt.ConsolePanel(consolePanelElement);
+        consolePanel = new jt.ConsolePanel(self, consolePanelElement);
         monitor = new jt.Monitor(self);
     }
 
@@ -588,7 +588,7 @@ jt.CanvasDisplay = function(mainElement) {
         });
 
         logoMessageOK.jtNeedsUIG = logoMessageOKText.jtNeedsUIG = true;     // User Initiated Gesture required
-        jt.Util.onTapOrMouseDownWithBlockUIG(logoMessageOK, closeLogoMessage);
+        jt.Util.onTapOrMouseDownWithBlockUIG(logoMessageOK, self.closeLogoMessage);
 
         // Used to show bar and close overlays and modals if not processed by any other function
         jt.Util.addEventsListener(fsElementCenter, "touchstart touchend mousedown", function backScreenTouched(e) {
@@ -1103,6 +1103,7 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function showLogoMessage(mes, button, higherButton, afterAction) {
+        consolePanel.setLogoMessageActive(true);
         if (logoMessageActive) return;
 
         closeAllOverlays();
@@ -1117,7 +1118,8 @@ jt.CanvasDisplay = function(mainElement) {
         updateLogo();
     }
 
-    function closeLogoMessage(e) {
+    this.closeLogoMessage = function(e) {
+        consolePanel.setLogoMessageActive(false);
         consoleControls.hapticFeedbackOnTouch(e);
         fsElement.classList.remove("jt-logo-message-active");
         logoMessageActive = false;
@@ -1126,7 +1128,7 @@ jt.CanvasDisplay = function(mainElement) {
             afterMessageAction = null;
             action();
         }
-    }
+    };
 
     function updateLogoScale() {
         if (logoMessageActive) {

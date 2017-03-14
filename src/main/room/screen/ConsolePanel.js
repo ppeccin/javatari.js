@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.ConsolePanel = function(panelElement) {
+jt.ConsolePanel = function(screen, panelElement) {
 "use strict";
 
     this.connectPeripherals = function(pFileLoader, pPeripheralControls) {
@@ -20,6 +20,10 @@ jt.ConsolePanel = function(panelElement) {
             updateVisibleControlsState();
         }
         document.documentElement.classList.toggle("jt-console-panel-active", active);
+    };
+
+    this.setLogoMessageActive = function(active) {
+        logoMessageActive = active;
     };
 
     function create() {
@@ -111,6 +115,7 @@ jt.ConsolePanel = function(panelElement) {
 
     function switchPressed(e) {
         jt.Util.blockEvent(e);
+        if (logoMessageActive) return;
         e.target.jtPressed = true;
         controlsSocket.controlStateChanged(e.target.jtControl, true);
     }
@@ -118,6 +123,7 @@ jt.ConsolePanel = function(panelElement) {
     function switchReleased(e) {
         jt.Util.blockEvent(e);
         e.target.jtPressed = false;
+        if (logoMessageActive) return;
         controlsSocket.controlStateChanged(e.target.jtControl, false);
     }
 
@@ -133,6 +139,7 @@ jt.ConsolePanel = function(panelElement) {
     };
 
     function cartridgeButtonPressed(e) {
+        if (logoMessageActive) screen.closeLogoMessage(e);
         peripheralControls.controlActivated(e.target.jtControl);
     }
 
@@ -179,6 +186,7 @@ jt.ConsolePanel = function(panelElement) {
     var peripheralControls;
     var controlsSocket, controlsStateReport = {};
     var cartridgeInserted;
+    var logoMessageActive = false;
 
     var powerButton;
     var colorButton;
