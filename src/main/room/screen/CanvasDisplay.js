@@ -443,22 +443,23 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function updateCanvasContentSize() {
-        canvas.width = targetWidth * CANVAS_SIZE_FACTOR;
-        canvas.height = targetHeight * CANVAS_SIZE_FACTOR;
+        var factor = crtFilterEffective > 0 ? CANVAS_SIZE_FACTOR : 1;
+        canvas.width = targetWidth * factor;
+        canvas.height = targetHeight * factor;
         canvasContext = null;
     }
 
     function setCRTFilter(level) {
         crtFilter = level;
         crtFilterEffective = crtFilter === -2 ? null : crtFilter === -1 ? crtFilterAutoValue() : level;
-        canvasContext = null;
+        updateCanvasContentSize();
     }
 
     function crtFilterAutoValue() {
         // Use mode 1 by default (canvas imageSmoothing OFF and CSS image-rendering set to smooth)
         // iOS browser bug: freezes after some time if imageSmoothing = true. OK if we use the setting above
         // Firefox on Android bug: image looks terrible if imageSmoothing = false. Lets use mode 2 or 3, or let browser default
-        return isMobileDevice && !isIOSDevice && browserName === "FIREFOX" ? 0 : 1;
+        return isMobileDevice && !isIOSDevice && browserName === "FIREFOX" ? 0 : 0;     // 0 : 1;
     }
 
     function setCRTMode(mode) {
@@ -468,7 +469,7 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function crtModeAutoValue() {
-        return isMobileDevice ? 0 : 1;
+        return isMobileDevice ? 0 : 0;      // 0 : 1;
     }
 
     function updateLogo() {

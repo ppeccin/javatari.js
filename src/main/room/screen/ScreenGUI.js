@@ -57,7 +57,11 @@ jt.ScreenGUI.html = function() {
 };
 
 jt.ScreenGUI.htmlConsolePanel =
-    `<div id="jt-console-panel-power" class="jt-console-panel-power jt-console-panel-lever"></div>
+    `<div id="jt-console-panel-p0-diff-label" class="jt-console-panel-p0-diff-label jt-console-panel-icon"></div>
+    <div id="jt-console-panel-p1-diff-label" class="jt-console-panel-p1-diff-label jt-console-panel-icon"></div>
+    <div id="jt-console-panel-power-labels" class="jt-console-panel-power-labels jt-console-panel-icon"></div>
+    <div id="jt-console-panel-reset-labels" class="jt-console-panel-reset-labels jt-console-panel-icon"></div>
+    <div id="jt-console-panel-power" class="jt-console-panel-power jt-console-panel-lever"></div>
     <div id="jt-console-panel-color" class="jt-console-panel-color jt-console-panel-lever"></div>
     <div id="jt-console-panel-select" class="jt-console-panel-select jt-console-panel-lever"></div>
     <div id="jt-console-panel-reset" class="jt-console-panel-reset jt-console-panel-lever"></div>
@@ -67,11 +71,7 @@ jt.ScreenGUI.htmlConsolePanel =
     <div id="jt-console-panel-cart-load" class="jt-console-panel-cart-load"></div>
     <div id="jt-console-panel-cart-file" class="jt-console-panel-cart-file jt-console-panel-icon"></div>
     <div id="jt-console-panel-cart-url" class="jt-console-panel-cart-url jt-console-panel-icon"></div>
-    <div id="jt-console-panel-cart-label" class="jt-console-panel-cart-label"></div>
-    <div id="jt-console-panel-p0-diff-label" class="jt-console-panel-p0-diff-label jt-console-panel-icon"></div>
-    <div id="jt-console-panel-p1-diff-label" class="jt-console-panel-p1-diff-label jt-console-panel-icon"></div>
-    <div id="jt-console-panel-power-labels" class="jt-console-panel-power-labels jt-console-panel-icon"></div>
-    <div id="jt-console-panel-reset-labels" class="jt-console-panel-reset-labels jt-console-panel-icon"></div>`
+    <div id="jt-console-panel-cart-label" class="jt-console-panel-cart-label"></div>`
 ;
 
 jt.ScreenGUI.css = function() {
