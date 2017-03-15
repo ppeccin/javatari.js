@@ -428,16 +428,15 @@ jt.CanvasDisplay = function(mainElement) {
         //buttonsBar.classList.toggle("jt-narrow", fixedWidth < NARROW_WIDTH);      // TODO Revise
     }
 
-    function calculateConsolePanelRect(maxWidth) {
-        var scale = Math.min(1, maxWidth / jt.ConsolePanel.DEFAULT_WIDTH);
-        return { w: Math.ceil(jt.ConsolePanel.DEFAULT_WIDTH * scale) , h: Math.ceil(jt.ConsolePanel.DEFAULT_HEIGHT * scale) };
-    }
-
     function updateConsolePanelScale(maxWidth) {
         if (consolePanelActive) {
-            var limit = isFullscreen ? 1 : 0.88;
-            var scale = Math.min(1, maxWidth * limit / jt.ConsolePanel.DEFAULT_WIDTH);
-            consolePanelElement.style.transform = "translateX(-50%) scale(" + scale.toFixed(8) + ")";
+            maxWidth = isFullscreen
+                ? readjustScreenSize.l ? maxWidth * 0.85 : maxWidth - 36
+                : maxWidth * 0.85;
+            var scale = Math.min(1, maxWidth / jt.ConsolePanel.DEFAULT_WIDTH);
+            consolePanelElement.style.transform = scale < 1
+                ? "translateX(-50%) scale(" + scale.toFixed(8) + ")"
+                : "translateX(-50%)";
         }
         mainElement.style.marginBottom = consolePanelActive && !isFullscreen
             ? "" + Math.ceil(scale * jt.ConsolePanel.DEFAULT_HEIGHT + 3) + "px"
@@ -620,11 +619,19 @@ jt.CanvasDisplay = function(mainElement) {
             { label: "Load State",                     control: jt.PeripheralControls.MACHINE_LOAD_STATE_MENU },
             { label: "Save State",                     control: jt.PeripheralControls.MACHINE_SAVE_STATE_MENU }
         ];
-        powerButton = addBarButton("jt-bar-power", -5, -1, "System Power", null, menu, "System");
+        powerButton = addBarButton("jt-bar-power", -5, -26, "System Power", null, menu, "System");
         barMenuSystem = menu;
 
-        menu = createSettingsMenuOptions();
-        settingsButton = addBarButton("jt-bar-settings", -33, -26, "Settings", null, menu, "Settings");
+        if (!isMobileDevice) {
+            menu = [
+                { label: "Help & Settings", clickModif: 0, control: jt.PeripheralControls.SCREEN_OPEN_SETTINGS },
+                { label: "Quick Options",                  control: jt.PeripheralControls.SCREEN_OPEN_QUICK_OPTIONS },
+                { label: "Defaults",                      control: jt.PeripheralControls.SCREEN_DEFAULTS,          fullScreenHidden: true }
+            ];
+            settingsButton = addBarButton("jt-bar-settings", -33, -26, "Settings", null, menu, "Settings");
+        } else {
+            settingsButton = addBarButton("jt-bar-settings", -33, -26, "Quick Options", jt.PeripheralControls.SCREEN_OPEN_QUICK_OPTIONS);
+        }
 
         if (FULLSCREEN_MODE !== -2) {
             fullscreenButton = addBarButton("jt-bar-full-screen", -103, -1, "Full Screen", jt.PeripheralControls.SCREEN_FULLSCREEN);
@@ -823,21 +830,6 @@ jt.CanvasDisplay = function(mainElement) {
         var elem = e.target;
         if (elem.jtBarElementType === 1) barButtonTouchEndOrMouseUp(e);
         else if (elem.jtBarElementType === 2) barMenuItemTouchEndOrMouseUp(e);
-    }
-
-    function createSettingsMenuOptions() {
-        var menu = [ ];
-
-        if (!isMobileDevice) {
-        menu.push({label: "Help & Settings", clickModif: 0, control: jt.PeripheralControls.SCREEN_OPEN_SETTINGS});
-        menu.push({label: "Quick Options",                  control: jt.PeripheralControls.SCREEN_OPEN_QUICK_OPTIONS});
-        } else
-        menu.push({label: "Quick Options",   clickModif: 0, control: jt.PeripheralControls.SCREEN_OPEN_QUICK_OPTIONS});
-
-        if (!isMobileDevice)
-        menu.push({ label: "Defaults",                      control: jt.PeripheralControls.SCREEN_DEFAULTS,          fullScreenHidden: true });
-
-        return menu;
     }
 
     function setupFullscreen() {
@@ -1150,14 +1142,11 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function readjustAll(force) {
-        if (readjustScreeSizeChanged(force)) {
+        if (isReadjustScreeSizeChanged(force)) {
             if (isFullscreen) {
-                var isLandscape = readjustScreenSize.w > readjustScreenSize.h;
-                var consolePanelRect = consolePanelActive && calculateConsolePanelRect(readjustScreenSize.w);
-                buttonsBarDesiredWidth = isLandscape ? consolePanelActive ? consolePanelRect.w : 0 : -1;
+                buttonsBarDesiredWidth = readjustScreenSize.l ? 0 : -1;
                 var winH = readjustScreenSize.h;
-                if (!isLandscape || consolePanelActive) winH -= jt.ScreenGUI.BAR_HEIGHT + 2;
-                if (consolePanelActive) winH -= consolePanelRect.h + 2;
+                if (!readjustScreenSize.l) winH -= jt.ScreenGUI.BAR_HEIGHT + 2;
                 monitor.displayScale(aspectX, displayOptimalScaleY(readjustScreenSize.w, winH));
             } else {
                 buttonsBarDesiredWidth = -1;
@@ -1177,7 +1166,7 @@ jt.CanvasDisplay = function(mainElement) {
         }
     }
 
-    function readjustScreeSizeChanged(force) {
+    function isReadjustScreeSizeChanged(force) {
         var parW = mainElement.parentElement.clientWidth;
         var winW = fsElementCenter.clientWidth;
         var winH = fsElementCenter.clientHeight;
@@ -1188,6 +1177,7 @@ jt.CanvasDisplay = function(mainElement) {
         readjustScreenSize.pw = parW;
         readjustScreenSize.w = winW;
         readjustScreenSize.h = winH;
+        readjustScreenSize.l = winW > winH;
         return true;
     }
 
@@ -1261,7 +1251,7 @@ jt.CanvasDisplay = function(mainElement) {
     var stateMedia;
 
     var readjustInterval = 0, readjustRequestTime = 0;
-    var readjustScreenSize = { w: 0, wk: 0, h: 0, pw: 0 };
+    var readjustScreenSize = { w: 0, wk: 0, h: 0, pw: 0, l: false };
 
     var isFullscreen = false;
 
