@@ -425,7 +425,7 @@ jt.CanvasDisplay = function(mainElement) {
     function updateBarWidth(canvasWidth) {
         var fixedWidth = buttonsBarDesiredWidth > 0 ? buttonsBarDesiredWidth : canvasWidth;
         buttonsBar.style.width = buttonsBarDesiredWidth === -1 ? "100%" : "" + fixedWidth + "px";
-        //buttonsBar.classList.toggle("jt-narrow", fixedWidth < NARROW_WIDTH);      // TODO Revise
+        buttonsBar.classList.toggle("jt-narrow", fixedWidth < NARROW_WIDTH);
     }
 
     function updateConsolePanelScale(maxWidth) {
@@ -619,7 +619,7 @@ jt.CanvasDisplay = function(mainElement) {
             { label: "Load State",                     control: jt.PeripheralControls.MACHINE_LOAD_STATE_MENU },
             { label: "Save State",                     control: jt.PeripheralControls.MACHINE_SAVE_STATE_MENU }
         ];
-        powerButton = addBarButton("jt-bar-power", -5, -26, "System Power", null, menu, "System");
+        powerButton = addBarButton("jt-bar-power", -5, -26, "System Power", null, false, menu, "System");
         barMenuSystem = menu;
 
         if (!isMobileDevice) {
@@ -628,28 +628,31 @@ jt.CanvasDisplay = function(mainElement) {
                 { label: "Quick Options",                  control: jt.PeripheralControls.SCREEN_OPEN_QUICK_OPTIONS },
                 { label: "Defaults",                      control: jt.PeripheralControls.SCREEN_DEFAULTS,          fullScreenHidden: true }
             ];
-            settingsButton = addBarButton("jt-bar-settings", -33, -26, "Settings", null, menu, "Settings");
+            settingsButton = addBarButton("jt-bar-settings", -33, -26, "Settings", null, false, menu, "Settings");
         } else {
-            settingsButton = addBarButton("jt-bar-settings", -33, -26, "Quick Options", jt.PeripheralControls.SCREEN_OPEN_QUICK_OPTIONS);
+            settingsButton = addBarButton("jt-bar-settings", -33, -26, "Quick Options", jt.PeripheralControls.SCREEN_OPEN_QUICK_OPTIONS, false);
         }
 
+        gameSelectButton = addBarButton("jt-bar-select", -78, -51, "Game Select", jt.ConsoleControls.SELECT, true);
+        gameResetButton = addBarButton("jt-bar-reset", -33, -51, "Game Reset", jt.ConsoleControls.RESET, true);
+
         if (FULLSCREEN_MODE !== -2) {
-            fullscreenButton = addBarButton("jt-bar-full-screen", -103, -1, "Full Screen", jt.PeripheralControls.SCREEN_FULLSCREEN);
+            fullscreenButton = addBarButton("jt-bar-full-screen", -103, -1, "Full Screen", jt.PeripheralControls.SCREEN_FULLSCREEN, false);
             fullscreenButton.jtNeedsUIG = true;
             if (isMobileDevice) fullscreenButton.classList.add("jt-mobile");
         }
 
         if (!Javatari.SCREEN_RESIZE_DISABLED && !isMobileDevice) {
-            scaleUpButton = addBarButton("jt-bar-scale-plus", -80, -1, "Increase Screen", jt.PeripheralControls.SCREEN_SCALE_PLUS);
+            scaleUpButton = addBarButton("jt-bar-scale-plus", -80, -1, "Increase Screen", jt.PeripheralControls.SCREEN_SCALE_PLUS, false);
             scaleUpButton.classList.add("jt-full-screen-hidden");
-            scaleDownButton = addBarButton("jt-bar-scale-minus", -58, -1, "Decrease Screen", jt.PeripheralControls.SCREEN_SCALE_MINUS);
+            scaleDownButton = addBarButton("jt-bar-scale-minus", -58, -1, "Decrease Screen", jt.PeripheralControls.SCREEN_SCALE_MINUS, false);
             scaleDownButton.classList.add("jt-full-screen-hidden");
         }
 
-        var consolePanelButton = addBarButton("jt-bar-console-panel", -62, -25, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE);
+        var consolePanelButton = addBarButton("jt-bar-console-panel", -62, -25, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE, false);
         consolePanelButton.classList.add("jt-full-screen-only");
 
-        logoButton = addBarButton("jt-bar-logo", -99, -26, "About Javatari", jt.PeripheralControls.SCREEN_OPEN_ABOUT);
+        logoButton = addBarButton("jt-bar-logo", -99, -26, "About Javatari", jt.PeripheralControls.SCREEN_OPEN_ABOUT, false);
         logoButton.classList.add("jt-full-screen-hidden");
         logoButton.classList.add("jt-narrow-hidden");
 
@@ -659,12 +662,13 @@ jt.CanvasDisplay = function(mainElement) {
         jt.Util.addEventsListener(buttonsBar, "mouseup touchend", barElementTouchEndOrMouseUp);
     }
 
-    function addBarButton(id, bx, by, tooltip, control, menu, menuTitle) {
+    function addBarButton(id, bx, by, tooltip, control, isConsoleControl, menu, menuTitle) {
         var but = document.createElement('div');
         but.id = id;
         but.classList.add("jt-bar-button");
         but.jtBarElementType = 1;     // Bar button
         but.jtControl = control;
+        but.jtIsConsoleControl = isConsoleControl;
         but.style.backgroundPosition = "" + bx + "px " + by + "px";
         but.jtBX = bx;
         if (menu) {
@@ -678,6 +682,8 @@ jt.CanvasDisplay = function(mainElement) {
 
         // Mouse hover button
         but.addEventListener("mouseenter", function(e) { barButtonHoverOver(e.target, e); });
+        // Mouse left button (only for ConsoleControls)
+        if (isConsoleControl) but.addEventListener("mouseleave", barButtonMouseLeft);
 
         buttonsBarInner.appendChild(but);
         return but;
@@ -693,7 +699,13 @@ jt.CanvasDisplay = function(mainElement) {
 
         // Single option, only left click
         if (elem.jtControl) {
-            if (!e.button) peripheralControls.controlActivated(elem.jtControl);
+            if (!e.button) {
+                if (elem.jtIsConsoleControl) {
+                    barConsoleControlPressed = elem.jtControl;
+                    consoleControlsSocket.controlStateChanged(barConsoleControlPressed, true);
+                } else
+                    peripheralControls.controlActivated(elem.jtControl);
+            }
             return;
         }
 
@@ -757,8 +769,22 @@ jt.CanvasDisplay = function(mainElement) {
         }
     }
 
+    function barButtonMouseLeft() {
+        if (barConsoleControlPressed) {
+            cursorHideFrameCountdown = CURSOR_HIDE_FRAMES;
+            consoleControlsSocket.controlStateChanged(barConsoleControlPressed, false);
+            barConsoleControlPressed = null;
+        }
+    }
+
     function barButtonTouchEndOrMouseUp(e) {
         if (logoMessageActive) return;
+        // Special case for ConsoleControl
+        if (barConsoleControlPressed) {
+            consoleControlsSocket.controlStateChanged(barConsoleControlPressed, false);
+            barConsoleControlPressed = null;
+            return;
+        }
         // Only touch, left or middle button
         if (barMenuItemActive && !(e.button > 1)) barMenuItemFireActive(e.shiftKey, e.button === 1 || e.ctrlKey);
     }
@@ -807,6 +833,7 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function barElementTapOrMouseDown(e) {
+        cursorHideFrameCountdown = CURSOR_HIDE_FRAMES;
         var elem = e.target;
         if (elem.jtBarElementType === 1) barButtonTapOrMousedown(elem, e);
         else if (elem.jtBarElementType === 2) barMenuItemTapOrMouseDown(elem, e);
@@ -825,6 +852,7 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function barElementTouchEndOrMouseUp(e) {
+        cursorHideFrameCountdown = CURSOR_HIDE_FRAMES;
         jt.Util.blockEvent(e);
         barButtonLongTouchCancel();
         var elem = e.target;
@@ -912,7 +940,7 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function hideBar() {
-        if ((BAR_AUTO_HIDE || isFullscreen) && !barMenuActive && !consolePanelActive) {
+        if ((BAR_AUTO_HIDE || isFullscreen) && !barMenuActive && !consolePanelActive && !barConsoleControlPressed) {
             hideBarMenu();
             buttonsBar.classList.add("jt-hidden");
         }
@@ -1284,6 +1312,7 @@ jt.CanvasDisplay = function(mainElement) {
 
     var barMenu;
     var barMenus = [], barMenuActive, barMenuItemActive, barMenuSystem;
+    var barConsoleControlPressed;
 
     var osd;
     var osdTimeout;
@@ -1316,6 +1345,8 @@ jt.CanvasDisplay = function(mainElement) {
     var scaleUpButton;
     var fullscreenButton;
     var settingsButton;
+    var gameSelectButton;
+    var gameResetButton;
 
     var mediaButtonBackYOffsets = [-51, -26, -1];
 
@@ -1329,7 +1360,7 @@ jt.CanvasDisplay = function(mainElement) {
     var BAR_AUTO_HIDE = Javatari.SCREEN_CONTROL_BAR === 0;
     var BAR_MENU_MAX_ITEMS = 10;
 
-    var NARROW_WIDTH = 450;
+    var NARROW_WIDTH = 336;
 
     var k = jt.DOMKeys;
     var KEY_CTRL_MASK  =  k.CONTROL;

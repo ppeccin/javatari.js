@@ -266,7 +266,15 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
 */
 
 #jt-bar-power {
-    margin: 0 12px 0 6px;
+    margin: 0 8px 0 6px;
+}
+#jt-bar-select {
+    margin: 0 2px;
+    width: 50px;
+}
+#jt-bar-reset {
+    margin: 0 2px;
+    width: 50px;
 }
 #jt-bar-settings, #jt-bar-full-screen, #jt-bar-scale-plus, #jt-bar-scale-minus {
     float: right;
