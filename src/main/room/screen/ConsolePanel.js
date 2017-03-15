@@ -221,6 +221,7 @@ jt.ConsolePanel.DEFAULT_WIDTH = 460;
 jt.ConsolePanel.DEFAULT_HEIGHT = 134;
 
 jt.ConsolePanel.shouldStartActive = function() {
+    // Try some backward compatible means to find if Panel should not be active by default
     return !Javatari.SCREEN_CONSOLE_PANEL_DISABLED && (Javatari.CONSOLE_PANEL_ELEMENT_ID === -1 || document.getElementById(Javatari.CONSOLE_PANEL_ELEMENT_ID));
 };
 

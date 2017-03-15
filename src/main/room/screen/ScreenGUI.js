@@ -276,6 +276,9 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
     margin: 0 2px;
     width: 50px;
 }
+html.jt-console-panel-active #jt-bar-select, html.jt-console-panel-active #jt-bar-reset {
+    display: none;
+}
 #jt-bar-settings, #jt-bar-full-screen, #jt-bar-scale-plus, #jt-bar-scale-minus {
     float: right;
     margin: 0;

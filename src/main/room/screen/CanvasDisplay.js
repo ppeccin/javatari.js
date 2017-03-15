@@ -49,11 +49,6 @@ jt.CanvasDisplay = function(mainElement) {
             setFullscreenState(true);
             setEnterFullscreenByAPIOnFirstTouch();
         }
-        if (jt.ConsolePanel.shouldStartActive()) {
-            consolePanelActive = true;
-            consolePanel.setActive(true);
-            updateScale();
-        }
     };
 
     this.powerOff = function() {
@@ -146,13 +141,23 @@ jt.CanvasDisplay = function(mainElement) {
     };
 
     this.toggleConsolePanel = function() {
-        consolePanelActive = !consolePanelActive;
+        if (isFullscreen && isLandscape) consolePanelActiveLandscape = !consolePanelActiveLandscape;
+        else consolePanelActivePortrait = !consolePanelActivePortrait;
+        consolePanelUpdateForOrientation();
+    };
+
+    function consolePanelUpdateForOrientation() {
+        setConsolePanelActive(isFullscreen && isLandscape ? consolePanelActiveLandscape : consolePanelActivePortrait);
+    }
+
+    function setConsolePanelActive(active) {
+        if (consolePanelActive === active) return;
+        consolePanelActive = active;
         consolePanel.setActive(consolePanelActive);
-        if (isFullscreen) this.requestReadjust(true);
-        else updateScale();
+        updateScale();
         if (consolePanelActive) showBar();
         else cursorHideFrameCountdown = CURSOR_HIDE_FRAMES;
-    };
+    }
 
     this.toggleMenuByKey = function() {
         if (barMenuActive) hideBarMenu();
@@ -431,7 +436,7 @@ jt.CanvasDisplay = function(mainElement) {
     function updateConsolePanelScale(maxWidth) {
         if (consolePanelActive) {
             maxWidth = isFullscreen
-                ? readjustScreenSize.l ? maxWidth * 0.85 : maxWidth - 36
+                ? isLandscape ? maxWidth * 0.85 : maxWidth - 36
                 : maxWidth * 0.85;
             var scale = Math.min(1, maxWidth / jt.ConsolePanel.DEFAULT_WIDTH);
             consolePanelElement.style.transform = scale < 1
@@ -1172,9 +1177,9 @@ jt.CanvasDisplay = function(mainElement) {
     function readjustAll(force) {
         if (isReadjustScreeSizeChanged(force)) {
             if (isFullscreen) {
-                buttonsBarDesiredWidth = readjustScreenSize.l ? 0 : -1;
+                buttonsBarDesiredWidth = isLandscape ? 0 : -1;
                 var winH = readjustScreenSize.h;
-                if (!readjustScreenSize.l) winH -= jt.ScreenGUI.BAR_HEIGHT + 2;
+                if (!isLandscape) winH -= jt.ScreenGUI.BAR_HEIGHT + 2;
                 monitor.displayScale(aspectX, displayOptimalScaleY(readjustScreenSize.w, winH));
             } else {
                 buttonsBarDesiredWidth = -1;
@@ -1182,6 +1187,7 @@ jt.CanvasDisplay = function(mainElement) {
             }
 
             self.focus();
+            consolePanelUpdateForOrientation();
             consoleControlsSocket.releaseControllers();
 
             //console.log("READJUST");
@@ -1205,7 +1211,7 @@ jt.CanvasDisplay = function(mainElement) {
         readjustScreenSize.pw = parW;
         readjustScreenSize.w = winW;
         readjustScreenSize.h = winH;
-        readjustScreenSize.l = winW > winH;
+        isLandscape = winW > winH;
         return true;
     }
 
@@ -1281,7 +1287,7 @@ jt.CanvasDisplay = function(mainElement) {
     var readjustInterval = 0, readjustRequestTime = 0;
     var readjustScreenSize = { w: 0, wk: 0, h: 0, pw: 0, l: false };
 
-    var isFullscreen = false;
+    var isFullscreen = false, isLandscape = false;
 
     var isTouchDevice = jt.Util.isTouchDevice();
     var isMobileDevice = jt.Util.isMobileDevice();
@@ -1306,6 +1312,8 @@ jt.CanvasDisplay = function(mainElement) {
 
     var touchControlsActive = false, touchControlsDirBig = false;
     var consolePanelActive = false;
+    var consolePanelActiveLandscape = false;
+    var consolePanelActivePortrait = jt.ConsolePanel.shouldStartActive();
 
     var buttonsBar, buttonsBarInner, buttonsBarDesiredWidth = -1;       // 0 = same as canvas. -1 means full width mode (100%)
     var barButtonLongTouchTarget, barButtonLongTouchSelectTimeout;
