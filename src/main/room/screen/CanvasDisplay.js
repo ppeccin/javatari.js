@@ -3,8 +3,6 @@
 // TODO Remove unstable UNICODE chars (Paste icon, Arrows in Settings)
 // TODO Remove "Center" rounding problems as possible. Main screen element centering still remaining
 // TODO Possible to use hotkeys and bypass logo messages
-// TODO Scroll message nor showing
-// TODO Smoothing issue on iPad
 
 jt.CanvasDisplay = function(mainElement) {
 "use strict";
@@ -456,10 +454,10 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function crtFilterAutoValue() {
-        // Use mode 1 by default (canvas imageSmoothing OFF and CSS image-rendering set to smooth)
+        // Use mode 1 by default (context imageSmoothing OFF and CSS image-rendering set to smooth)
         // iOS browser bug: freezes after some time if imageSmoothing = true. OK if we use the setting above
         // Firefox on Android bug: image looks terrible if imageSmoothing = false. Lets use mode 2 or 3, or let browser default
-        return isMobileDevice && !isIOSDevice && browserName === "FIREFOX" ? 0 : 0;     // 0 : 1;
+        return isMobileDevice && !isIOSDevice && browserName === "FIREFOX" ? 0 : 1;
     }
 
     function setCRTMode(mode) {
@@ -490,11 +488,11 @@ jt.CanvasDisplay = function(mainElement) {
     function createCanvasContext() {
         // Prepare Context used to draw frame
         canvasContext = canvas.getContext("2d", { alpha: false, antialias: false });
-        updateImageComposition();
-        updateImageSmoothing();
+        setImageComposition();
+        setImageSmoothing();
     }
 
-    function updateImageComposition() {
+    function setImageComposition() {
         if (crtModeEffective > 0 && !debugMode) {
             canvasContext.globalCompositeOperation = "source-over";
             canvasContext.globalAlpha = 0.8;
@@ -504,10 +502,10 @@ jt.CanvasDisplay = function(mainElement) {
         }
     }
 
-    function updateImageSmoothing() {
-        if (crtFilterEffective === null) return;    // let default values
+    function setImageSmoothing() {
+        canvas.style.imageRendering = (crtFilterEffective === 0 || crtFilterEffective === 2) ? canvasImageRenderingValue : "initial";
 
-        canvas.style.imageRendering = (crtFilterEffective === 1 || crtFilterEffective === 3) ? "initial" : canvasImageRenderingValue;
+        if (crtFilterEffective === null) return;    // let default values for imageSmoothingEnabled
 
         var smoothing = crtFilterEffective >= 2;
         if (canvasContext.imageSmoothingEnabled !== undefined)
@@ -1157,6 +1155,9 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function setScrollMessage(state) {
+
+        console.error("Scroll Message: " + state);
+
         fsElement.classList.toggle("jt-scroll-message", state);
         scrollMessageActive = state;
         if (state) {

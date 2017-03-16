@@ -131,12 +131,16 @@ html.jt-started #` + Javatari.SCREEN_ELEMENT_ID + ` {
 
 #jt-screen-scroll-message {
     position: absolute;
-    top: -50%;
-    left: 50%;
+    bottom: 150%;
+    right: 0;
+    left: 0;
     height: 0;
+    width: 0;
+    margin: 0 auto;
     padding: 0;
     font-size: 16px;
     line-height: 28px;
+    white-space: nowrap;
     color: hsl(0, 0%, 4%);
     background: hsl(0, 0%, 92%);
     border-radius: 15px;
@@ -147,11 +151,7 @@ html.jt-started #` + Javatari.SCREEN_ELEMENT_ID + ` {
 }
 html.jt-full-screen-scroll-hack #jt-screen-fs.jt-scroll-message #jt-screen-scroll-message {
     opacity: 1;
-    right: 0;
-    width: 0;
     bottom: 23%;
-    margin: 0 auto;
-    white-space: nowrap;
     width: 215px;
     height: 56px;
     padding: 13px 20px;

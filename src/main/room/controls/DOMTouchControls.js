@@ -31,8 +31,6 @@ jt.DOMTouchControls = function(consoleControls) {
 
         var center = !isLandscape && ((screenWidth - width - 10) / 2) < SPEED_CONTROLS_WIDTH;
 
-        console.log("CENTER: " + center + ", sw: " + screenWidth + ", w: " + width + " h: " + height);
-
         speedControls.classList.toggle("jt-center", center);
         if (center) speedControls.style.bottom = "" + (jt.ScreenGUI.BAR_HEIGHT + height + 3) + "px";
         else speedControls.style.removeProperty("bottom");
