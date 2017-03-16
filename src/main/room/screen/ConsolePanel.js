@@ -3,7 +3,8 @@
 jt.ConsolePanel = function(screen, panelElement) {
 "use strict";
 
-    this.connectPeripherals = function(pFileLoader, pPeripheralControls) {
+    this.connectPeripherals = function(pFileLoader, pConsoleControls, pPeripheralControls) {
+        consoleControls = pConsoleControls;
         peripheralControls = pPeripheralControls;
         pFileLoader.registerForDnD(panelElement);
     };
@@ -116,6 +117,7 @@ jt.ConsolePanel = function(screen, panelElement) {
     function switchPressed(e) {
         jt.Util.blockEvent(e);
         if (logoMessageActive) return;
+        consoleControls.hapticFeedbackOnTouch(e);
         e.target.jtPressed = true;
         controlsSocket.controlStateChanged(e.target.jtControl, true);
     }
@@ -124,6 +126,7 @@ jt.ConsolePanel = function(screen, panelElement) {
         jt.Util.blockEvent(e);
         e.target.jtPressed = false;
         if (logoMessageActive) return;
+        consoleControls.hapticFeedbackOnTouch(e);
         controlsSocket.controlStateChanged(e.target.jtControl, false);
     }
 
@@ -140,6 +143,7 @@ jt.ConsolePanel = function(screen, panelElement) {
 
     function cartridgeButtonPressed(e) {
         if (logoMessageActive) screen.closeLogoMessage(e);
+        consoleControls.hapticFeedbackOnTouch(e);
         peripheralControls.controlActivated(e.target.jtControl);
     }
 
@@ -183,6 +187,7 @@ jt.ConsolePanel = function(screen, panelElement) {
 
     var active = false;
 
+    var consoleControls;
     var peripheralControls;
     var controlsSocket, controlsStateReport = {};
     var cartridgeInserted;

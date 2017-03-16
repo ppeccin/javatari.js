@@ -36,7 +36,7 @@ jt.CanvasDisplay = function(mainElement) {
         consoleControls = pConsoleControls;
         consoleControls.addKeyInputElement(fsElement);
         stateMedia = pStateMedia;
-        consolePanel.connectPeripherals(pFileLoader, peripheralControls);
+        consolePanel.connectPeripherals(pFileLoader, consoleControls, peripheralControls);
     };
 
     this.powerOn = function() {
