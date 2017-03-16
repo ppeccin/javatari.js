@@ -26,6 +26,18 @@ jt.DOMTouchControls = function(consoleControls) {
         resetStates();
     };
 
+    this.updateConsolePanelSize = function(screenWidth, width, height, isFullscreen, isLandscape) {
+        if (!speedControls || !isFullscreen) return;
+
+        var center = !isLandscape && ((screenWidth - width - 10) / 2) < SPEED_CONTROLS_WIDTH;
+
+        console.log("CENTER: " + center + ", sw: " + screenWidth + ", w: " + width + " h: " + height);
+
+        speedControls.classList.toggle("jt-center", center);
+        if (center) speedControls.style.bottom = "" + (jt.ScreenGUI.BAR_HEIGHT + height + 3) + "px";
+        else speedControls.style.removeProperty("bottom");
+    };
+
     this.toggleMode = function() {
         if (!isTouchDevice) {
             screen.showOSD("Touch Controls unavailable. Not a touch device!", true, true);
@@ -297,6 +309,8 @@ jt.DOMTouchControls = function(consoleControls) {
     var consolePower = false, consolePaused = false;
 
     var prefs = Javatari.userPreferences.current;
+
+    var SPEED_CONTROLS_WIDTH = 84;
 
 
     function JoystickState() {

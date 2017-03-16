@@ -855,10 +855,19 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
 #jt-touch-button  { z-index: 7 }
 #jt-touch-buttonT { z-index: 6 }
 
+
+#jt-touch-speed.jt-center {
+     width: 84px;
+     left: 0; right: 0;
+     margin: 0 auto;
+}
+#jt-touch-speed.jt-center.jt-poweroff #jt-touch-pause {
+     margin-left: 21px
+}
 #jt-touch-pause, #jt-touch-fast {
     float: left;
-    width: 46px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
     border-color: hsl(0, 0%, 70%);
 }
 #jt-touch-pause::after, #jt-touch-fast::before, #jt-touch-fast::after {
@@ -868,9 +877,9 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
     box-sizing: border-box;
 }
 #jt-touch-pause::after {
-    margin-top: 16px;
-    width: 14px;
-    height: 16px;
+    margin-top: 14px;
+    width: 13px;
+    height: 14px;
     border-width: 0;
     border-left-width: 4px;
     border-left-color: inherit;
@@ -878,20 +887,20 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
     border-right-color: inherit;
 }
 #jt-touch-fast::before, #jt-touch-fast::after {
-    margin-top: 16px;
-    width: 12px;
-    height: 16px;
-    border-width: 8px;
-    border-left-width: 12px;
+    margin-top: 14px;
+    width: 11px;
+    height: 14px;
+    border-width: 7px;
+    border-left-width: 11px;
     border-left-color: inherit;
     border-right-width: 0;
 }
 #jt-touch-speed.jt-paused #jt-touch-pause::after, #jt-touch-speed.jt-poweroff #jt-touch-pause::after {
-    margin-top: 14px;
-    width: 17px;
-    height: 20px;
-    border-width: 10px;
-    border-left-width: 17px;
+    margin: 12px 0 0 3px;
+    width: 15px;
+    height: 18x;
+    border-width: 9px;
+    border-left-width: 15px;
     border-right-width: 0;
 }
 #jt-touch-speed.jt-paused  #jt-touch-fast::after {
@@ -1128,8 +1137,8 @@ html.jt-full-screen .jt-console-panel {
 
     #jt-touch-speed {
         position: absolute;
-        left: -106px;
-        top: 8px;
+        left: -103px;
+        top: 10px;
     }
     html.jt-full-screen.jt-touch-active.jt-dir-big  #jt-touch-speed {
         left: -118px;
@@ -1150,7 +1159,7 @@ html.jt-full-screen .jt-console-panel {
 
     #jt-touch-left {
         left: 2px;
-        bottom: 182px;
+        bottom: 200px;
     }
     html.jt-full-screen.jt-touch-active.jt-dir-big  #jt-touch-left {
         transform: scale(1.2);
@@ -1159,22 +1168,22 @@ html.jt-full-screen .jt-console-panel {
 
     #jt-touch-right {
         right: 5px;
-        bottom: 36px;
+        bottom: 144px;
         width: 112px;
-        height: 224px;
+        height: 112px;
     }
 
     #jt-touch-speed {
         position: absolute;
-        left: 21px;
-        bottom: ` + (this.BAR_HEIGHT + 18) + `px;
+        left: 19px;
+        bottom: ` + (this.BAR_HEIGHT + 12) + `px;
     }
 
     .jt-touch-button {
         position: absolute;
     }
     #jt-touch-button {
-        bottom: 75%;
+        bottom: 50%;
         right: 50%;
     }
     #jt-touch-buttonT {
@@ -1187,10 +1196,10 @@ html.jt-full-screen .jt-console-panel {
 @media only screen and (orientation: portrait) and (max-device-height: 638px) {    /* Medium Portrait. Like iPhone 5 */
 
     #jt-touch-left {
-        bottom: 154px;
+        bottom: 156px;
     }
     #jt-touch-right {
-        bottom: -18px;
+        bottom: 98px;
     }
 
 }
@@ -1201,8 +1210,21 @@ html.jt-full-screen .jt-console-panel {
         bottom: 98px;
     }
     #jt-touch-right {
-        bottom: -74px;
+        bottom: 42px;
     }
 
-}`;
+    html.jt-console-panel-active #jt-touch-left {
+        bottom: 106px;
+    }
+    html.jt-console-panel-active #jt-touch-right {
+        bottom: 52px;
+    }
+
+    html.jt-full-screen.jt-console-panel-active #jt-touch-speed {
+        display: none;
+    }
+
+}
+
+`;
 };

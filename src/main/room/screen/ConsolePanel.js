@@ -27,6 +27,27 @@ jt.ConsolePanel = function(screen, panelElement) {
         logoMessageActive = active;
     };
 
+    this.updateScale = function(screenWidth, isFullscreen, isLandscape) {
+        var height = 0, width = 0;
+        if (active) {
+            screenWidth = isFullscreen
+                ? isLandscape ? screenWidth * 0.85 : screenWidth - 36
+                : screenWidth * 0.85;
+            var scale = Math.min(1, screenWidth / jt.ConsolePanel.DEFAULT_WIDTH);
+            panelElement.style.transform = scale < 1
+                ? "translateX(-50%) scale(" + scale.toFixed(8) + ")"
+                : "translateX(-50%)";
+            height = Math.ceil(scale * jt.ConsolePanel.DEFAULT_HEIGHT);
+            width  = Math.ceil(scale * jt.ConsolePanel.DEFAULT_WIDTH);
+        }
+
+        if (consoleControls) consoleControls.getTouchControls().updateConsolePanelSize(screenWidth, width, height, isFullscreen, isLandscape);
+
+        //console.error("PANEL SCALE: " + scale);
+
+        return height;
+    };
+
     function create() {
         setupMain();
         setupButtons();

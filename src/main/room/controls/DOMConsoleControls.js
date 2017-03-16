@@ -57,6 +57,10 @@ jt.DOMConsoleControls = function(keyForwardControls) {
         touchControls.releaseControllers();
     };
 
+    this.getTouchControls = function() {
+        return touchControls;
+    };
+
     this.toggleP1ControlsMode = function() {
         this.setP1ControlsMode(!p1ControlsMode);
         showModeOSD();

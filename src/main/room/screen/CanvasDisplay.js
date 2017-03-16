@@ -3,6 +3,8 @@
 // TODO Remove unstable UNICODE chars (Paste icon, Arrows in Settings)
 // TODO Remove "Center" rounding problems as possible. Main screen element centering still remaining
 // TODO Possible to use hotkeys and bypass logo messages
+// TODO Scroll message nor showing
+// TODO Smoothing issue on iPad
 
 jt.CanvasDisplay = function(mainElement) {
 "use strict";
@@ -434,20 +436,10 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function updateConsolePanelScale(maxWidth) {
-        if (consolePanelActive) {
-            maxWidth = isFullscreen
-                ? isLandscape ? maxWidth * 0.85 : maxWidth - 36
-                : maxWidth * 0.85;
-            var scale = Math.min(1, maxWidth / jt.ConsolePanel.DEFAULT_WIDTH);
-            consolePanelElement.style.transform = scale < 1
-                ? "translateX(-50%) scale(" + scale.toFixed(8) + ")"
-                : "translateX(-50%)";
-        }
-        mainElement.style.marginBottom = consolePanelActive && !isFullscreen
-            ? "" + Math.ceil(scale * jt.ConsolePanel.DEFAULT_HEIGHT + 3) + "px"
+        var panelHeight = consolePanel.updateScale(maxWidth, isFullscreen, isLandscape);
+        mainElement.style.marginBottom = !isFullscreen && panelHeight > 0
+            ? "" + Math.ceil(panelHeight + 3) + "px"
             : "initial";
-
-        //console.error("PANEL SCALE: " + scale);
     }
 
     function updateCanvasContentSize() {
