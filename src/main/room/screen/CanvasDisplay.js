@@ -643,12 +643,11 @@ jt.CanvasDisplay = function(mainElement) {
             scaleDownButton.classList.add("jt-full-screen-hidden");
         }
 
-        var consolePanelButton = addBarButton("jt-bar-console-panel", -60, -26, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE, false);
+        var consolePanelButton = addBarButton("jt-bar-console-panel", -61, -25, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE, false);
         consolePanelButton.classList.add("jt-full-screen-only");
 
         logoButton = addBarButton("jt-bar-logo", -99, -26, "About Javatari", jt.PeripheralControls.SCREEN_OPEN_ABOUT, false);
         logoButton.classList.add("jt-full-screen-hidden");
-        logoButton.classList.add("jt-narrow-hidden");
 
         // Events for BarButtons and also MenuItems
         jt.Util.onTapOrMouseDownWithBlockUIG(buttonsBar, barElementTapOrMouseDown);

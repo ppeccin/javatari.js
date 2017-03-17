@@ -312,7 +312,7 @@ html.jt-console-panel-active #jt-bar-select, html.jt-console-panel-active #jt-ba
 #jt-bar.jt-narrow #jt-bar-console-panel {
     position: static;
     float: right;
-    margin-right: 4px;
+    margin-right: 3px;
 }
 #jt-bar-logo {
     position: absolute;
@@ -320,7 +320,9 @@ html.jt-console-panel-active #jt-bar-select, html.jt-console-panel-active #jt-ba
     width: 34px;
     margin: 0 auto;
 }
-
+html:not(.jt-console-panel-active) #jt-bar.jt-narrow #jt-bar-logo {
+    display: none;
+}
 
 #jt-bar-menu {
     position: absolute;
@@ -848,6 +850,17 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
     background: hsl(0, 70%, 42%);
     box-shadow: inset 0 2px 0 0px hsl(0, 70%, 48%), 0 2px 0 2px hsl(0, 70%, 27%), inset 0 0px 1px 9px hsl(0, 70%, 38%);
 }
+._jt-touch-button-joy.jt-touch-button-joy-button::after {
+    content: "";
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    border: none;
+    width: 32px;
+    height: 30px;
+    border-radius: 100%;
+    background: hsl(0, 70%, 50%);
+}
 .jt-touch-button-joy.jt-touch-button-joy-buttonT::before {
     border: none;
     background: hsl(240, 50%, 45%);
@@ -1201,7 +1214,7 @@ html.jt-full-screen .jt-console-panel {
         bottom: 156px;
     }
     #jt-touch-right {
-        bottom: 98px;
+        bottom: 100px;
     }
 
 }
