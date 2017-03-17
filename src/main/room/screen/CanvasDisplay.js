@@ -643,7 +643,7 @@ jt.CanvasDisplay = function(mainElement) {
             scaleDownButton.classList.add("jt-full-screen-hidden");
         }
 
-        var consolePanelButton = addBarButton("jt-bar-console-panel", -62, -25, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE, false);
+        var consolePanelButton = addBarButton("jt-bar-console-panel", -60, -26, "Toggle Console Panel", jt.PeripheralControls.SCREEN_CONSOLE_PANEL_TOGGLE, false);
         consolePanelButton.classList.add("jt-full-screen-only");
 
         logoButton = addBarButton("jt-bar-logo", -99, -26, "About Javatari", jt.PeripheralControls.SCREEN_OPEN_ABOUT, false);
@@ -775,6 +775,7 @@ jt.CanvasDisplay = function(mainElement) {
         if (logoMessageActive) return;
         // Special case for ConsoleControl
         if (barConsoleControlPressed) {
+            consoleControls.hapticFeedbackOnTouch(e);
             consoleControlsSocket.controlStateChanged(barConsoleControlPressed, false);
             barConsoleControlPressed = null;
             return;

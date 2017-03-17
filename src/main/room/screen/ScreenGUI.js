@@ -132,11 +132,10 @@ html.jt-started #` + Javatari.SCREEN_ELEMENT_ID + ` {
 #jt-screen-scroll-message {
     position: absolute;
     bottom: 150%;
-    right: 0;
-    left: 0;
+    left: 50%;
     height: 0;
     width: 0;
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
     font-size: 16px;
     line-height: 28px;
@@ -144,8 +143,10 @@ html.jt-started #` + Javatari.SCREEN_ELEMENT_ID + ` {
     color: hsl(0, 0%, 4%);
     background: hsl(0, 0%, 92%);
     border-radius: 15px;
+    transform: translate(-50%, 0);
     box-shadow: 2px 2px 9px rgba(0, 0, 0, 0.7);
     transition: all 1.7s step-end, opacity 1.6s linear;
+    overflow: hidden;
     opacity: 0;
     z-index: -1;
 }
@@ -304,13 +305,14 @@ html.jt-console-panel-active #jt-bar-select, html.jt-console-panel-active #jt-ba
 }
 #jt-bar-console-panel {
     position: absolute;
-    left: 0; right: 0;
-    width: 37px;
+    left: 2px; right: 0;
+    width: 39px;
     margin: 0 auto;
 }
 #jt-bar.jt-narrow #jt-bar-console-panel {
     position: static;
     float: right;
+    margin-right: 4px;
 }
 #jt-bar-logo {
     position: absolute;
