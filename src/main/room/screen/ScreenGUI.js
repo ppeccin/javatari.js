@@ -847,24 +847,13 @@ html.jt-full-screen.jt-touch-active #jt-touch-left, html.jt-full-screen.jt-touch
 
 .jt-touch-button-joy.jt-touch-button-joy-button::before {
     border: none;
-    background: hsl(0, 70%, 42%);
-    box-shadow: inset 0 2px 0 0px hsl(0, 70%, 48%), 0 2px 0 2px hsl(0, 70%, 27%), inset 0 0px 1px 9px hsl(0, 70%, 38%);
-}
-._jt-touch-button-joy.jt-touch-button-joy-button::after {
-    content: "";
-    position: absolute;
-    top: 18px;
-    left: 20px;
-    border: none;
-    width: 32px;
-    height: 30px;
-    border-radius: 100%;
-    background: hsl(0, 70%, 50%);
+    background: hsl(3, 70%, 34%);
+    box-shadow: inset -2px -7px 2px 1px hsl(3, 68%, 38%), inset 0px 0px 0px 8px hsl(3, 72%, 30%), 0px -1px 0px 1px hsl(3, 70%, 43%), 0px 1px 0px 2px hsl(3, 70%, 23%);
 }
 .jt-touch-button-joy.jt-touch-button-joy-buttonT::before {
     border: none;
-    background: hsl(240, 50%, 45%);
-    box-shadow: inset 0 2px 0 0px hsl(240, 50%, 52%), 0 2px 0 2px hsl(240, 50%, 24%), inset 0 0px 1px 9px hsl(240, 50%, 40%);
+    background: hsl(220, 72%, 39%);
+    box-shadow: inset -2px -7px 2px 1px hsl(220, 70%, 43%), inset 0px 0px 0px 8px hsl(220, 75%, 34%), 0px -1px 0px 1px hsl(220, 72%, 50%), 0px 1px 0px 2px hsl(220, 72%, 28%);
 }
 
 #jt-touch-button  { z-index: 7 }
