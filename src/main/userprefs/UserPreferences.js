@@ -75,6 +75,10 @@ Javatari.userPreferences.defaults = function() {
         },
 
         hapticFeedback: true,
+        turboFireSpeed: 6,
+
+        vSynch: null,                      // as specified in parameters
+        crtFilter: null,                   // as specified in parameters
 
         audioBufferBase: -1                // auto
 

@@ -1314,7 +1314,7 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
                 videoSignal.toggleShowInfo(); return;
             case controls.NO_COLLISIONS:
                 debugNoCollisions = !debugNoCollisions;
-                videoSignal.showOSD(debugNoCollisions ? "Collisions OFF" : "Collisions ON", true);
+                videoSignal.showOSD(debugNoCollisions ? "No Collisions: ON" : "No Collisions: OFF", true);
         }
     };
 

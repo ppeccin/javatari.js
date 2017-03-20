@@ -442,7 +442,7 @@ html.jt-full-screen #jt-console-panel {
     font-size: 18px;
     line-height: 21px;
     background: hsl(0, 0%, 16%);
-    padding: 14px 0 0;
+    padding: 11px 0 0;
     text-align: center;
     border: 1px solid black;
     box-sizing: initial;
@@ -653,7 +653,7 @@ html.jt-full-screen #jt-console-panel {
     color: hsl(0, 0%, 88%);
 }
 .jt-quick-options-list li {
-    margin-top: 9px;
+    margin-top: 8px;
     line-height: 1px;
     text-align: left;
 }
@@ -694,10 +694,10 @@ html.jt-full-screen #jt-console-panel {
     position: absolute;
     top: 0; bottom: 0;
     left: 0; right: 0;
-    width: 216px;
-    height: 282px;
+    width: 233px;
+    height: 310px;
     margin: auto;
-    padding: 14px 16px 0;
+    padding: 11px 14px 0;
     color: white;
     font-size: 18px;
     line-height: 22px;

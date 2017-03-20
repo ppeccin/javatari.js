@@ -50,13 +50,14 @@ jt.QuickOptionsDialog = function(mainElement, consoleControls, peripheralControl
         var pc = jt.PeripheralControls;
 
         items = [
-            { label: "NTSC / PAL",         control: cc.VIDEO_STANDARD },
-            { label: "Collisions",         control: cc.NO_COLLISIONS },
-            { label: "Audio Buffer *",     control: pc.SPEAKER_BUFFER_TOGGLE,       peripheral: true },
-            { label: "Paddles Mode",       control: pc.PADDLES_TOGGLE_MODE,         peripheral: true },
-            { label: "Turbo Fire",         control: pc.TURBO_FIRE_TOGGLE,           peripheral: true },
-            { label: "Big Directionals *", control: pc.TOUCH_TOGGLE_DIR_BIG,        peripheral: true },
-            { label: "Haptic Feedback *",  control: pc.HAPTIC_FEEDBACK_TOGGLE_MODE, peripheral: true }
+            { label: "Paddles Mode",                     control: pc.PADDLES_TOGGLE_MODE,         peripheral: true },
+            { label: "No Collisions",                    control: cc.NO_COLLISIONS },
+            { label: "&#128190;&nbsp; V-Synch",          control: cc.VSYNCH },
+            { label: "&#128190;&nbsp; CRT Filter",       control: pc.SCREEN_CRT_FILTER,           peripheral: true },
+            { label: "&#128190;&nbsp; Audio Buffer",     control: pc.SPEAKER_BUFFER_TOGGLE,       peripheral: true },
+            { label: "&#128190;&nbsp; Big Directionals", control: pc.TOUCH_TOGGLE_DIR_BIG,        peripheral: true },
+            { label: "&#128190;&nbsp; TurboFire Speed",  control: pc.TURBO_FIRE_TOGGLE,           peripheral: true },
+            { label: "&#128190;&nbsp; Haptic Feedback",  control: pc.HAPTIC_FEEDBACK_TOGGLE_MODE, peripheral: true }
         ];
 
         // Define list

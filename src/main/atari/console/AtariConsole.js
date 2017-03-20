@@ -9,7 +9,6 @@ jt.AtariConsole = function() {
         mainComponentsCreate();
         socketsCreate();
         self.setDefaults();
-        setVSynchMode(Javatari.SCREEN_VSYNCH_MODE);
     }
 
     this.powerOn = function() {
@@ -124,6 +123,28 @@ jt.AtariConsole = function() {
         this.getVideoOutput().showOSD(message, overlap);
     };
 
+    this.vSynchSetSupported = function(boo) {
+        // To be called once and only by Room during Native Video Freq detection
+        vSynchMode = boo
+            ? Javatari.userPreferences.current.vSynch === null ? Javatari.SCREEN_VSYNCH_MODE : Javatari.userPreferences.current.vSynch
+            : -1;
+    };
+
+    function vSynchToggleMode() {
+        if (vSynchMode === -1) {
+            self.showOSD("V-Synch is DISABLED / UNSUPPORTED", true, true);
+            return;
+        }
+        vSynchMode = vSynchMode ? 0 : 1;
+        updateVideoSynchronization();
+        self.showOSD("V-Synch: " + (vSynchMode ? "ON" : "OFF"), true);
+
+        // Persist
+        Javatari.userPreferences.current.vSynch = vSynchMode;
+        Javatari.userPreferences.setDirty();
+        Javatari.userPreferences.save();
+    }
+
     var setCartridge = function(cartridge) {
         Javatari.cartridge = cartridge;
         var removedCartridge = getCartridge();
@@ -179,12 +200,6 @@ jt.AtariConsole = function() {
         videoStandardIsAuto = false;
         setVideoStandard(forcedVideoStandard);
     };
-
-    function setVSynchMode(mode) {
-        if (vSynchMode === mode) return;
-        if (vSynchMode !== -1) vSynchMode = mode % 2;
-        updateVideoSynchronization();
-    }
 
     function updateVideoSynchronization() {
         // According to the native video frequency detected, target Video Standard and vSynchMode, use a specific pulldown configuration
@@ -297,7 +312,7 @@ jt.AtariConsole = function() {
     var videoStandardAutoDetectionInProgress = false;
     var videoStandardAutoDetectionTries = 0;
 
-    var vSynchMode = Javatari.SCREEN_VSYNCH_MODE;
+    var vSynchMode = -1;
 
     var VIDEO_STANDARD_AUTO_DETECTION_FRAMES = 90;
 
@@ -393,12 +408,7 @@ jt.AtariConsole = function() {
                 else setVideoStandardAuto();
                 break;
             case controls.VSYNCH:
-                if (vSynchMode === -1 || jt.Clock.HOST_NATIVE_FPS === -1) {
-                    self.showOSD("V-Synch is disabled / unsupported", true, true);
-                } else {
-                    setVSynchMode(vSynchMode + 1);
-                    self.showOSD("V-Synch: " + (vSynchMode === 1 ? "ON" : vSynchMode === 0 ? "OFF" : "DISABLED"), true);
-                }
+                vSynchToggleMode();
                 break;
             case controls.CARTRIDGE_FORMAT:
                 cycleCartridgeFormat();
@@ -495,8 +505,10 @@ jt.AtariConsole = function() {
             switch(control) {
                 case jt.ConsoleControls.VIDEO_STANDARD:
                     return { label: videoStandardIsAuto ? "Auto" : videoStandard.name, active: !videoStandardIsAuto };
+                case jt.ConsoleControls.VSYNCH:
+                    return { label: vSynchMode === -1 ? "DISABL" : vSynchMode ? "ON" : "OFF", active: vSynchMode === 1 };
                 case jt.ConsoleControls.NO_COLLISIONS:
-                    return { label: tia.getDebugNoCollisions() ? "OFF" : "ON", active: tia.getDebugNoCollisions() };
+                    return { label: tia.getDebugNoCollisions() ? "ON" : "OFF", active: tia.getDebugNoCollisions() };
                 default:
                     return { label: "Unknown", active: false };
             }

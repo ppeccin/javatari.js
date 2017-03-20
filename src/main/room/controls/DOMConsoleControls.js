@@ -107,12 +107,21 @@ jt.DOMConsoleControls = function(keyForwardControls) {
     };
 
     this.toggleTurboFireSpeed = function() {
-        turboFireSpeed = (turboFireSpeed + 1) % 11;
+        setTurboFireSpeed((turboFireSpeed + 1) % 11);
+        screen.showOSD("Turbo Fire" + (turboFireSpeed ? " speed: " + this.getTurboFireSpeedDesc() : ": OFF"), true);
+
+        // Persist
+        prefs.turboFireSpeed = turboFireSpeed;
+        Javatari.userPreferences.setDirty();
+        Javatari.userPreferences.save();
+    };
+
+    function setTurboFireSpeed(speed) {
+        turboFireSpeed = speed;
         turboFireClocks = turboFireSpeed ? (60 / turboFirePerSecond[turboFireSpeed]) | 0 : 0;
         turboFireFlipClock = (turboFireClocks / 2) | 0;
         turboFireClockCount = 0;
-        screen.showOSD("Turbo Fire" + (turboFireSpeed ? " speed: " + this.getTurboFireSpeedDesc() : ": OFF"), true);
-    };
+    }
 
     this.getTurboFireSpeedDesc = function() {
         return turboFireSpeed ? turboFireSpeed + "x" : "OFF";
@@ -237,6 +246,7 @@ jt.DOMConsoleControls = function(keyForwardControls) {
 
     this.applyPreferences = function() {
         initKeys();
+        setTurboFireSpeed(prefs.turboFireSpeed);
         touchControls.applyPreferences();
         gamepadControls.applyPreferences();
     };

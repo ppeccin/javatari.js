@@ -150,7 +150,7 @@ jt.Clock.detectHostNativeFPSAndCallback = function(callback) {
             requestAnimationFrame(sampler);
         } else {
             jt.Clock.HOST_NATIVE_FPS = -1;
-            jt.Util.error("Could not detect video native frequency. V-Synch DISABLED!");
+            jt.Util.warning("Could not detect video native frequency. V-Synch DISABLED!");
             if (callback) callback(jt.Clock.HOST_NATIVE_FPS);
         }
     };

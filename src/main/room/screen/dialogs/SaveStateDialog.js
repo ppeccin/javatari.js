@@ -62,7 +62,7 @@ jt.SaveStateDialog = function(mainElement, consoleControls, peripheralControls, 
         dialog.id = "jt-savestate";
         dialog.classList.add("jt-select-dialog");
         dialog.style.width = "280px";
-        dialog.style.height = "" + (43 + 11 * 33) + "px";
+        dialog.style.height = "" + (41 + 11 * 33) + "px";
         dialog.tabIndex = -1;
 
         header = document.createTextNode("Select Slot");

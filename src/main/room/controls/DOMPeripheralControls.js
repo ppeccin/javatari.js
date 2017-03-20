@@ -29,6 +29,8 @@ jt.DOMPeripheralControls = function() {
             case controls.TOUCH_TOGGLE_DIR_BIG:
             case controls.HAPTIC_FEEDBACK_TOGGLE_MODE:
                 return consoleControls.getControlReport(control);
+            case controls.SCREEN_CRT_FILTER:
+                return screen.getControlReport(control);
             case controls.SPEAKER_BUFFER_TOGGLE:
                 return speaker.getControlReport(control);
         }

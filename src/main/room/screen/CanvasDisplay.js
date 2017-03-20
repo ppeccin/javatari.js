@@ -145,6 +145,11 @@ jt.CanvasDisplay = function(mainElement) {
         consolePanelUpdateForOrientation();
     };
 
+    this.getControlReport = function(control) {
+        // Only CRT Filter for now
+        return { label: crtFilter === -2 ? "Browser" : crtFilter === -1 ? "Auto" : crtFilter === 0 ? "OFF" : "Level " + crtFilter, active: crtFilter >= 0 };
+    };
+
     function consolePanelUpdateForOrientation() {
         setConsolePanelActive(isFullscreen && isLandscape ? consolePanelActiveLandscape : consolePanelActivePortrait);
     }
@@ -250,10 +255,18 @@ jt.CanvasDisplay = function(mainElement) {
         setCRTFilter(newLevel);
         var levelDesc = crtFilterEffective === null ? "browser default" : crtFilterEffective < 1 ? "OFF" : "level " + crtFilterEffective;
         this.showOSD("CRT filter: " + (crtFilter === -1 ? "AUTO (" + levelDesc + ")" : levelDesc), true);
+
+        // Persist
+        if (Javatari.userPreferences.current.crtFilter !== crtFilter) {
+            Javatari.userPreferences.current.crtFilter = crtFilter;
+            Javatari.userPreferences.setDirty();
+            Javatari.userPreferences.save();
+        }
     };
 
     this.crtFilterSetDefault = function() {
-        setCRTFilter(Javatari.SCREEN_FILTER_MODE);
+        var value = Javatari.userPreferences.current.crtFilter;
+        setCRTFilter(value === null ? Javatari.SCREEN_FILTER_MODE : value);
     };
 
     this.crtModeToggle = function() {

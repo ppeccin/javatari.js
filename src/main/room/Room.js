@@ -33,7 +33,8 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     };
 
     this.start = function(startAction) {
-        jt.Clock.detectHostNativeFPSAndCallback(function() {
+        jt.Clock.detectHostNativeFPSAndCallback(function(nativeFPS) {
+            self.console.vSynchSetSupported(nativeFPS > 0);
             afterPowerONDelay(function () {
                 self.setLoading(false);
                 self.screen.start(startAction || consolePowerOnStartAction);
