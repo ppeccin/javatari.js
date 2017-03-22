@@ -318,10 +318,10 @@ jt.CanvasDisplay = function(mainElement) {
     };
 
     this.consolePowerAndUserPauseStateUpdate = function(power, paused) {
-        if (isLoading) return;
+        if (isLoading) power = false;
         powerButton.style.backgroundPosition = "" + powerButton.jtBX + "px " + (mediaButtonBackYOffsets[power ? 2 : 1]) + "px";
         powerButton.jtMenu[0].label = "Power " + (power ? "OFF" : "ON");
-        powerButton.jtMenu[1].disabled = powerButton.jtMenu[7].disabled = !power;
+        powerButton.jtMenu[1].disabled = powerButton.jtMenu[8].disabled = !power;
     };
 
     this.cartridgeInserted = function(cart) {
@@ -643,6 +643,7 @@ jt.CanvasDisplay = function(mainElement) {
         ];
         powerButton = addBarButton("jt-bar-power", -5, -26, "System Power", null, false, menu, "System");
         barMenuSystem = menu;
+        self.consolePowerAndUserPauseStateUpdate(false, false);     // init states
 
         if (!isMobileDevice) {
             menu = [
