@@ -112,14 +112,14 @@ jt.ConsolePanel = function(screen, panelElement) {
 
         cartInsertedImage = document.getElementById("jt-console-panel-cart-image");
         cartChangeButton  = document.getElementById("jt-console-panel-cart-load");
-        addCartridgeControlButton(cartChangeButton, jt.PeripheralControls.CARTRIDGE_LOAD_FILE);
+        addCartridgeControlButton(cartChangeButton, jt.PeripheralControls.CARTRIDGE_LOAD_RECENT);
 
         if (!Javatari.CARTRIDGE_CHANGE_DISABLED) {
             cartChangeFileButton = document.getElementById("jt-console-panel-cart-file");
-            addCartridgeControlButton(cartChangeFileButton, jt.PeripheralControls.CARTRIDGE_LOAD_FILE);
+            addCartridgeControlButton(cartChangeFileButton, jt.PeripheralControls.CARTRIDGE_LOAD_RECENT);
             setVisibility(cartChangeFileButton, true);
             cartChangeURLButton = document.getElementById("jt-console-panel-cart-url");
-            addCartridgeControlButton(cartChangeURLButton, jt.PeripheralControls.CARTRIDGE_LOAD_URL);
+            addCartridgeControlButton(cartChangeURLButton, jt.PeripheralControls.AUTO_LOAD_URL);
             setVisibility(cartChangeURLButton, true);
         }
     };
@@ -180,7 +180,7 @@ jt.ConsolePanel = function(screen, panelElement) {
         if (colors[2]) DEFAULT_CARTRIDGE_BORDER_COLOR = colors[2];
 
         cartLabel = document.getElementById("jt-console-panel-cart-label");
-        addCartridgeControlButton(cartLabel, jt.PeripheralControls.CARTRIDGE_LOAD_FILE);
+        addCartridgeControlButton(cartLabel, jt.PeripheralControls.CARTRIDGE_LOAD_RECENT);
     };
 
 

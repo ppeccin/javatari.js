@@ -13,6 +13,9 @@ jt.Configurator = {
             if (urlParams.PRESETS) { this.applyParam("PRESETS", urlParams.PRESETS); delete urlParams.PRESETS }
         }
 
+        // Apply reset
+        if (urlParams.RESET) this.applyReset();
+
         // Apply  presets
         this.applyPresets(Javatari.PRESETS);
 
@@ -106,6 +109,12 @@ jt.Configurator = {
                 }
             }
         ];
+    },
+
+    applyReset: function() {
+        jt.Util.warning("Removing all data saved on this client");
+        for(var p in localStorage)
+            if (p.indexOf("javatari") === 0) delete localStorage[p];
     },
 
     abbreviations: {

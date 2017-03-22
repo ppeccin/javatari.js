@@ -59,12 +59,13 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         self.consoleControls = new jt.DOMConsoleControls(self.peripheralControls);
         self.fileDownloader = new jt.FileDownloader();
         self.stateMedia = new jt.LocalStorageSaveStateMedia();
-        self.fileLoader = new jt.FileLoader();
+        self.recentROMs = new jt.RecentStoredROMs();
+        self.fileLoader = new jt.FileLoader(self.recentROMs);
         self.speaker = new jt.WebAudioSpeaker(screenElement);
         self.screen = new jt.CanvasDisplay(screenElement);
 
         self.fileDownloader.connectPeripherals(self.screen);
-        self.screen.connectPeripherals(self.fileLoader, self.fileDownloader, self.consoleControls, self.peripheralControls, self.stateMedia);
+        self.screen.connectPeripherals(self.recentROMs, self.fileLoader, self.fileDownloader, self.consoleControls, self.peripheralControls, self.stateMedia);
         self.speaker.connectPeripherals(self.screen);
         self.consoleControls.connectPeripherals(self.screen);
         self.stateMedia.connectPeripherals(self.fileDownloader);
@@ -89,6 +90,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     this.consoleControls = null;
     this.fileDownloader = null;
     this.stateMedia = null;
+    this.recentROMs = null;
     this.fileLoader = null;
     this.peripheralControls = null;
 

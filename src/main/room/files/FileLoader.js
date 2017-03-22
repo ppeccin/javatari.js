@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.FileLoader = function() {
+jt.FileLoader = function(recentStoredROMs) {
 "use strict";
 
     var self = this;
@@ -140,6 +140,14 @@ jt.FileLoader = function() {
         showError("No valid " + TYPE_DESC[openType] + " found.")
     };
 
+    this.loadROM = function(rom, port, altPower, chooserAsExpansion) {
+        var cart = jt.CartridgeCreator.createCartridgeFromRom(rom);
+        if (!cart) return false;
+        cartridgeSocket.insert(cart, !altPower);
+        recentStoredROMs.storeROM(rom);
+        return true;
+    };
+
     function tryLoadFilesAsMedia(files, openType, port, altPower, asExpansion, format, filesFromZIP) {
         // Try as Single media (first found)
         for (var i = 0; i < files.length; i++)
@@ -183,11 +191,7 @@ jt.FileLoader = function() {
         // Try to load as ROM (Cartridge)
         if (openType === OPEN_TYPE.ROM || openType === OPEN_TYPE.AUTO) {
             var rom = new jt.ROM(name, content, null, format);
-            var cart = jt.CartridgeCreator.createCartridgeFromRom(rom);
-            if (cart) {
-                cartridgeSocket.insert(cart, !altPower);
-                return true;
-            }
+            return self.loadROM(rom, port, altPower, asExpansion);
         }
         // Not a valid content
         return false;

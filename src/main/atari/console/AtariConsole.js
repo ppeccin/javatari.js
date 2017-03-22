@@ -582,6 +582,7 @@ jt.AtariConsole = function() {
                 self.showOSD("State file load failed, wrong version", true);
                 return true;
             }
+            if (!self.powerIsOn) self.powerOn();
             loadState(state);
             self.showOSD("State file loaded", true);
             return true;

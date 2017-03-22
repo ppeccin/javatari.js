@@ -205,8 +205,8 @@ jt.CartridgeFormats = {
         }
     },
 
-    "DPCa": {
-        name: "DPCa",
+    "DPC": {
+        name: "DPC",
         desc: "10K DPC Pitfall 2 (Enhanced Audio)",
         priority: 101,
         tryFormat: function(rom) {

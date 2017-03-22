@@ -42,6 +42,7 @@ Javatari = {
     TOUCH_MODE:                     -1,                         // -1: auto; 0: disabled; 1: enabled; 2: enabled (swapped)
     IMAGES_PATH:                    window.JAVATARI_IMAGES_PATH || "images/",
 
+    RESET:                          0,                          // if value = 1 clear all saved data on the client
     ALLOW_URL_PARAMETERS:           true                        // Allows user to override any of these parameters via URL query parameters
 
 };

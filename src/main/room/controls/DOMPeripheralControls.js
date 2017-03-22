@@ -67,6 +67,9 @@ jt.DOMPeripheralControls = function() {
             case controls.MACHINE_SAVE_STATE_MENU:
                 screen.openSaveStateDialog(true);
                 break;
+            case controls.CARTRIDGE_LOAD_RECENT:
+                if (!mediaChangeDisabledWarning()) screen.openCartridgeChooserDialog(altPower, secPort);
+                break;
             case controls.CARTRIDGE_LOAD_FILE:
                 if (!mediaChangeDisabledWarning()) fileLoader.openFileChooserDialog(OPEN_TYPE.ROM, altPower, secPort, false);
                 break;
@@ -170,8 +173,8 @@ jt.DOMPeripheralControls = function() {
     var initKeys = function() {
         var k = jt.DOMKeys;
 
-        keyCodeMap[KEY_LOAD_FILE]           = controls.AUTO_LOAD_FILE;
-        keyCodeMap[KEY_LOAD_FILE | k.ALT]   = controls.AUTO_LOAD_FILE;
+        keyCodeMap[KEY_LOAD_RECENT]           = controls.CARTRIDGE_LOAD_RECENT;
+        keyCodeMap[KEY_LOAD_RECENT | k.ALT]   = controls.CARTRIDGE_LOAD_RECENT;
         keyCodeMap[KEY_LOAD_URL]            = controls.AUTO_LOAD_URL;
         keyCodeMap[KEY_LOAD_URL | k.ALT]    = controls.AUTO_LOAD_URL;
         keyCodeMap[KEY_CART_REMOVE]         = controls.CARTRIDGE_REMOVE;
@@ -242,7 +245,7 @@ jt.DOMPeripheralControls = function() {
 
     var KEY_SPEAKER_BUFFER  = jt.DOMKeys.VK_A.c;
 
-    var KEY_LOAD_FILE   = jt.DOMKeys.VK_F5.c;
+    var KEY_LOAD_RECENT = jt.DOMKeys.VK_F5.c;
     var KEY_LOAD_URL    = jt.DOMKeys.VK_F6.c;
     var KEY_CART_REMOVE = jt.DOMKeys.VK_F7.c;
 

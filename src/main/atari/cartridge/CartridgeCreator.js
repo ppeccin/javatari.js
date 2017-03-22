@@ -30,10 +30,10 @@ jt.CartridgeCreatorImpl = function() {
         // Get info from the library
         var info = jt.CartridgeDatabase[hash];
         if (info) {
-            jt.Util.log("" + info.n);
+            jt.Util.log("" + info.n + " (" + hash + ")");
         } else {
             info = buildInfo(rom.source);
-            jt.Util.log("Unknown ROM: " + info.n);
+            jt.Util.log("Unknown ROM: " + info.n + " (" + hash + ")");
         }
 
         finishInfo(info, rom.source, hash, formatHint);
@@ -204,8 +204,8 @@ jt.CartridgeCreatorImpl = function() {
         "3E": [
             "^.*BOULDER.*DASH.*$", 		 "^.*BLDRDASH.*$"
         ],
-        "DPCa": [
-            "^.*PITFALL.*(2|II).*$"
+        "DPC": [
+            "^.*PITFALL.*II.*$"
         ]
     };
 

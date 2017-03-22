@@ -26,7 +26,9 @@ jt.CanvasDisplay = function(mainElement) {
         consolePanel.connect(consoleControlsSocket);
     };
 
-    this.connectPeripherals = function(pFileLoader, pFileDownloader, pConsoleControls, pPeripheralControls, pStateMedia) {
+    this.connectPeripherals = function(pRecentROMs, pFileLoader, pFileDownloader, pConsoleControls, pPeripheralControls, pStateMedia) {
+        recentROMs = pRecentROMs;
+        fileLoader = pFileLoader;
         pFileLoader.registerForDnD(fsElement);
         pFileLoader.registerForFileInputElement(fsElement);
         fileDownloader = pFileDownloader;
@@ -134,9 +136,19 @@ jt.CanvasDisplay = function(mainElement) {
         quickOtionsDialog.show();
     };
 
-    this.openLoadFileDialog = function() {
-        peripheralControls.controlActivated(jt.PeripheralControls.AUTO_LOAD_FILE);
-        return false;
+    this.openLoadFileDialog = function(altPower, secPort) {
+        fileLoader.openFileChooserDialog(jt.FileLoader.OPEN_TYPE.AUTO, altPower, secPort, false);
+    };
+
+    this.openRecenROMsDialog = function () {
+        closeAllOverlays();
+        if (!recentROMsDialog) recentROMsDialog = new jt.RecentROMsDialog(fsElementCenter, this, recentROMs, fileLoader);
+        recentROMsDialog.show();
+    };
+
+    this.openCartridgeChooserDialog = function (altPower, secPort) {
+        if (recentROMs.getCatalog().length === 0) this.openLoadFileDialog(altPower, secPort);
+        else this.openRecenROMsDialog();
     };
 
     this.toggleConsolePanel = function() {
@@ -593,6 +605,8 @@ jt.CanvasDisplay = function(mainElement) {
             self.requestReadjust();
         });
 
+        mainElement.addEventListener("drop", closeAllOverlays, true);
+
         logoMessageOK.jtNeedsUIG = logoMessageOKText.jtNeedsUIG = true;     // User Initiated Gesture required
         jt.Util.onTapOrMouseDownWithBlockUIG(logoMessageOK, self.closeLogoMessage);
 
@@ -622,9 +636,10 @@ jt.CanvasDisplay = function(mainElement) {
             { label: "",                   divider: true },
             { label: "Open File",          clickModif: KEY_CTRL_MASK, control: jt.PeripheralControls.AUTO_LOAD_FILE, needsUIG: true },
             { label: "Open URL",           clickModif: KEY_CTRL_MASK | KEY_ALT_MASK, control: jt.PeripheralControls.AUTO_LOAD_URL, needsUIG: true },
+            { label: "Open Recent",                       control: jt.PeripheralControls.CARTRIDGE_LOAD_RECENT },
             { label: "",                   divider: true },
-            { label: "Load State",                     control: jt.PeripheralControls.MACHINE_LOAD_STATE_MENU },
-            { label: "Save State",                     control: jt.PeripheralControls.MACHINE_SAVE_STATE_MENU }
+            { label: "Load State",                        control: jt.PeripheralControls.MACHINE_LOAD_STATE_MENU },
+            { label: "Save State",                        control: jt.PeripheralControls.MACHINE_SAVE_STATE_MENU }
         ];
         powerButton = addBarButton("jt-bar-power", -5, -26, "System Power", null, false, menu, "System");
         barMenuSystem = menu;
@@ -1127,6 +1142,7 @@ jt.CanvasDisplay = function(mainElement) {
         if (saveStateDialog) saveStateDialog.hide();
         if (quickOtionsDialog) quickOtionsDialog.hide();
         if (settingsDialog) settingsDialog.hide();
+        if (recentROMsDialog) recentROMsDialog.hide();
     }
 
     function showLogoMessage(mes, button, higherButton, afterAction) {
@@ -1284,10 +1300,12 @@ jt.CanvasDisplay = function(mainElement) {
 
     var monitor;
     var peripheralControls;
+    var fileLoader;
     var fileDownloader;
     var consoleControls;
     var cartridgeSocket;
     var stateMedia;
+    var recentROMs;
 
     var readjustInterval = 0, readjustRequestTime = 0;
     var readjustScreenSize = { w: 0, wk: 0, h: 0, pw: 0, l: false };
@@ -1307,6 +1325,7 @@ jt.CanvasDisplay = function(mainElement) {
     var consolePanelElement;
     var settingsDialog;
     var saveStateDialog;
+    var recentROMsDialog;
     var quickOtionsDialog;
 
     var fsElement, fsElementCenter;

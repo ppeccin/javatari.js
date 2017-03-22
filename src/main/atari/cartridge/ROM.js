@@ -11,11 +11,11 @@ jt.ROM = function(source, content, info, formatHint) {
 
     // Savestate  -------------------------------------------
 
-    this.saveState = function() {
+    this.saveState = function(includeContent) {
         return {
             s: this.source,
-            i: this.info
-            // content not needed in savestates
+            i: this.info,
+            c: includeContent ? jt.Util.compressInt8BitArrayToStringBase64(this.content) : null     // content may not be needed in savestates
         };
     };
 
@@ -23,5 +23,6 @@ jt.ROM = function(source, content, info, formatHint) {
 
 jt.ROM.loadState = function(state) {
 "use strict";
-    return new jt.ROM(state.s, null, state.i);
+    var c = state.c ? jt.Util.uncompressStringBase64ToInt8BitArray(state.c) : null;
+    return new jt.ROM(state.s, c, state.i);
 };

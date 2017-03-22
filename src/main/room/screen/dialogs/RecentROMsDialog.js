@@ -1,0 +1,144 @@
+// Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
+
+jt.RecentROMsDialog = function(mainElement, screen, recentROMs, fileLoader) {
+"use strict";
+
+    var self = this;
+
+    this.show = function (pSave) {
+        items = recentROMs.getCatalog();
+
+        if (!dialog) {
+            create();
+            return setTimeout(function() {
+                self.show(pSave);
+            }, 0);
+        }
+
+        visible = true;
+        var last = recentROMs.lastROMLoadedIndex;
+        itemSelected = last < 0 || last >= items.length ? 0 : last + 1;
+        refreshList();
+        dialog.classList.add("jt-show");
+        dialog.focus();
+
+        var availHeight = mainElement.clientHeight - jt.ScreenGUI.BAR_HEIGHT - 20;      //  bar - tolerance
+        var height = dialog.clientHeight;
+        var scale = height < availHeight ? 1 : availHeight / height;
+        dialog.style.transform = "translateY(-" + ((jt.ScreenGUI.BAR_HEIGHT / 2) | 0) + "px) scale(" + scale.toFixed(4) + ")";
+
+        //console.error("OPEN RECENT availHeight: " + availHeight + ", height: " + height + ", final: " + height * scale);
+    };
+
+    this.hide = function (confirm) {
+        if (!visible) return;
+        dialog.classList.remove("jt-show");
+        visible = false;
+        Javatari.room.screen.focus();
+        if (confirm) {
+            if (itemSelected === 0)
+                screen.openLoadFileDialog();
+            else {
+                var rom = recentROMs.getROM(itemSelected - 1);
+                fileLoader.loadROM(rom);
+            }
+        }
+    };
+
+    function refreshList() {
+        dialog.style.height = "" + (45 + (items.length + 1) * 33) + "px";
+
+        for (var i = 0; i < 11; ++i) {                               // 10 + 1 for Open File option
+            var li = listItems[i];
+            var item = items[i - 1];
+            li.classList.toggle("jt-visible", i <= items.length);
+            li.jtNeedsUIG = i === 0;                                 // Open file
+            li.innerHTML = item ? item.n : "Open ROM File...";
+        }
+        refreshListSelection();
+    }
+
+    function refreshListSelection() {
+        for (var i = 0; i < listItems.length; ++i)
+            listItems[i].classList.toggle("jt-selected", i === itemSelected);
+    }
+
+    function create() {
+        dialog = document.createElement("div");
+        dialog.id = "jt-recent-roms";
+        dialog.classList.add("jt-select-dialog");
+        dialog.style.width = "360px";
+        dialog.tabIndex = -1;
+
+        dialog.appendChild(document.createTextNode("Select Cartridge"));
+
+        // Define list
+        list = document.createElement('ul');
+        list.style.width = "87%";
+
+        for (var i = 0; i < 11; ++i) {
+            var li = document.createElement("li");
+            li.style.textAlign = "center";
+            li.innerHTML = "";
+            li.jtItem = i;
+            listItems.push(li);
+            list.appendChild(li);
+        }
+        dialog.appendChild(list);
+
+        setupEvents();
+
+        mainElement.appendChild(dialog);
+    }
+
+    function setupEvents() {
+        function hideAbort()   { self.hide(false); }
+        function hideConfirm() { self.hide(true); }
+
+        // Do not close with taps or clicks inside
+        jt.Util.onTapOrMouseDownWithBlock(dialog, function() {
+            dialog.focus();
+        });
+
+        // Select with tap or mousedown (UIG)
+        jt.Util.onTapOrMouseDownWithBlockUIG(dialog, function(e) {
+            if (e.target.jtItem >= 0) {
+                jt.DOMConsoleControls.hapticFeedbackOnTouch(e);
+                itemSelected = e.target.jtItem;
+                refreshListSelection();
+                setTimeout(hideConfirm, 120);
+            }
+        });
+
+        // Trap keys, respond to some
+        dialog.addEventListener("keydown", function(e) {
+            // Abort
+            if (e.keyCode === ESC_KEY) hideAbort();
+            // Confirm
+            else if (CONFIRM_KEYS.indexOf(e.keyCode) >= 0) hideConfirm();
+            // Select
+            else if (SELECT_KEYS[e.keyCode]) {
+                itemSelected += SELECT_KEYS[e.keyCode];
+                if (itemSelected < 0) itemSelected = 0; else if (itemSelected > items.length) itemSelected =  items.length;     // + 1 for Open File
+                refreshListSelection();
+            }
+            return jt.Util.blockEvent(e);
+        });
+    }
+
+
+    var items = [];
+    var itemSelected = 0;
+
+    var dialog, list;
+    var listItems = [];
+    var visible = false;
+
+    var k = jt.DOMKeys;
+    var ESC_KEY = k.VK_ESCAPE.c;
+    var CONFIRM_KEYS = [ k.VK_ENTER.c, k.VK_SPACE.c ];
+    var SELECT_KEYS = {};
+    SELECT_KEYS[k.VK_UP.c] = -1;
+    SELECT_KEYS[k.VK_DOWN.c] = 1;
+
+};
