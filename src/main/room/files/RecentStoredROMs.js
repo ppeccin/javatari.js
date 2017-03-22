@@ -36,10 +36,13 @@ jt.RecentStoredROMs = function() {
             jt.Util.log("New ROM stored: " + rom.info.n + ", " + rom.info.h);
         } else
             this.lastROMLoadedIndex = storedList.indexOf(found);
+
+        localStorage.javataristoredromslastindex = this.lastROMLoadedIndex;
     };
 
     this.getROM = function(index) {
         this.lastROMLoadedIndex = index;
+        localStorage.javataristoredromslastindex = index;
         var romState = getStoredROMs()[index];
         return romState ? jt.ROM.loadState(romState) : null;
     };
@@ -60,12 +63,12 @@ jt.RecentStoredROMs = function() {
     function initStore() {
         storedList = [];
         localStorage.javataristoredromsicatalog = JSON.stringify(storedList);
-        storedROMs = []
+        storedROMs = [];
         localStorage.javataristoredromsdata = JSON.stringify(storedROMs);
     }
 
-
-    this.lastROMLoadedIndex = -1;
+    var last = localStorage.javataristoredromslastindex;
+    this.lastROMLoadedIndex = last !== undefined ? Number.parseInt(last) : -1;
 
     var storedList, storedROMs;
 
