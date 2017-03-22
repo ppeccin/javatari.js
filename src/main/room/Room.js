@@ -51,7 +51,9 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     }
 
     function consolePowerOnStartAction() {
-        if (consoleStartPowerOn) self.console.userPowerOn(false);
+        if (!consoleStartPowerOn) return;
+        if (self.console.getCartridgeSocket().inserted()) self.console.userPowerOn();
+        else if (Javatari.CARTRIDGE_SHOW_RECENT && !Javatari.CARTRIDGE_CHANGE_DISABLED) self.screen.openCartridgeChooserDialog(true);   // Show even if no recent ROMs present
     }
 
     function buildPeripherals() {

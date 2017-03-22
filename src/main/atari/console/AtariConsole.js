@@ -31,9 +31,8 @@ jt.AtariConsole = function() {
         else consoleControlsSocket.firePowerAndUserPauseStateUpdate();
     };
 
-    this.userPowerOn = function(evenWithNoCartridge) {
-        if (isLoading) return;
-        if (evenWithNoCartridge || getCartridge()) this.powerOn();
+    this.userPowerOn = function() {
+        if (!isLoading) this.powerOn();
     };
 
     this.setLoading = function(state) {
@@ -355,7 +354,7 @@ jt.AtariConsole = function() {
         switch (control) {
             case controls.POWER:
                 if (self.powerIsOn) self.powerOff();
-                else self.userPowerOn(true);
+                else self.userPowerOn();
                 break;
             case controls.POWER_OFF:
                 if (self.powerIsOn) self.powerOff();

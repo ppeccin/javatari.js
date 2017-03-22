@@ -68,7 +68,7 @@ jt.DOMPeripheralControls = function() {
                 screen.openSaveStateDialog(true);
                 break;
             case controls.CARTRIDGE_LOAD_RECENT:
-                if (!mediaChangeDisabledWarning()) screen.openCartridgeChooserDialog(altPower, secPort);
+                if (!mediaChangeDisabledWarning()) screen.openCartridgeChooserDialog(false, altPower, secPort);
                 break;
             case controls.CARTRIDGE_LOAD_FILE:
                 if (!mediaChangeDisabledWarning()) fileLoader.openFileChooserDialog(OPEN_TYPE.ROM, altPower, secPort, false);

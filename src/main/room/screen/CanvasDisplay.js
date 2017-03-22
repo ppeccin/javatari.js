@@ -146,8 +146,8 @@ jt.CanvasDisplay = function(mainElement) {
         recentROMsDialog.show();
     };
 
-    this.openCartridgeChooserDialog = function (altPower, secPort) {
-        if (recentROMs.getCatalog().length === 0) this.openLoadFileDialog(altPower, secPort);
+    this.openCartridgeChooserDialog = function (force, altPower, secPort) {
+        if (!force && recentROMs.getCatalog().length === 0) this.openLoadFileDialog(altPower, secPort);
         else this.openRecenROMsDialog();
     };
 
