@@ -321,7 +321,7 @@ jt.CanvasDisplay = function(mainElement) {
         if (isLoading) power = false;
         powerButton.style.backgroundPosition = "" + powerButton.jtBX + "px " + (mediaButtonBackYOffsets[power ? 2 : 1]) + "px";
         powerButton.jtMenu[0].label = "Power " + (power ? "OFF" : "ON");
-        powerButton.jtMenu[1].disabled = powerButton.jtMenu[8].disabled = !power;
+        powerButton.jtMenu[1].disabled = powerButton.jtMenu[9].disabled = !power;
     };
 
     this.cartridgeInserted = function(cart) {
@@ -634,9 +634,10 @@ jt.CanvasDisplay = function(mainElement) {
             { label: "Power",              clickModif: 0, control: jt.PeripheralControls.MACHINE_POWER_TOGGLE },
             { label: "Fry Console",                       control: jt.PeripheralControls.MACHINE_POWER_FRY },
             { label: "",                   divider: true },
+            { label: "Select Cartridge",                  control: jt.PeripheralControls.CARTRIDGE_LOAD_RECENT },
+            { label: "",                   divider: true },
             { label: "Open File",          clickModif: KEY_CTRL_MASK, control: jt.PeripheralControls.AUTO_LOAD_FILE, needsUIG: true },
             { label: "Open URL",           clickModif: KEY_CTRL_MASK | KEY_ALT_MASK, control: jt.PeripheralControls.AUTO_LOAD_URL, needsUIG: true },
-            { label: "Open Recent",                       control: jt.PeripheralControls.CARTRIDGE_LOAD_RECENT },
             { label: "",                   divider: true },
             { label: "Load State",                        control: jt.PeripheralControls.MACHINE_LOAD_STATE_MENU },
             { label: "Save State",                        control: jt.PeripheralControls.MACHINE_SAVE_STATE_MENU }
@@ -1145,6 +1146,7 @@ jt.CanvasDisplay = function(mainElement) {
         if (settingsDialog) settingsDialog.hide();
         if (recentROMsDialog) recentROMsDialog.hide();
     }
+    this.closeAllOverlays = closeAllOverlays;
 
     function showLogoMessage(mes, button, higherButton, afterAction) {
         consolePanel.setLogoMessageActive(true);
