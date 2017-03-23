@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-// TODO NUSIZ during scan with HMOVE not correct. We kill the scan in progress
+// TODO NUSIZ during scan with HMOVE not correct. For now kill the scan in progress
 // TODO Starfield Effect not implemented
 // TODO PAL Sinch too aggressive
 // TODO Vsynch lines count affects vertical position!
