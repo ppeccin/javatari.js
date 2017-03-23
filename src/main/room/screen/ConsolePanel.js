@@ -165,7 +165,6 @@ jt.ConsolePanel = function(screen, panelElement) {
 
     function cartridgeButtonPressed(e) {
         consoleControls.hapticFeedbackOnTouch(e);
-        if (logoMessageActive) screen.closeLogoMessage(e);
         screen.closeAllOverlays();
         peripheralControls.controlActivated(e.target.jtControl);
     }

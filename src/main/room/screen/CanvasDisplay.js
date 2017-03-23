@@ -140,15 +140,16 @@ jt.CanvasDisplay = function(mainElement) {
         fileLoader.openFileChooserDialog(jt.FileLoader.OPEN_TYPE.AUTO, altPower, secPort, false);
     };
 
-    this.openRecenROMsDialog = function () {
+    this.openRecentROMsDialog = function () {
         closeAllOverlays();
         if (!recentROMsDialog) recentROMsDialog = new jt.RecentROMsDialog(fsElementCenter, this, recentROMs, fileLoader);
         recentROMsDialog.show();
     };
 
     this.openCartridgeChooserDialog = function (force, altPower, secPort) {
+        if (logoMessageActive) self.closeLogoMessage();      // May be invoked directly from outside!
         if (!force && recentROMs.getCatalog().length === 0) this.openLoadFileDialog(altPower, secPort);
-        else this.openRecenROMsDialog();
+        else this.openRecentROMsDialog();
     };
 
     this.toggleConsolePanel = function() {
@@ -608,7 +609,10 @@ jt.CanvasDisplay = function(mainElement) {
         mainElement.addEventListener("drop", closeAllOverlays, true);
 
         logoMessageOK.jtNeedsUIG = logoMessageOKText.jtNeedsUIG = true;     // User Initiated Gesture required
-        jt.Util.onTapOrMouseDownWithBlockUIG(logoMessageOK, self.closeLogoMessage);
+        jt.Util.onTapOrMouseDownWithBlockUIG(logoMessageOK, function(e) {
+            consoleControls.hapticFeedbackOnTouch(e);
+            self.closeLogoMessage();
+        });
 
         // Used to show bar and close overlays and modals if not processed by any other function
         jt.Util.addEventsListener(fsElementCenter, "touchstart touchend mousedown", function backScreenTouched(e) {
@@ -1164,9 +1168,8 @@ jt.CanvasDisplay = function(mainElement) {
         updateLogo();
     }
 
-    this.closeLogoMessage = function(e) {
+    this.closeLogoMessage = function() {
         consolePanel.setLogoMessageActive(false);
-        consoleControls.hapticFeedbackOnTouch(e);
         fsElement.classList.remove("jt-logo-message-active");
         logoMessageActive = false;
         if (afterMessageAction) {
