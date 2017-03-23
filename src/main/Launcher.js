@@ -101,7 +101,7 @@ if (window.applicationCache) {
     else window.applicationCache.addEventListener("updateready", onUpdateReady);
 }
 
-Javatari.VERSION = "4.0 alpha";
+Javatari.VERSION = "4.0.903";
 
 // Start pre-loading images right away
 Javatari.preLoadImagesAndStart();

@@ -138,8 +138,8 @@ jt.ConsolePanel = function(screen, panelElement) {
     function switchPressed(e) {
         jt.Util.blockEvent(e);
         if (logoMessageActive) return;
-        screen.closeAllOverlays();
         consoleControls.hapticFeedbackOnTouch(e);
+        screen.closeAllOverlays();
         e.target.jtPressed = true;
         controlsSocket.controlStateChanged(e.target.jtControl, true);
     }
@@ -164,9 +164,9 @@ jt.ConsolePanel = function(screen, panelElement) {
     };
 
     function cartridgeButtonPressed(e) {
+        consoleControls.hapticFeedbackOnTouch(e);
         if (logoMessageActive) screen.closeLogoMessage(e);
         screen.closeAllOverlays();
-        consoleControls.hapticFeedbackOnTouch(e);
         peripheralControls.controlActivated(e.target.jtControl);
     }
 

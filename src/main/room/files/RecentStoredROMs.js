@@ -28,7 +28,8 @@ jt.RecentStoredROMs = function() {
                 storedList = storedList.slice(0, MAX_ITMES - 1);
                 storedROMs = storedROMs.slice(0, MAX_ITMES - 1);
             }
-            storedList.unshift({ n: rom.info.n, h: rom.info.h, f: rom.info.f });
+            storedList.unshift({ n: rom.info.l, h: rom.info.h, f: rom.info.f });
+            for (var i = 0; i < storedList.length; ++i) storedList[i].i = i;
             localStorage.javataristoredromsicatalog = JSON.stringify(storedList);
             storedROMs.unshift(rom.saveState(true));        // true: include content bytes
             localStorage.javataristoredromsdata = JSON.stringify(storedROMs);

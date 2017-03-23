@@ -46,7 +46,6 @@ jt.SaveStateDialog = function(mainElement, consoleControls, peripheralControls, 
         for (var i = 0; i < listItems.length; ++i) {
             var li = listItems[i];
             li.innerHTML = prefix + slotOptions[i].d;
-            li.classList.toggle("jt-selected", i === slotSelected);
             li.classList.toggle("jt-toggle-checked", stateMedia.isSlotUsed(i + 1));
         }
         refreshListSelection();
@@ -137,17 +136,17 @@ jt.SaveStateDialog = function(mainElement, consoleControls, peripheralControls, 
     var c = jt.ConsoleControls;
     var p = jt.PeripheralControls;
     var slotOptions = [
-        { d: "Slot 1", load: c.LOAD_STATE_1,            save: c.SAVE_STATE_1 },
-        { d: "Slot 2", load: c.LOAD_STATE_2,            save: c.SAVE_STATE_2 },
-        { d: "Slot 3", load: c.LOAD_STATE_3,            save: c.SAVE_STATE_3 },
-        { d: "Slot 4", load: c.LOAD_STATE_4,            save: c.SAVE_STATE_4 },
-        { d: "Slot 5", load: c.LOAD_STATE_5,            save: c.SAVE_STATE_5 },
-        { d: "Slot 6", load: c.LOAD_STATE_6,            save: c.SAVE_STATE_6 },
-        { d: "Slot 7", load: c.LOAD_STATE_7,            save: c.SAVE_STATE_7 },
-        { d: "Slot 8", load: c.LOAD_STATE_8,            save: c.SAVE_STATE_8 },
-        { d: "Slot 9", load: c.LOAD_STATE_9,            save: c.SAVE_STATE_9 },
-        { d: "Slot 10", load: c.LOAD_STATE_10,          save: c.SAVE_STATE_10 },
-        { d: "File",   load: p.MACHINE_LOAD_STATE_FILE, save: p.MACHINE_SAVE_STATE_FILE, peripheral: true }
+        { d: "Slot 1", load: c.LOAD_STATE_1,             save: c.SAVE_STATE_1 },
+        { d: "Slot 2", load: c.LOAD_STATE_2,             save: c.SAVE_STATE_2 },
+        { d: "Slot 3", load: c.LOAD_STATE_3,             save: c.SAVE_STATE_3 },
+        { d: "Slot 4", load: c.LOAD_STATE_4,             save: c.SAVE_STATE_4 },
+        { d: "Slot 5", load: c.LOAD_STATE_5,             save: c.SAVE_STATE_5 },
+        { d: "Slot 6", load: c.LOAD_STATE_6,             save: c.SAVE_STATE_6 },
+        { d: "Slot 7", load: c.LOAD_STATE_7,             save: c.SAVE_STATE_7 },
+        { d: "Slot 8", load: c.LOAD_STATE_8,             save: c.SAVE_STATE_8 },
+        { d: "Slot 9", load: c.LOAD_STATE_9,             save: c.SAVE_STATE_9 },
+        { d: "Slot 10", load: c.LOAD_STATE_10,           save: c.SAVE_STATE_10 },
+        { d: "File...", load: p.MACHINE_LOAD_STATE_FILE, save: p.MACHINE_SAVE_STATE_FILE, peripheral: true }
     ];
 
     var k = jt.DOMKeys;

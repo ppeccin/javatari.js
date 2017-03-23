@@ -6,8 +6,6 @@ jt.RecentROMsDialog = function(mainElement, screen, recentROMs, fileLoader) {
     var self = this;
 
     this.show = function (pSave) {
-        items = recentROMs.getCatalog();
-
         if (!dialog) {
             create();
             return setTimeout(function() {
@@ -15,9 +13,13 @@ jt.RecentROMsDialog = function(mainElement, screen, recentROMs, fileLoader) {
             }, 0);
         }
 
-        visible = true;
+        items = recentROMs.getCatalog().slice();        // clone
+        items.sort(function (a, b) { return a.n > b.n; });
         var last = recentROMs.lastROMLoadedIndex;
-        itemSelected = last < 0 || last >= items.length ? 0 : last + 1;
+        last = items.indexOf(items.find(function(r) { return r.i === last; }));
+        itemSelected = last < 0 || last >= items.length ? items.length : last;
+
+        visible = true;
         refreshList();
         dialog.classList.add("jt-show");
         dialog.focus();
@@ -36,24 +38,26 @@ jt.RecentROMsDialog = function(mainElement, screen, recentROMs, fileLoader) {
         visible = false;
         Javatari.room.screen.focus();
         if (confirm) {
-            if (itemSelected === 0)
+            if (itemSelected === items.length)
                 screen.openLoadFileDialog();
             else {
-                var rom = recentROMs.getROM(itemSelected - 1);
+                var rom = recentROMs.getROM(items[itemSelected].i);
                 fileLoader.loadROM(rom);
             }
         }
     };
 
     function refreshList() {
-        dialog.style.height = "" + (45 + (items.length + 1) * 33) + "px";
+        dialog.style.height = "" + (42 + (items.length + 1) * 33) + "px";
 
         for (var i = 0; i < 11; ++i) {                               // 10 + 1 for Open File option
             var li = listItems[i];
-            var item = items[i - 1];
+            var item = items[i];
             li.classList.toggle("jt-visible", i <= items.length);
-            li.jtNeedsUIG = i === 0;                                 // Open file
-            li.innerHTML = item ? item.n : "Open ROM File...";
+            li.classList.toggle("jt-toggle", i < items.length);
+            li.classList.toggle("jt-toggle-checked", i < items.length);
+            li.jtNeedsUIG = i === items.length;                      // Open file
+            li.innerHTML = item ? item.n : "&nbsp;&nbsp;Open ROM File...";
         }
         refreshListSelection();
     }
@@ -67,14 +71,14 @@ jt.RecentROMsDialog = function(mainElement, screen, recentROMs, fileLoader) {
         dialog = document.createElement("div");
         dialog.id = "jt-recent-roms";
         dialog.classList.add("jt-select-dialog");
-        dialog.style.width = "360px";
+        dialog.style.width = "350px";
         dialog.tabIndex = -1;
 
         dialog.appendChild(document.createTextNode("Select Cartridge"));
 
         // Define list
         list = document.createElement('ul');
-        list.style.width = "87%";
+        list.style.width = "85%";
 
         for (var i = 0; i < 11; ++i) {
             var li = document.createElement("li");

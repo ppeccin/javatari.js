@@ -481,7 +481,7 @@ html.jt-full-screen #jt-console-panel {
     height: 26px;
     background: rgb(70, 70, 70);
     margin: 7px 0;
-    padding: 11px 10px 0;
+    padding: 11px 10px 0 18px;       /* Space on the left for the toggle mark for all lines */
     line-height: 0;
     text-align: left;
     text-overflow: ellipsis;
