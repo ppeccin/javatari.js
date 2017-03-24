@@ -2,7 +2,7 @@
 
 // TODO NUSIZ during scan with HMOVE not correct. For now kill the scan in progress
 // TODO Starfield Effect not implemented
-// TODO PAL Sinch too aggressive
+// TODO AUTO Video Standard Detection too aggressive?
 // TODO Vsynch lines count affects vertical position!
 
 jt.Tia = function(pCpu, pPia, audioSocket) {
