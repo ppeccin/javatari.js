@@ -34,6 +34,27 @@ jt.Monitor = function(display) {
         return vSynched;
     };
 
+    //this.nextLineNew = function(pixels, vSynchSignal) {
+    //    // Process new line received
+    //    var frameEnd = false;
+    //    if (line < signalHeight) {
+    //        // Copy to the back buffer only contents that will be displayed
+    //        if (line >= viewportOriginY && line < viewportOriginY + viewportHeight)
+    //            backBuffer.set(pixels, (line - viewportOriginY) * signalWidth);
+    //    } else
+    //        frameEnd = maxLineExceeded();
+    //    line++;
+    //    if (!videoStandardDetected) ++videoStandardDetectionFrameLineCount;
+    //    if (vSynchActive ^ vSynchSignal) {
+    //        vSynchActive = vSynchSignal;
+    //        if (!vSynchSignal) {
+    //            if (!videoStandardDetected) videoStandardDetectionNewFrame();
+    //            return newFrame();
+    //        }
+    //    }
+    //    return frameEnd;
+    //};
+
     var newFrame = function() {
         if (line < minLinesToSync) return false;
 
