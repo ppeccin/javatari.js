@@ -654,7 +654,7 @@ jt.CanvasDisplay = function(mainElement) {
             menu = [
                 { label: "Help & Settings", clickModif: 0, control: jt.PeripheralControls.SCREEN_OPEN_SETTINGS },
                 { label: "Quick Options",                  control: jt.PeripheralControls.SCREEN_OPEN_QUICK_OPTIONS },
-                { label: "Defaults",                      control: jt.PeripheralControls.SCREEN_DEFAULTS,          fullScreenHidden: true }
+                { label: "Defaults",                       control: jt.PeripheralControls.SCREEN_DEFAULTS/*,          fullScreenHidden: true*/ }
             ];
             settingsButton = addBarButton("jt-bar-settings", -33, -26, "Settings", null, false, menu, "Settings");
         } else {
