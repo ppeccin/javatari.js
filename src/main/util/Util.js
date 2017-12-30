@@ -3,14 +3,20 @@
 jt.Util = new function() {
 "use strict";
 
-    this.log = function(str) {
-        console.log(">> jt: " + str);
+    this.log = function() {
+        var args = [ "jt:" ];
+        Array.prototype.push.apply(args, arguments);
+        console.log.apply(null, args);
     };
-    this.warning = function(str) {
-        console.warn(">> jt Warning: " + str);
+    this.warning = function(str, a, b, c) {
+        var args = [ "jt Warning:" ];
+        Array.prototype.push.apply(args, arguments);
+        console.warn.apply(null, args);
     };
-    this.error = function(str) {
-        console.error(">> jt Error: " + str);
+    this.error = function(str, a, b, c) {
+        var args = [ "jt Error:" ];
+        Array.prototype.push.apply(args, arguments);
+        console.error.apply(null, args);
     };
 
     this.message = function(str) {

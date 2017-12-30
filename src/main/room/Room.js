@@ -5,7 +5,25 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
 
     var self = this;
 
+    this.enterStandaloneMode = function() {
+        this.netPlayMode = 0;
+        this.netServer = undefined;
+        self.mainVideoClock.go();       // Local Clock
+    };
+
+    this.enterNetServerMode = function(netServer) {
+        this.netPlayMode = 1;
+        this.netServer = netServer;
+        self.mainVideoClock.go();       // Local Clock, also sent to Client
+    };
+
+    this.enterNetClientMode = function() {
+        this.netPlayMode = 2;
+        self.mainVideoClock.pause();    // Clock comes Server
+    };
+
     function init() {
+        buildMainClock();
         buildPeripherals();
         buildAndPlugConsole();
     }
@@ -15,6 +33,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         self.speaker.powerOn();
         self.consoleControls.powerOn();
         self.setLoading(true);
+        self.enterStandaloneMode();
         roomPowerOnTime = Date.now();
     };
 
@@ -42,6 +61,16 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         });
     };
 
+    this.showOSD = function(message, overlap, error) {
+        this.console.showOSD(message, overlap, error);
+    };
+
+    this.videoClockPulse = function() {
+        self.console.videoClockPulse();
+
+        if (self.netServer) self.netServer.broadcastClockPulse();
+    };
+
     function afterPowerONDelay(func) {
         var wait = Javatari.AUTO_POWER_ON_DELAY;
         if (wait >= 0 && JavatariFullScreenSetup.shouldStartInFullScreen()) wait += 1400;   // Wait a bit more
@@ -54,6 +83,13 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         if (!consoleStartPowerOn) return;
         if (self.console.getCartridgeSocket().inserted()) self.console.userPowerOn();
         else if (Javatari.CARTRIDGE_SHOW_RECENT && !Javatari.CARTRIDGE_CHANGE_DISABLED) self.screen.openCartridgeChooserDialog(true);   // Show even if no recent ROMs present
+    }
+
+    function buildMainClock() {
+        // Main clock will be the Tia Frame VideoClock (60Hz/50Hz)
+        // CPU and other clocks (Pia, Audio) will be sent by the Tia
+        // Clock frequency will be changed directly by the Console
+        self.mainVideoClock = new jt.Clock(self.videoClockPulse);
     }
 
     function buildPeripherals() {
@@ -75,7 +111,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     }
 
     function buildAndPlugConsole() {
-        self.console = new jt.AtariConsole();
+        self.console = new jt.AtariConsole(self.mainVideoClock);
         self.stateMedia.connect(self.console.getSavestateSocket());
         self.fileLoader.connect(self.console);
         self.screen.connect(self.console);
@@ -86,6 +122,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     }
 
 
+    this.mainVideoClock = null;
     this.console = null;
     this.screen = null;
     this.speaker = null;
@@ -95,6 +132,9 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     this.recentROMs = null;
     this.fileLoader = null;
     this.peripheralControls = null;
+
+    this.netPlayMode = 0;       // 0 = standalone, 1 = server, 2 = client
+    this.netServer = undefined;
 
     this.isLoading = false;
 

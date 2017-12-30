@@ -23,8 +23,8 @@ jt.VideoSignal = function() {
         if (this.monitor) this.monitor.videoSignalOff();
     };
 
-    this.showOSD = function(message, overlap) {
-        if (this.monitor) this.monitor.showOSD(message, overlap);
+    this.showOSD = function(message, overlap, error) {
+        if (this.monitor) this.monitor.showOSD(message, overlap, error);
     };
 
     this.toggleShowInfo = function() {

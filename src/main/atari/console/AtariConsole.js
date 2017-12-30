@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.AtariConsole = function() {
+jt.AtariConsole = function(mainVideoClock) {
 "use strict";
 
     var self = this;
@@ -19,7 +19,6 @@ jt.AtariConsole = function() {
         updateVideoSynchronization();
         videoStandardAutoDetectionStart();
         consoleControlsSocket.firePowerAndUserPauseStateUpdate();
-        if (!mainVideoClock.isRunning()) mainVideoClock.go();
     };
 
     this.powerOff = function() {
@@ -118,8 +117,8 @@ jt.AtariConsole = function() {
         return audioSocket;
     };
 
-    this.showOSD = function(message, overlap) {
-        this.getVideoOutput().showOSD(message, overlap);
+    this.showOSD = function(message, overlap, error) {
+        this.getVideoOutput().showOSD(message, overlap, error);
     };
 
     this.vSynchSetSupported = function(boo) {
@@ -261,10 +260,6 @@ jt.AtariConsole = function() {
     }
 
     var mainComponentsCreate = function() {
-        // Main clock will be the Tia Frame VideoClock (60Hz/50Hz)
-        // CPU and other clocks (Pia, Audio) will be sent by the Tia
-        self.mainVideoClock = mainVideoClock = new jt.Clock(self.videoClockPulse);
-
         cpu = new jt.M6502();
         pia = new jt.Pia();
         tia = new jt.Tia(cpu, pia);
@@ -292,7 +287,6 @@ jt.AtariConsole = function() {
     var speedControl = 1;
     var alternateSpeed = false;
 
-    var mainVideoClock;
     var cpu;
     var pia;
     var tia;
