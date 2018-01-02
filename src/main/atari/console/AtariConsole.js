@@ -232,6 +232,7 @@ jt.AtariConsole = function(mainVideoClock) {
             vs: videoStandard.name
         };
     };
+    this.saveState = saveState;
 
     var loadState = function(state) {
         mainVideoClockUpdateSpeed();
@@ -243,6 +244,7 @@ jt.AtariConsole = function(mainVideoClock) {
         setVideoStandard(jt.VideoStandard[state.vs]);
         consoleControlsSocket.controlsStatesRedefined();
     };
+    this.loadState = loadState;
 
     this.setDefaults = function() {
         setVideoStandardAuto();

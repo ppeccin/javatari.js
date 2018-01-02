@@ -37,6 +37,15 @@ jt.NetClient = function(room) {
         room.enterStandaloneMode();
     };
 
+    this.processLocalControl = function (control, press) {
+        // Send only to server, do not process locally
+        controlsToSend.push({ c: control, p: press});
+    };
+
+    this.netVideoClockPulse = function() {
+        // Client get clocks from Server
+    };
+
     function onSessionServerConnected() {
         // Join a Session
         ws.send(JSON.stringify({ sessionControl: "joinSession", sessionID: sessionIDToJoin }));
@@ -61,10 +70,11 @@ jt.NetClient = function(room) {
         }
     }
 
-    function onSessionJoined(message) {
-        room.enterNetClientMode();
+    function onSessionJoined(netClock) {
+        room.enterNetClientMode(self);
+        controlsToSend.length = 0;
 
-        sessionID = message.sessionID;
+        sessionID = netClock.sessionID;
         room.showOSD("NetPlay Session joined: " + sessionID, true);
         jt.Util.log("NetPlay Session joined: " + sessionID);
 
@@ -102,7 +112,35 @@ jt.NetClient = function(room) {
     }
 
     function onDataChannelMessage(event) {
-        room.videoClockPulse();
+        var update = JSON.parse(event.data);
+
+        // window.console.log(update);
+
+        ++updates;
+        if (update.update !== updates) {
+            jt.Util.error("NetPlay Client expected update: " + updates + ", but got: " + update.update);
+            self.leaveSession(true);
+        }
+
+        if (update.power !== undefined)
+            update.power ? console.powerOn() : console.powerOff();
+
+        if (update.state)
+            console.loadState(update.state);
+
+        if (update.controls) {
+            var controls = update.controls;
+            for (var i = 0, len = controls.length; i < len; ++i)
+                consoleControlsSocket.controlStateChanged(controls[i].c, controls[i].p);
+        }
+
+        console.videoClockPulse();
+
+        // Send local controls to Server
+        if (controlsToSend.length) {
+            dataChannel.send(JSON.stringify({ controls: controlsToSend }));
+            controlsToSend.length = 0;
+        }
     }
 
     function onRTCError(error) {
@@ -110,11 +148,19 @@ jt.NetClient = function(room) {
         self.leaveSession(true);
     }
 
+
+    var console = room.console;
+    var consoleControlsSocket = console.getConsoleControlsSocket();
+
+    var controlsToSend = new Array(100);
+
     var ws;
     var sessionID;
     var sessionIDToJoin;
 
     var rtcConnection;
     var dataChannel;
+
+    var updates = 0;
 
 };

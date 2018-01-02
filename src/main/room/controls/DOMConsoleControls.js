@@ -47,6 +47,14 @@ jt.DOMConsoleControls = function(keyForwardControls) {
         touchControls.powerOff();
     };
 
+    this.enterStandaloneMode = function() {
+        netController = undefined;
+    };
+
+    this.enterNetMode = function(pNetController) {
+        netController = pNetController;
+    };
+
     this.releaseControllers = function() {
         for (var c in controlStateMap) if (controlStateMap[c]) {
             consoleControlsSocket.controlStateChanged(c | 0, false);
@@ -261,8 +269,12 @@ jt.DOMConsoleControls = function(keyForwardControls) {
         // Then other controls
         if (press === controlStateMap[control]) return;
 
-        consoleControlsSocket.controlStateChanged(control, press);
         controlStateMap[control] = press;
+
+        if (netController)
+            netController.processLocalControl(control, press);
+        else
+            consoleControlsSocket.controlStateChanged(control, press);
     }
 
     var preventIEHelp = function() {
@@ -464,6 +476,8 @@ jt.DOMConsoleControls = function(keyForwardControls) {
 
 
     var controls = jt.ConsoleControls;
+
+    var netController;
 
     var consoleControlsSocket;
     var screen;

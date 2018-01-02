@@ -25,9 +25,49 @@ jt.NetServer = function(room) {
         room.enterStandaloneMode();
     };
 
-    this.broadcastClockPulse = function() {
-        for (var cID in clients)
-            if (clients[cID].dataChannelOpen) clients[cID].dataChannel.send("clock");
+    this.netVideoClockPulse = function() {
+        var state;
+
+        for (var cID in clients) {
+            var client = clients[cID];
+            if (!client.dataChannelActive) continue;
+
+            var netClock = { update: ++client.updates };
+
+            if (client.justJoined) {
+                client.justJoined = false;
+                netClock.power = console.powerIsOn;
+                if (!state) state = console.saveState();
+                netClock.state = state;
+            } else {
+                if (controlsToProcess.length) netClock.controls = controlsToProcess;
+            }
+
+            var data = JSON.stringify(netClock);
+
+            // window.console.log(data.length);
+            // window.console.log("Controls sent:", controlsToSend.length);
+
+            try {
+                client.dataChannel.send(data);
+            } catch (e) {
+                jt.Util.error("NetPlay Client " + client.id + " error sending data:", e.toString());
+                dropClient(client, true);
+            }
+        }
+
+        if (controlsToProcess.length) {
+            for (var i = 0, len = controlsToProcess.length; i < len; ++i)
+                consoleControlsSocket.controlStateChanged(controlsToProcess[i].c, controlsToProcess[i].p);
+            controlsToProcess.length = 0;
+        }
+
+        console.videoClockPulse();
+    };
+
+    this.processLocalControl = function (control, press) {
+        // Just store chances, to be processed on netVideoClockPulse
+        controlsToProcess.push({ c: control, p: press});
     };
 
     function onSessionServerConnected() {
@@ -66,10 +106,11 @@ jt.NetServer = function(room) {
 
         sessionID = message.sessionID;
         room.enterNetServerMode(self);
+        controlsToProcess.length = 0;
     }
 
     function onClientJoined(message) {
-        var client = { id: message.clientID };
+        var client = { id: message.clientID, updates: 0 };
         clients[client.id] = client;
         room.showOSD("NetPlay Client " + client.id + " joined", true);
         jt.Util.log("NetPlay Client " + client.id + " joined");
@@ -113,7 +154,8 @@ jt.NetServer = function(room) {
     }
 
     function onDataChannelOpen(client, event) {
-        client.dataChannelOpen = true;
+        client.dataChannelActive = true;
+        client.justJoined = true;
     }
 
     function onDataChannelClose(client, event) {
@@ -122,6 +164,9 @@ jt.NetServer = function(room) {
     }
 
     function onDataChannelMessage(client, event) {
+        var update = JSON.parse(event.data);
+        // Store remote controls to process on netVideoClockPulse
+        if (update.controls) controlsToProcess.push.apply(controlsToProcess, update.controls);
     }
 
     function onRTCError(client, error) {
@@ -146,6 +191,11 @@ jt.NetServer = function(room) {
         delete clients[client.id];
     }
 
+
+    var console = room.console;
+    var consoleControlsSocket = console.getConsoleControlsSocket();
+
+    var controlsToProcess = new Array(100);
 
     var ws;
     var sessionID;
