@@ -26,24 +26,27 @@ jt.NetServer = function(room) {
     };
 
     this.netVideoClockPulse = function() {
-        var state;
+        var netUpdate = { update: ++updates };
+        if (controlsToProcess.length) netUpdate.controls = controlsToProcess;
 
+        var state;
+        var data, dataFirst, dataNormal;
         for (var cID in clients) {
             var client = clients[cID];
             if (!client.dataChannelActive) continue;
 
-            var netClock = { update: ++client.updates };
-
             if (client.justJoined) {
                 client.justJoined = false;
-                netClock.power = console.powerIsOn;
+                netUpdate.power = console.powerIsOn;
                 if (!state) state = console.saveState();
-                netClock.state = state;
+                netUpdate.state = state;
+                if (!dataFirst) dataFirst = JSON.stringify(netUpdate);
+                data = dataFirst;
             } else {
-                if (controlsToProcess.length) netClock.controls = controlsToProcess;
+                delete netUpdate.state;
+                if (!dataNormal) dataNormal = JSON.stringify(netUpdate);
+                data = dataNormal;
             }
-
-            var data = JSON.stringify(netClock);
 
             // window.console.log(data.length);
             // window.console.log("Controls sent:", controlsToSend.length);
@@ -110,7 +113,7 @@ jt.NetServer = function(room) {
     }
 
     function onClientJoined(message) {
-        var client = { id: message.clientID, updates: 0 };
+        var client = { id: message.clientID };
         clients[client.id] = client;
         room.showOSD("NetPlay Client " + client.id + " joined", true);
         jt.Util.log("NetPlay Client " + client.id + " joined");
@@ -200,5 +203,6 @@ jt.NetServer = function(room) {
     var ws;
     var sessionID;
     var clients = {};
+    var updates = 0;
 
 };

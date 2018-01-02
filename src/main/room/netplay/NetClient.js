@@ -112,24 +112,24 @@ jt.NetClient = function(room) {
     }
 
     function onDataChannelMessage(event) {
-        var update = JSON.parse(event.data);
+        var netUpdate = JSON.parse(event.data);
 
         // window.console.log(update);
 
-        ++updates;
-        if (update.update !== updates) {
-            jt.Util.error("NetPlay Client expected update: " + updates + ", but got: " + update.update);
+        if (netUpdate.update !== nextUpdate && nextUpdate >= 0) {
+            jt.Util.error("NetPlay Client expected update: " + nextUpdate + ", but got: " + netUpdate.update);
             self.leaveSession(true);
         }
+        nextUpdate = netUpdate.update + 1;
 
-        if (update.power !== undefined)
-            update.power ? console.powerOn() : console.powerOff();
+        if (netUpdate.power !== undefined)
+            netUpdate.power ? console.powerOn() : console.powerOff();
 
-        if (update.state)
-            console.loadState(update.state);
+        if (netUpdate.state)
+            console.loadState(netUpdate.state);
 
-        if (update.controls) {
-            var controls = update.controls;
+        if (netUpdate.controls) {
+            var controls = netUpdate.controls;
             for (var i = 0, len = controls.length; i < len; ++i)
                 consoleControlsSocket.controlStateChanged(controls[i].c, controls[i].p);
         }
@@ -161,6 +161,6 @@ jt.NetClient = function(room) {
     var rtcConnection;
     var dataChannel;
 
-    var updates = 0;
+    var nextUpdate = -1;
 
 };
