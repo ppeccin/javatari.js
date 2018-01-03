@@ -26,25 +26,34 @@ jt.NetServer = function(room) {
     };
 
     this.netVideoClockPulse = function() {
-        var netUpdate = { update: ++updates };
-        if (controlsToProcess.length) netUpdate.controls = controlsToProcess;
+        ++updates;
 
-        var state;
-        var data, dataFirst, dataNormal;
+        var data, dataFull, dataNormal;
         for (var cID in clients) {
             var client = clients[cID];
             if (!client.dataChannelActive) continue;
 
-            if (client.justJoined) {
+            if (client.justJoined || nextUpdateFull) {
                 client.justJoined = false;
-                netUpdate.power = console.powerIsOn;
-                if (!state) state = console.saveState();
-                netUpdate.state = state;
-                if (!dataFirst) dataFirst = JSON.stringify(netUpdate);
-                data = dataFirst;
+                if (!dataFull) {
+
+                    window.console.log("Full Update");
+
+                    netUpdateFull.u = updates;
+                    netUpdateFull.p = console.powerIsOn;
+                    netUpdateFull.s = console.saveState();
+                    if (controlsToProcess.length) netUpdateFull.c = controlsToProcess;
+                    else if (netUpdateFull.c) delete netUpdateFull.c;
+                    dataFull = JSON.stringify(netUpdateFull);
+                }
+                data = dataFull;
             } else {
-                delete netUpdate.state;
-                if (!dataNormal) dataNormal = JSON.stringify(netUpdate);
+                if (!dataNormal) {
+                    netUpdate.u = updates;
+                    if (controlsToProcess.length) netUpdate.c = controlsToProcess;
+                    else if (netUpdate.c) delete netUpdate.c;
+                    dataNormal = JSON.stringify(netUpdate);
+                }
                 data = dataNormal;
             }
 
@@ -59,9 +68,15 @@ jt.NetServer = function(room) {
             }
         }
 
+        if (nextUpdateFull) nextUpdateFull = false;
+
         if (controlsToProcess.length) {
-            for (var i = 0, len = controlsToProcess.length; i < len; ++i)
+            for (var i = 0, len = controlsToProcess.length; i < len; ++i) {
+
+                // window.console.log("Accepting control:", controlsToProcess);
+
                 consoleControlsSocket.controlStateChanged(controlsToProcess[i].c, controlsToProcess[i].p);
+            }
             controlsToProcess.length = 0;
         }
 
@@ -69,8 +84,16 @@ jt.NetServer = function(room) {
     };
 
     this.processLocalControl = function (control, press) {
-        // Just store chances, to be processed on netVideoClockPulse
+        // Just store changes, to be processed on netVideoClockPulse
         controlsToProcess.push({ c: control, p: press});
+    };
+
+    this.processCartridgeInserted = function() {
+        nextUpdateFull = true;
+    };
+
+    this.processSaveStateLoaded = function() {
+        nextUpdateFull = true;
     };
 
     function onSessionServerConnected() {
@@ -199,6 +222,9 @@ jt.NetServer = function(room) {
     var consoleControlsSocket = console.getConsoleControlsSocket();
 
     var controlsToProcess = new Array(100);
+    var netUpdate = { u: 0 };
+    var netUpdateFull = { u: 0, p: false, s: {} };
+    var nextUpdateFull = false;
 
     var ws;
     var sessionID;

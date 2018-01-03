@@ -5,32 +5,29 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
 
     var self = this;
 
+    function init() {
+        buildMainClock();
+        buildPeripherals();
+        buildAndPlugConsole();
+    }
+
     this.enterStandaloneMode = function() {
         this.netPlayMode = 0;
         this.netController = undefined;
-        this.consoleControls.enterStandaloneMode();
         self.mainVideoClock.go();       // Local Clock
     };
 
     this.enterNetServerMode = function(netController) {
         this.netPlayMode = 1;
         this.netController = netController;
-        this.consoleControls.enterNetMode(netController);
         self.mainVideoClock.go();       // Local Clock, also sent to Client
     };
 
     this.enterNetClientMode = function(netController) {
         this.netPlayMode = 2;
         this.netController = netController;
-        this.consoleControls.enterNetMode(netController);
         self.mainVideoClock.pause();    // Clock comes from Server
     };
-
-    function init() {
-        buildMainClock();
-        buildPeripherals();
-        buildAndPlugConsole();
-    }
 
     this.powerOn = function() {
         self.screen.powerOn();
@@ -98,12 +95,12 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     }
 
     function buildPeripherals() {
-        self.peripheralControls = new jt.DOMPeripheralControls();
-        self.consoleControls = new jt.DOMConsoleControls(self.peripheralControls);
+        self.peripheralControls = new jt.DOMPeripheralControls(self);
+        self.consoleControls = new jt.DOMConsoleControls(self, self.peripheralControls);
         self.fileDownloader = new jt.FileDownloader();
-        self.stateMedia = new jt.LocalStorageSaveStateMedia();
+        self.stateMedia = new jt.LocalStorageSaveStateMedia(self);
         self.recentROMs = new jt.RecentStoredROMs();
-        self.fileLoader = new jt.FileLoader(self.recentROMs);
+        self.fileLoader = new jt.FileLoader(self, self.recentROMs);
         self.speaker = new jt.WebAudioSpeaker(screenElement);
         self.screen = new jt.CanvasDisplay(screenElement);
 

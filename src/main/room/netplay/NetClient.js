@@ -37,13 +37,25 @@ jt.NetClient = function(room) {
         room.enterStandaloneMode();
     };
 
+    this.netVideoClockPulse = function() {
+        // Client get clocks from Server
+    };
+
     this.processLocalControl = function (control, press) {
+        // Reject controls not available to NetPlay Clients
+        if (disabledControls.has(control))
+            return room.showOSD("Function not available in NetPlay Client mode", true, true);
+
         // Send only to server, do not process locally
         controlsToSend.push({ c: control, p: press});
     };
 
-    this.netVideoClockPulse = function() {
-        // Client get clocks from Server
+    this.processCartridgeInserted = function() {
+        throw new Error("Should never get here!");
+    };
+
+    this.processSaveStateLoaded = function() {
+        throw new Error("Should never get here!");
     };
 
     function onSessionServerConnected() {
@@ -116,20 +128,20 @@ jt.NetClient = function(room) {
 
         // window.console.log(update);
 
-        if (netUpdate.update !== nextUpdate && nextUpdate >= 0) {
-            jt.Util.error("NetPlay Client expected update: " + nextUpdate + ", but got: " + netUpdate.update);
+        if (netUpdate.u !== nextUpdate && nextUpdate >= 0) {
+            jt.Util.error("NetPlay Client expected update: " + nextUpdate + ", but got: " + netUpdate.u);
             self.leaveSession(true);
         }
-        nextUpdate = netUpdate.update + 1;
+        nextUpdate = netUpdate.u + 1;
 
-        if (netUpdate.power !== undefined)
-            netUpdate.power ? console.powerOn() : console.powerOff();
+        if (netUpdate.p !== undefined)
+            netUpdate.p ? console.powerOn() : console.powerOff();
 
-        if (netUpdate.state)
-            console.loadState(netUpdate.state);
+        if (netUpdate.s)
+            console.loadState(netUpdate.s);
 
-        if (netUpdate.controls) {
-            var controls = netUpdate.controls;
+        if (netUpdate.c) {
+            var controls = netUpdate.c;
             for (var i = 0, len = controls.length; i < len; ++i)
                 consoleControlsSocket.controlStateChanged(controls[i].c, controls[i].p);
         }
@@ -162,5 +174,13 @@ jt.NetClient = function(room) {
     var dataChannel;
 
     var nextUpdate = -1;
+
+    var ct = jt.ConsoleControls;
+    var disabledControls = new Set([
+        ct.SAVE_STATE_0, ct.SAVE_STATE_1, ct.SAVE_STATE_2, ct.SAVE_STATE_3, ct.SAVE_STATE_4, ct.SAVE_STATE_5, ct.SAVE_STATE_6,
+        ct.SAVE_STATE_7, ct.SAVE_STATE_8, ct.SAVE_STATE_9, ct.SAVE_STATE_10, ct.SAVE_STATE_11, ct.SAVE_STATE_12, ct.SAVE_STATE_FILE,
+        ct.LOAD_STATE_0, ct.LOAD_STATE_1, ct.LOAD_STATE_2, ct.LOAD_STATE_3, ct.LOAD_STATE_4, ct.LOAD_STATE_5, ct.LOAD_STATE_6,
+        ct.LOAD_STATE_7, ct.LOAD_STATE_8, ct.LOAD_STATE_9, ct.LOAD_STATE_10, ct.LOAD_STATE_11, ct.LOAD_STATE_12
+    ]);
 
 };

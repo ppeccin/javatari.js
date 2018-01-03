@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.LocalStorageSaveStateMedia = function() {
+jt.LocalStorageSaveStateMedia = function(room) {
 "use strict";
 
     this.connect = function(socket) {
@@ -50,6 +50,10 @@ jt.LocalStorageSaveStateMedia = function() {
         } catch(ex) {
             // give up
         }
+    };
+
+    this.saveStateLoaded = function() {
+        if (room.netController) room.netController.processSaveStateLoaded();
     };
 
     var saveToLocalStorage = function(entry, data) {

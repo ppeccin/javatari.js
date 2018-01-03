@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.DOMConsoleControls = function(keyForwardControls) {
+jt.DOMConsoleControls = function(room, keyForwardControls) {
 "use strict";
 
     var self = this;
@@ -45,14 +45,6 @@ jt.DOMConsoleControls = function(keyForwardControls) {
         setPaddleMode(false, false);
         gamepadControls.powerOff();
         touchControls.powerOff();
-    };
-
-    this.enterStandaloneMode = function() {
-        netController = undefined;
-    };
-
-    this.enterNetMode = function(pNetController) {
-        netController = pNetController;
     };
 
     this.releaseControllers = function() {
@@ -271,11 +263,12 @@ jt.DOMConsoleControls = function(keyForwardControls) {
 
         controlStateMap[control] = press;
 
-        if (netController)
-            netController.processLocalControl(control, press);
+        if (room.netController)
+            room.netController.processLocalControl(control, press);
         else
             consoleControlsSocket.controlStateChanged(control, press);
     }
+    this.processControl = processControl;
 
     var preventIEHelp = function() {
         window.onhelp = function () {
@@ -476,8 +469,6 @@ jt.DOMConsoleControls = function(keyForwardControls) {
 
 
     var controls = jt.ConsoleControls;
-
-    var netController;
 
     var consoleControlsSocket;
     var screen;

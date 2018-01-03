@@ -98,17 +98,17 @@ jt.ConsolePanel = function(screen, panelElement) {
 
     var setupButtons = function() {
         powerButton  = document.getElementById("jt-console-panel-power");
-        consoleControlButton(powerButton, controls.POWER, false);
+        consoleControlButton(powerButton, controls.POWER, true);
         colorButton  = document.getElementById("jt-console-panel-color");
-        consoleControlButton(colorButton, controls.BLACK_WHITE, false);
+        consoleControlButton(colorButton, controls.BLACK_WHITE, true);
         selectButton = document.getElementById("jt-console-panel-select");
         consoleControlButton(selectButton, controls.SELECT, true);
         resetButton  = document.getElementById("jt-console-panel-reset");
         consoleControlButton(resetButton, controls.RESET, true);
         p0DiffButton = document.getElementById("jt-console-panel-p0-diff");
-        consoleControlButton(p0DiffButton, controls.DIFFICULTY0, false);
+        consoleControlButton(p0DiffButton, controls.DIFFICULTY0, true);
         p1DiffButton = document.getElementById("jt-console-panel-p1-diff");
-        consoleControlButton(p1DiffButton, controls.DIFFICULTY1, false);
+        consoleControlButton(p1DiffButton, controls.DIFFICULTY1, true);
 
         cartInsertedImage = document.getElementById("jt-console-panel-cart-image");
         cartChangeButton  = document.getElementById("jt-console-panel-cart-load");
@@ -141,7 +141,7 @@ jt.ConsolePanel = function(screen, panelElement) {
         consoleControls.hapticFeedbackOnTouch(e);
         screen.closeAllOverlays();
         e.target.jtPressed = true;
-        controlsSocket.controlStateChanged(e.target.jtControl, true);
+        consoleControls.processControl(e.target.jtControl, true);
     }
 
     function switchReleased(e) {
@@ -149,7 +149,7 @@ jt.ConsolePanel = function(screen, panelElement) {
         e.target.jtPressed = false;
         if (logoMessageActive) return;
         consoleControls.hapticFeedbackOnTouch(e);
-        controlsSocket.controlStateChanged(e.target.jtControl, false);
+        consoleControls.processControl(e.target.jtControl, false);
     }
 
     function switchLeft(e) {

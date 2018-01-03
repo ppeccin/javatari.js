@@ -395,7 +395,7 @@ jt.AtariConsole = function(mainVideoClock) {
                 wasPaused = self.systemPause(true);
                 saveStateSocket.loadState(control.from);
                 if (!wasPaused) self.systemPause(false);
-            break;
+                break;
             case controls.VIDEO_STANDARD:
                 self.showOSD(null, true);	// Prepares for the upcoming "AUTO" OSD to always show
                 if (videoStandardIsAuto) setVideoStandardForced(jt.VideoStandard.NTSC);
@@ -529,8 +529,8 @@ jt.AtariConsole = function(mainVideoClock) {
             if (cartridge) cartridge.connectSaveStateSocket(this);
         };
 
-        this.externalStateChange = function() {
-            // Nothing (no Multiplayer yet)
+        this.saveStateLoaded = function() {
+            media.saveStateLoaded();
         };
 
         this.saveState = function(slot) {
@@ -555,6 +555,7 @@ jt.AtariConsole = function(mainVideoClock) {
             }
             if (!self.powerIsOn) self.powerOn();
             loadState(state);
+            this.saveStateLoaded();
             self.showOSD("State " + slot + " loaded", true);
         };
 
@@ -579,6 +580,7 @@ jt.AtariConsole = function(mainVideoClock) {
             }
             if (!self.powerIsOn) self.powerOn();
             loadState(state);
+            this.saveStateLoaded();
             self.showOSD("State file loaded", true);
             return true;
         };

@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.DOMPeripheralControls = function() {
+jt.DOMPeripheralControls = function(room) {
 "use strict";
 
     var self = this;
@@ -77,7 +77,10 @@ jt.DOMPeripheralControls = function() {
                 if (!mediaChangeDisabledWarning()) fileLoader.openURLChooserDialog(OPEN_TYPE.ROM, altPower, secPort);
                 break;
             case controls.CARTRIDGE_REMOVE:
-                if (!mediaChangeDisabledWarning()) cartridgeSocket.insert(null, false);
+                if (!mediaChangeDisabledWarning()) {
+                    cartridgeSocket.insert(null, false);
+                    if (room.netController) room.netController.processCartridgeInserted();
+                }
                 break;
             case controls.CARTRIDGE_LOAD_DATA_FILE:
                 //if (cartridgeSocket.dataOperationNotSupportedMessage(secPort ? 1 : 0, false, false)) break;
