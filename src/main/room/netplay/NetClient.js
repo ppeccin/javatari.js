@@ -126,7 +126,7 @@ jt.NetClient = function(room) {
     function onDataChannelMessage(event) {
         var netUpdate = JSON.parse(event.data);
 
-        // window.console.log(update);
+        // window.console.log(netUpdate);
 
         if (netUpdate.u !== nextUpdate && nextUpdate >= 0) {
             jt.Util.error("NetPlay Client expected update: " + nextUpdate + ", but got: " + netUpdate.u);
@@ -146,7 +146,7 @@ jt.NetClient = function(room) {
                 consoleControlsSocket.controlStateChanged(controls[i].c, controls[i].p);
         }
 
-        console.videoClockPulse();
+        console.videoClockPulse(true);
 
         // Send local controls to Server
         if (controlsToSend.length) {
@@ -180,7 +180,8 @@ jt.NetClient = function(room) {
         ct.SAVE_STATE_0, ct.SAVE_STATE_1, ct.SAVE_STATE_2, ct.SAVE_STATE_3, ct.SAVE_STATE_4, ct.SAVE_STATE_5, ct.SAVE_STATE_6,
         ct.SAVE_STATE_7, ct.SAVE_STATE_8, ct.SAVE_STATE_9, ct.SAVE_STATE_10, ct.SAVE_STATE_11, ct.SAVE_STATE_12, ct.SAVE_STATE_FILE,
         ct.LOAD_STATE_0, ct.LOAD_STATE_1, ct.LOAD_STATE_2, ct.LOAD_STATE_3, ct.LOAD_STATE_4, ct.LOAD_STATE_5, ct.LOAD_STATE_6,
-        ct.LOAD_STATE_7, ct.LOAD_STATE_8, ct.LOAD_STATE_9, ct.LOAD_STATE_10, ct.LOAD_STATE_11, ct.LOAD_STATE_12
+        ct.LOAD_STATE_7, ct.LOAD_STATE_8, ct.LOAD_STATE_9, ct.LOAD_STATE_10, ct.LOAD_STATE_11, ct.LOAD_STATE_12,
+        ct.POWER_FRY, ct.VIDEO_STANDARD, ct.VSYNCH, ct.TRACE, ct.NO_COLLISIONS, ct.CARTRIDGE_FORMAT
     ]);
 
 };

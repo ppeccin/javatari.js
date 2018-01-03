@@ -66,16 +66,16 @@ jt.Clock = function(clockPulse) {
     };
 
     var pulse = function() {
-        //var pulseTime = jt.Util.performanceNow();
-        //timeMeasures[timeMeasures.length] = pulseTime - lastPulseTime;
-        //lastPulseTime = pulseTime;
+        // var pulseTime = jt.Util.performanceNow();
+        // timeMeasures[timeMeasures.length] = pulseTime - lastPulseTime;
+        // var lastPulseTime = pulseTime;
 
         animationFrame = null;
         clockPulse();
         if (useRequestAnimationFrame && !animationFrame)
             animationFrame = requestAnimationFrame(pulse);
 
-        //console.log(jt.Util.performanceNow() - pulseTime);
+        // console.log(jt.Util.performanceNow() - pulseTime);
     };
 
     //this.getMeasures = function() {

@@ -63,8 +63,8 @@ jt.AtariConsole = function(mainVideoClock) {
         return systemPaused;
     };
 
-    this.videoClockPulse = function() {
-        if (systemPaused) return;
+    this.videoClockPulse = function(ignoreSystemPause) {
+        if (systemPaused && !ignoreSystemPause) return;
 
         consoleControlsSocket.controlsClockPulse();
 
@@ -84,7 +84,7 @@ jt.AtariConsole = function(mainVideoClock) {
         }
 
         // Finish audio signal (generate any missing samples to adjust to sample rate)
-        audioSocket.audioFinishFrame();
+        if (!systemPaused) audioSocket.audioFinishFrame();
     };
 
     function videoFrame() {
@@ -154,19 +154,24 @@ jt.AtariConsole = function(mainVideoClock) {
         return bus.getCartridge();
     };
 
-    var setVideoStandard = function(pVideoStandard) {
+    var setVideoStandard = function (pVideoStandard) {
         if (videoStandard !== pVideoStandard) {
             videoStandard = pVideoStandard;
             tia.setVideoStandard(videoStandard);
             updateVideoSynchronization();
         }
-        self.showOSD((videoStandardIsAuto ? "AUTO: " : "") + videoStandard.name, false);
     };
 
-    var setVideoStandardAuto = function() {
-        videoStandardIsAuto = true;
-        if (self.powerIsOn) videoStandardAutoDetectionStart();
-        else setVideoStandard(jt.VideoStandard.NTSC);
+    function showVideoStandardMessage() {
+        self.showOSD((videoStandardIsAuto ? "AUTO: " : "") + videoStandard.name, true);
+    }
+
+    var setVideoStandardAuto = function(state) {
+        videoStandardIsAuto = state;
+        if (state) {
+            if (self.powerIsOn) videoStandardAutoDetectionStart();
+            else setVideoStandard(jt.VideoStandard.NTSC);
+        }
     };
 
     var videoStandardAutoDetectionStart = function() {
@@ -189,8 +194,13 @@ jt.AtariConsole = function(mainVideoClock) {
         if (!standard && videoStandardAutoDetectionTries < VIDEO_STANDARD_AUTO_DETECTION_FRAMES)
             return;
 
-        if (standard) setVideoStandard(standard);
-        else self.showOSD("AUTO: FAILED", false);
+        if (standard) {
+            if (standard !== videoStandard) {
+                setVideoStandard(standard);
+                showVideoStandardMessage();
+            }
+        } else
+            self.showOSD("AUTO: FAILED", true, true);
         videoStandardAutoDetectionInProgress = false;
     };
 
@@ -229,6 +239,7 @@ jt.AtariConsole = function(mainVideoClock) {
             r: ram.saveState(),
             c: cpu.saveState(),
             ca: getCartridge() && getCartridge().saveState(),
+            vsa: videoStandardIsAuto,
             vs: videoStandard.name
         };
     };
@@ -241,13 +252,14 @@ jt.AtariConsole = function(mainVideoClock) {
         ram.loadState(state.r);
         cpu.loadState(state.c);
         setCartridge(state.ca && jt.CartridgeCreator.recreateCartridgeFromSaveState(state.ca, getCartridge()));
+        if (state.vsa !== undefined) setVideoStandardAuto(state.vsa);
         setVideoStandard(jt.VideoStandard[state.vs]);
         consoleControlsSocket.controlsStatesRedefined();
     };
     this.loadState = loadState;
 
     this.setDefaults = function() {
-        setVideoStandardAuto();
+        setVideoStandardAuto(true);
         speedControl = 1;
         alternateSpeed = null;
         mainVideoClockUpdateSpeed();
@@ -397,10 +409,10 @@ jt.AtariConsole = function(mainVideoClock) {
                 if (!wasPaused) self.systemPause(false);
                 break;
             case controls.VIDEO_STANDARD:
-                self.showOSD(null, true);	// Prepares for the upcoming "AUTO" OSD to always show
                 if (videoStandardIsAuto) setVideoStandardForced(jt.VideoStandard.NTSC);
                 else if (videoStandard == jt.VideoStandard.NTSC) setVideoStandardForced(jt.VideoStandard.PAL);
-                else setVideoStandardAuto();
+                else setVideoStandardAuto(true);
+                showVideoStandardMessage();
                 break;
             case controls.VSYNCH:
                 vSynchToggleMode();

@@ -1397,6 +1397,7 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
 
             co: collisions,
             cop: collisionsPossible,
+            cod: debugNoCollisions,
 
             CTRLPF: CTRLPF,
             COLUPF: COLUPF,
@@ -1507,6 +1508,7 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
 
         collisions = s.co | 0;
         collisionsPossible = s.cop | 0;
+        if (s.cod !== undefined) debugNoCollisions = s.cod;
 
         CTRLPF = s.CTRLPF | 0;
         COLUPF = s.COLUPF | 0;

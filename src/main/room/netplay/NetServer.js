@@ -80,7 +80,7 @@ jt.NetServer = function(room) {
             controlsToProcess.length = 0;
         }
 
-        console.videoClockPulse();
+        console.videoClockPulse(true);
     };
 
     this.processLocalControl = function (control, press) {

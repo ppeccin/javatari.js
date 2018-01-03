@@ -66,7 +66,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         this.console.showOSD(message, overlap, error);
     };
 
-    this.videoClockPulse = function() {
+    this.mainVideoClockPulse = function() {
         if (self.netController)
             self.netController.netVideoClockPulse();
         else
@@ -91,7 +91,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         // Main clock will be the Tia Frame VideoClock (60Hz/50Hz)
         // CPU and other clocks (Pia, Audio) will be sent by the Tia
         // Clock frequency will be changed directly by the Console
-        self.mainVideoClock = new jt.Clock(self.videoClockPulse);
+        self.mainVideoClock = new jt.Clock(self.mainVideoClockPulse);
     }
 
     function buildPeripherals() {
