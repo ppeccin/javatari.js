@@ -5,23 +5,25 @@ jt.NetServer = function(room) {
 
     var self = this;
 
-    this.startSession = function() {
-        ws = new WebSocket("ws://webmsx.herokuapp.com");
+    this.startSession = function(id) {
+        sessionIDToCreate = id ? ("" + id).trim() : undefined;
+        ws = new WebSocket("ws://10.42.10.141:8081");
+        // ws = new WebSocket("ws://webmsx.herokuapp.com");
         ws.onmessage = onSessionMessage;
         ws.onopen = onSessionServerConnected;
         ws.onclose = onSessionServerDisconnected;
     };
 
     this.stopSession = function(wasError) {
+        clearInterval(keepAliveTimer);
         sessionID = undefined;
         if (ws) {
             ws.onmessage = ws.onopen = ws.onclose = undefined;
             ws.close();
+            ws = undefined;
         }
         for (var cID in clients)
             dropClient(clients[cID], false);
-
-        clearInterval(keepAliveTimer);
 
         room.showOSD("NetPlay Session stopped", true, wasError);
         room.enterStandaloneMode();
@@ -31,8 +33,8 @@ jt.NetServer = function(room) {
         ++updates;
 
         var data, dataFull, dataNormal;
-        for (var cID in clients) {
-            var client = clients[cID];
+        for (var cNick in clients) {
+            var client = clients[cNick];
             if (!client.dataChannelActive) continue;
 
             if (client.justJoined || nextUpdateFull) {
@@ -65,8 +67,8 @@ jt.NetServer = function(room) {
             try {
                 client.dataChannel.send(data);
             } catch (e) {
-                jt.Util.error("NetPlay Client " + client.id + " error sending data:", e.toString());
-                dropClient(client, true);
+                jt.Util.error("NetPlay Client " + client.nick + " error sending data:", e.toString());
+                dropClient(client, true, true, 'NetPlay client "' + client.nick + '" dropped: P2P error sending data');
             }
         }
 
@@ -100,7 +102,9 @@ jt.NetServer = function(room) {
 
     function onSessionServerConnected() {
         // Start a new Session
-        ws.send(JSON.stringify({ sessionControl: "createSession" }));
+        var command = { sessionControl: "createSession" };
+        if (sessionIDToCreate) command.sessionID = sessionIDToCreate;
+        ws.send(JSON.stringify(command));
         // Setup keep-alive
         keepAliveTimer = setInterval(keepAlive, 30000);
     }
@@ -131,8 +135,8 @@ jt.NetServer = function(room) {
     }
 
     function onSessionCreated(message) {
-        room.showOSD("NetPlay Session started: " + message.sessionID, true);
-        jt.Util.log("NetPlay Session started: " + message.sessionID);
+        room.showOSD('NetPlay Session "' + message.sessionID + '" started', true);
+        jt.Util.log('NetPlay Session "' + message.sessionID + '" started');
 
         sessionID = message.sessionID;
         room.enterNetServerMode(self);
@@ -140,10 +144,10 @@ jt.NetServer = function(room) {
     }
 
     function onClientJoined(message) {
-        var client = { id: message.clientID };
-        clients[client.id] = client;
-        room.showOSD("NetPlay Client " + client.id + " joined", true);
-        jt.Util.log("NetPlay Client " + client.id + " joined");
+        var client = { nick: message.clientNick };
+        clients[client.nick] = client;
+        room.showOSD('NetPlay client "' + client.nick + '" joined', true);
+        jt.Util.log('NetPlay client "' + client.nick + '" joined');
 
         // Start RTC
         var rtcConnection = new RTCPeerConnection({});
@@ -152,7 +156,7 @@ jt.NetServer = function(room) {
         // Set up the ICE candidates
         rtcConnection.onicecandidate = function(e) {
             if (!e.candidate)
-                ws.send(JSON.stringify({ toClientID: client.id, serverSDP: rtcConnection.localDescription }));
+                ws.send(JSON.stringify({ toClientNick: client.nick, serverSDP: rtcConnection.localDescription }));
         };
 
         // Create the data channel and establish its event listeners
@@ -169,14 +173,14 @@ jt.NetServer = function(room) {
     }
 
     function onClientLeft(message) {
-        var client = clients[message.clientID];
+        var client = clients[message.clientNick];
         if (!client) return;
 
-        dropClient(client, true, false);
+        dropClient(client, true, false, 'NetPlay client "' + client.nick + '" left');
     }
 
     function onClientSDP(message) {
-        var client = clients[message.fromClientID];
+        var client = clients[message.fromClientNick];
         if (!client) return;
 
         client.rtcConnection.setRemoteDescription(new RTCSessionDescription(message.clientSDP))
@@ -189,8 +193,8 @@ jt.NetServer = function(room) {
     }
 
     function onDataChannelClose(client, event) {
-        jt.Util.error("NetPlay Client " + client.id + " dataChannel closed");
-        dropClient(client, true, true);
+        jt.Util.error("NetPlay Client " + client.nick + " dataChannel closed");
+        dropClient(client, true, true, 'NetPlay client "' + client.nick + '" dropped: P2P connection lost');
     }
 
     function onDataChannelMessage(client, event) {
@@ -200,14 +204,14 @@ jt.NetServer = function(room) {
     }
 
     function onRTCError(client, error) {
-        jt.Util.error("NetPlay Client " + client.id + " RTC error:", error);
-        dropClient(client, true, true);
+        jt.Util.error("NetPlay Client " + client.nick + " RTC error:", error);
+        dropClient(client, true, true, 'NetPlay client "' + client.nick + '" dropped: P2P connection error');
     }
 
-    function dropClient(client, showMessage, wasError) {
+    function dropClient(client, showMessage, wasError, userMessage) {
         if (showMessage) {
-            room.showOSD("NetPlay Client " + client.id + " left", true, wasError);
-            (wasError ? jt.Util.error : jt.Util.log) ("NetPlay Client " + client.id + " left");
+            room.showOSD(userMessage || 'NetPlay client "' + client.nick + '" left', true, wasError);
+            (wasError ? jt.Util.error : jt.Util.log) (userMessage || 'NetPlay client "' + client.nick + '" left');
         }
 
         if (client.dataChannel) {
@@ -218,7 +222,7 @@ jt.NetServer = function(room) {
             client.rtcConnection.onicecandidate = undefined;
             client.rtcConnection.close();
         }
-        delete clients[client.id];
+        delete clients[client.nick];
     }
 
     function keepAlive() {
@@ -241,6 +245,7 @@ jt.NetServer = function(room) {
 
     var ws;
     var sessionID;
+    var sessionIDToCreate;
     var keepAliveTimer;
     var clients = {};
     var updates = 0;

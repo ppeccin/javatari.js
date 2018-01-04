@@ -1,38 +1,35 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.NetClient = function(room) {
+jt.NetClient = function(room, desiredNick) {
     "use strict";
 
     var self = this;
 
     this.joinSession = function(sessionID) {
         sessionIDToJoin = sessionID;
-        ws = new WebSocket("ws://webmsx.herokuapp.com");
+        ws = new WebSocket("ws://10.42.10.141:8081");
+        // ws = new WebSocket("ws://webmsx.herokuapp.com");
         ws.onopen = onSessionServerConnected;
         ws.onclose = onSessionServerDisconnected;
         ws.onmessage = onSessionMessage;
     };
 
-    this.leaveSession = function(wasError) {
+    this.leaveSession = function(wasError, userMessage) {
+        clearInterval(keepAliveTimer);
         sessionID = sessionIDToJoin = undefined;
         if (ws) {
             ws.onpen = ws.onclose = ws.onmessage = undefined;
             ws.close();
             ws = undefined;
         }
-        if (dataChannel) {
-            dataChannel.onpen = dataChannel.onclose = dataChannel.onmessage = undefined;
-            dataChannel.close();
-            dataChannel = undefined;
-        }
-        if (rtcConnection) {
-            rtcConnection.onicecandidate = rtcConnection.ondatachannel = undefined;
-            rtcConnection.close();
-            rtcConnection = undefined;
-        }
+        if (dataChannel) dataChannel.onpen = dataChannel.onclose = dataChannel.onmessage = undefined;
+        if (rtcConnection) rtcConnection.onicecandidate = rtcConnection.ondatachannel = undefined;
 
-        room.showOSD("NetPlay Session left", true, wasError);
-        (wasError ? jt.Util.error : jt.Util.log) ("NetPlay Session left");
+        if (wasError) stopRTC();
+        else setTimeout(stopRTC, 300);      // Give some time before ending RTC so Session Disconnection can be detected first by Server
+
+        room.showOSD(userMessage || "NetPlay Session ended", true, wasError);
+        (wasError ? jt.Util.error : jt.Util.log) (userMessage || "NetPlay Session ended");
 
         room.enterStandaloneMode();
     };
@@ -59,15 +56,14 @@ jt.NetClient = function(room) {
     };
 
     function onSessionServerConnected() {
-        // Join a Session
-        ws.send(JSON.stringify({ sessionControl: "joinSession", sessionID: sessionIDToJoin }));
         // Setup keep-alive
         keepAliveTimer = setInterval(keepAlive, 30000);
+        // Join a Session
+        ws.send(JSON.stringify({ sessionControl: "joinSession", sessionID: sessionIDToJoin, clientNick: desiredNick }));
     }
 
     function onSessionServerDisconnected() {
-        jt.Util.error("NetPlay Session disconnected");
-        self.leaveSession(true);
+        self.leaveSession(true, keepAliveTimer ? "NetPlay session ended: Connection lost" : "NetPlay: Connection error");
     }
 
     function onSessionMessage(event) {
@@ -77,6 +73,12 @@ jt.NetClient = function(room) {
                 case "sessionJoined":
                     onSessionJoined(message);
                     return;
+                case "sessionDestroyed":
+                    self.leaveSession(false, "NetPlay session ended");
+                    return;
+                case "joinError":
+                    self.leaveSession(true, "NetPlay: " + message.errorMessage);
+                    return;
             }
         } else {
             if(message.serverSDP)
@@ -84,13 +86,14 @@ jt.NetClient = function(room) {
         }
     }
 
-    function onSessionJoined(netClock) {
+    function onSessionJoined(message) {
         room.enterNetClientMode(self);
         controlsToSend.length = 0;
 
-        sessionID = netClock.sessionID;
-        room.showOSD("NetPlay Session joined: " + sessionID, true);
-        jt.Util.log("NetPlay Session joined: " + sessionID);
+        sessionID = message.sessionID;
+        nick = message.clientNick;
+        room.showOSD('NetPlay Session "' + sessionID + '" joined as "' + nick + '"', true);
+        jt.Util.log('NetPlay Session "' + sessionID + '" joined as "' + nick + '"');
 
         // Start RTC
         rtcConnection = new RTCPeerConnection({});
@@ -121,8 +124,7 @@ jt.NetClient = function(room) {
     }
 
     function onDataChannelClose(event) {
-        jt.Util.error("NetPlay dataChannel closed");
-        self.leaveSession(true);
+        self.leaveSession(true, "NetPlay session ended: P2P connection lost");
     }
 
     function onDataChannelMessage(event) {
@@ -132,11 +134,11 @@ jt.NetClient = function(room) {
 
         if (netUpdate.u !== nextUpdate && nextUpdate >= 0) {
             jt.Util.error("NetPlay Client expected update: " + nextUpdate + ", but got: " + netUpdate.u);
-            self.leaveSession(true);
+            self.leaveSession(true, "NetPlay session ended: Update sequence error");
         }
         nextUpdate = netUpdate.u + 1;
 
-        if (netUpdate.p !== undefined)
+        if (netUpdate.p !== undefined && console.powerIsOn !== netUpdate.p)
             netUpdate.p ? console.powerOn() : console.powerOff();
 
         if (netUpdate.s)
@@ -159,7 +161,20 @@ jt.NetClient = function(room) {
 
     function onRTCError(error) {
         jt.Util.error("NetPlay RTC error:", error);
-        self.leaveSession(true);
+        self.leaveSession(true, "NetPlay session ended: P2P connection error");
+    }
+
+    function stopRTC() {
+        if (dataChannel) {
+            dataChannel.onpen = dataChannel.onclose = dataChannel.onmessage = undefined;
+            dataChannel.close();
+            dataChannel = undefined;
+        }
+        if (rtcConnection) {
+            rtcConnection.onicecandidate = rtcConnection.ondatachannel = undefined;
+            rtcConnection.close();
+            rtcConnection = undefined;
+        }
     }
 
     function keepAlive() {
@@ -180,6 +195,7 @@ jt.NetClient = function(room) {
     var ws;
     var sessionID;
     var sessionIDToJoin;
+    var nick;
     var keepAliveTimer;
 
     var rtcConnection;

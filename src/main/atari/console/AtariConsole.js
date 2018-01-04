@@ -84,7 +84,7 @@ jt.AtariConsole = function(mainVideoClock) {
         }
 
         // Finish audio signal (generate any missing samples to adjust to sample rate)
-        if (!systemPaused) audioSocket.audioFinishFrame();
+        if (!systemPaused && !userPaused) audioSocket.audioFinishFrame();
     };
 
     function videoFrame() {
