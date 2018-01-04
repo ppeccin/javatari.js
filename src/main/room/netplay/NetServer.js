@@ -6,7 +6,7 @@ jt.NetServer = function(room) {
     var self = this;
 
     this.startSession = function() {
-        ws = new WebSocket("ws://localhost");
+        ws = new WebSocket("ws://webmsx.herokuapp.com");
         ws.onmessage = onSessionMessage;
         ws.onopen = onSessionServerConnected;
         ws.onclose = onSessionServerDisconnected;
@@ -20,6 +20,8 @@ jt.NetServer = function(room) {
         }
         for (var cID in clients)
             dropClient(clients[cID], false);
+
+        clearInterval(keepAliveTimer);
 
         room.showOSD("NetPlay Session stopped", true, wasError);
         room.enterStandaloneMode();
@@ -99,6 +101,8 @@ jt.NetServer = function(room) {
     function onSessionServerConnected() {
         // Start a new Session
         ws.send(JSON.stringify({ sessionControl: "createSession" }));
+        // Setup keep-alive
+        keepAliveTimer = setInterval(keepAlive, 30000);
     }
 
     function onSessionServerDisconnected() {
@@ -217,6 +221,15 @@ jt.NetServer = function(room) {
         delete clients[client.id];
     }
 
+    function keepAlive() {
+        try {
+            ws.send('{ "sessionControl": "keep-alive" }');
+        } catch (e) {
+            jt.Util.error("NetPlay Session error sending keep-alive");
+            self.stopSession(true);
+        }
+    }
+
 
     var console = room.console;
     var consoleControlsSocket = console.getConsoleControlsSocket();
@@ -228,6 +241,7 @@ jt.NetServer = function(room) {
 
     var ws;
     var sessionID;
+    var keepAliveTimer;
     var clients = {};
     var updates = 0;
 
