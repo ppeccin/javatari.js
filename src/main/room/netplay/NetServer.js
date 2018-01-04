@@ -5,17 +5,26 @@ jt.NetServer = function(room) {
 
     var self = this;
 
-    this.startSession = function(id) {
-        sessionIDToCreate = id ? ("" + id).trim() : undefined;
-        ws = new WebSocket("ws://10.42.10.141:8081");
-        // ws = new WebSocket("ws://webmsx.herokuapp.com");
-        ws.onmessage = onSessionMessage;
-        ws.onopen = onSessionServerConnected;
-        ws.onclose = onSessionServerDisconnected;
+    this.startSession = function(pSessionID) {
+        sessionIDToCreate = pSessionID ? ("" + pSessionID).trim() : undefined;
+
+        if (sessionID === sessionIDToCreate) return;
+        if (sessionID) this.stopSession(true);
+
+        if (!ws) {
+            ws = new WebSocket("ws://10.42.10.141:8081");
+            // ws = new WebSocket("ws://webmsx.herokuapp.com");
+            ws.onmessage = onSessionMessage;
+            ws.onopen = onSessionServerConnected;
+            ws.onclose = onSessionServerDisconnected;
+        } else
+            onSessionServerConnected();
     };
 
     this.stopSession = function(wasError, userMessage) {
         clearInterval(keepAliveTimer);
+        keepAliveTimer = undefined;
+
         if (ws) {
             ws.onmessage = ws.onopen = ws.onclose = undefined;
             ws.close();
@@ -104,7 +113,7 @@ jt.NetServer = function(room) {
 
     function onSessionServerConnected() {
         // Setup keep-alive
-        keepAliveTimer = setInterval(keepAlive, 30000);
+        if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
         // Start a new Session
         var command = { sessionControl: "createSession" };
         if (sessionIDToCreate) command.sessionID = sessionIDToCreate;

@@ -1,21 +1,31 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.NetClient = function(room, desiredNick) {
+jt.NetClient = function(room) {
     "use strict";
 
     var self = this;
 
-    this.joinSession = function(sessionID) {
-        sessionIDToJoin = sessionID;
-        ws = new WebSocket("ws://10.42.10.141:8081");
-        // ws = new WebSocket("ws://webmsx.herokuapp.com");
-        ws.onopen = onSessionServerConnected;
-        ws.onclose = onSessionServerDisconnected;
-        ws.onmessage = onSessionMessage;
+    this.joinSession = function(pSessionID, pNick) {
+        sessionIDToJoin = "" + pSessionID.trim();
+        desiredNick = pNick;
+
+        if (sessionID === sessionIDToJoin && nick === desiredNick) return;
+        if (sessionID) this.leaveSession(true);
+
+        if (!ws) {
+            ws = new WebSocket("ws://10.42.10.141:8081");
+            // ws = new WebSocket("ws://webmsx.herokuapp.com");
+            ws.onmessage = onSessionMessage;
+            ws.onopen = onSessionServerConnected;
+            ws.onclose = onSessionServerDisconnected;
+        } else
+            onSessionServerConnected();
     };
 
     this.leaveSession = function(wasError, userMessage) {
         clearInterval(keepAliveTimer);
+        keepAliveTimer = undefined;
+
         sessionID = nick = undefined;
         if (ws) {
             ws.onpen = ws.onclose = ws.onmessage = undefined;
@@ -57,7 +67,7 @@ jt.NetClient = function(room, desiredNick) {
 
     function onSessionServerConnected() {
         // Setup keep-alive
-        keepAliveTimer = setInterval(keepAlive, 30000);
+        if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
         // Join a Session
         ws.send(JSON.stringify({ sessionControl: "joinSession", sessionID: sessionIDToJoin, clientNick: desiredNick }));
     }
@@ -197,6 +207,7 @@ jt.NetClient = function(room, desiredNick) {
     var sessionID;
     var sessionIDToJoin;
     var nick;
+    var desiredNick;
     var keepAliveTimer;
 
     var rtcConnection;
