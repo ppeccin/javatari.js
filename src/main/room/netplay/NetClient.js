@@ -16,7 +16,7 @@ jt.NetClient = function(room, desiredNick) {
 
     this.leaveSession = function(wasError, userMessage) {
         clearInterval(keepAliveTimer);
-        sessionID = sessionIDToJoin = undefined;
+        sessionID = nick = undefined;
         if (ws) {
             ws.onpen = ws.onclose = ws.onmessage = undefined;
             ws.close();
@@ -28,8 +28,8 @@ jt.NetClient = function(room, desiredNick) {
         if (wasError) stopRTC();
         else setTimeout(stopRTC, 300);      // Give some time before ending RTC so Session Disconnection can be detected first by Server
 
-        room.showOSD(userMessage || "NetPlay Session ended", true, wasError);
-        (wasError ? jt.Util.error : jt.Util.log) (userMessage || "NetPlay Session ended");
+        room.showOSD(userMessage || "NetPlay session ended", true, wasError);
+        (wasError ? jt.Util.error : jt.Util.log) (userMessage || "NetPlay session ended");
 
         room.enterStandaloneMode();
     };
@@ -74,7 +74,7 @@ jt.NetClient = function(room, desiredNick) {
                     onSessionJoined(message);
                     return;
                 case "sessionDestroyed":
-                    self.leaveSession(false, "NetPlay session ended");
+                    self.leaveSession(false, 'NetPlay Session "' + sessionID + '" ended');
                     return;
                 case "joinError":
                     self.leaveSession(true, "NetPlay: " + message.errorMessage);
@@ -87,14 +87,6 @@ jt.NetClient = function(room, desiredNick) {
     }
 
     function onSessionJoined(message) {
-        room.enterNetClientMode(self);
-        controlsToSend.length = 0;
-
-        sessionID = message.sessionID;
-        nick = message.clientNick;
-        room.showOSD('NetPlay Session "' + sessionID + '" joined as "' + nick + '"', true);
-        jt.Util.log('NetPlay Session "' + sessionID + '" joined as "' + nick + '"');
-
         // Start RTC
         rtcConnection = new RTCPeerConnection({});
 
@@ -111,6 +103,15 @@ jt.NetClient = function(room, desiredNick) {
             dataChannel.onclose = onDataChannelClose;
             dataChannel.onmessage = onDataChannelMessage;
         };
+
+        sessionID = message.sessionID;
+        nick = message.clientNick;
+        controlsToSend.length = 0;
+        nextUpdate = -1;
+        room.enterNetClientMode(self);
+
+        room.showOSD('NetPlay Session "' + sessionID + '" joined as "' + nick + '"', true);
+        jt.Util.log('NetPlay Session "' + sessionID + '" joined as "' + nick + '"');
     }
 
     function onServerSDP(message) {
@@ -181,8 +182,8 @@ jt.NetClient = function(room, desiredNick) {
         try {
             ws.send('{ "sessionControl": "keep-alive" }');
         } catch (e) {
-            jt.Util.error("NetPlay Session error sending keep-alive");
-            self.stopSession(true);
+            jt.Util.error("NetPlay error sending keep-alive");
+            self.leaveSession(true, "NetPlay session ended: Connection error");
         }
     }
 

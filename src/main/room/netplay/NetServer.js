@@ -14,18 +14,21 @@ jt.NetServer = function(room) {
         ws.onclose = onSessionServerDisconnected;
     };
 
-    this.stopSession = function(wasError) {
+    this.stopSession = function(wasError, userMessage) {
         clearInterval(keepAliveTimer);
-        sessionID = undefined;
         if (ws) {
             ws.onmessage = ws.onopen = ws.onclose = undefined;
             ws.close();
             ws = undefined;
         }
-        for (var cID in clients)
-            dropClient(clients[cID], false);
 
-        room.showOSD("NetPlay Session stopped", true, wasError);
+        if (wasError) dropAllClients();
+        else setTimeout(dropAllClients, 300);      // Give some time before ending RTC so Session ending can be detected first by Clients
+
+        room.showOSD(userMessage || 'NetPlay Session "' + sessionID + '" stopped', true, wasError);
+        (wasError ? jt.Util.error : jt.Util.log) (userMessage || 'NetPlay Session "' + sessionID + '" stopped');
+
+        sessionID = undefined;
         room.enterStandaloneMode();
     };
 
@@ -67,7 +70,6 @@ jt.NetServer = function(room) {
             try {
                 client.dataChannel.send(data);
             } catch (e) {
-                jt.Util.error("NetPlay Client " + client.nick + " error sending data:", e.toString());
                 dropClient(client, true, true, 'NetPlay client "' + client.nick + '" dropped: P2P error sending data');
             }
         }
@@ -101,17 +103,16 @@ jt.NetServer = function(room) {
     };
 
     function onSessionServerConnected() {
+        // Setup keep-alive
+        keepAliveTimer = setInterval(keepAlive, 30000);
         // Start a new Session
         var command = { sessionControl: "createSession" };
         if (sessionIDToCreate) command.sessionID = sessionIDToCreate;
         ws.send(JSON.stringify(command));
-        // Setup keep-alive
-        keepAliveTimer = setInterval(keepAlive, 30000);
     }
 
     function onSessionServerDisconnected() {
-        jt.Util.error("NetPlay Session disconnected");
-        self.stopSession(true);
+        self.stopSession(true, keepAliveTimer ? "NetPlay Session stopped: Connection lost" : "NetPlay: Connection error");
     }
 
     function onSessionMessage(event) {
@@ -135,12 +136,13 @@ jt.NetServer = function(room) {
     }
 
     function onSessionCreated(message) {
-        room.showOSD('NetPlay Session "' + message.sessionID + '" started', true);
-        jt.Util.log('NetPlay Session "' + message.sessionID + '" started');
-
         sessionID = message.sessionID;
-        room.enterNetServerMode(self);
+        updates = 0;
         controlsToProcess.length = 0;
+        room.enterNetServerMode(self);
+
+        room.showOSD('NetPlay session "' + message.sessionID + '" started', true);
+        jt.Util.log('NetPlay session "' + message.sessionID + '" started');
     }
 
     function onClientJoined(message) {
@@ -208,6 +210,11 @@ jt.NetServer = function(room) {
         dropClient(client, true, true, 'NetPlay client "' + client.nick + '" dropped: P2P connection error');
     }
 
+    function dropAllClients() {
+        for (var cID in clients)
+            dropClient(clients[cID], false);
+    }
+
     function dropClient(client, showMessage, wasError, userMessage) {
         if (showMessage) {
             room.showOSD(userMessage || 'NetPlay client "' + client.nick + '" left', true, wasError);
@@ -229,8 +236,8 @@ jt.NetServer = function(room) {
         try {
             ws.send('{ "sessionControl": "keep-alive" }');
         } catch (e) {
-            jt.Util.error("NetPlay Session error sending keep-alive");
-            self.stopSession(true);
+            jt.Util.error("NetPlay error sending keep-alive");
+            self.stopSession(true, "NetPlay Session stopped: connection error");
         }
     }
 
