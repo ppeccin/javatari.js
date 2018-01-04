@@ -128,6 +128,9 @@ jt.NetServer = function(room) {
                 case "clientLeft":
                     onClientLeft(message);
                     return;
+                case "createError":
+                    self.stopSession(true, "NetPlay: " + message.errorMessage);
+                    return;
             }
         } else {
             if(message.clientSDP)

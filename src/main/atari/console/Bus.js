@@ -16,7 +16,7 @@ jt.Bus = function(pCpu, pTia, pPia, pRam) {
     this.powerOn = function() {
         data = 0;
         if (!cartridge) {
-            tia.getVideoOutput().showOSD("NO CARTRIDGE INSERTED!", true);
+            tia.getVideoOutput().showOSD("NO CARTRIDGE INSERTED!", false, true);
             // Data in the bus comes random at powerOn if no Cartridge is present
             data = (Math.random()* 256) | 0;
         }

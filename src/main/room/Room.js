@@ -17,15 +17,15 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         self.mainVideoClock.go();       // Local Clock
     };
 
-    this.enterNetServerMode = function(netController) {
+    this.enterNetServerMode = function(netServer) {
         this.netPlayMode = 1;
-        this.netController = netController;
+        this.netController = netServer;
         self.mainVideoClock.go();       // Local Clock, also sent to Client
     };
 
-    this.enterNetClientMode = function(netController) {
+    this.enterNetClientMode = function(netClient) {
         this.netPlayMode = 2;
-        this.netController = netController;
+        this.netController = netClient;
         self.mainVideoClock.pause();    // Clock comes from Server
     };
 
