@@ -126,7 +126,7 @@ jt.DOMPeripheralControls = function(room) {
                 screen.toggleConsolePanel();
                 break;
             case controls.SCREEN_OPEN_NETPLAY:
-                screen.openQuickOptionsDialog();
+                screen.openNetPlayDialog();
                 break;
             case controls.P1_CONTROLS_TOGGLE:
                 consoleControls.toggleP1ControlsMode(); break;

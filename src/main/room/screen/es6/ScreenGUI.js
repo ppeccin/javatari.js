@@ -721,6 +721,80 @@ html.jt-full-screen #jt-console-panel {
 }
 
 
+#jt-netplay {
+    display: none;
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 0; right: 0;
+    width: 400px;
+    height: 200px;
+    margin: auto;
+    padding: 11px 30px 0;
+    color: white;
+    font-size: 18px;
+    line-height: 22px;
+    background: hsl(0, 0%, 16%);
+    text-align: center;
+    border: 1px solid black;
+    box-sizing: initial;
+    text-shadow: 1px 1px 1px black;
+    box-shadow: 3px 3px 15px 2px rgba(0, 0, 0, .4);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: auto;
+    z-index: 50;
+}
+#jt-netplay.jt-show {
+    display: block;
+}
+#jt-netplay::before {
+    content: "Net Play!";
+    display: block;
+}
+#jt-netplay-status-line {
+    margin-top: 20px;
+}
+#jt-netplay-status {
+    display: inline-block;
+    width: 296px;
+    font-size: 15px;
+    line-height: 27px;
+    background: black;
+    vertical-align: top;
+}
+#jt-netplay-stop,
+#jt-netplay-start,
+#jt-netplay-join {
+    display: inline-block;
+    width: 92px;
+    font-size: 15px;
+    line-height: 26px;
+    background: hsl(358, 67%, 46%);
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+}
+#jt-netplay-stop {
+    margin-left: 8px;
+}
+#jt-netplay-session-label {
+    margin-top: 20px;
+    font-size: 15px;
+}
+#jt-netplay-session-label::before {
+    content: "Session Name";
+}
+#jt-netplay-session-line {
+    margin-top: 4px;
+}
+#jt-netplay-session-name {
+    width: 192px;
+    margin: 0 10px;
+    height: 26px;
+    border: none;
+    box-sizing: border-box;
+}
+
+
+
 #jt-touch-left, #jt-touch-right, #jt-touch-speed {
     display: none;
     position: absolute;

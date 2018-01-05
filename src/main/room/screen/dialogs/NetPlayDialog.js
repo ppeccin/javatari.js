@@ -31,53 +31,48 @@ jt.NetPlayDialog = function(mainElement, consoleControls, peripheralControls) {
     };
 
     function refresh() {
-        for (var i = 0; i < items.length; ++i) {
-            var item = items[i];
-            var report = item.peripheral ? peripheralControls.getControlReport(item.control) : consoleControls.getControlReport(item.control);
-            item.value = report.label;
-            item.selected = report.active;
-            controlsItems[i].innerHTML = item.value;
-            controlsItems[i].classList.toggle("jt-selected", !!item.selected);
-        }
     }
 
     function create() {
         dialog = document.createElement("div");
-        dialog.id = "jt-quick-options";
+        dialog.id = "jt-netplay";
         dialog.tabIndex = -1;
 
-        var cc = jt.ConsoleControls;
-        var pc = jt.PeripheralControls;
+        var statusLine = document.createElement("div");
+        statusLine.id = "jt-netplay-status-line";
+        dialog.appendChild(statusLine);
 
-        items = [
-            { label: "Paddles Mode",                     control: pc.PADDLES_TOGGLE_MODE,         peripheral: true },
-            { label: "No Collisions",                    control: cc.NO_COLLISIONS },
-            { label: "&#128190;&nbsp; V-Synch",          control: cc.VSYNCH },
-            { label: "&#128190;&nbsp; CRT Filter",       control: pc.SCREEN_CRT_FILTER,           peripheral: true },
-            { label: "&#128190;&nbsp; Audio Buffer",     control: pc.SPEAKER_BUFFER_TOGGLE,       peripheral: true },
-            { label: "&#128190;&nbsp; Big Directionals", control: pc.TOUCH_TOGGLE_DIR_BIG,        peripheral: true },
-            { label: "&#128190;&nbsp; TurboFire Speed",  control: pc.TURBO_FIRE_TOGGLE,           peripheral: true },
-            { label: "&#128190;&nbsp; Haptic Feedback",  control: pc.HAPTIC_FEEDBACK_TOGGLE_MODE, peripheral: true }
-        ];
+        var status = document.createElement("div");
+        status.id = "jt-netplay-status";
+        status.textContent = 'HOSTING Session "Teste"';
+        statusLine.appendChild(status);
 
-        // Define list
-        var list = document.createElement('ul');
-        list.classList.add("jt-quick-options-list");
+        var stop = document.createElement("div");
+        stop.id = "jt-netplay-stop";
+        stop.textContent = "STOP";
+        statusLine.appendChild(stop);
 
-        for (var i = 0; i < items.length; ++i) {
-            var li = document.createElement("li");
-            var label = document.createElement("div");
-            label.innerHTML = items[i].label;
-            li.appendChild(label);
-            var control = document.createElement("div");
-            control.classList.add("jt-control");
-            control.jtControlItem = items[i];
-            li.appendChild(control);
-            list.appendChild(li);
-            controlsItems.push(control);
-        }
+        var sessionLabel = document.createElement("div");
+        sessionLabel.id = "jt-netplay-session-label";
+        dialog.appendChild(sessionLabel);
 
-        dialog.appendChild(list);
+        var sessionLine = document.createElement("div");
+        sessionLine.id = "jt-netplay-session-line";
+        dialog.appendChild(sessionLine);
+
+        var start = document.createElement("div");
+        start.id = "jt-netplay-start";
+        start.textContent = "HOST";
+        sessionLine.appendChild(start);
+
+        var sessionName = document.createElement("input");
+        sessionName.id = "jt-netplay-session-name";
+        sessionLine.appendChild(sessionName);
+
+        var join = document.createElement("div");
+        join.id = "jt-netplay-join";
+        join.textContent = "JOIN";
+        sessionLine.appendChild(join);
 
         setupEvents();
 
@@ -108,7 +103,6 @@ jt.NetPlayDialog = function(mainElement, consoleControls, peripheralControls) {
 
     var visible = false;
     var dialog, list;
-    var items, controlsItems = [];
 
     var k = jt.DOMKeys;
     var EXIT_KEYS = [ k.VK_ESCAPE.c, k.VK_ENTER.c, k.VK_SPACE.c ];
