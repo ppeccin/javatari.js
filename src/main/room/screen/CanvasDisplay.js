@@ -136,6 +136,12 @@ jt.CanvasDisplay = function(mainElement) {
         quickOtionsDialog.show();
     };
 
+    this.openNetPlayDialog = function() {
+        closeAllOverlays();
+        if (!netPlayDialog) netPlayDialog = new jt.NetPlayDialog(fsElementCenter, consoleControlsSocket, peripheralControls);
+        netPlayDialog.show();
+    };
+
     this.openLoadFileDialog = function(altPower, secPort) {
         fileLoader.openFileChooserDialog(jt.FileLoader.OPEN_TYPE.AUTO, altPower, secPort, false);
     };
@@ -637,6 +643,8 @@ jt.CanvasDisplay = function(mainElement) {
         var menu = [
             { label: "Power",              clickModif: 0, control: jt.PeripheralControls.MACHINE_POWER_TOGGLE },
             { label: "Fry Console",                       control: jt.PeripheralControls.MACHINE_POWER_FRY },
+            { label: "",                   divider: true },
+            { label: "Net Play!",                         control: jt.PeripheralControls.SCREEN_OPEN_NETPLAY },
             { label: "",                   divider: true },
             { label: "Select Cartridge",                  control: jt.PeripheralControls.CARTRIDGE_LOAD_RECENT },
             { label: "",                   divider: true },
@@ -1147,6 +1155,7 @@ jt.CanvasDisplay = function(mainElement) {
         hideBarMenu();
         if (saveStateDialog) saveStateDialog.hide();
         if (quickOtionsDialog) quickOtionsDialog.hide();
+        if (netPlayDialog) netPlayDialog.hide();
         if (settingsDialog) settingsDialog.hide();
         if (recentROMsDialog) recentROMsDialog.hide();
     }
@@ -1333,6 +1342,7 @@ jt.CanvasDisplay = function(mainElement) {
     var saveStateDialog;
     var recentROMsDialog;
     var quickOtionsDialog;
+    var netPlayDialog;
 
     var fsElement, fsElementCenter;
 
@@ -1396,7 +1406,7 @@ jt.CanvasDisplay = function(mainElement) {
     var FULLSCREEN_MODE = Javatari.SCREEN_FULLSCREEN_MODE;
 
     var BAR_AUTO_HIDE = Javatari.SCREEN_CONTROL_BAR === 0;
-    var BAR_MENU_MAX_ITEMS = 10;
+    var BAR_MENU_MAX_ITEMS = 12;
 
     var NARROW_WIDTH = 336;
 
