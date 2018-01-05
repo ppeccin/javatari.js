@@ -349,6 +349,10 @@ jt.CanvasDisplay = function(mainElement) {
         }
     };
 
+    this.roomNetPlayStatusChangeUpdate = function() {
+        if (netPlayDialog) netPlayDialog.roomNetPlayStatusChangeUpdate();
+    };
+
     this.controlStateChanged = function(control, state) {
         consolePanel.controlStateChanged(control, state);
     };

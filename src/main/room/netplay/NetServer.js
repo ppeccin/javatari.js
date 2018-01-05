@@ -8,8 +8,10 @@ jt.NetServer = function(room) {
     this.startSession = function(pSessionID) {
         sessionIDToCreate = pSessionID ? ("" + pSessionID).trim() : undefined;
 
-        if (sessionID === sessionIDToCreate) return;
+        if (sessionIDToCreate && (sessionID === sessionIDToCreate)) return;
         if (sessionID) this.stopSession(true);
+
+        room.enterNetPendingMode(this);
 
         if (!ws) {
             ws = new WebSocket("ws://10.42.10.141:8081");
@@ -39,6 +41,10 @@ jt.NetServer = function(room) {
 
         sessionID = undefined;
         room.enterStandaloneMode();
+    };
+
+    this.getSessionID = function() {
+        return sessionID;
     };
 
     this.netVideoClockPulse = function() {

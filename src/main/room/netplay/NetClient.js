@@ -6,11 +6,16 @@ jt.NetClient = function(room) {
     var self = this;
 
     this.joinSession = function(pSessionID, pNick) {
-        sessionIDToJoin = "" + pSessionID.trim();
+        sessionIDToJoin = ("" + pSessionID).trim();
+        if (!sessionIDToJoin)
+            return room.showOSD("Must enter Session Name for joining NetPlay session", true, true);
+
         desiredNick = pNick;
 
         if (sessionID === sessionIDToJoin && nick === desiredNick) return;
         if (sessionID) this.leaveSession(true);
+
+        room.enterNetPendingMode(this);
 
         if (!ws) {
             ws = new WebSocket("ws://10.42.10.141:8081");
@@ -42,6 +47,10 @@ jt.NetClient = function(room) {
         (wasError ? jt.Util.error : jt.Util.log) (userMessage || "NetPlay session ended");
 
         room.enterStandaloneMode();
+    };
+
+    this.getSessionID = function() {
+        return sessionID;
     };
 
     this.netVideoClockPulse = function() {

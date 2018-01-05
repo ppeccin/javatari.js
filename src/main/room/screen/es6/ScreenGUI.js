@@ -726,10 +726,10 @@ html.jt-full-screen #jt-console-panel {
     position: absolute;
     top: 0; bottom: 0;
     left: 0; right: 0;
-    width: 400px;
-    height: 200px;
+    width: 390px;
+    height: 220px;
     margin: auto;
-    padding: 11px 30px 0;
+    padding-top: 11px;
     color: white;
     font-size: 18px;
     line-height: 22px;
@@ -739,6 +739,7 @@ html.jt-full-screen #jt-console-panel {
     box-sizing: initial;
     text-shadow: 1px 1px 1px black;
     box-shadow: 3px 3px 15px 2px rgba(0, 0, 0, .4);
+    transform-origin: center center;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     cursor: auto;
@@ -751,46 +752,75 @@ html.jt-full-screen #jt-console-panel {
     content: "Net Play!";
     display: block;
 }
-#jt-netplay-status-line {
-    margin-top: 20px;
+#jt-netplay-status-box {
+    margin-top: 17px;
 }
 #jt-netplay-status {
     display: inline-block;
-    width: 296px;
+    width: 340px;
     font-size: 15px;
     line-height: 27px;
     background: black;
     vertical-align: top;
 }
-#jt-netplay-stop,
-#jt-netplay-start,
-#jt-netplay-join {
+.jt-netplay-button {
     display: inline-block;
-    width: 92px;
+    width: 86px;
+    padding: 0;
+    margin: 0;
     font-size: 15px;
     line-height: 26px;
+    color: white;
     background: hsl(358, 67%, 46%);
+    text-shadow: 1px 1px 1px black;
+    border: none;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+    cursor: pointer;    
 }
-#jt-netplay-stop {
-    margin-left: 8px;
+#jt-netplay-session-box {
+    margin-top: 18px;
 }
-#jt-netplay-session-label {
-    margin-top: 20px;
+#jt-netplay-session-label,
+#jt-netplay-nick-label {
     font-size: 15px;
+    margin-bottom: 4px;
 }
 #jt-netplay-session-label::before {
     content: "Session Name";
 }
-#jt-netplay-session-line {
-    margin-top: 4px;
-}
-#jt-netplay-session-name {
-    width: 192px;
-    margin: 0 10px;
+#jt-netplay input {
+    width: 150px;
     height: 26px;
+    padding: 0 10px;
+    margin: 0 8px;
+    font-size: 15px;
+    line-height: 26px;
+    background: rgb(240, 240, 240);
     border: none;
     box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#jt-netplay-nick-label {
+    margin-top: 10px;
+}
+#jt-netplay-nick-label::before {
+    content: "User Nickname";
+}
+.jt-netplay-button:disabled {
+    color: rgb(150, 150, 150);
+    background: rgb(70, 70, 70);
+    cursor: default;
+}
+#jt-netplay input:disabled {
+    color: black;
+    background: rgb(180, 180, 180);
+    cursor: default;
+}
+#jt-netplay-session-box.jt-disabled div {
+    color: rgb(150, 150, 150);
 }
 
 

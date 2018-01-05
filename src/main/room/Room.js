@@ -69,18 +69,28 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         this.netPlayMode = 0;
         this.netController = undefined;
         self.mainVideoClock.go();       // Local Clock
+        this.screen.roomNetPlayStatusChangeUpdate();
     };
 
     this.enterNetServerMode = function(netServer) {
         this.netPlayMode = 1;
         this.netController = netServer;
         self.mainVideoClock.go();       // Local Clock, also sent to Client
+        this.screen.roomNetPlayStatusChangeUpdate();
     };
 
     this.enterNetClientMode = function(netClient) {
         this.netPlayMode = 2;
         this.netController = netClient;
         self.mainVideoClock.pause();    // Clock comes from Server
+        this.screen.roomNetPlayStatusChangeUpdate();
+    };
+
+    this.enterNetPendingMode = function(netController) {
+        this.netPlayMode = -1;
+        this.netController = undefined;
+        self.mainVideoClock.go();       // Local Clock
+        this.screen.roomNetPlayStatusChangeUpdate();
     };
 
     function afterPowerONDelay(func) {
@@ -145,7 +155,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     this.fileLoader = null;
     this.peripheralControls = null;
 
-    this.netPlayMode = 0;       // 0 = standalone, 1 = server, 2 = client
+    this.netPlayMode = 0;       // -1 = pending, 0 = standalone, 1 = server, 2 = client
     this.netController = undefined;
     this.netServer = undefined;
     this.netClient = undefined;
