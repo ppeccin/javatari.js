@@ -187,17 +187,20 @@ jt.NetPlayDialog = function(mainElement) {
         }
         sessionName.addEventListener("input", filterChars);
         nick.addEventListener("input", filterChars);
-        // Allow selection and edit in sessionName and nick
+        // Allow selection and edit in status, sessionName and nick
+        jt.Util.addEventsListener(status, "touchstart touchmove touchend mousedown mousemove mouseup keydown keyup", function(e) {
+            e.stopPropagation();
+        });
         jt.Util.addEventsListener(sessionName, "touchstart touchmove touchend mousedown mousemove mouseup keydown keyup", function(e) {
             e.stopPropagation();
         });
         jt.Util.addEventsListener(nick, "touchstart touchmove touchend mousedown mousemove mouseup keydown keyup", function(e) {
             e.stopPropagation();
         });
-        // Allow context in sessionName
-        // sessionName.addEventListener("contextmenu", function(e) {
-        //     e.stopPropagation();
-        // });
+        // Allow context in status
+        status.addEventListener("contextmenu", function(e) {
+            e.stopPropagation();
+        });
     }
 
 

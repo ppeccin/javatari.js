@@ -762,6 +762,12 @@ html.jt-full-screen #jt-console-panel {
     line-height: 27px;
     background: black;
     vertical-align: top;
+    text-shadow: none;
+     -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    cursor: auto;
 }
 .jt-netplay-button {
     display: inline-block;
@@ -798,10 +804,11 @@ html.jt-full-screen #jt-console-panel {
     background: rgb(240, 240, 240);
     border: none;
     box-sizing: border-box;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    cursor: auto;
 }
 #jt-netplay-nick-label {
     margin-top: 10px;
