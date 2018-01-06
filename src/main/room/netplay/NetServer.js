@@ -105,8 +105,12 @@ jt.NetServer = function(room) {
     };
 
     this.processLocalControl = function (control, press) {
-        // Just store changes, to be processed on netVideoClockPulse
-        controlsToProcess.push({ c: control, p: press});
+        if (localOnlyControls.has(control))
+            // Process local-only controls right away, do not store
+            consoleControlsSocket.controlStateChanged(control, press);
+        else
+            // Just store changes, to be processed on netVideoClockPulse
+            controlsToProcess.push({ c: control, p: press});
     };
 
     this.processCartridgeInserted = function() {
@@ -291,5 +295,15 @@ jt.NetServer = function(room) {
 
     var rtcConnectionConfig;
     var dataChannelConfig;
+
+    var ct = jt.ConsoleControls;
+    var localOnlyControls = new Set([
+        ct.SAVE_STATE_0, ct.SAVE_STATE_1, ct.SAVE_STATE_2, ct.SAVE_STATE_3, ct.SAVE_STATE_4, ct.SAVE_STATE_5, ct.SAVE_STATE_6,
+        ct.SAVE_STATE_7, ct.SAVE_STATE_8, ct.SAVE_STATE_9, ct.SAVE_STATE_10, ct.SAVE_STATE_11, ct.SAVE_STATE_12, ct.SAVE_STATE_FILE,
+        ct.LOAD_STATE_0, ct.LOAD_STATE_1, ct.LOAD_STATE_2, ct.LOAD_STATE_3, ct.LOAD_STATE_4, ct.LOAD_STATE_5, ct.LOAD_STATE_6,
+        ct.LOAD_STATE_7, ct.LOAD_STATE_8, ct.LOAD_STATE_9, ct.LOAD_STATE_10, ct.LOAD_STATE_11, ct.LOAD_STATE_12,
+        ct.POWER_FRY, ct.VSYNCH, ct.TRACE, ct.CARTRIDGE_FORMAT,
+        ct.FAST_SPEED, ct.SLOW_SPEED, ct.INC_SPEED, ct.DEC_SPEED, ct.NORMAL_SPEED, ct.MIN_SPEED
+    ]);
 
 };

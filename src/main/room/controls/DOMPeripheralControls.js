@@ -50,16 +50,16 @@ jt.DOMPeripheralControls = function(room) {
         // All controls are Press-only and repeatable
         switch(control) {
             case controls.MACHINE_POWER_TOGGLE:
-                consoleControlsSocket.controlStateChanged(jt.ConsoleControls.POWER, true);
+                consoleControls.processControl(jt.ConsoleControls.POWER, true);
                 break;
             case controls.MACHINE_POWER_FRY:
-                consoleControlsSocket.controlStateChanged(jt.ConsoleControls.POWER_FRY, true);
+                consoleControls.processControl(jt.ConsoleControls.POWER_FRY, true);
                 break;
             case controls.MACHINE_LOAD_STATE_FILE:
                 if (!mediaChangeDisabledWarning()) fileLoader.openFileChooserDialog(OPEN_TYPE.STATE, false, false, false);
                 break;
             case controls.MACHINE_SAVE_STATE_FILE:
-                consoleControlsSocket.controlStateChanged(jt.ConsoleControls.SAVE_STATE_FILE, true);
+                consoleControls.processControl(jt.ConsoleControls.SAVE_STATE_FILE, true);
                 break;
             case controls.MACHINE_LOAD_STATE_MENU:
                 screen.openSaveStateDialog(false);

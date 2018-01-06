@@ -126,19 +126,19 @@ jt.CanvasDisplay = function(mainElement) {
 
     this.openSaveStateDialog = function (save) {
         closeAllOverlays();
-        if (!saveStateDialog) saveStateDialog = new jt.SaveStateDialog(fsElementCenter, consoleControlsSocket, peripheralControls, stateMedia);
+        if (!saveStateDialog) saveStateDialog = new jt.SaveStateDialog(fsElementCenter, consoleControls, peripheralControls, stateMedia);
         saveStateDialog.show(save);
     };
 
     this.openQuickOptionsDialog = function() {
         closeAllOverlays();
-        if (!quickOtionsDialog) quickOtionsDialog = new jt.QuickOptionsDialog(fsElementCenter, consoleControlsSocket, peripheralControls);
+        if (!quickOtionsDialog) quickOtionsDialog = new jt.QuickOptionsDialog(fsElementCenter, consoleControls, consoleControlsSocket, peripheralControls);
         quickOtionsDialog.show();
     };
 
     this.openNetPlayDialog = function() {
         closeAllOverlays();
-        if (!netPlayDialog) netPlayDialog = new jt.NetPlayDialog(fsElementCenter, consoleControlsSocket, peripheralControls);
+        if (!netPlayDialog) netPlayDialog = new jt.NetPlayDialog(fsElementCenter);
         netPlayDialog.show();
     };
 
@@ -741,7 +741,7 @@ jt.CanvasDisplay = function(mainElement) {
             if (!e.button) {
                 if (elem.jtIsConsoleControl) {
                     barConsoleControlPressed = elem.jtControl;
-                    consoleControlsSocket.controlStateChanged(barConsoleControlPressed, true);
+                    consoleControls.processControl(barConsoleControlPressed, true);
                 } else
                     peripheralControls.controlActivated(elem.jtControl);
             }
@@ -811,7 +811,7 @@ jt.CanvasDisplay = function(mainElement) {
     function barButtonMouseLeft() {
         if (barConsoleControlPressed) {
             cursorHideFrameCountdown = CURSOR_HIDE_FRAMES;
-            consoleControlsSocket.controlStateChanged(barConsoleControlPressed, false);
+            consoleControls.processControl(barConsoleControlPressed, false);
             barConsoleControlPressed = null;
         }
     }
@@ -821,7 +821,7 @@ jt.CanvasDisplay = function(mainElement) {
         // Special case for ConsoleControl
         if (barConsoleControlPressed) {
             consoleControls.hapticFeedbackOnTouch(e);
-            consoleControlsSocket.controlStateChanged(barConsoleControlPressed, false);
+            consoleControls.processControl(barConsoleControlPressed, false);
             barConsoleControlPressed = null;
             return;
         }

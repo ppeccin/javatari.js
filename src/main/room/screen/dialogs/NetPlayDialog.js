@@ -73,17 +73,28 @@ jt.NetPlayDialog = function(mainElement) {
                 status.classList.add("jt-active");
                 sessionBox.classList.remove("jt-disabled");
                 sessionBox.classList.add("jt-disabled");
+                sessionName.setAttribute("placeholder", "Enter a name");
                 break;
             case -1:
-                status.textContent = "PENDING connection";
-                start.textContent = "HOST";
-                join.textContent = "JOIN";
+            case -2:
+                status.textContent = "Establishing connection...";
                 sessionName.disabled = true;
-                start.disabled = true;
-                join.disabled = true;
                 nick.disabled = true;
                 status.classList.remove("jt-active");
                 sessionBox.classList.add("jt-disabled");
+                if (room.netPlayMode === -1) {
+                    start.textContent = "CANCEL";
+                    join.textContent = "JOIN";
+                    start.disabled = false;
+                    join.disabled = true;
+                    sessionName.setAttribute("placeholder", "Automatic");
+                } else {
+                    start.textContent = "HOST";
+                    join.textContent = "CANCEL";
+                    start.disabled = true;
+                    join.disabled = false;
+                    sessionName.setAttribute("placeholder", "Enter a name");
+                }
                 break;
         }
     }
@@ -95,12 +106,12 @@ jt.NetPlayDialog = function(mainElement) {
         jt.DOMConsoleControls.hapticFeedbackOnTouch(e);
 
         var mode = room.netPlayMode;
-        if (button === start && (mode === 0 || mode === 1)) {
+        if (button === start && (mode === 0 || mode === 1 || mode === -1)) {
             if (mode === 0) room.getNetServer().startSession(sessionName.value);
-            else room.getNetServer().stopSession();
-        } else if (button === join && (mode === 0 || mode === 2)) {
+            else room.getNetServer().stopSession(false, mode === -1 ? "NetPlay connection aborted" : undefined);
+        } else if (button === join && (mode === 0 || mode === 2 || mode === -2)) {
             if (mode === 0) room.getNetClient().joinSession(sessionName.value, nick.value);
-            else room.getNetClient().leaveSession();
+            else room.getNetClient().leaveSession(false, mode === -2 ? "NetPlay connection aborted" : undefined);
         }
     }
 

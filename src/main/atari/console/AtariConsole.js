@@ -464,6 +464,7 @@ jt.AtariConsole = function(mainVideoClock) {
     function ConsoleControlsSocket() {
 
         this.setDefaults = function() {
+            // TODO Check for NetPlay
             self.setDefaults();
         };
 
@@ -501,6 +502,7 @@ jt.AtariConsole = function(mainVideoClock) {
         };
 
         this.releaseControllers = function() {
+            // TODO Check for NetPlay
             controls.releaseControllers();
         };
 

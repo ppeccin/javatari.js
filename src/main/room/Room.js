@@ -87,9 +87,9 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     };
 
     this.enterNetPendingMode = function(netController) {
-        this.netPlayMode = -1;
+        this.netPlayMode = netController === this.netServer ? -1 : -2;
         this.netController = undefined;
-        self.mainVideoClock.go();       // Local Clock
+        self.mainVideoClock.go();       // Local Clock continued
         this.screen.roomNetPlayStatusChangeUpdate();
     };
 

@@ -134,10 +134,6 @@ jt.NetClient = function(room) {
         nick = message.clientNick;
         controlsToSend.length = 0;
         nextUpdate = -1;
-        room.enterNetClientMode(self);
-
-        room.showOSD('NetPlay Session "' + sessionID + '" joined as "' + nick + '"', true);
-        jt.Util.log('NetPlay Session "' + sessionID + '" joined as "' + nick + '"');
     }
 
     function onServerSDP(message) {
@@ -148,6 +144,10 @@ jt.NetClient = function(room) {
     }
 
     function onDataChannelOpen(event) {
+        room.enterNetClientMode(self);
+
+        room.showOSD('NetPlay Session "' + sessionID + '" joined as "' + nick + '"', true);
+        jt.Util.log('NetPlay Session "' + sessionID + '" joined as "' + nick + '"');
     }
 
     function onDataChannelClose(event) {
