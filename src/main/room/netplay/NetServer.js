@@ -14,8 +14,8 @@ jt.NetServer = function(room) {
         room.enterNetPendingMode(this);
 
         if (!ws) {
-            ws = new WebSocket("ws://10.42.10.141:8081");
-            // ws = new WebSocket("ws://webmsx.herokuapp.com");
+            // ws = new WebSocket("ws://10.42.10.141:8081");
+            ws = new WebSocket("ws://webmsx.herokuapp.com");
             ws.onmessage = onSessionMessage;
             ws.onopen = onSessionServerConnected;
             ws.onclose = onSessionServerDisconnected;
@@ -154,8 +154,12 @@ jt.NetServer = function(room) {
     }
 
     function onSessionCreated(message) {
-        rtcConnectionConfig = message.queriedVariables.RTC_CONFIG || {};
-        dataChannelConfig =   message.queriedVariables.RTC_DATA_CHANNEL_CONFIG || {};
+        try {
+            rtcConnectionConfig = JSON.parse(message.queriedVariables.RTC_CONFIG || "{}");
+        } catch (e) {}
+        try {
+            dataChannelConfig = JSON.parse(message.queriedVariables.RTC_DATA_CHANNEL_CONFIG || "{}");
+        } catch (e) {}
 
         sessionID = message.sessionID;
         updates = 0;
