@@ -757,6 +757,7 @@ html.jt-full-screen #jt-console-panel {
 }
 #jt-netplay-status {
     display: inline-block;
+    position: relative;
     width: 340px;
     font-size: 15px;
     line-height: 27px;
@@ -817,7 +818,7 @@ html.jt-full-screen #jt-console-panel {
     content: "User Nickname";
 }
 .jt-netplay-button:disabled {
-    color: rgb(150, 150, 150);
+    color: rgb(130, 130, 130);
     background: rgb(70, 70, 70);
     cursor: default;
 }
@@ -827,9 +828,17 @@ html.jt-full-screen #jt-console-panel {
     cursor: default;
 }
 #jt-netplay-session-box.jt-disabled div {
-    color: rgb(150, 150, 150);
+    color: rgb(130, 130, 130);
 }
-
+#jt-netplay-status.jt-active::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 18px;
+    top: 4px;
+    left: 7px;
+    background: rgb(248, 33, 28);
+}
 
 
 #jt-touch-left, #jt-touch-right, #jt-touch-speed {

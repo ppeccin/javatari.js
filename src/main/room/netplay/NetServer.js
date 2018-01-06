@@ -121,7 +121,7 @@ jt.NetServer = function(room) {
         // Setup keep-alive
         if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
         // Start a new Session
-        var command = { sessionControl: "createSession" };
+        var command = { sessionControl: "createSession", queryVariables: [ "RTC_CONFIG", "RTC_DATA_CHANNEL_CONFIG" ] };
         if (sessionIDToCreate) command.sessionID = sessionIDToCreate;
         ws.send(JSON.stringify(command));
     }
@@ -154,6 +154,9 @@ jt.NetServer = function(room) {
     }
 
     function onSessionCreated(message) {
+        rtcConnectionConfig = message.queriedVariables.RTC_CONFIG || {};
+        dataChannelConfig =   message.queriedVariables.RTC_DATA_CHANNEL_CONFIG || {};
+
         sessionID = message.sessionID;
         updates = 0;
         controlsToProcess.length = 0;
@@ -170,17 +173,20 @@ jt.NetServer = function(room) {
         jt.Util.log('NetPlay client "' + client.nick + '" joined');
 
         // Start RTC
-        var rtcConnection = new RTCPeerConnection({});
+        var rtcConnection = new RTCPeerConnection(rtcConnectionConfig);
         client.rtcConnection = rtcConnection;
 
         // Set up the ICE candidates
         rtcConnection.onicecandidate = function(e) {
-            if (!e.candidate)
-                ws.send(JSON.stringify({ toClientNick: client.nick, serverSDP: rtcConnection.localDescription }));
+            if (!e.candidate) {
+                jt.Util.log("Server SDP:", rtcConnection.localDescription);
+
+                ws.send(JSON.stringify({toClientNick: client.nick, serverSDP: rtcConnection.localDescription}));
+            }
         };
 
         // Create the data channel and establish its event listeners
-        var dataChannel = rtcConnection.createDataChannel("dataChannel", { _protocol: "tcp", _id: 1 } );
+        var dataChannel = rtcConnection.createDataChannel("dataChannel", dataChannelConfig );
         client.dataChannel = dataChannel;
         dataChannel.onopen = function(event) { onDataChannelOpen(client, event) };
         dataChannel.onclose = function(event) { onDataChannelClose(client, event) };
@@ -203,11 +209,15 @@ jt.NetServer = function(room) {
         var client = clients[message.fromClientNick];
         if (!client) return;
 
+        jt.Util.log("Client " + client.nick + " SDP:", message.clientSDP);
+
         client.rtcConnection.setRemoteDescription(new RTCSessionDescription(message.clientSDP))
             .catch(onRTCError);
     }
 
     function onDataChannelOpen(client, event) {
+        jt.Util.log("Client " + client.nick + " dataChannel open");
+
         client.dataChannelActive = true;
         client.justJoined = true;
     }
@@ -274,5 +284,8 @@ jt.NetServer = function(room) {
     var keepAliveTimer;
     var clients = {};
     var updates = 0;
+
+    var rtcConnectionConfig;
+    var dataChannelConfig;
 
 };

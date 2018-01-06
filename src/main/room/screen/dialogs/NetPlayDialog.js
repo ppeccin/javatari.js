@@ -44,6 +44,7 @@ jt.NetPlayDialog = function(mainElement) {
                 join.disabled = false;
                 sessionName.disabled = false;
                 nick.disabled = false;
+                status.classList.remove("jt-active");
                 sessionBox.classList.remove("jt-disabled");
                 sessionName.setAttribute("placeholder", "Enter a name");
                 break;
@@ -56,6 +57,7 @@ jt.NetPlayDialog = function(mainElement) {
                 join.disabled = true;
                 sessionName.disabled = true;
                 nick.disabled = true;
+                status.classList.add("jt-active");
                 sessionBox.classList.add("jt-disabled");
                 sessionName.setAttribute("placeholder", "Automatic");
                 break;
@@ -68,6 +70,7 @@ jt.NetPlayDialog = function(mainElement) {
                 join.disabled = false;
                 sessionName.disabled = true;
                 nick.disabled = true;
+                status.classList.add("jt-active");
                 sessionBox.classList.remove("jt-disabled");
                 sessionBox.classList.add("jt-disabled");
                 break;
@@ -79,6 +82,7 @@ jt.NetPlayDialog = function(mainElement) {
                 start.disabled = true;
                 join.disabled = true;
                 nick.disabled = true;
+                status.classList.remove("jt-active");
                 sessionBox.classList.add("jt-disabled");
                 break;
         }

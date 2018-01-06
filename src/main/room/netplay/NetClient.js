@@ -78,7 +78,10 @@ jt.NetClient = function(room) {
         // Setup keep-alive
         if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
         // Join a Session
-        ws.send(JSON.stringify({ sessionControl: "joinSession", sessionID: sessionIDToJoin, clientNick: desiredNick }));
+        ws.send(JSON.stringify({
+            sessionControl: "joinSession", sessionID: sessionIDToJoin, clientNick: desiredNick,
+            queryVariables: [ "RTC_CONFIG" ]
+        }));
     }
 
     function onSessionServerDisconnected() {
@@ -106,8 +109,10 @@ jt.NetClient = function(room) {
     }
 
     function onSessionJoined(message) {
+        rtcConnectionConfig = message.queriedVariables.RTC_CONFIG || {};
+
         // Start RTC
-        rtcConnection = new RTCPeerConnection({});
+        rtcConnection = new RTCPeerConnection(rtcConnectionConfig);
 
         // Set up the ICE candidates
         rtcConnection.onicecandidate = function(e) {
@@ -218,6 +223,8 @@ jt.NetClient = function(room) {
     var nick;
     var desiredNick;
     var keepAliveTimer;
+
+    var rtcConnectionConfig;
 
     var rtcConnection;
     var dataChannel;
