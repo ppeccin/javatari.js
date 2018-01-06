@@ -74,6 +74,15 @@ jt.NetClient = function(room) {
         throw new Error("Should never get here!");
     };
 
+    this.processCheckLocalPeripheralControl = function (control) {
+        // Reject controls not available to NetPlay Clients
+        if (disabledPeripheralControls.has(control)) {
+            room.showOSD("Function not available in NetPlay Client mode", true, true);
+            return false;
+        }
+        return true;
+    };
+
     function onSessionServerConnected() {
         // Setup keep-alive
         if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
@@ -233,13 +242,22 @@ jt.NetClient = function(room) {
 
     var nextUpdate = -1;
 
-    var ct = jt.ConsoleControls;
+    var cc = jt.ConsoleControls;
     var disabledControls = new Set([
-        ct.SAVE_STATE_0, ct.SAVE_STATE_1, ct.SAVE_STATE_2, ct.SAVE_STATE_3, ct.SAVE_STATE_4, ct.SAVE_STATE_5, ct.SAVE_STATE_6,
-        ct.SAVE_STATE_7, ct.SAVE_STATE_8, ct.SAVE_STATE_9, ct.SAVE_STATE_10, ct.SAVE_STATE_11, ct.SAVE_STATE_12, ct.SAVE_STATE_FILE,
-        ct.LOAD_STATE_0, ct.LOAD_STATE_1, ct.LOAD_STATE_2, ct.LOAD_STATE_3, ct.LOAD_STATE_4, ct.LOAD_STATE_5, ct.LOAD_STATE_6,
-        ct.LOAD_STATE_7, ct.LOAD_STATE_8, ct.LOAD_STATE_9, ct.LOAD_STATE_10, ct.LOAD_STATE_11, ct.LOAD_STATE_12,
-        ct.POWER_FRY, ct.VIDEO_STANDARD, ct.VSYNCH, ct.TRACE, ct.NO_COLLISIONS, ct.CARTRIDGE_FORMAT
+        cc.SAVE_STATE_0, cc.SAVE_STATE_1, cc.SAVE_STATE_2, cc.SAVE_STATE_3, cc.SAVE_STATE_4, cc.SAVE_STATE_5, cc.SAVE_STATE_6,
+        cc.SAVE_STATE_7, cc.SAVE_STATE_8, cc.SAVE_STATE_9, cc.SAVE_STATE_10, cc.SAVE_STATE_11, cc.SAVE_STATE_12, cc.SAVE_STATE_FILE,
+        cc.LOAD_STATE_0, cc.LOAD_STATE_1, cc.LOAD_STATE_2, cc.LOAD_STATE_3, cc.LOAD_STATE_4, cc.LOAD_STATE_5, cc.LOAD_STATE_6,
+        cc.LOAD_STATE_7, cc.LOAD_STATE_8, cc.LOAD_STATE_9, cc.LOAD_STATE_10, cc.LOAD_STATE_11, cc.LOAD_STATE_12,
+        cc.POWER_FRY, cc.VIDEO_STANDARD, cc.VSYNCH, cc.TRACE, cc.NO_COLLISIONS, cc.CARTRIDGE_FORMAT
+    ]);
+
+    var pc = jt.PeripheralControls;
+    var disabledPeripheralControls = new Set([
+        pc.MACHINE_POWER_FRY,
+        pc.MACHINE_LOAD_STATE_FILE, pc.MACHINE_SAVE_STATE_FILE, pc.MACHINE_LOAD_STATE_MENU, pc.MACHINE_SAVE_STATE_MENU,
+        pc.CARTRIDGE_LOAD_RECENT,
+        pc.CARTRIDGE_LOAD_FILE, pc.CARTRIDGE_LOAD_URL, pc.CARTRIDGE_REMOVE, pc.CARTRIDGE_LOAD_DATA_FILE, pc.CARTRIDGE_SAVE_DATA_FILE,
+        pc.AUTO_LOAD_FILE, pc.AUTO_LOAD_URL
     ]);
 
 };

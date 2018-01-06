@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.FileLoader = function(room, recentStoredROMs) {
+jt.FileLoader = function(room, recentStoredROMs, peripheralControls) {
 "use strict";
 
     var self = this;
@@ -255,7 +255,7 @@ jt.FileLoader = function(room, recentStoredROMs) {
         e.stopPropagation();
         e.target.focus();
 
-        if (Javatari.CARTRIDGE_CHANGE_DISABLED) return;
+        if (peripheralControls.mediaChangeDisabledWarning()) return;
         if (!e.dataTransfer) return;
 
         var wasPaused = console.systemPause(true);

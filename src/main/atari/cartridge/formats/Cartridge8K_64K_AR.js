@@ -182,6 +182,7 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
     };
 
     var signalPartLoadedOK = function(ok) {
+        // TODO Signal Full Update for NetPlay
         bytes[BIOS_BANK_OFFSET + BIOS_INT_PART_LOADED_OK - 0xf800] = (ok ? 1 : 0);
     };
 
@@ -244,7 +245,7 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
     this.saveState = function() {
         return {
             f: this.format.name,
-            r: this.rom.saveState(),
+            r: this.rom.saveState(),    // TODO Shouldn't we also save ROM contents for later partLoads?
             b: jt.Util.compressInt8BitArrayToStringBase64(bytes)
         };
     };

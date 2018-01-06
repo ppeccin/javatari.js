@@ -82,7 +82,6 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
     var readMemoryFromFlash = function() {
         bus.getTia().getVideoOutput().showOSD("Reading from Cartridge Flash Memory...", true);
         if (saveStateSocket) {
-            // TODO Route Load/Save Resource through Socket
             var data = saveStateSocket.getMedia().loadResource(flashMemoryResourceName());
             if (data) harmonyFlashMemory = jt.Util.uncompressStringBase64ToInt8BitArray(data, harmonyFlashMemory);
         }

@@ -120,7 +120,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         self.fileDownloader = new jt.FileDownloader();
         self.stateMedia = new jt.LocalStorageSaveStateMedia(self);
         self.recentROMs = new jt.RecentStoredROMs();
-        self.fileLoader = new jt.FileLoader(self, self.recentROMs);
+        self.fileLoader = new jt.FileLoader(self, self.recentROMs, self.peripheralControls);
         self.speaker = new jt.WebAudioSpeaker(screenElement);
         self.screen = new jt.CanvasDisplay(screenElement);
 

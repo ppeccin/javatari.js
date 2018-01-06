@@ -113,6 +113,11 @@ jt.NetServer = function(room) {
             controlsToProcess.push({ c: control, p: press});
     };
 
+    this.processCheckLocalPeripheralControl = function (control) {
+        // All controls allowed
+        return true;
+    };
+
     this.processCartridgeInserted = function() {
         nextUpdateFull = true;
     };

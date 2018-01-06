@@ -124,7 +124,7 @@ jt.CanvasDisplay = function(mainElement) {
         settingsDialog.show(page);
     };
 
-    this.openSaveStateDialog = function (save) {
+    this.openSaveStateDialog = function(save) {
         closeAllOverlays();
         if (!saveStateDialog) saveStateDialog = new jt.SaveStateDialog(fsElementCenter, consoleControls, peripheralControls, stateMedia);
         saveStateDialog.show(save);

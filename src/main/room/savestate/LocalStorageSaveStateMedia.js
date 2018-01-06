@@ -1,5 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
+// TODO Check for operations during NetPlay Client
 jt.LocalStorageSaveStateMedia = function(room) {
 "use strict";
 

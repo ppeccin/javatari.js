@@ -47,6 +47,9 @@ jt.DOMPeripheralControls = function(room) {
     };
 
     this.controlActivated = function(control, altPower, secPort) {                // Never secPort
+        // Check for NetPlay blocked controls
+        if (room.netController && !room.netController.processCheckLocalPeripheralControl(control)) return;
+
         // All controls are Press-only and repeatable
         switch(control) {
             case controls.MACHINE_POWER_TOGGLE:
@@ -56,7 +59,7 @@ jt.DOMPeripheralControls = function(room) {
                 consoleControls.processControl(jt.ConsoleControls.POWER_FRY, true);
                 break;
             case controls.MACHINE_LOAD_STATE_FILE:
-                if (!mediaChangeDisabledWarning()) fileLoader.openFileChooserDialog(OPEN_TYPE.STATE, false, false, false);
+                fileLoader.openFileChooserDialog(OPEN_TYPE.STATE, false, false, false);
                 break;
             case controls.MACHINE_SAVE_STATE_FILE:
                 consoleControls.processControl(jt.ConsoleControls.SAVE_STATE_FILE, true);
@@ -173,8 +176,13 @@ jt.DOMPeripheralControls = function(room) {
             monitor.showOSD("Cartridge change is disabled!", true, true);
             return true;
         }
+        if (room.netPlayMode === 1) {
+            monitor.showOSD("Cartridge change is disabled in NetPlay Client mode!", true, true);
+            return true;
+        }
         return false;
     };
+    this.mediaChangeDisabledWarning = mediaChangeDisabledWarning;
 
     var initKeys = function() {
         var k = jt.DOMKeys;

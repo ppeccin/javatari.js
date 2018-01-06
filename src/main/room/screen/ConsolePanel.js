@@ -114,13 +114,15 @@ jt.ConsolePanel = function(screen, panelElement) {
         cartChangeButton  = document.getElementById("jt-console-panel-cart-load");
         addCartridgeControlButton(cartChangeButton, jt.PeripheralControls.CARTRIDGE_LOAD_RECENT);
 
+        cartChangeFileButton = document.getElementById("jt-console-panel-cart-file");
+        cartChangeURLButton = document.getElementById("jt-console-panel-cart-url");
+
         if (!Javatari.CARTRIDGE_CHANGE_DISABLED) {
-            cartChangeFileButton = document.getElementById("jt-console-panel-cart-file");
             addCartridgeControlButton(cartChangeFileButton, jt.PeripheralControls.CARTRIDGE_LOAD_RECENT);
-            setVisibility(cartChangeFileButton, true);
-            cartChangeURLButton = document.getElementById("jt-console-panel-cart-url");
             addCartridgeControlButton(cartChangeURLButton, jt.PeripheralControls.AUTO_LOAD_URL);
-            setVisibility(cartChangeURLButton, true);
+        } else {
+            setUnavailable(cartChangeFileButton);
+            setUnavailable(cartChangeURLButton);
         }
     };
 
@@ -171,6 +173,10 @@ jt.ConsolePanel = function(screen, panelElement) {
 
     var setVisibility = function(element, boo) {
         element.style.opacity = boo ? 1 : 0;
+    };
+
+    var setUnavailable = function(element, boo) {
+        element.style.display = "none";
     };
 
     var setupCartridgeLabel = function() {
