@@ -105,9 +105,8 @@ jt.DOMPeripheralControls = function(room) {
             case controls.SCREEN_FULLSCREEN:
                 monitor.fullscreenToggle(); break;
             case controls.SCREEN_DEFAULTS:
-                consoleControlsSocket.setDefaults();
+                consoleControls.processControl(jt.ConsoleControls.DEFAULTS, true);
                 monitor.setDefaults();
-                monitor.showOSD("Default Settings", true);
                 break;
             case controls.SCREEN_TOGGLE_MENU:
                 screen.toggleMenuByKey();

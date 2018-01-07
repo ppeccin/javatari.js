@@ -8,7 +8,7 @@ jt.AtariConsole = function(mainVideoClock) {
     function init() {
         mainComponentsCreate();
         socketsCreate();
-        self.setDefaults();
+        setDefaults();
     }
 
     this.powerOn = function() {
@@ -63,10 +63,8 @@ jt.AtariConsole = function(mainVideoClock) {
         return systemPaused;
     };
 
-    this.videoClockPulse = function(ignoreSystemPause) {
+    this.videoClockPulseOLD = function(ignoreSystemPause) {
         if (systemPaused && !ignoreSystemPause) return;
-
-        consoleControlsSocket.controlsClockPulse();
 
         if (!self.powerIsOn) return;
 
@@ -85,6 +83,28 @@ jt.AtariConsole = function(mainVideoClock) {
 
         // Finish audio signal (generate any missing samples to adjust to sample rate)
         if (!systemPaused && !userPaused) audioSocket.audioFinishFrame();
+    };
+
+    this.videoClockPulse = function() {
+        this.videoClockPulseApplyPulldowns(self.videoClockPulseGetNextPulldowns());
+    };
+
+    this.videoClockPulseApplyPulldowns = function(pulls) {
+        if (!self.powerIsOn) return;
+
+        while(pulls-- > 0) videoFrame();
+
+        // Finish audio signal (generate any missing samples to adjust to sample rate)
+        if (!userPaused) audioSocket.audioFinishFrame();
+    };
+
+    this.videoClockPulseGetNextPulldowns = function() {
+        // Simple pulldown with 1:1 cadence
+        if (videoPulldown.steps === 1) return 1;
+
+        // Complex pulldown
+        if (--videoPulldownStep < 0) videoPulldownStep = videoPulldown.steps - 1;
+        return videoPulldown.cadence[videoPulldownStep];
     };
 
     function videoFrame() {
@@ -126,6 +146,12 @@ jt.AtariConsole = function(mainVideoClock) {
         vSynchMode = boo
             ? Javatari.userPreferences.current.vSynch === null ? Javatari.SCREEN_VSYNCH_MODE : Javatari.userPreferences.current.vSynch
             : -1;
+    };
+
+    this.vSynchSetForcedOFF = function(state) {
+        if (vSynchForcedOFF === state) return;
+        vSynchForcedOFF = !!state;
+        updateVideoSynchronization();
     };
 
     function vSynchToggleMode() {
@@ -211,7 +237,7 @@ jt.AtariConsole = function(mainVideoClock) {
 
     function updateVideoSynchronization() {
         // According to the native video frequency detected, target Video Standard and vSynchMode, use a specific pulldown configuration
-        if (vSynchMode === 1) {    // ON
+        if (!vSynchForcedOFF && vSynchMode === 1) {    // ON
             // Will V-synch to host freq if detected and supported, or use optimal timer configuration)
             videoPulldown = videoStandard.pulldowns[jt.Clock.HOST_NATIVE_FPS] || videoStandard.pulldowns.TIMER;
         } else {                  // OFF, DISABLED
@@ -219,7 +245,7 @@ jt.AtariConsole = function(mainVideoClock) {
             videoPulldown = videoStandard.pulldowns.TIMER;
         }
 
-        videoPulldownStep = videoPulldown.steps;
+        videoPulldownStep = 0;
         mainVideoClockUpdateSpeed();
 
         //console.error("Update Synchronization: " + videoPulldown.frequency);
@@ -258,13 +284,14 @@ jt.AtariConsole = function(mainVideoClock) {
     };
     this.loadState = loadState;
 
-    this.setDefaults = function() {
+    function setDefaults() {
         setVideoStandardAuto(true);
         speedControl = 1;
         alternateSpeed = null;
         mainVideoClockUpdateSpeed();
-        tia.debug(0);
-    };
+        tia.debug(0);                       // TODO Check for NetPlay
+        tia.debugNoCollisions(false);
+    }
 
     function mainVideoClockUpdateSpeed() {
         var freq = videoPulldown.frequency;
@@ -319,7 +346,7 @@ jt.AtariConsole = function(mainVideoClock) {
     var videoStandardAutoDetectionInProgress = false;
     var videoStandardAutoDetectionTries = 0;
 
-    var vSynchMode = -1;
+    var vSynchMode = -1, vSynchForcedOFF = false;
 
     var VIDEO_STANDARD_AUTO_DETECTION_FRAMES = 90;
 
@@ -420,6 +447,10 @@ jt.AtariConsole = function(mainVideoClock) {
             case controls.CARTRIDGE_FORMAT:
                 cycleCartridgeFormat();
                 break;
+            case controls.DEFAULTS:
+                setDefaults();
+                self.showOSD("Default Settings", true);
+                break;
         }
     };
 
@@ -462,11 +493,6 @@ jt.AtariConsole = function(mainVideoClock) {
     // ConsoleControlsSocket  -----------------------------------------
 
     function ConsoleControlsSocket() {
-
-        this.setDefaults = function() {
-            // TODO Check for NetPlay
-            self.setDefaults();
-        };
 
         this.connectControls = function(pControls) {
             controls = pControls;
@@ -672,7 +698,7 @@ jt.AtariConsole = function(mainVideoClock) {
         var start = jt.Util.performanceNow();
         for (var i = 0; i < frames; i++) {
             //var pulseTime = jt.Util.performanceNow();
-            self.videoClockPulse();
+            self.videoClockPulseApplyPulldowns(1);
             //console.log(jt.Util.performanceNow() - pulseTime);
         }
         var duration = jt.Util.performanceNow() - start;

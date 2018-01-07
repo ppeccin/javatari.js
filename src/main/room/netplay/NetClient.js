@@ -186,7 +186,7 @@ jt.NetClient = function(room) {
                 consoleControlsSocket.controlStateChanged(controls[i].c, controls[i].p);
         }
 
-        console.videoClockPulse(true);
+        console.videoClockPulseApplyPulldowns(netUpdate.v);
 
         // Send local controls to Server
         if (controlsToSend.length) {
@@ -248,7 +248,7 @@ jt.NetClient = function(room) {
         cc.SAVE_STATE_7, cc.SAVE_STATE_8, cc.SAVE_STATE_9, cc.SAVE_STATE_10, cc.SAVE_STATE_11, cc.SAVE_STATE_12, cc.SAVE_STATE_FILE,
         cc.LOAD_STATE_0, cc.LOAD_STATE_1, cc.LOAD_STATE_2, cc.LOAD_STATE_3, cc.LOAD_STATE_4, cc.LOAD_STATE_5, cc.LOAD_STATE_6,
         cc.LOAD_STATE_7, cc.LOAD_STATE_8, cc.LOAD_STATE_9, cc.LOAD_STATE_10, cc.LOAD_STATE_11, cc.LOAD_STATE_12,
-        cc.POWER_FRY, cc.VIDEO_STANDARD, cc.VSYNCH, cc.TRACE, cc.NO_COLLISIONS, cc.CARTRIDGE_FORMAT
+        cc.POWER_FRY, cc.VSYNCH, cc.TRACE, cc.NO_COLLISIONS, cc.CARTRIDGE_FORMAT
     ]);
 
     var pc = jt.PeripheralControls;

@@ -83,11 +83,18 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
     this.debug = function(level) {
         debugLevel = level > 4 ? 0 : level;
         debug = debugLevel !== 0;
-        videoSignal.showOSD(debug ? "Debug Level " + debugLevel : "Debug OFF", true);
         //cpu.debug = debug;
         pia.debug = debug;
         if (debug) debugSetColors();
         else debugRestoreColors();
+    };
+
+    this.showDebugMessage = function() {
+        videoSignal.showOSD(debug ? "Debug Level " + debugLevel : "Debug OFF", true);
+    };
+
+    this.debugNoCollisions = function(state) {
+        debugNoCollisions = !!state;
     };
 
     this.getDebugNoCollisions = function() {
@@ -1309,11 +1316,13 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
         if (!state) return;
         switch (control) {
             case controls.DEBUG:
-                self.debug(debugLevel + 1); return;
+                self.debug(debugLevel + 1);
+                self.showDebugMessage();
+                return;
             case controls.SHOW_INFO:
                 videoSignal.toggleShowInfo(); return;
             case controls.NO_COLLISIONS:
-                debugNoCollisions = !debugNoCollisions;
+                self.debugNoCollisions(!debugNoCollisions);
                 videoSignal.showOSD(debugNoCollisions ? "No Collisions: ON" : "No Collisions: OFF", true);
         }
     };

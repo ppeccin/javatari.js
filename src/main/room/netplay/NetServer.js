@@ -50,6 +50,8 @@ jt.NetServer = function(room) {
     this.netVideoClockPulse = function() {
         ++updates;
 
+        var videoPulls = console.videoClockPulseGetNextPulldowns();
+
         var data, dataFull, dataNormal;
         for (var cNick in clients) {
             var client = clients[cNick];
@@ -59,11 +61,12 @@ jt.NetServer = function(room) {
                 client.justJoined = false;
                 if (!dataFull) {
 
-                    window.console.log("Full Update");
+                    jt.Util.log("Full Update");
 
                     netUpdateFull.u = updates;
                     netUpdateFull.p = console.powerIsOn;
                     netUpdateFull.s = console.saveState();
+                    netUpdateFull.v = videoPulls;
                     if (controlsToProcess.length) netUpdateFull.c = controlsToProcess;
                     else if (netUpdateFull.c) delete netUpdateFull.c;
                     dataFull = JSON.stringify(netUpdateFull);
@@ -72,15 +75,13 @@ jt.NetServer = function(room) {
             } else {
                 if (!dataNormal) {
                     netUpdate.u = updates;
+                    netUpdate.v = videoPulls;
                     if (controlsToProcess.length) netUpdate.c = controlsToProcess;
                     else if (netUpdate.c) delete netUpdate.c;
                     dataNormal = JSON.stringify(netUpdate);
                 }
                 data = dataNormal;
             }
-
-            // window.console.log(data.length);
-            // window.console.log("Controls sent:", controlsToSend.length);
 
             try {
                 client.dataChannel.send(data);
@@ -92,16 +93,12 @@ jt.NetServer = function(room) {
         if (nextUpdateFull) nextUpdateFull = false;
 
         if (controlsToProcess.length) {
-            for (var i = 0, len = controlsToProcess.length; i < len; ++i) {
-
-                // window.console.log("Accepting control:", controlsToProcess);
-
+            for (var i = 0, len = controlsToProcess.length; i < len; ++i)
                 consoleControlsSocket.controlStateChanged(controlsToProcess[i].c, controlsToProcess[i].p);
-            }
             controlsToProcess.length = 0;
         }
 
-        console.videoClockPulse(true);
+        console.videoClockPulseApplyPulldowns(videoPulls);
     };
 
     this.processLocalControl = function (control, press) {
@@ -307,8 +304,7 @@ jt.NetServer = function(room) {
         ct.SAVE_STATE_7, ct.SAVE_STATE_8, ct.SAVE_STATE_9, ct.SAVE_STATE_10, ct.SAVE_STATE_11, ct.SAVE_STATE_12, ct.SAVE_STATE_FILE,
         ct.LOAD_STATE_0, ct.LOAD_STATE_1, ct.LOAD_STATE_2, ct.LOAD_STATE_3, ct.LOAD_STATE_4, ct.LOAD_STATE_5, ct.LOAD_STATE_6,
         ct.LOAD_STATE_7, ct.LOAD_STATE_8, ct.LOAD_STATE_9, ct.LOAD_STATE_10, ct.LOAD_STATE_11, ct.LOAD_STATE_12,
-        ct.POWER_FRY, ct.VSYNCH, ct.TRACE, ct.CARTRIDGE_FORMAT,
-        ct.FAST_SPEED, ct.SLOW_SPEED, ct.INC_SPEED, ct.DEC_SPEED, ct.NORMAL_SPEED, ct.MIN_SPEED
+        ct.POWER_FRY, ct.VSYNCH, ct.TRACE, ct.CARTRIDGE_FORMAT
     ]);
 
 };

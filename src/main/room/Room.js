@@ -59,6 +59,11 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     };
 
     this.mainVideoClockPulse = function() {
+        // TODO Optimize
+        if (self.console.isSystemPaused()) return;
+
+        self.console.getConsoleControlsSocket().controlsClockPulse();
+
         if (self.netController)
             self.netController.netVideoClockPulse();
         else
