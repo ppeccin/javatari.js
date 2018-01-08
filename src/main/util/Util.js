@@ -5,25 +5,25 @@ jt.Util = new function() {
 
     this.logs = [];
 
-    this.log = function(str) {
-        // var args = [ "jt:" ];
-        // Array.prototype.push.apply(args, arguments);
-        // console.log.apply(null, args);
-        console.log(str);
+    this.log = function() {
+         var args = [ "jt:" ];
+         Array.prototype.push.apply(args, arguments);
+         console.log.apply(null, args);
+        //console.log(str);
         // this.logs.push(str);
     };
-    this.warning = function(str) {
-        // var args = [ "jt Warning:" ];
-        // Array.prototype.push.apply(args, arguments);
-        // console.warn.apply(null, args);
-        console.warn(str);
+    this.warning = function() {
+         var args = [ "jt Warning:" ];
+         Array.prototype.push.apply(args, arguments);
+         console.warn.apply(null, args);
+        //console.warn(str);
         // this.logs.push(str);
     };
-    this.error = function(str) {
-        // var args = [ "jt Error:" ];
-        // Array.prototype.push.apply(args, arguments);
-        // console.error.apply(null, args);
-        console.error(str);
+    this.error = function() {
+         var args = [ "jt Error:" ];
+         Array.prototype.push.apply(args, arguments);
+         console.error.apply(null, args);
+        //console.error(str);
         // this.logs.push(str);
     };
 

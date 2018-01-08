@@ -48,14 +48,14 @@ jt.NetServer = function(room) {
     };
 
     this.netVideoClockPulse = function() {
-        ++updates;
+        //++updates;     Not needed in an ordered DataChannel?
 
         var videoPulls = console.videoClockPulseGetNextPulldowns();
 
         var data, dataFull, dataNormal;
         for (var cNick in clients) {
             var client = clients[cNick];
-            if (!client.dataChannelActive) continue;
+            if (!client.wsOnly && !client.dataChannelActive) continue;
 
             if (client.justJoined || nextUpdateFull) {
                 client.justJoined = false;
@@ -63,7 +63,7 @@ jt.NetServer = function(room) {
 
                     jt.Util.log("Full Update");
 
-                    netUpdateFull.u = updates;
+                    //netUpdateFull.u = updates;
                     netUpdateFull.p = console.powerIsOn;
                     netUpdateFull.s = console.saveState();
                     netUpdateFull.v = videoPulls;
@@ -84,7 +84,12 @@ jt.NetServer = function(room) {
             }
 
             try {
-                client.dataChannel.send(data);
+                if (client.dataChannelActive)
+                    // Use DataChannel if available
+                    client.dataChannel.send(data);
+                else
+                    // Or fallback to WebSocket relayed through the Session Server (BAD!)
+                    ws.send(JSON.stringify({ toClientNick: client.nick, javatariUpdate: data }));
             } catch (e) {
                 dropClient(client, true, true, 'NetPlay client "' + client.nick + '" dropped: P2P error sending data');
             }
@@ -138,6 +143,10 @@ jt.NetServer = function(room) {
 
     function onSessionMessage(event) {
         const message = JSON.parse(event.data);
+
+        if (message.javatariUpdate)
+            return onClientNetUpdate(message.javatariUpdate);
+
         if (message.sessionControl) {
             switch (message.sessionControl) {
                 case "sessionCreated":
@@ -153,10 +162,11 @@ jt.NetServer = function(room) {
                     self.stopSession(true, "NetPlay: " + message.errorMessage);
                     return;
             }
-        } else {
-            if(message.clientSDP)
-                onClientSDP(message);
+            return;
         }
+
+        if(message.clientSDP)
+            onClientSDP(message);
     }
 
     function onSessionCreated(message) {
@@ -177,16 +187,18 @@ jt.NetServer = function(room) {
     }
 
     function onClientJoined(message) {
-        var client = { nick: message.clientNick };
+        var client = { nick: message.clientNick, justJoined: true, wsOnly: !!message.wsOnly };
         clients[client.nick] = client;
+
         room.showOSD('NetPlay client "' + client.nick + '" joined', true);
         jt.Util.log('NetPlay client "' + client.nick + '" joined');
+
+        if (client.wsOnly) return;
 
         // Start RTC
         var rtcConnection = new RTCPeerConnection(rtcConnectionConfig);
         client.rtcConnection = rtcConnection;
 
-        // Set up the ICE candidates
         rtcConnection.onicecandidate = function(e) {
             if (!e.candidate) {
                 jt.Util.log("Server SDP:", rtcConnection.localDescription);
@@ -195,14 +207,13 @@ jt.NetServer = function(room) {
             }
         };
 
-        // Create the data channel and establish its event listeners
         var dataChannel = rtcConnection.createDataChannel("dataChannel", dataChannelConfig );
         client.dataChannel = dataChannel;
         dataChannel.onopen = function(event) { onDataChannelOpen(client, event) };
         dataChannel.onclose = function(event) { onDataChannelClose(client, event) };
         dataChannel.onmessage = function(event) { onDataChannelMessage(client, event) };
 
-        // Create an offer to connect; this starts the process
+        // Create an offer to connect
         rtcConnection.createOffer()
             .then(function(desc) { return rtcConnection.setLocalDescription(desc); })
             .catch( function(error) { onRTCError(client, error); });
@@ -229,7 +240,6 @@ jt.NetServer = function(room) {
         jt.Util.log("Client " + client.nick + " dataChannel open");
 
         client.dataChannelActive = true;
-        client.justJoined = true;
     }
 
     function onDataChannelClose(client, event) {
@@ -238,9 +248,7 @@ jt.NetServer = function(room) {
     }
 
     function onDataChannelMessage(client, event) {
-        var update = JSON.parse(event.data);
-        // Store remote controls to process on netVideoClockPulse
-        if (update.controls) controlsToProcess.push.apply(controlsToProcess, update.controls);
+        onClientNetUpdate(JSON.parse(event.data));
     }
 
     function onRTCError(client, error) {
@@ -268,6 +276,11 @@ jt.NetServer = function(room) {
             client.rtcConnection.close();
         }
         delete clients[client.nick];
+    }
+
+    function onClientNetUpdate(netUpdate) {
+        // Store remote controls to process on netVideoClockPulse
+        if (netUpdate.controls) controlsToProcess.push.apply(controlsToProcess, netUpdate.controls);
     }
 
     function keepAlive() {

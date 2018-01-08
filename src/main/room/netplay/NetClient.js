@@ -99,6 +99,10 @@ jt.NetClient = function(room) {
 
     function onSessionMessage(event) {
         const message = JSON.parse(event.data);
+
+        if (message.javatariUpdate)
+            return onServerNetUpdate(JSON.parse(message.javatariUpdate));
+
         if (message.sessionControl) {
             switch (message.sessionControl) {
                 case "sessionJoined":
@@ -111,10 +115,11 @@ jt.NetClient = function(room) {
                     self.leaveSession(true, "NetPlay: " + message.errorMessage);
                     return;
             }
-        } else {
-            if(message.serverSDP)
-                onServerSDP(message);
+            return;
         }
+
+        if(message.serverSDP)
+            onServerSDP(message);
     }
 
     function onSessionJoined(message) {
@@ -143,6 +148,11 @@ jt.NetClient = function(room) {
         nick = message.clientNick;
         controlsToSend.length = 0;
         nextUpdate = -1;
+
+        room.showOSD('NetPlay Session "' + sessionID + '" joined as "' + nick + '"', true);
+        jt.Util.log('NetPlay Session "' + sessionID + '" joined as "' + nick + '"');
+
+        room.enterNetClientMode(self);
     }
 
     function onServerSDP(message) {
@@ -153,46 +163,16 @@ jt.NetClient = function(room) {
     }
 
     function onDataChannelOpen(event) {
-        room.enterNetClientMode(self);
-
-        room.showOSD('NetPlay Session "' + sessionID + '" joined as "' + nick + '"', true);
-        jt.Util.log('NetPlay Session "' + sessionID + '" joined as "' + nick + '"');
+        dataChannelActive = true;
     }
 
     function onDataChannelClose(event) {
+        jt.Util.error("NetPlay dataChannel closed");
         self.leaveSession(true, "NetPlay session ended: P2P connection lost");
     }
 
     function onDataChannelMessage(event) {
-        var netUpdate = JSON.parse(event.data);
-
-        // window.console.log(netUpdate);
-
-        if (netUpdate.u !== nextUpdate && nextUpdate >= 0) {
-            jt.Util.error("NetPlay Client expected update: " + nextUpdate + ", but got: " + netUpdate.u);
-            self.leaveSession(true, "NetPlay session ended: Update sequence error");
-        }
-        nextUpdate = netUpdate.u + 1;
-
-        if (netUpdate.p !== undefined && console.powerIsOn !== netUpdate.p)
-            netUpdate.p ? console.powerOn() : console.powerOff();
-
-        if (netUpdate.s)
-            console.loadState(netUpdate.s);
-
-        if (netUpdate.c) {
-            var controls = netUpdate.c;
-            for (var i = 0, len = controls.length; i < len; ++i)
-                consoleControlsSocket.controlStateChanged(controls[i].c, controls[i].p);
-        }
-
-        console.videoClockPulseApplyPulldowns(netUpdate.v);
-
-        // Send local controls to Server
-        if (controlsToSend.length) {
-            dataChannel.send(JSON.stringify({ controls: controlsToSend }));
-            controlsToSend.length = 0;
-        }
+        onServerNetUpdate(JSON.parse(event.data));
     }
 
     function onRTCError(error) {
@@ -211,6 +191,45 @@ jt.NetClient = function(room) {
             rtcConnection.close();
             rtcConnection = undefined;
         }
+    }
+
+    function onServerNetUpdate(netUpdate) {
+        // window.console.log(netUpdate);
+
+        // Not needed in an ordered DataChannel?
+        //if (netUpdate.u !== nextUpdate && nextUpdate >= 0) {
+        //    jt.Util.error("NetPlay Client expected update: " + nextUpdate + ", but got: " + netUpdate.u);
+        //    self.leaveSession(true, "NetPlay session ended: Update sequence error");
+        //}
+        //nextUpdate = netUpdate.u + 1;
+
+        if (netUpdate.p !== undefined && console.powerIsOn !== netUpdate.p)
+            netUpdate.p ? console.powerOn() : console.powerOff();
+
+        if (netUpdate.s)
+            console.loadState(netUpdate.s);
+
+        if (netUpdate.c) {
+            var controls = netUpdate.c;
+            for (var i = 0, len = controls.length; i < len; ++i)
+                consoleControlsSocket.controlStateChanged(controls[i].c, controls[i].p);
+        }
+
+        console.videoClockPulseApplyPulldowns(netUpdate.v);
+
+        // Send local controls to Server. TODO Should we always send a message even when empty?
+        //if (controlsToSend.length) {
+
+            if (dataChannelActive)
+                // Use DataChannel if available
+                dataChannel.send(JSON.stringify({ controls: controlsToSend }));
+            else
+                // Or fallback to WebSocket relayed through the Session Server (BAD!)
+                ws.send(JSON.stringify({ javatariUpdate: { controls: controlsToSend } }));
+
+            controlsToSend.length = 0;
+
+        //}
     }
 
     function keepAlive() {
@@ -239,6 +258,7 @@ jt.NetClient = function(room) {
 
     var rtcConnection;
     var dataChannel;
+    var dataChannelActive = false;
 
     var nextUpdate = -1;
 
