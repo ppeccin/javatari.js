@@ -197,11 +197,15 @@ jt.NetPlayDialog = function(mainElement) {
         // Block invalid characters in sessionName and nick
         function filterChars(e) {
             var item = e.target;
-            var sani = item.value.replace(/[^A-Za-z0-9_-]/g, "");
-            if (item.value != sani) item.value = sani;
+            var value = item.value;
+            if (!value || value.match(/^[A-Za-z0-9]+[A-Za-z0-9_\-]*@?$/))       // OK, store value
+                return item.jtLastValidValue = value;
+            else
+                return item.value = item.jtLastValidValue || "";                // Not OK, use last OK value
         }
         sessionName.addEventListener("input", filterChars);
         nick.addEventListener("input", filterChars);
+
         // Allow selection and edit in status, sessionName and nick
         jt.Util.addEventsListener(status, "touchstart touchmove touchend mousedown mousemove mouseup keydown keyup", function(e) {
             e.stopPropagation();
@@ -212,6 +216,7 @@ jt.NetPlayDialog = function(mainElement) {
         jt.Util.addEventsListener(nick, "touchstart touchmove touchend mousedown mousemove mouseup keydown keyup", function(e) {
             e.stopPropagation();
         });
+
         // Allow context in status
         status.addEventListener("contextmenu", function(e) {
             e.stopPropagation();

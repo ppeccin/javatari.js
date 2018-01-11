@@ -10,9 +10,18 @@ jt.NetClient = function(room) {
         if (!sessionIDToJoin)
             return room.showOSD("Must enter Session Name for joining NetPlay session", true, true);
 
-        desiredNick = pNick;
+        // Check for wsOnly indicator
+        var wsOnlyAsked;
+        if (sessionIDToJoin[sessionIDToJoin.length - 1] === "@") {
+            sessionIDToJoin  = sessionIDToJoin.substr(0, sessionIDToJoin.length -1);
+            wsOnlyAsked = true;
+        } else
+            wsOnlyAsked = false;
 
-        if (sessionID === sessionIDToJoin && nick === desiredNick) return;
+        nickDesired = pNick;
+        wsOnlyDesired = wsOnlyAsked;
+
+        if (sessionID === sessionIDToJoin && nick === nickDesired && wsOnly === wsOnlyDesired) return;
         if (sessionID) this.leaveSession(true);
 
         room.enterNetPendingMode(this);
@@ -32,6 +41,8 @@ jt.NetClient = function(room) {
         keepAliveTimer = undefined;
 
         sessionID = nick = undefined;
+        wsOnly = false;
+
         if (ws) {
             ws.onpen = ws.onclose = ws.onmessage = undefined;
             ws.close();
@@ -39,6 +50,8 @@ jt.NetClient = function(room) {
         }
         if (dataChannel) dataChannel.onpen = dataChannel.onclose = dataChannel.onmessage = undefined;
         if (rtcConnection) rtcConnection.onicecandidate = rtcConnection.ondatachannel = undefined;
+
+        dataChannelActive = false;
 
         if (wasError) stopRTC();
         else setTimeout(stopRTC, 300);      // Give some time before ending RTC so Session Disconnection can be detected first by Server
@@ -88,7 +101,7 @@ jt.NetClient = function(room) {
         if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
         // Join a Session
         ws.send(JSON.stringify({
-            sessionControl: "joinSession", sessionID: sessionIDToJoin, clientNick: desiredNick,
+            sessionControl: "joinSession", sessionID: sessionIDToJoin, clientNick: nickDesired, wsOnly: wsOnlyDesired,
             queryVariables: [ "RTC_CONFIG" ]
         }));
     }
@@ -123,6 +136,13 @@ jt.NetClient = function(room) {
     }
 
     function onSessionJoined(message) {
+        sessionID = message.sessionID;
+        nick = message.clientNick;
+        wsOnly = wsOnlyDesired || message.wsOnly;
+        // nextUpdate = -1;
+
+        if (wsOnly) return enterNetClientMode();
+
         try {
             rtcConnectionConfig = JSON.parse(message.queriedVariables.RTC_CONFIG || "{}");
         } catch (e) {}
@@ -143,15 +163,13 @@ jt.NetClient = function(room) {
             dataChannel.onclose = onDataChannelClose;
             dataChannel.onmessage = onDataChannelMessage;
         };
+    }
 
-        sessionID = message.sessionID;
-        nick = message.clientNick;
-        controlsToSend.length = 0;
-        nextUpdate = -1;
-
+    function enterNetClientMode() {
         room.showOSD('NetPlay Session "' + sessionID + '" joined as "' + nick + '"', true);
         jt.Util.log('NetPlay Session "' + sessionID + '" joined as "' + nick + '"');
 
+        controlsToSend.length = 0;
         room.enterNetClientMode(self);
     }
 
@@ -164,6 +182,7 @@ jt.NetClient = function(room) {
 
     function onDataChannelOpen(event) {
         dataChannelActive = true;
+        enterNetClientMode();
     }
 
     function onDataChannelClose(event) {
@@ -245,16 +264,18 @@ jt.NetClient = function(room) {
     var console = room.console;
     var consoleControlsSocket = console.getConsoleControlsSocket();
 
-    var controlsToSend = new Array(100);
+    var controlsToSend = new Array(100); controlsToSend.length = 0;     // pre allocate empty Array
 
     var ws;
     var sessionID;
     var sessionIDToJoin;
     var nick;
-    var desiredNick;
+    var nickDesired;
+    var wsOnlyDesired = false;
     var keepAliveTimer;
 
     var rtcConnectionConfig;
+    var wsOnly = false;
 
     var rtcConnection;
     var dataChannel;

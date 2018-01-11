@@ -175,7 +175,7 @@ jt.DOMPeripheralControls = function(room) {
             monitor.showOSD("Cartridge change is disabled!", true, true);
             return true;
         }
-        if (room.netPlayMode === 1) {
+        if (room.netPlayMode === 2) {
             monitor.showOSD("Cartridge change is disabled in NetPlay Client mode!", true, true);
             return true;
         }
@@ -186,8 +186,8 @@ jt.DOMPeripheralControls = function(room) {
     var initKeys = function() {
         var k = jt.DOMKeys;
 
-        keyCodeMap[KEY_LOAD_RECENT]           = controls.CARTRIDGE_LOAD_RECENT;
-        keyCodeMap[KEY_LOAD_RECENT | k.ALT]   = controls.CARTRIDGE_LOAD_RECENT;
+        keyCodeMap[KEY_LOAD_RECENT]         = controls.CARTRIDGE_LOAD_RECENT;
+        keyCodeMap[KEY_LOAD_RECENT | k.ALT] = controls.CARTRIDGE_LOAD_RECENT;
         keyCodeMap[KEY_LOAD_URL]            = controls.AUTO_LOAD_URL;
         keyCodeMap[KEY_LOAD_URL | k.ALT]    = controls.AUTO_LOAD_URL;
         keyCodeMap[KEY_CART_REMOVE]         = controls.CARTRIDGE_REMOVE;

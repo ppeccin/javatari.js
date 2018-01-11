@@ -804,7 +804,9 @@ html.jt-full-screen #jt-console-panel {
     line-height: 26px;
     background: rgb(240, 240, 240);
     border: none;
+    border-radius: 0;
     box-sizing: border-box;
+    outline: none;
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;

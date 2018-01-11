@@ -8,10 +8,20 @@ jt.NetServer = function(room) {
     this.startSession = function(pSessionID) {
         sessionIDToCreate = pSessionID ? ("" + pSessionID).trim() : undefined;
 
-        if (sessionIDToCreate && (sessionID === sessionIDToCreate)) return;
+        // Check for wsOnly indicator
+        var wsOnlyAsked;
+        if (sessionIDToCreate && sessionIDToCreate[sessionIDToCreate.length - 1] === "@") {
+            sessionIDToCreate  = sessionIDToCreate.substr(0, sessionIDToCreate.length -1);
+            wsOnlyAsked = true;
+        } else
+            wsOnlyAsked = false;
+
+        if (sessionIDToCreate && (sessionID === sessionIDToCreate) && (wsOnly === wsOnlyAsked)) return;
         if (sessionID) this.stopSession(true);
 
         room.enterNetPendingMode(this);
+
+        wsOnly = wsOnlyAsked;
 
         if (!ws) {
             // ws = new WebSocket("ws://10.42.10.141:8081");
@@ -112,7 +122,7 @@ jt.NetServer = function(room) {
             consoleControlsSocket.controlStateChanged(control, press);
         else
             // Just store changes, to be processed on netVideoClockPulse
-            controlsToProcess.push({ c: control, p: press});
+            controlsToProcess.push({ c: control, p: press });
     };
 
     this.processCheckLocalPeripheralControl = function (control) {
@@ -132,7 +142,7 @@ jt.NetServer = function(room) {
         // Setup keep-alive
         if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
         // Start a new Session
-        var command = { sessionControl: "createSession", queryVariables: [ "RTC_CONFIG", "RTC_DATA_CHANNEL_CONFIG" ] };
+        var command = { sessionControl: "createSession", wsOnly: wsOnly, queryVariables: [ "RTC_CONFIG", "RTC_DATA_CHANNEL_CONFIG" ] };
         if (sessionIDToCreate) command.sessionID = sessionIDToCreate;
         ws.send(JSON.stringify(command));
     }
@@ -187,12 +197,13 @@ jt.NetServer = function(room) {
     }
 
     function onClientJoined(message) {
-        var client = { nick: message.clientNick, justJoined: true, wsOnly: !!message.wsOnly };
+        var client = { nick: message.clientNick, justJoined: true, wsOnly: wsOnly || !!message.wsOnly };
         clients[client.nick] = client;
 
         room.showOSD('NetPlay client "' + client.nick + '" joined', true);
         jt.Util.log('NetPlay client "' + client.nick + '" joined');
 
+        // Use RTC?
         if (client.wsOnly) return;
 
         // Start RTC
@@ -296,7 +307,7 @@ jt.NetServer = function(room) {
     var console = room.console;
     var consoleControlsSocket = console.getConsoleControlsSocket();
 
-    var controlsToProcess = new Array(100);
+    var controlsToProcess = new Array(100); controlsToProcess.length = 0;     // pre allocate empty Array
     var netUpdate = { u: 0 };
     var netUpdateFull = { u: 0, p: false, s: {} };
     var nextUpdateFull = false;
@@ -307,6 +318,7 @@ jt.NetServer = function(room) {
     var keepAliveTimer;
     var clients = {};
     var updates = 0;
+    var wsOnly = false;
 
     var rtcConnectionConfig;
     var dataChannelConfig;
