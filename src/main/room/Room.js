@@ -74,6 +74,14 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         this.netPlayMode = 0;
         this.netController = undefined;
         self.mainVideoClock.go();       // Local Clock
+
+        // Restore state from before NetPlay if any
+        if (this.netPlayStateBeforeClientMode) {
+            this.console.loadStateExtended(this.netPlayStateBeforeClientMode);
+            this.consoleControls.setP1ControlsAndPaddleMode(this.netPlayControlsModeBeforeClientMode.p1, this.netPlayControlsModeBeforeClientMode.pd);
+            this.netPlayStateBeforeClientMode = undefined;
+        }
+
         this.screen.roomNetPlayStatusChangeUpdate();
     };
 
@@ -88,6 +96,11 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         this.netPlayMode = 2;
         this.netController = netClient;
         self.mainVideoClock.pause();    // Clock comes from Server
+
+        // Save state from before NetPlay, to be restored when session is over
+        this.netPlayStateBeforeClientMode = this.console.saveStateExtended();
+        this.netPlayControlsModeBeforeClientMode = { p1: this.consoleControls.isP1ControlsMode(), pd: this.consoleControls.isPaddleMode() };
+
         this.screen.roomNetPlayStatusChangeUpdate();
     };
 
@@ -164,6 +177,8 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     this.netController = undefined;
     this.netServer = undefined;
     this.netClient = undefined;
+    this.netPlayStateBeforeClientMode = undefined;
+    this.netPlayControlsModeBeforeClientMode = undefined;
 
     this.isLoading = false;
 

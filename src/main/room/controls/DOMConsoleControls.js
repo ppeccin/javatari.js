@@ -88,6 +88,12 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
         return paddleMode;
     };
 
+    this.setP1ControlsAndPaddleMode = function(p1, paddle) {
+        this.setP1ControlsMode(p1);
+        setPaddleMode(paddle, false);
+        fireModeStateUpdate();
+    };
+
     this.toggleGamepadMode = function() {
         gamepadControls.toggleMode();
         fireModeStateUpdate();

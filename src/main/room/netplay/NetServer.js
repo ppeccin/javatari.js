@@ -70,21 +70,17 @@ jt.NetServer = function(room) {
             if (client.justJoined || nextUpdateFull) {
                 client.justJoined = false;
                 if (!dataFull) {
-
-                    jt.Util.log("Full Update");
-
                     //netUpdateFull.u = updates;
-                    netUpdateFull.p = console.powerIsOn;
-                    netUpdateFull.s = console.saveState();
+                    netUpdateFull.cm = { p1: room.consoleControls.isP1ControlsMode(), pd: room.consoleControls.isPaddleMode() };
+                    netUpdateFull.s = console.saveStateExtended();
                     netUpdateFull.v = videoPulls;
-                    if (controlsToProcess.length) netUpdateFull.c = controlsToProcess;
-                    else if (netUpdateFull.c) delete netUpdateFull.c;
+                    netUpdateFull.c = controlsToProcess.length ? controlsToProcess : undefined;
                     dataFull = JSON.stringify(netUpdateFull);
                 }
                 data = dataFull;
             } else {
                 if (!dataNormal) {
-                    netUpdate.u = updates;
+                    // netUpdate.u = updates;
                     netUpdate.v = videoPulls;
                     if (controlsToProcess.length) netUpdate.c = controlsToProcess;
                     else if (netUpdate.c) delete netUpdate.c;
@@ -188,7 +184,7 @@ jt.NetServer = function(room) {
         } catch (e) {}
 
         sessionID = message.sessionID;
-        updates = 0;
+        // updates = 0;
         controlsToProcess.length = 0;
         room.enterNetServerMode(self);
 
@@ -212,7 +208,7 @@ jt.NetServer = function(room) {
 
         rtcConnection.onicecandidate = function(e) {
             if (!e.candidate) {
-                jt.Util.log("Server SDP:", rtcConnection.localDescription);
+                jt.Util.log("Server SDP for client " + client.nick + ":", rtcConnection.localDescription);
 
                 ws.send(JSON.stringify({toClientNick: client.nick, serverSDP: rtcConnection.localDescription}));
             }
@@ -241,7 +237,7 @@ jt.NetServer = function(room) {
         var client = clients[message.fromClientNick];
         if (!client) return;
 
-        jt.Util.log("Client " + client.nick + " SDP:", message.clientSDP);
+        jt.Util.log("Client SDP from client " + client.nick + ":", message.clientSDP);
 
         client.rtcConnection.setRemoteDescription(new RTCSessionDescription(message.clientSDP))
             .catch(onRTCError);
@@ -317,8 +313,9 @@ jt.NetServer = function(room) {
     var sessionIDToCreate;
     var keepAliveTimer;
     var clients = {};
-    var updates = 0;
     var wsOnly = false;
+
+    // var updates = 0;
 
     var rtcConnectionConfig;
     var dataChannelConfig;

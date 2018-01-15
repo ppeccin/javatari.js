@@ -222,12 +222,15 @@ jt.NetClient = function(room) {
         //}
         //nextUpdate = netUpdate.u + 1;
 
-        if (netUpdate.p !== undefined && console.powerIsOn !== netUpdate.p)
-            netUpdate.p ? console.powerOn() : console.powerOff();
+        // Full Initial Update?
+        if (netUpdate.s) {
+            // Load initial state
+            console.loadStateExtended(netUpdate.s);
+            // Change Controls Mode automatically to adapt to Server
+            room.consoleControls.setP1ControlsAndPaddleMode(!netUpdate.cm.p1, netUpdate.cm.pd);
+        }
 
-        if (netUpdate.s)
-            console.loadState(netUpdate.s);
-
+        // Apply controls changes
         if (netUpdate.c) {
             var controls = netUpdate.c;
             for (var i = 0, len = controls.length; i < len; ++i)
@@ -281,7 +284,7 @@ jt.NetClient = function(room) {
     var dataChannel;
     var dataChannelActive = false;
 
-    var nextUpdate = -1;
+    // var nextUpdate = -1;
 
     var cc = jt.ConsoleControls;
     var disabledControls = new Set([
