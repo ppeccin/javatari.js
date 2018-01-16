@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-// TODO Check for operations during NetPlay Client
+// TODO Check for operations during NetPlay Client mode
 jt.LocalStorageSaveStateMedia = function(room) {
 "use strict";
 

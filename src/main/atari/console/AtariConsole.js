@@ -541,7 +541,6 @@ jt.AtariConsole = function(mainVideoClock) {
         };
 
         this.releaseControllers = function() {
-            // TODO Check for NetPlay
             controls.releaseControllers();
         };
 
