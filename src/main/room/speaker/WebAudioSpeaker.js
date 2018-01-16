@@ -77,7 +77,7 @@ jt.WebAudioSpeaker = function(mainElement) {
         // Set bufferBaseSize according to browser and platform
         return jt.Util.isMobileDevice()
             ? jt.Util.browserInfo().name === "CHROME" && !jt.Util.isIOSDevice()
-                ? 5      // for now mobile Chrome needs more buffer, except on iOS
+                ? 4      // for now mobile Chrome needs more buffer, except on iOS
                 : 3      // other mobile scenarios
             : 2;         // desktop
     }

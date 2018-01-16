@@ -82,6 +82,7 @@ jt.DOMTouchControls = function(consoleControls) {
         var pause = document.createElement('div');
         pause.id = "jt-touch-pause";
         pause.addEventListener("touchstart", pauseTouchStart);
+        pause.addEventListener("touchend", pauseTouchEnd);
         speedControls.appendChild(pause);
         var ff = document.createElement('div');
         ff.id = "jt-touch-fast";
@@ -262,16 +263,18 @@ jt.DOMTouchControls = function(consoleControls) {
         consoleControls.processControlState(!consolePower ? jt.ConsoleControls.POWER : jt.ConsoleControls.PAUSE, true);
     }
 
+    function pauseTouchEnd(e) {
+        jt.Util.blockEvent(e);
+        consoleControls.processControlState(!consolePower ? jt.ConsoleControls.POWER : jt.ConsoleControls.PAUSE, false);
+    }
+
     function fastTouchStart(e) {
         jt.Util.blockEvent(e);
-        consoleControls.hapticFeedback();
         consoleControls.processControlState(consolePaused ? jt.ConsoleControls.FRAME : jt.ConsoleControls.FAST_SPEED, true);
     }
 
     function fastTouchEnd(e) {
         jt.Util.blockEvent(e);
-        if (consolePaused) return;
-        consoleControls.hapticFeedback();
         consoleControls.processControlState(consolePaused ? jt.ConsoleControls.FRAME : jt.ConsoleControls.FAST_SPEED, false);
     }
 
