@@ -36,7 +36,7 @@ jt.SaveStateDialog = function(mainElement, consoleControls, peripheralControls, 
             var option = slotOptions[slotSelected];
             var control = save ? option.save : option.load;
             if (option.peripheral) peripheralControls.controlActivated(control);
-            else consoleControls.processControl(control, true);
+            else consoleControls.processControlState(control, true);
         }
     };
 

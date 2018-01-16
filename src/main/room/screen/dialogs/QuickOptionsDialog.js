@@ -91,7 +91,7 @@ jt.QuickOptionsDialog = function(mainElement, consoleControls, consoleControlsSo
                 jt.DOMConsoleControls.hapticFeedbackOnTouch(e);
                 var item = e.target.jtControlItem;
                 if (item.peripheral) peripheralControls.controlActivated(item.control, false, false);
-                else consoleControls.processControl(item.control, true);
+                else consoleControls.processControlState(item.control, true);
                 refresh();
             } else
                 dialog.focus();

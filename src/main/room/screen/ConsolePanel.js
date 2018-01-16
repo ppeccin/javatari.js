@@ -143,7 +143,7 @@ jt.ConsolePanel = function(screen, panelElement) {
         consoleControls.hapticFeedbackOnTouch(e);
         screen.closeAllOverlays();
         e.target.jtPressed = true;
-        consoleControls.processControl(e.target.jtControl, true);
+        consoleControls.processControlState(e.target.jtControl, true);
     }
 
     function switchReleased(e) {
@@ -151,7 +151,7 @@ jt.ConsolePanel = function(screen, panelElement) {
         e.target.jtPressed = false;
         if (logoMessageActive) return;
         consoleControls.hapticFeedbackOnTouch(e);
-        consoleControls.processControl(e.target.jtControl, false);
+        consoleControls.processControlState(e.target.jtControl, false);
     }
 
     function switchLeft(e) {

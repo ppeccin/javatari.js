@@ -124,7 +124,7 @@ jt.GamepadConsoleControls = function(consoleControls) {
             var newPosition = joystick.getPaddlePosition();
             if (newPosition !== joyState.xPosition) {
                 joyState.xPosition = newPosition;
-                consoleControlsSocket.controlValueChanged(joyPrefs.player ? controls.PADDLE1_POSITION : controls.PADDLE0_POSITION, newPosition);
+                consoleControls.processControlValue(joyPrefs.player ? controls.PADDLE1_POSITION : controls.PADDLE0_POSITION, newPosition);
             }
         }
         // Joystick direction (Analog or POV) and Paddle Digital (Analog or POV)
@@ -164,27 +164,27 @@ jt.GamepadConsoleControls = function(consoleControls) {
         // Other Console controls
         var newSelect = joystick.getButtonDigital(joyPrefs.select);
         if (newSelect !== joyState.select) {
-            consoleControlsSocket.controlStateChanged(controls.SELECT, newSelect);
+            consoleControls.processControlState(controls.SELECT, newSelect);
             joyState.select = newSelect;
         }
         var newReset = joystick.getButtonDigital(joyPrefs.reset);
         if (newReset !== joyState.reset) {
-            consoleControlsSocket.controlStateChanged(controls.RESET, newReset);
+            consoleControls.processControlState(controls.RESET, newReset);
             joyState.reset = newReset;
         }
         var newPause = joystick.getButtonDigital(joyPrefs.pause);
         if (newPause !== joyState.pause) {
-            consoleControlsSocket.controlStateChanged(controls.PAUSE, newPause);
+            consoleControls.processControlState(controls.PAUSE, newPause);
             joyState.pause = newPause;
         }
         var newFastSpeed = joystick.getButtonDigital(joyPrefs.fastSpeed);
         if (newFastSpeed !== joyState.fastSpeed) {
-            consoleControlsSocket.controlStateChanged(controls.FAST_SPEED, newFastSpeed);
+            consoleControls.processControlState(controls.FAST_SPEED, newFastSpeed);
             joyState.fastSpeed = newFastSpeed;
         }
         var newSlowSpeed = joystick.getButtonDigital(joyPrefs.slowSpeed);
         if (newSlowSpeed !== joyState.slowSpeed) {
-            consoleControlsSocket.controlStateChanged(controls.SLOW_SPEED, newSlowSpeed);
+            consoleControls.processControlState(controls.SLOW_SPEED, newSlowSpeed);
             joyState.slowSpeed = newSlowSpeed;
         }
     };

@@ -67,24 +67,21 @@ jt.NetClient = function(room) {
     };
 
     this.netVideoClockPulse = function() {
-        // Client get clocks from Server
+        // Client gets clocks from Server at onServerNetUpdate()
     };
 
-    this.processLocalControl = function (control, press) {
+    this.processLocalControlState = function (control, press) {
         // Reject controls not available to NetPlay Clients
         if (disabledControls.has(control))
             return room.showOSD("Function not available in NetPlay Client mode", true, true);
 
         // Send only to server, do not process locally
-        controlsToSend.push({ c: control, p: press});
+        controlsToSend.push({ c: control, p: press });
     };
 
-    this.processCartridgeInserted = function() {
-        throw new Error("Should never get here!");
-    };
-
-    this.processSaveStateLoaded = function() {
-        throw new Error("Should never get here!");
+    this.processLocalControlValue = function (control, value) {
+        // Send only to server, do not process locally
+        controlsToSend.push({ c: control, v: value });
     };
 
     this.processCheckLocalPeripheralControl = function (control) {
@@ -94,6 +91,14 @@ jt.NetClient = function(room) {
             return false;
         }
         return true;
+    };
+
+    this.processCartridgeInserted = function() {
+        throw new Error("Should never get here!");
+    };
+
+    this.processSaveStateLoaded = function() {
+        throw new Error("Should never get here!");
     };
 
     function onSessionServerConnected() {
@@ -222,6 +227,9 @@ jt.NetClient = function(room) {
         //}
         //nextUpdate = netUpdate.u + 1;
 
+        // NetClient gets no local clock, so...
+        console.getConsoleControlsSocket().controlsClockPulse();
+
         // Full Initial Update?
         if (netUpdate.s) {
             // Load initial state
@@ -233,8 +241,13 @@ jt.NetClient = function(room) {
         // Apply controls changes
         if (netUpdate.c) {
             var controls = netUpdate.c;
-            for (var i = 0, len = controls.length; i < len; ++i)
-                consoleControlsSocket.controlStateChanged(controls[i].c, controls[i].p);
+            for (var i = 0, len = controls.length; i < len; ++i) {
+                var control = controls[i];
+                if (control.p !== undefined)
+                    consoleControlsSocket.controlStateChanged(control.c, control.p);
+                else
+                    consoleControlsSocket.controlValueChanged(control.c, control.v);
+            }
         }
 
         console.videoClockPulseApplyPulldowns(netUpdate.v);
@@ -244,10 +257,10 @@ jt.NetClient = function(room) {
 
             if (dataChannelActive)
                 // Use DataChannel if available
-                dataChannel.send(JSON.stringify({ controls: controlsToSend }));
+                dataChannel.send(JSON.stringify({ c: controlsToSend.length ? controlsToSend : undefined }));
             else
                 // Or fallback to WebSocket relayed through the Session Server (BAD!)
-                ws.send(JSON.stringify({ javatariUpdate: { controls: controlsToSend } }));
+                ws.send(JSON.stringify({ javatariUpdate: { c: controlsToSend.length ? controlsToSend : undefined } }));
 
             controlsToSend.length = 0;
 

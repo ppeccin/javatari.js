@@ -104,21 +104,31 @@ jt.NetServer = function(room) {
         if (nextUpdateFull) nextUpdateFull = false;
 
         if (controlsToProcess.length) {
-            for (var i = 0, len = controlsToProcess.length; i < len; ++i)
-                consoleControlsSocket.controlStateChanged(controlsToProcess[i].c, controlsToProcess[i].p);
+            for (var i = 0, len = controlsToProcess.length; i < len; ++i) {
+                var control = controlsToProcess[i];
+                if (control.p !== undefined)
+                    consoleControlsSocket.controlStateChanged(control.c, control.p);
+                else
+                    consoleControlsSocket.controlValueChanged(control.c, control.v);
+            }
             controlsToProcess.length = 0;
         }
 
         console.videoClockPulseApplyPulldowns(videoPulls);
     };
 
-    this.processLocalControl = function (control, press) {
+    this.processLocalControlState = function (control, press) {
         if (localOnlyControls.has(control))
-            // Process local-only controls right away, do not store
+        // Process local-only controls right away, do not store
             consoleControlsSocket.controlStateChanged(control, press);
         else
-            // Just store changes, to be processed on netVideoClockPulse
+        // Just store changes, to be processed on netVideoClockPulse
             controlsToProcess.push({ c: control, p: press });
+    };
+
+    this.processLocalControlValue = function (control, value) {
+        // Just store changes, to be processed on netVideoClockPulse
+        controlsToProcess.push({ c: control, v: value });
     };
 
     this.processCheckLocalPeripheralControl = function (control) {
@@ -287,7 +297,7 @@ jt.NetServer = function(room) {
 
     function onClientNetUpdate(netUpdate) {
         // Store remote controls to process on netVideoClockPulse
-        if (netUpdate.controls) controlsToProcess.push.apply(controlsToProcess, netUpdate.controls);
+        if (netUpdate.c) controlsToProcess.push.apply(controlsToProcess, netUpdate.c);
     }
 
     function keepAlive() {

@@ -49,7 +49,7 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
 
     this.releaseControllers = function() {
         for (var c in controlStateMap) if (controlStateMap[c]) {
-            consoleControlsSocket.controlStateChanged(c | 0, false);
+            processControlState(c | 0, false);
             controlStateMap[c] = false;
         }
         paddle0MovingLeft = paddle0MovingRight = paddle1MovingLeft = paddle1MovingRight = false;
@@ -166,8 +166,8 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
             // State flipped?
             if (turboFireClockCount === turboFireFlipClock || turboFireClockCount === 0) {
                 var state = turboFireClockCount > 0;
-                if (turboControlState[controls.JOY0_BUTTON]) processControl(controls.JOY0_BUTTON, state);
-                if (turboControlState[controls.JOY1_BUTTON]) processControl(controls.JOY1_BUTTON, state);
+                if (turboControlState[controls.JOY0_BUTTON]) processControlState(controls.JOY0_BUTTON, state);
+                if (turboControlState[controls.JOY1_BUTTON]) processControlState(controls.JOY1_BUTTON, state);
             }
             if (turboFireClockCount <= 0) turboFireClockCount = turboFireClocks;        // restart cycle
         }
@@ -180,23 +180,23 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
                 if (!paddle0MovingLeft) {
                     paddle0Position -= paddle0Speed;
                     if (paddle0Position < 0) paddle0Position = 0;
-                    consoleControlsSocket.controlValueChanged(controls.PADDLE0_POSITION, paddle0Position);
+                    processControlValue(controls.PADDLE0_POSITION, paddle0Position);
                 }
             } else if (paddle0MovingLeft) {
                 paddle0Position += paddle0Speed;
                 if (paddle0Position > 380) paddle0Position = 380;
-                consoleControlsSocket.controlValueChanged(controls.PADDLE0_POSITION, paddle0Position);
+                processControlValue(controls.PADDLE0_POSITION, paddle0Position);
             }
             if (paddle1MovingRight) {
                 if (!paddle1MovingLeft) {
                     paddle1Position -= paddle1Speed;
                     if (paddle1Position < 0) paddle1Position = 0;
-                    consoleControlsSocket.controlValueChanged(controls.PADDLE1_POSITION, paddle1Position);
+                    processControlValue(controls.PADDLE1_POSITION, paddle1Position);
                 }
             } else if (paddle1MovingLeft) {
                 paddle1Position += paddle1Speed;
                 if (paddle1Position > 380) paddle1Position = 380;
-                consoleControlsSocket.controlValueChanged(controls.PADDLE1_POSITION, paddle1Position);
+                processControlValue(controls.PADDLE1_POSITION, paddle1Position);
             }
         }
     };
@@ -247,7 +247,7 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
             control = keyCodeMap[code];
             if (!control) return keyForwardControls.processKey(code, press);        // Next in chain
         }
-        processControl(control, press);
+        processControlState(control, press);
     };
 
     this.applyPreferences = function() {
@@ -257,7 +257,7 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
         gamepadControls.applyPreferences();
     };
 
-    function processControl(control, press) {
+    function processControlState(control, press) {
         // Paddles first
         if (paddleMode) {
             control = translatePaddleModeButtons(control);
@@ -270,11 +270,19 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
         controlStateMap[control] = press;
 
         if (room.netController)
-            room.netController.processLocalControl(control, press);
+            room.netController.processLocalControlState(control, press);
         else
             consoleControlsSocket.controlStateChanged(control, press);
     }
-    this.processControl = processControl;
+    this.processControlState = processControlState;
+
+    function processControlValue(control, value) {
+        if (room.netController)
+            room.netController.processLocalControlValue(control, value);
+        else
+            consoleControlsSocket.controlValueChanged(control, value);
+    }
+    this.processControlValue = processControlValue;
 
     var preventIEHelp = function() {
         window.onhelp = function () {
@@ -338,8 +346,11 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
         paddleMode = mode;
         paddle0Speed = paddle1Speed = 2;
         paddle0Position = paddle1Position = (paddleMode ? 190 : -1);	// -1 = disconnected, won't charge POTs
-        consoleControlsSocket.controlValueChanged(controls.PADDLE0_POSITION, paddle0Position);
-        consoleControlsSocket.controlValueChanged(controls.PADDLE1_POSITION, paddle1Position);
+        // Only send Paddles connection reset when not in NetPlay Client mode
+        if (room.netPlayMode !== 2) {
+            processControlValue(controls.PADDLE0_POSITION, paddle0Position);
+            processControlValue(controls.PADDLE1_POSITION, paddle1Position);
+        }
         gamepadControls.setPaddleMode(paddleMode);
         if (showOSD) showModeOSD();
     };

@@ -2,6 +2,8 @@
 
 jt.ConsoleControls = {
 
+    // CAUTION: cannot use 0 or falsy values for controls
+
     JOY0_UP: 11, JOY0_DOWN: 12, JOY0_LEFT: 13, JOY0_RIGHT: 14, JOY0_BUTTON: 15,
     JOY1_UP: 21, JOY1_DOWN: 22, JOY1_LEFT: 23, JOY1_RIGHT: 24, JOY1_BUTTON: 25,
     PADDLE0_POSITION: 31, PADDLE1_POSITION: 32,		// Position from 380 (Left) to 190 (Center) to 0 (Right); -1 = disconnected, won't charge POTs

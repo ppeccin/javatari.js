@@ -53,16 +53,16 @@ jt.DOMPeripheralControls = function(room) {
         // All controls are Press-only and repeatable
         switch(control) {
             case controls.MACHINE_POWER_TOGGLE:
-                consoleControls.processControl(jt.ConsoleControls.POWER, true);
+                consoleControls.processControlState(jt.ConsoleControls.POWER, true);
                 break;
             case controls.MACHINE_POWER_FRY:
-                consoleControls.processControl(jt.ConsoleControls.POWER_FRY, true);
+                consoleControls.processControlState(jt.ConsoleControls.POWER_FRY, true);
                 break;
             case controls.MACHINE_LOAD_STATE_FILE:
                 fileLoader.openFileChooserDialog(OPEN_TYPE.STATE, false, false, false);
                 break;
             case controls.MACHINE_SAVE_STATE_FILE:
-                consoleControls.processControl(jt.ConsoleControls.SAVE_STATE_FILE, true);
+                consoleControls.processControlState(jt.ConsoleControls.SAVE_STATE_FILE, true);
                 break;
             case controls.MACHINE_LOAD_STATE_MENU:
                 screen.openSaveStateDialog(false);
@@ -105,7 +105,7 @@ jt.DOMPeripheralControls = function(room) {
             case controls.SCREEN_FULLSCREEN:
                 monitor.fullscreenToggle(); break;
             case controls.SCREEN_DEFAULTS:
-                consoleControls.processControl(jt.ConsoleControls.DEFAULTS, true);
+                consoleControls.processControlState(jt.ConsoleControls.DEFAULTS, true);
                 monitor.setDefaults();
                 break;
             case controls.SCREEN_TOGGLE_MENU:

@@ -1063,7 +1063,7 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
             if (controlsJOY1ButtonPressed) INPT5 &= 0x7f; else INPT5 |= 0x80;
         }
 
-        if ((blank & 0x80) != 0) {					// Ground paddle capacitors
+        if ((blank & 0x80) !== 0) {					// Ground paddle capacitors
             paddleCapacitorsGrounded = true;
             paddle0CapacitorCharge = paddle1CapacitorCharge = 0;
             INPT0 &= 0x7f; INPT1 &= 0x7f; INPT2 &= 0x7f; INPT3 &= 0x7f;
@@ -1408,6 +1408,16 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
             cop: collisionsPossible,
             cod: debugNoCollisions,
 
+            cbl: controlsButtonsLatched,
+            j0p: controlsJOY0ButtonPressed,
+            j1p: controlsJOY1ButtonPressed,
+
+            pcg: paddleCapacitorsGrounded,
+            pd0: paddle0Position,
+            pd0c: paddle0CapacitorCharge,
+            pd1: paddle1Position,
+            pd1c: paddle1CapacitorCharge,
+
             CTRLPF: CTRLPF,
             COLUPF: COLUPF,
             COLUBK: COLUBK,
@@ -1518,6 +1528,18 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
         collisions = s.co | 0;
         collisionsPossible = s.cop | 0;
         if (s.cod !== undefined) debugNoCollisions = s.cod;
+
+        if (s.cbl !== undefined) {                          // backward compatibility
+            controlsButtonsLatched = s.cbl;
+            controlsJOY0ButtonPressed = s.j0p;
+            controlsJOY1ButtonPressed = s.j1p;
+
+            paddleCapacitorsGrounded = s.pcg;
+            paddle0Position = s.pd0;
+            paddle0CapacitorCharge = s.pd0c;
+            paddle1Position = s.pd1;
+            paddle1CapacitorCharge = s.pd1c;
+        }
 
         CTRLPF = s.CTRLPF | 0;
         COLUPF = s.COLUPF | 0;
@@ -1654,11 +1676,6 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
 
     var collisions = 0, collisionsPossible = 0;
 
-    var debug = false;
-    var debugLevel = 0;
-    var debugNoCollisions = false;
-    var debugPixels = new Uint32Array(LINE_WIDTH);
-
     var controlsButtonsLatched = false;
     var controlsJOY0ButtonPressed = false;
     var controlsJOY1ButtonPressed = false;
@@ -1668,6 +1685,12 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
     var paddle0CapacitorCharge = 0;
     var paddle1Position = -1;
     var paddle1CapacitorCharge = 0;
+
+
+    var debug = false;
+    var debugLevel = 0;
+    var debugNoCollisions = false;
+    var debugPixels = new Uint32Array(LINE_WIDTH);
 
 
     var playerLineSprites = new Uint8Array(2 * 256 * 8 * 64);               // 2 Mirrors * 256 Patterns * 8 Variations * (1 base + 2 alts) * 20 8Bits line data specifying 1bit pixels + 4 bytes spare

@@ -259,20 +259,20 @@ jt.DOMTouchControls = function(consoleControls) {
     function pauseTouchStart(e) {
         jt.Util.blockEvent(e);
         consoleControls.hapticFeedback();
-        consoleControlsSocket.controlStateChanged(!consolePower ? jt.ConsoleControls.POWER : jt.ConsoleControls.PAUSE, true);
+        consoleControls.processControlState(!consolePower ? jt.ConsoleControls.POWER : jt.ConsoleControls.PAUSE, true);
     }
 
     function fastTouchStart(e) {
         jt.Util.blockEvent(e);
         consoleControls.hapticFeedback();
-        consoleControlsSocket.controlStateChanged(consolePaused ? jt.ConsoleControls.FRAME : jt.ConsoleControls.FAST_SPEED, true);
+        consoleControls.processControlState(consolePaused ? jt.ConsoleControls.FRAME : jt.ConsoleControls.FAST_SPEED, true);
     }
 
     function fastTouchEnd(e) {
         jt.Util.blockEvent(e);
         if (consolePaused) return;
         consoleControls.hapticFeedback();
-        consoleControlsSocket.controlStateChanged(consolePaused ? jt.ConsoleControls.FRAME : jt.ConsoleControls.FAST_SPEED, false);
+        consoleControls.processControlState(consolePaused ? jt.ConsoleControls.FRAME : jt.ConsoleControls.FAST_SPEED, false);
     }
 
     function resetStates() {

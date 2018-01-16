@@ -741,7 +741,7 @@ jt.CanvasDisplay = function(mainElement) {
             if (!e.button) {
                 if (elem.jtIsConsoleControl) {
                     barConsoleControlPressed = elem.jtControl;
-                    consoleControls.processControl(barConsoleControlPressed, true);
+                    consoleControls.processControlState(barConsoleControlPressed, true);
                 } else
                     peripheralControls.controlActivated(elem.jtControl);
             }
@@ -811,7 +811,7 @@ jt.CanvasDisplay = function(mainElement) {
     function barButtonMouseLeft() {
         if (barConsoleControlPressed) {
             cursorHideFrameCountdown = CURSOR_HIDE_FRAMES;
-            consoleControls.processControl(barConsoleControlPressed, false);
+            consoleControls.processControlState(barConsoleControlPressed, false);
             barConsoleControlPressed = null;
         }
     }
@@ -821,7 +821,7 @@ jt.CanvasDisplay = function(mainElement) {
         // Special case for ConsoleControl
         if (barConsoleControlPressed) {
             consoleControls.hapticFeedbackOnTouch(e);
-            consoleControls.processControl(barConsoleControlPressed, false);
+            consoleControls.processControlState(barConsoleControlPressed, false);
             barConsoleControlPressed = null;
             return;
         }
