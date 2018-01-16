@@ -30,6 +30,10 @@ jt.QuickOptionsDialog = function(mainElement, consoleControls, consoleControlsSo
         Javatari.room.screen.focus();
     };
 
+    this.controlsModeStateUpdate = function () {
+        if (visible) refresh();
+    };
+
     function refresh() {
         for (var i = 0; i < items.length; ++i) {
             var item = items[i];
@@ -50,7 +54,8 @@ jt.QuickOptionsDialog = function(mainElement, consoleControls, consoleControlsSo
         var pc = jt.PeripheralControls;
 
         items = [
-            { label: "Paddles Mode",                     control: pc.PADDLES_TOGGLE_MODE,         peripheral: true },
+            { label: "Paddles",                          control: pc.PADDLES_TOGGLE_MODE,         peripheral: true },
+            { label: "Swap Controllers",                 control: pc.P1_CONTROLS_TOGGLE,          peripheral: true },
             { label: "No Collisions",                    control: cc.NO_COLLISIONS },
             { label: "&#128190;&nbsp; V-Synch",          control: cc.VSYNCH },
             { label: "&#128190;&nbsp; CRT Filter",       control: pc.SCREEN_CRT_FILTER,           peripheral: true },

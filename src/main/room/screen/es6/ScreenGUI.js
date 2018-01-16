@@ -695,7 +695,7 @@ html.jt-full-screen #jt-console-panel {
     top: 0; bottom: 0;
     left: 0; right: 0;
     width: 233px;
-    height: 310px;
+    height: 345px;
     margin: auto;
     padding: 11px 14px 0;
     color: white;

@@ -25,6 +25,7 @@ jt.DOMPeripheralControls = function(room) {
     this.getControlReport = function(control) {
         switch (control) {
             case controls.PADDLES_TOGGLE_MODE:
+            case controls.P1_CONTROLS_TOGGLE:
             case controls.TURBO_FIRE_TOGGLE:
             case controls.TOUCH_TOGGLE_DIR_BIG:
             case controls.HAPTIC_FEEDBACK_TOGGLE_MODE:

@@ -337,6 +337,7 @@ jt.CanvasDisplay = function(mainElement) {
 
     this.controlsModeStateUpdate = function () {
         if(settingsDialog) settingsDialog.controlsModeStateUpdate();
+        if(quickOtionsDialog) quickOtionsDialog.controlsModeStateUpdate();
     };
 
     this.touchControlsActiveUpdate = function(active, dirBig) {

@@ -135,6 +135,8 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
 
     this.getControlReport = function(control) {
         switch (control) {
+            case jt.PeripheralControls.P1_CONTROLS_TOGGLE:
+                return { label: p1ControlsMode ? "ON" : "OFF", active: p1ControlsMode };
             case jt.PeripheralControls.PADDLES_TOGGLE_MODE:
                 return { label: paddleMode ? "ON" : "OFF", active: paddleMode };
             case jt.PeripheralControls.TOUCH_TOGGLE_DIR_BIG:
