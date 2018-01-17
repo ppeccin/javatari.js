@@ -12,6 +12,8 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
         // Also, ROM content represents the entire tape and can have multiple parts
         bytes = jt.Util.arrayFill(new Array(4 * BANK_SIZE));
         loadBIOS();
+        // Initialize Random seeds
+        for (var i = 0; i < 31; ++i) randomSeeds[i] = (Math.random() * 256) | 0;
     }
 
     this.powerOn = function() {
@@ -174,8 +176,7 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
         // Patch BIOS interface area with correct values from stored Header data
         bytes[BIOS_BANK_OFFSET + BIOS_INT_CONTROL_REG_ADDR - 0xf800] = romControlRegister;
         bytes[BIOS_BANK_OFFSET + BIOS_INT_PART_NO_ADDR - 0xf800] = romMultiLoadIndex;
-        // TODO This random() is a source of indeterminism. Potential problem for NetPlay (Dragonstomper shows the problem)
-        bytes[BIOS_BANK_OFFSET + BIOS_INT_RANDOM_SEED_ADDR - 0xf800] = ((Math.random() * 256) | 0);
+        bytes[BIOS_BANK_OFFSET + BIOS_INT_RANDOM_SEED_ADDR - 0xf800] = randomSeeds[currentRandomSeed++]; if (currentRandomSeed > 30) currentRandomSeed = 0;
         bytes[BIOS_BANK_OFFSET + BIOS_INT_START_ADDR - 0xf800] = romStartupAddress & 0xff;
         bytes[BIOS_BANK_OFFSET + BIOS_INT_START_ADDR + 1 - 0xf800] = (romStartupAddress >> 8) & 0xff;
         signalPartLoadedOK(true);
@@ -210,6 +211,9 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
     var romMultiLoadIndex = 0;
     var romProgressBarSpeed = 0;
     var romPageOffsets;
+
+    var randomSeeds = new Array(31);    // Circular Random seeds pre-determined at init() and preserved at saveStates to avoid indeterminism
+    var currentRandomSeed = 0;
 
     var tapeOffset = 0;
 
@@ -260,7 +264,9 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
             rm: romMultiLoadIndex,
             rb: romProgressBarSpeed,
             ro: romPageOffsets,
-            to: tapeOffset
+            to: tapeOffset,
+            rnd: jt.Util.storeInt8BitArrayToStringBase64(randomSeeds),
+            rnc: currentRandomSeed
         };
     };
 
@@ -283,6 +289,8 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
         romProgressBarSpeed = state.rb;
         romPageOffsets = state.ro;
         tapeOffset = state.to;
+        jt.Util.restoreStringBase64ToInt8BitArray(state.rnd, randomSeeds);
+        currentRandomSeed = state.rnc;
     };
 
 
