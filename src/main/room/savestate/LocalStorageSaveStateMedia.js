@@ -1,6 +1,5 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-// TODO Check for operations during NetPlay Client mode
 jt.LocalStorageSaveStateMedia = function(room) {
 "use strict";
 
@@ -27,11 +26,15 @@ jt.LocalStorageSaveStateMedia = function(room) {
     };
 
     this.saveStateFile = function(fileName, state) {
+        if (checkDenyNetPlayOperation()) return;
+
         var data = buildDataFromState(state);
         if (data) fileDownloader.startDownloadBinary((fileName || "Javatari SaveState") + SAVE_STATE_FILE_EXTENSION, data, "System State file");
     };
 
     this.loadStateFile = function(data) {
+        if (checkDenyNetPlayOperation()) return;
+
         return buildStateFromData(data);
     };
 
@@ -54,10 +57,13 @@ jt.LocalStorageSaveStateMedia = function(room) {
     };
 
     this.saveStateLoaded = function() {
-        if (room.netController) room.netController.processSaveStateLoaded();
+        // Let the NetPlay Server know
+        if (room.netPlayMode === 1) room.netController.processSaveStateLoaded();
     };
 
     var saveToLocalStorage = function(entry, data) {
+        if (checkDenyNetPlayOperation()) return true;
+
         try {
             localStorage["javatari" + entry] = data;
             return true;
@@ -68,6 +74,8 @@ jt.LocalStorageSaveStateMedia = function(room) {
     };
 
     var loadFromLocalStorage = function(entry) {
+        if (checkDenyNetPlayOperation()) return;
+
         try {
             return localStorage["javatari" + entry];
         } catch (ex) {
@@ -108,6 +116,10 @@ jt.LocalStorageSaveStateMedia = function(room) {
         }
     };
 
+    function checkDenyNetPlayOperation() {
+        // Do not perform operation during NetPlay Client mode
+        return room.netPlayMode === 2;
+    }
 
     var fileDownloader;
 

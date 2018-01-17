@@ -97,10 +97,6 @@ jt.NetClient = function(room) {
         throw new Error("Should never get here!");
     };
 
-    this.processSaveStateLoaded = function() {
-        throw new Error("Should never get here!");
-    };
-
     function onSessionServerConnected() {
         // Setup keep-alive
         if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
@@ -252,19 +248,14 @@ jt.NetClient = function(room) {
 
         console.videoClockPulseApplyPulldowns(netUpdate.v);
 
-        // Send local controls to Server. TODO Should we always send a message even when empty?
-        //if (controlsToSend.length) {
-
-            if (dataChannelActive)
-                // Use DataChannel if available
-                dataChannel.send(JSON.stringify({ c: controlsToSend.length ? controlsToSend : undefined }));
-            else
-                // Or fallback to WebSocket relayed through the Session Server (BAD!)
-                ws.send(JSON.stringify({ javatariUpdate: { c: controlsToSend.length ? controlsToSend : undefined } }));
-
-            controlsToSend.length = 0;
-
-        //}
+        // Send local controls to Server. We always send a message even when empty to keep the channel active
+        if (dataChannelActive)
+            // Use DataChannel if available
+            dataChannel.send(JSON.stringify({ c: controlsToSend.length ? controlsToSend : undefined }));
+        else
+            // Or fallback to WebSocket relayed through the Session Server (BAD!)
+            ws.send(JSON.stringify({ javatariUpdate: { c: controlsToSend.length ? controlsToSend : undefined } }));
+        controlsToSend.length = 0;
     }
 
     function keepAlive() {

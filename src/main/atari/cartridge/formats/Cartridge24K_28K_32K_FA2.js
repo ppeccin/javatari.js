@@ -73,7 +73,7 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
 
     var performFlashOperation = function(op) {
         harmonyFlashOpInProgress = op;
-        harmonyFlashOpStartTime = Date.now();
+        harmonyFlashOpChecksCount = 0;
         // 1 = read, 2 = write
         if (op === 1) readMemoryFromFlash();
         else if (op === 2) saveMemoryToFlash();
@@ -96,14 +96,12 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
     };
 
     var detectFlashOperationCompletion = function() {
-        if (Date.now() - harmonyFlashOpStartTime > 1100) {		// 1.1 seconds
-            harmonyFlashOpStartTime = Date.now();
+        if (++harmonyFlashOpChecksCount > 140) {
+            harmonyFlashOpChecksCount = 0;
             harmonyFlashOpInProgress = 0;
             extraRAM[FLASH_OP_CONTROL] = 0;			// Set return code for Successful operation
             bus.getTia().getVideoOutput().showOSD("Done.", true);
-            // Signal a external state modification
-            // Flash memory may have been loaded from file and changed
-            // Also the waiting timer is a source of indeterminism! TODO Remove indeterminism
+            // Signal a external state modification, Flash memory may have been loaded from file and changed
             if (saveStateSocket) saveStateSocket.saveStateLoaded();
         }
     };
@@ -125,7 +123,7 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
             tb: topBankSwitchAddress,
             e: jt.Util.compressInt8BitArrayToStringBase64(extraRAM),
             ho: harmonyFlashOpInProgress,
-            ht: harmonyFlashOpStartTime
+            ht: harmonyFlashOpChecksCount
         };
     };
 
@@ -138,7 +136,7 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
         topBankSwitchAddress =  state.tb;
         extraRAM = jt.Util.uncompressStringBase64ToInt8BitArray(state.e, extraRAM);
         harmonyFlashOpInProgress = state.ho || 0;
-        harmonyFlashOpStartTime = Date.now();   // Always as if operation just started
+        harmonyFlashOpChecksCount = state.ht || 0;
     };
 
 
@@ -152,7 +150,7 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
     var topBankSwitchAddress;
     var extraRAM = jt.Util.arrayFill(new Array(256), 0);
 
-    var harmonyFlashOpStartTime = Date.now();
+    var harmonyFlashOpChecksCount = 0;
     var harmonyFlashOpInProgress = 0;					// 0 = none, 1 = read, 2 = write
     var harmonyFlashMemory = jt.Util.arrayFill(new Array(256), 0);
 

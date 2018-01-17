@@ -29,7 +29,8 @@ jt.M6502 = function() {
     this.reset = function() {
         I = 1;
         T = -1;
-        instruction = [ fetchOpcodeAndDecodeInstruction ];    // Bootstrap instruction
+        opcode = -1;
+        instruction = boostrapInstruction;
         PC = bus.read(RESET_VECTOR) | (bus.read(RESET_VECTOR + 1) << 8);
         this.setRDY(true);
     };
@@ -106,6 +107,7 @@ jt.M6502 = function() {
     };
 
     var fetchNextOpcode = fetchOpcodeAndDecodeInstruction;
+    var boostrapInstruction = [ fetchOpcodeAndDecodeInstruction ];
 
     var fetchOpcodeAndDiscard = function() {
         bus.read(PC);
@@ -1733,7 +1735,7 @@ jt.M6502 = function() {
         data = state.d; AD = state.AD; BA = state.BA; BALCrossed = !!state.BC; IA = state.IA;
         branchOffset = state.bo; branchOffsetCrossAdjust = state.boa;
 
-        instruction = instructions[opcode];
+        instruction = opcode === -1 ? boostrapInstruction : instructions[opcode];      // for states saved right after a reset or before first reset
     };
 
 

@@ -82,8 +82,7 @@ jt.NetServer = function(room) {
                 if (!dataNormal) {
                     // netUpdate.u = updates;
                     netUpdate.v = videoPulls;
-                    if (controlsToProcess.length) netUpdate.c = controlsToProcess;
-                    else if (netUpdate.c) delete netUpdate.c;
+                    netUpdate.c = controlsToProcess.length ? controlsToProcess : undefined;
                     dataNormal = JSON.stringify(netUpdate);
                 }
                 data = dataNormal;
@@ -314,8 +313,8 @@ jt.NetServer = function(room) {
     var consoleControlsSocket = console.getConsoleControlsSocket();
 
     var controlsToProcess = new Array(100); controlsToProcess.length = 0;     // pre allocate empty Array
-    var netUpdate = { u: 0 };
-    var netUpdateFull = { u: 0, p: false, s: {} };
+    var netUpdate = { v: 0, c: undefined };
+    var netUpdateFull = { cm: {}, s: {}, v: 0, c: undefined };
     var nextUpdateFull = false;
 
     var ws;
