@@ -70,6 +70,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     };
 
     this.enterStandaloneMode = function() {
+        var oldMode = this.netPlayMode;
         this.netPlayMode = 0;
         this.netController = undefined;
         self.mainVideoClock.go();       // Local Clock
@@ -81,17 +82,20 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
             this.netPlayStateBeforeClientMode = undefined;
         }
 
-        this.screen.roomNetPlayStatusChangeUpdate();
+        if (oldMode !== this.netPlayMode) this.screen.roomNetPlayStatusChangeUpdate(oldMode);
     };
 
     this.enterNetServerMode = function(netServer) {
+        var oldMode = this.netPlayMode;
         this.netPlayMode = 1;
         this.netController = netServer;
         self.mainVideoClock.go();       // Local Clock, also sent to Client
-        this.screen.roomNetPlayStatusChangeUpdate();
+
+        if (oldMode !== this.netPlayMode) this.screen.roomNetPlayStatusChangeUpdate(oldMode);
     };
 
     this.enterNetClientMode = function(netClient) {
+        var oldMode = this.netPlayMode;
         this.netPlayMode = 2;
         this.netController = netClient;
         self.mainVideoClock.pause();    // Clock comes from Server
@@ -100,14 +104,16 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         this.netPlayStateBeforeClientMode = this.console.saveStateExtended();
         this.netPlayControlsModeBeforeClientMode = { p1: this.consoleControls.isP1ControlsMode(), pd: this.consoleControls.isPaddleMode() };
 
-        this.screen.roomNetPlayStatusChangeUpdate();
+        if (oldMode !== this.netPlayMode) this.screen.roomNetPlayStatusChangeUpdate(oldMode);
     };
 
     this.enterNetPendingMode = function(netController) {
+        var oldMode = this.netPlayMode;
         this.netPlayMode = netController === this.netServer ? -1 : -2;
         this.netController = undefined;
         self.mainVideoClock.go();       // Local Clock continued
-        this.screen.roomNetPlayStatusChangeUpdate();
+
+        if (oldMode !== this.netPlayMode) this.screen.roomNetPlayStatusChangeUpdate(oldMode);
     };
 
     function afterPowerONDelay(func) {

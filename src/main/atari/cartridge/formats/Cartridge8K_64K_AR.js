@@ -174,7 +174,7 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
         // Patch BIOS interface area with correct values from stored Header data
         bytes[BIOS_BANK_OFFSET + BIOS_INT_CONTROL_REG_ADDR - 0xf800] = romControlRegister;
         bytes[BIOS_BANK_OFFSET + BIOS_INT_PART_NO_ADDR - 0xf800] = romMultiLoadIndex;
-        // TODO This random() is a source of indeterminism. Potential problem for NetPlay
+        // TODO This random() is a source of indeterminism. Potential problem for NetPlay (Dragonstomper shows the problem)
         bytes[BIOS_BANK_OFFSET + BIOS_INT_RANDOM_SEED_ADDR - 0xf800] = ((Math.random() * 256) | 0);
         bytes[BIOS_BANK_OFFSET + BIOS_INT_START_ADDR - 0xf800] = romStartupAddress & 0xff;
         bytes[BIOS_BANK_OFFSET + BIOS_INT_START_ADDR + 1 - 0xf800] = (romStartupAddress >> 8) & 0xff;

@@ -80,7 +80,10 @@ Javatari.userPreferences.defaults = function() {
         vSynch: null,                      // as specified in parameters
         crtFilter: null,                   // as specified in parameters
 
-        audioBufferBase: -1                // auto
+        audioBufferBase: -1,               // auto
+
+        netPlaySessionName: "",
+        netPlayNick: ""
 
     };
 };

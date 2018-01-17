@@ -1,6 +1,5 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-// TODO Implement auto close
 jt.NetPlayDialog = function(mainElement) {
     "use strict";
 
@@ -13,6 +12,7 @@ jt.NetPlayDialog = function(mainElement) {
         }
 
         refresh();
+        refreshPreferencesData();
         visible = true;
         dialog.classList.add("jt-show");
         dialog.focus();
@@ -25,14 +25,21 @@ jt.NetPlayDialog = function(mainElement) {
 
     this.hide = function() {
         if (!visible) return;
-        Javatari.userPreferences.save();
         dialog.classList.remove("jt-show");
         visible = false;
         Javatari.room.screen.focus();
     };
 
-    this.roomNetPlayStatusChangeUpdate = function() {
+    this.roomNetPlayStatusChangeUpdate = function(oldMode) {
         if (visible) refresh();
+
+        // Close automatically when entering Server/Client mode
+        if (room.netPlayMode > 0 && oldMode < 0 && visible) return setTimeout(function() {
+            self.hide();
+        }, 1500);
+
+        // Open automatically when leaving Server/Client mode
+        if (room.netPlayMode === 0 && oldMode > 0 && !visible) self.show();
     };
 
     function refresh() {
@@ -100,19 +107,43 @@ jt.NetPlayDialog = function(mainElement) {
         }
     }
 
+    function refreshPreferencesData() {
+        sessionName.value = prefs.netPlaySessionName;
+        nick.value = prefs.netPlayNick;
+    }
+
     function performCommand(e) {
         var button = e.target;
         if (button.disabled) return;
 
         jt.DOMConsoleControls.hapticFeedbackOnTouch(e);
 
-        var mode = room.netPlayMode;
-        if (button === start && (mode === 0 || mode === 1 || mode === -1)) {
-            if (mode === 0) room.getNetServer().startSession(sessionName.value);
-            else room.getNetServer().stopSession(false, mode === -1 ? "NetPlay connection aborted" : undefined);
-        } else if (button === join && (mode === 0 || mode === 2 || mode === -2)) {
-            if (mode === 0) room.getNetClient().joinSession(sessionName.value, nick.value);
-            else room.getNetClient().leaveSession(false, mode === -2 ? "NetPlay connection aborted" : undefined);
+        var save = false;
+        var prevMode = room.netPlayMode;
+        if (button === start && (prevMode === 0 || prevMode === 1 || prevMode === -1)) {
+            if (prevMode === 0) {
+                room.getNetServer().startSession(sessionName.value);
+                save = true;
+            } else
+                room.getNetServer().stopSession(false, prevMode === -1 ? "NetPlay connection aborted" : undefined);
+        } else if (button === join && (prevMode === 0 || prevMode === 2 || prevMode === -2)) {
+            if (prevMode === 0) {
+                room.getNetClient().joinSession(sessionName.value, nick.value);
+                save = true;
+            } else
+                room.getNetClient().leaveSession(false, prevMode === -2 ? "NetPlay connection aborted" : undefined);
+        }
+
+        // Save Session Name and Nick if starting/joining
+        if (save) {
+            var s = sessionName.value.trim();
+            var n = nick.value.trim();
+            if (prefs.netPlaySessionName !== s || prefs.netPlayNick !== n) {
+                prefs.netPlaySessionName = s;
+                prefs.netPlayNick = n;
+                Javatari.userPreferences.setDirty();
+                Javatari.userPreferences.save();
+            }
         }
     }
 
@@ -230,6 +261,8 @@ jt.NetPlayDialog = function(mainElement) {
     var visible = false;
     var dialog, statusBox, sessionBox;
     var start, join, stop, status, sessionName, nick;
+
+    var prefs = Javatari.userPreferences.current;
 
     var k = jt.DOMKeys;
     var EXIT_KEYS = [ k.VK_ESCAPE.c, k.VK_ENTER.c, k.VK_SPACE.c ];
