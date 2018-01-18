@@ -102,7 +102,7 @@ jt.Cartridge24K_28K_32K_FA2 = function(rom, format, pRomStartAddress) {
             extraRAM[FLASH_OP_CONTROL] = 0;			// Set return code for Successful operation
             bus.getTia().getVideoOutput().showOSD("Done.", true);
             // Signal a external state modification, Flash memory may have been loaded from file and changed
-            if (saveStateSocket) saveStateSocket.saveStateLoaded();
+            if (saveStateSocket) saveStateSocket.externalStateChange();
         }
     };
 

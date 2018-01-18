@@ -135,11 +135,7 @@ jt.NetServer = function(room) {
         return true;
     };
 
-    this.processCartridgeInserted = function() {
-        nextUpdateFull = true;
-    };
-
-    this.processSaveStateLoaded = function() {
+    this.processExternalStateChange = function() {
         nextUpdateFull = true;
     };
 

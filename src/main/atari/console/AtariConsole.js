@@ -31,7 +31,10 @@ jt.AtariConsole = function(mainVideoClock) {
     };
 
     this.userPowerOn = function() {
-        if (!isLoading) this.powerOn();
+        if (isLoading) return;
+
+        this.powerOn();
+        if (!bus.getCartridge()) this.showOSD("NO CARTRIDGE INSERTED!", false, true);
     };
 
     this.setLoading = function(state) {
@@ -253,6 +256,7 @@ jt.AtariConsole = function(mainVideoClock) {
 
     var powerFry = function() {
         ram.powerFry();
+        saveStateSocket.externalStateChange();
     };
 
     var cycleCartridgeFormat = function() {
@@ -263,6 +267,7 @@ jt.AtariConsole = function(mainVideoClock) {
             t: tia.saveState(),
             p: pia.saveState(),
             r: ram.saveState(),
+            b: bus.saveState(),
             c: cpu.saveState(),
             ca: getCartridge() && getCartridge().saveState(),
             vsa: videoStandardIsAuto,
@@ -283,15 +288,17 @@ jt.AtariConsole = function(mainVideoClock) {
         tia.loadState(state.t);
         pia.loadState(state.p);
         ram.loadState(state.r);
+        if (state.b) bus.loadState(state.b);
         cpu.loadState(state.c);
         setCartridge(state.ca && jt.CartridgeCreator.recreateCartridgeFromSaveState(state.ca, getCartridge()));
         if (state.vsa !== undefined) setVideoStandardAuto(state.vsa);
         setVideoStandard(jt.VideoStandard[state.vs]);
         consoleControlsSocket.controlsStatesRedefined();
+        saveStateSocket.externalStateChange();
     };
 
     this.loadStateExtended = function(state) {
-        state.pw ? this.powerOn() : this.powerOff();
+        if (this.powerIsOn !== state.pw) state.pw ? this.powerOn() : this.powerOff();
         this.userPause(state.up);
         userPauseMoreFrames = state.upf;
         loadState(state);
@@ -481,6 +488,7 @@ jt.AtariConsole = function(mainVideoClock) {
             if (autoPower && self.powerIsOn) self.powerOff();
             setCartridge(cartridge);
             if (autoPower && !self.powerIsOn) self.powerOn();
+            saveStateSocket.externalStateChange();
         };
 
         this.inserted = function () {
@@ -496,6 +504,7 @@ jt.AtariConsole = function(mainVideoClock) {
 
         // Data operations unavailable
         this.loadCartridgeData = function (port, name, arrContent) {
+            // would need: saveStateSocket.externalStateChange();
         };
         this.saveCartridgeDataFile = function (port) {
         };
@@ -581,8 +590,8 @@ jt.AtariConsole = function(mainVideoClock) {
             if (cartridge) cartridge.connectSaveStateSocket(this);
         };
 
-        this.saveStateLoaded = function() {
-            media.saveStateLoaded();
+        this.externalStateChange = function() {
+            media.externalStateChange();
         };
 
         this.saveState = function(slot) {
@@ -607,7 +616,6 @@ jt.AtariConsole = function(mainVideoClock) {
             }
             if (!self.powerIsOn) self.powerOn();
             loadState(state);
-            this.saveStateLoaded();
             self.showOSD("State " + slot + " loaded", true);
         };
 
@@ -632,7 +640,6 @@ jt.AtariConsole = function(mainVideoClock) {
             }
             if (!self.powerIsOn) self.powerOn();
             loadState(state);
-            this.saveStateLoaded();
             self.showOSD("State file loaded", true);
             return true;
         };

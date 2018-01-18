@@ -93,10 +93,6 @@ jt.NetClient = function(room) {
         return true;
     };
 
-    this.processCartridgeInserted = function() {
-        throw new Error("Should never get here!");
-    };
-
     function onSessionServerConnected() {
         // Setup keep-alive
         if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);

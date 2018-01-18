@@ -14,12 +14,6 @@ jt.Bus = function(pCpu, pTia, pPia, pRam) {
     }
 
     this.powerOn = function() {
-        data = 0;
-        if (!cartridge) {
-            tia.getVideoOutput().showOSD("NO CARTRIDGE INSERTED!", false, true);
-            // Data in the bus comes random at powerOn if no Cartridge is present
-            data = (Math.random()* 256) | 0;
-        }
         // Power on devices connected to the BUS
         if (cartridge != null) cartridge.powerOn();
         ram.powerOn();
@@ -59,7 +53,7 @@ jt.Bus = function(pCpu, pTia, pPia, pRam) {
 
     this.read = function(address) {
         // CART Bus monitoring
-        if (cartridgeNeedsBusMonitoring) cartridge.monitorBusBeforeRead(address, data);
+        if (cartridgeNeedsBusMonitoring) cartridge.monitorBusBeforeRead(address);
 
         if ((address & CART_MASK) === CART_SELECT) {
             if (cartridge) return data = cartridge.read(address);
@@ -87,6 +81,19 @@ jt.Bus = function(pCpu, pTia, pPia, pRam) {
     };
 
 
+    // Savestate  -------------------------------------------
+
+    this.saveState = function() {
+        return {
+            d: data
+        };
+    };
+
+    this.loadState = function(state) {
+        data = state.d;
+    };
+
+
     var cpu;
     var tia;
     var pia;
@@ -94,7 +101,7 @@ jt.Bus = function(pCpu, pTia, pPia, pRam) {
     var cartridge;
     var cartridgeNeedsBusMonitoring = false;
 
-    var data = 0;
+    var data = (Math.random()* 256) | 0;            // Comes random ate creation!
 
 
     var CART_MASK = 0x1000;

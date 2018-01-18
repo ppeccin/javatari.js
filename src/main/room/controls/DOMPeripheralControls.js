@@ -81,10 +81,7 @@ jt.DOMPeripheralControls = function(room) {
                 if (!mediaChangeDisabledWarning()) fileLoader.openURLChooserDialog(OPEN_TYPE.ROM, altPower, secPort);
                 break;
             case controls.CARTRIDGE_REMOVE:
-                if (!mediaChangeDisabledWarning()) {
-                    cartridgeSocket.insert(null, false);
-                    if (room.netController) room.netController.processCartridgeInserted();
-                }
+                if (!mediaChangeDisabledWarning()) cartridgeSocket.insert(null, false);
                 break;
             case controls.CARTRIDGE_LOAD_DATA_FILE:
                 //if (cartridgeSocket.dataOperationNotSupportedMessage(secPort ? 1 : 0, false, false)) break;

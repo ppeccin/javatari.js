@@ -56,9 +56,9 @@ jt.LocalStorageSaveStateMedia = function(room) {
         }
     };
 
-    this.saveStateLoaded = function() {
+    this.externalStateChange = function() {
         // Let the NetPlay Server know
-        if (room.netPlayMode === 1) room.netController.processSaveStateLoaded();
+        if (room.netPlayMode === 1) room.netController.processExternalStateChange();
     };
 
     var saveToLocalStorage = function(entry, data) {

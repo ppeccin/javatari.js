@@ -144,7 +144,6 @@ jt.FileLoader = function(room, recentStoredROMs, peripheralControls) {
         var cart = jt.CartridgeCreator.createCartridgeFromRom(rom);
         if (!cart) return false;
         cartridgeSocket.insert(cart, !altPower);
-        if (room.netController) room.netController.processCartridgeInserted();
         recentStoredROMs.storeROM(rom);
         return true;
     };
@@ -188,10 +187,7 @@ jt.FileLoader = function(room, recentStoredROMs, peripheralControls) {
             if (saveStateSocket.loadStateFile(content)) return true;
         // Try as Cartridge Data (SRAM, etc)
         if (openType === OPEN_TYPE.CART_DATA || openType === OPEN_TYPE.AUTO)
-            if (cartridgeSocket.loadCartridgeData(port, name, content)) {
-                if (room.netController) room.netController.processCartridgeInserted();
-                return true;
-            }
+            if (cartridgeSocket.loadCartridgeData(port, name, content)) return true;
         // Try to load as ROM (Cartridge)
         if (openType === OPEN_TYPE.ROM || openType === OPEN_TYPE.AUTO) {
             var rom = new jt.ROM(name, content, null, format);

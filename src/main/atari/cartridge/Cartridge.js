@@ -30,7 +30,7 @@ jt.Cartridge = function() {
         return false;
     };
 
-    this.monitorBusBeforeRead = function(address, data)  {
+    this.monitorBusBeforeRead = function(address)  {
     };
 
     this.monitorBusBeforeWrite = function(address, val)  {

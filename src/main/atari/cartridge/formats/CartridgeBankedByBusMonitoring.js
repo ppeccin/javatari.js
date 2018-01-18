@@ -9,7 +9,7 @@ jt.CartridgeBankedByBusMonitoring = function(rom, format) {
         return true;
     };
 
-    this.monitorBusBeforeRead = function(address, data) {
+    this.monitorBusBeforeRead = function(address) {
         this.performBankSwitchOnMonitoredAccess(address)
     };
 
