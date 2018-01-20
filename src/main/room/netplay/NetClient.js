@@ -76,12 +76,12 @@ jt.NetClient = function(room) {
             return room.showOSD("Function not available in NetPlay Client mode", true, true);
 
         // Send only to server, do not process locally
-        controlsToSend.push({ c: control, p: press });
+        controlsToSend.push((control << 4) | press );            // binary encoded, always < 16000
     };
 
     this.processLocalControlValue = function (control, value) {
         // Send only to server, do not process locally
-        controlsToSend.push({ c: control, v: value });
+        controlsToSend.push(control + (value + 10));             // always > 16000
     };
 
     this.processCheckLocalPeripheralControl = function (control) {
@@ -235,10 +235,10 @@ jt.NetClient = function(room) {
             var controls = netUpdate.c;
             for (var i = 0, len = controls.length; i < len; ++i) {
                 var control = controls[i];
-                if (control.p !== undefined)
-                    consoleControlsSocket.controlStateChanged(control.c, control.p);
+                if (control < 16000)
+                    consoleControlsSocket.controlStateChanged(control >> 4, control & 0x01);        // binary encoded
                 else
-                    consoleControlsSocket.controlValueChanged(control.c, control.v);
+                    consoleControlsSocket.controlValueChanged(control & ~0x3fff, (control & 0x3fff) - 10);
             }
         }
 

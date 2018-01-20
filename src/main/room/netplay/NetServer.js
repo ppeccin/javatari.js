@@ -105,10 +105,10 @@ jt.NetServer = function(room) {
         if (controlsToProcess.length) {
             for (var i = 0, len = controlsToProcess.length; i < len; ++i) {
                 var control = controlsToProcess[i];
-                if (control.p !== undefined)
-                    consoleControlsSocket.controlStateChanged(control.c, control.p);
+                if (control < 16000)
+                    consoleControlsSocket.controlStateChanged(control >> 4, control & 0x01);            // binary encoded
                 else
-                    consoleControlsSocket.controlValueChanged(control.c, control.v);
+                    consoleControlsSocket.controlValueChanged(control & ~0x3fff, (control & 0x3fff) - 10);
             }
             controlsToProcess.length = 0;
         }
@@ -118,16 +118,16 @@ jt.NetServer = function(room) {
 
     this.processLocalControlState = function (control, press) {
         if (localOnlyControls.has(control))
-        // Process local-only controls right away, do not store
+            // Process local-only controls right away, do not store
             consoleControlsSocket.controlStateChanged(control, press);
         else
-        // Just store changes, to be processed on netVideoClockPulse
-            controlsToProcess.push({ c: control, p: press });
+            // Just store changes, to be processed on netVideoClockPulse
+            controlsToProcess.push((control << 4) | press );        // binary encoded, always < 16000
     };
 
     this.processLocalControlValue = function (control, value) {
         // Just store changes, to be processed on netVideoClockPulse
-        controlsToProcess.push({ c: control, v: value });
+        controlsToProcess.push(control + (value + 10));             // always > 16000
     };
 
     this.processCheckLocalPeripheralControl = function (control) {

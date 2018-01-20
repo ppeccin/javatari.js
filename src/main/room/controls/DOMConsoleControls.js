@@ -48,8 +48,8 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
     };
 
     this.releaseControllers = function() {
-        for (var c in keyStateMap) if (keyStateMap[c] && keyCodeMap[c]) {
-            processControlState(keyCodeMap[c], false);
+        for (var c in keyStateMap) if (keyStateMap[c]) {
+            processControlState(c, false);
             keyStateMap[c] = false;
         }
         paddle0MovingLeft = paddle0MovingRight = paddle1MovingLeft = paddle1MovingRight = false;
@@ -248,8 +248,8 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
             // Normal controls
             control = keyCodeMap[code];
             if (!control) return keyForwardControls.processKey(code, press);        // Next in chain
-            if (press === keyStateMap[code]) return;
-            keyStateMap[code] = press;
+            if (press === keyStateMap[control]) return;
+            keyStateMap[control] = press;
         }
         processControlState(control, press);
     };
