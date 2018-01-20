@@ -24,7 +24,7 @@ jt.AtariConsole = function(mainVideoClock) {
     this.powerOff = function() {
         bus.powerOff();
         this.powerIsOn = false;
-        consoleControlsSocket.releaseControllers();
+        // consoleControlsSocket.releaseControllers();      TODO Really needed? Causing problems...
         consoleControlsSocket.controlsStatesRedefined();
         if (userPaused) this.userPause(false);
         else consoleControlsSocket.firePowerAndUserPauseStateUpdate();
@@ -89,6 +89,9 @@ jt.AtariConsole = function(mainVideoClock) {
     };
 
     this.videoClockPulse = function() {
+        // Video clock will be the Tia Frame video clock (60Hz/50Hz)
+        // CPU and other clocks (Pia, Audio) will be sent by the Tia
+
         this.videoClockPulseApplyPulldowns(self.videoClockPulseGetNextPulldowns());
     };
 

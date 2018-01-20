@@ -9,8 +9,7 @@ jt.DOMPeripheralControls = function(room) {
         initKeys();
     }
 
-    this.connect = function(pConsoleControlsSocket, pCartridgeSocket) {
-        consoleControlsSocket = pConsoleControlsSocket;
+    this.connect = function(pCartridgeSocket) {
         cartridgeSocket = pCartridgeSocket;
     };
 
@@ -53,22 +52,22 @@ jt.DOMPeripheralControls = function(room) {
 
         // All controls are Press-only and repeatable
         switch(control) {
-            case controls.MACHINE_POWER_TOGGLE:
+            case controls.CONSOLE_POWER_TOGGLE:
                 consoleControls.processControlState(jt.ConsoleControls.POWER, true);
                 break;
-            case controls.MACHINE_POWER_FRY:
+            case controls.CONSOLE_POWER_FRY:
                 consoleControls.processControlState(jt.ConsoleControls.POWER_FRY, true);
                 break;
-            case controls.MACHINE_LOAD_STATE_FILE:
+            case controls.CONSOLE_LOAD_STATE_FILE:
                 fileLoader.openFileChooserDialog(OPEN_TYPE.STATE, false, false, false);
                 break;
-            case controls.MACHINE_SAVE_STATE_FILE:
+            case controls.CONSOLE_SAVE_STATE_FILE:
                 consoleControls.processControlState(jt.ConsoleControls.SAVE_STATE_FILE, true);
                 break;
-            case controls.MACHINE_LOAD_STATE_MENU:
+            case controls.CONSOLE_LOAD_STATE_MENU:
                 screen.openSaveStateDialog(false);
                 break;
-            case controls.MACHINE_SAVE_STATE_MENU:
+            case controls.CONSOLE_SAVE_STATE_MENU:
                 screen.openSaveStateDialog(true);
                 break;
             case controls.CARTRIDGE_LOAD_RECENT:
@@ -190,8 +189,8 @@ jt.DOMPeripheralControls = function(room) {
         keyCodeMap[KEY_LOAD_URL | k.ALT]    = controls.AUTO_LOAD_URL;
         keyCodeMap[KEY_CART_REMOVE]         = controls.CARTRIDGE_REMOVE;
         keyCodeMap[KEY_CART_REMOVE | k.ALT] = controls.CARTRIDGE_REMOVE;
-        keyCodeMap[KEY_STATE_FILE]          = controls.MACHINE_SAVE_STATE_FILE;
-        keyCodeMap[KEY_STATE_FILE | k.ALT]  = controls.MACHINE_SAVE_STATE_FILE;
+        keyCodeMap[KEY_STATE_FILE]          = controls.CONSOLE_SAVE_STATE_FILE;
+        keyCodeMap[KEY_STATE_FILE | k.ALT]  = controls.CONSOLE_SAVE_STATE_FILE;
 
         keyCodeMap[KEY_P1_CONTROLS_TOGGLE | k.ALT]    = controls.P1_CONTROLS_TOGGLE;
         keyCodeMap[KEY_PADDLES_TOGGLE | k.ALT]        = controls.PADDLES_TOGGLE_MODE;
@@ -229,7 +228,6 @@ jt.DOMPeripheralControls = function(room) {
 
     var controls = jt.PeripheralControls;
 
-    var consoleControlsSocket;
     var screen;
     var monitor;
     var speaker;

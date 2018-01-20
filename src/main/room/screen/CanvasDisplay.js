@@ -646,8 +646,8 @@ jt.CanvasDisplay = function(mainElement) {
         }
 
         var menu = [
-            { label: "Power",              clickModif: 0, control: jt.PeripheralControls.MACHINE_POWER_TOGGLE },
-            { label: "Fry Console",                       control: jt.PeripheralControls.MACHINE_POWER_FRY },
+            { label: "Power",              clickModif: 0, control: jt.PeripheralControls.CONSOLE_POWER_TOGGLE },
+            { label: "Fry Console",                       control: jt.PeripheralControls.CONSOLE_POWER_FRY },
             { label: "",                   divider: true },
             { label: "Net Play!",                         control: jt.PeripheralControls.SCREEN_OPEN_NETPLAY },
             { label: "",                   divider: true },
@@ -656,8 +656,8 @@ jt.CanvasDisplay = function(mainElement) {
             { label: "Open File",          clickModif: KEY_CTRL_MASK, control: jt.PeripheralControls.AUTO_LOAD_FILE, needsUIG: true },
             { label: "Open URL",           clickModif: KEY_CTRL_MASK | KEY_ALT_MASK, control: jt.PeripheralControls.AUTO_LOAD_URL, needsUIG: true },
             { label: "",                   divider: true },
-            { label: "Load State",                        control: jt.PeripheralControls.MACHINE_LOAD_STATE_MENU },
-            { label: "Save State",                        control: jt.PeripheralControls.MACHINE_SAVE_STATE_MENU }
+            { label: "Load State",                        control: jt.PeripheralControls.CONSOLE_LOAD_STATE_MENU },
+            { label: "Save State",                        control: jt.PeripheralControls.CONSOLE_SAVE_STATE_MENU }
         ];
         powerButton = addBarButton("jt-bar-power", -5, -26, "System Power", null, false, menu, "System");
         barMenuSystem = menu;

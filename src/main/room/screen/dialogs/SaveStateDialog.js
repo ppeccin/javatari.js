@@ -146,7 +146,7 @@ jt.SaveStateDialog = function(mainElement, consoleControls, peripheralControls, 
         { d: "Slot 8", load: c.LOAD_STATE_8,             save: c.SAVE_STATE_8 },
         { d: "Slot 9", load: c.LOAD_STATE_9,             save: c.SAVE_STATE_9 },
         { d: "Slot 10", load: c.LOAD_STATE_10,           save: c.SAVE_STATE_10 },
-        { d: "File...", load: p.MACHINE_LOAD_STATE_FILE, save: p.MACHINE_SAVE_STATE_FILE, peripheral: true }
+        { d: "File...", load: p.CONSOLE_LOAD_STATE_FILE, save: p.CONSOLE_SAVE_STATE_FILE, peripheral: true }
     ];
 
     var k = jt.DOMKeys;

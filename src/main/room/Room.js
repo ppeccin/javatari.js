@@ -131,8 +131,6 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     }
 
     function buildMainClock() {
-        // Main clock will be the Tia Frame VideoClock (60Hz/50Hz)
-        // CPU and other clocks (Pia, Audio) will be sent by the Tia
         // Clock frequency will be changed directly by the Console
         self.mainVideoClock = new jt.Clock(self.mainVideoClockPulse);
     }
@@ -162,7 +160,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         self.screen.connect(self.console);
         self.speaker.connect(self.console.getAudioSocket());
         self.consoleControls.connect(self.console.getConsoleControlsSocket());
-        self.peripheralControls.connect(self.console.getConsoleControlsSocket(), self.console.getCartridgeSocket());
+        self.peripheralControls.connect(self.console.getCartridgeSocket());
         // Cartridge Data operations unavailable self.console.getCartridgeSocket().connectFileDownloader(self.fileDownloader);
     }
 

@@ -48,9 +48,9 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
     };
 
     this.releaseControllers = function() {
-        for (var c in controlStateMap) if (controlStateMap[c]) {
-            processControlState(c | 0, false);
-            controlStateMap[c] = false;
+        for (var c in keyStateMap) if (keyStateMap[c] && keyCodeMap[c]) {
+            processControlState(keyCodeMap[c], false);
+            keyStateMap[c] = false;
         }
         paddle0MovingLeft = paddle0MovingRight = paddle1MovingLeft = paddle1MovingRight = false;
         turboControlState[controls.JOY0_BUTTON] = turboControlState[controls.JOY1_BUTTON] = false;
@@ -248,6 +248,8 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
             // Normal controls
             control = keyCodeMap[code];
             if (!control) return keyForwardControls.processKey(code, press);        // Next in chain
+            if (press === keyStateMap[code]) return;
+            keyStateMap[code] = press;
         }
         processControlState(control, press);
     };
@@ -267,10 +269,6 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
         }
 
         // Then other controls
-        if (press === controlStateMap[control]) return;
-
-        controlStateMap[control] = press;
-
         if (room.netController)
             room.netController.processLocalControlState(control, press);
         else
@@ -369,6 +367,7 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
         var k = jt.DOMKeys;
 
         keyCodeMap = {};
+        keyStateMap = {};
         turboKeyCodeMap = {};
 
         // Fixed keys
@@ -493,9 +492,9 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
     var screen;
 
     var keyCodeMap;
+    var keyStateMap;
     var turboKeyCodeMap;
 
-    var controlStateMap =  {};
     var turboControlState = {};
 
     var prefs = Javatari.userPreferences.current;
