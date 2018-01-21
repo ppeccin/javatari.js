@@ -91,7 +91,7 @@ jt.NetServer = function(room) {
             try {
                 if (client.dataChannelActive)
                     // Use DataChannel if available
-                    client.dataChannel.send(data);
+                    sendToDataChannel(client.dataChannel, data);
                 else
                     // Or fallback to WebSocket relayed through the Session Server (BAD!)
                     ws.send(JSON.stringify({ toClientNick: client.nick, javatariUpdate: data }));
@@ -304,6 +304,31 @@ jt.NetServer = function(room) {
         }
     }
 
+    // Automatically fragments message if needed. Data must be a String
+    function sendToDataChannel(dataChannel, data) {
+        var len = data.length;
+
+        if (len < MAX_DATA_CHANNEL_SIZE)
+            return dataChannel.send(data);
+
+        var c = 0;
+        var p = 0;
+        while (true) {
+            var frag = data.substr(p, DATA_CHANNEL_FRAG_SIZE);
+            p += DATA_CHANNEL_FRAG_SIZE;
+            c++;
+            if (p < len)
+                dataChannel.send(DATA_CHANNEL_FRAG_PART + frag);
+            else {
+                dataChannel.send(DATA_CHANNEL_FRAG_END + frag);
+
+                // console.log("Fragmented message sent: " + data.length, + ", fragments: " + c);
+
+                return;
+            }
+        }
+    }
+
 
     var console = room.console;
     var consoleControlsSocket = console.getConsoleControlsSocket();
@@ -333,5 +358,11 @@ jt.NetServer = function(room) {
         ct.LOAD_STATE_7, ct.LOAD_STATE_8, ct.LOAD_STATE_9, ct.LOAD_STATE_10, ct.LOAD_STATE_11, ct.LOAD_STATE_12,
         ct.POWER_FRY, ct.VSYNCH, ct.TRACE, ct.CARTRIDGE_FORMAT
     ]);
+
+
+    var MAX_DATA_CHANNEL_SIZE = 16300;
+    var DATA_CHANNEL_FRAG_SIZE = 16200;
+    var DATA_CHANNEL_FRAG_PART = "#@FrgS@#";
+    var DATA_CHANNEL_FRAG_END =  "#@FrgE@#";
 
 };

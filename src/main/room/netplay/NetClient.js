@@ -52,6 +52,7 @@ jt.NetClient = function(room) {
         if (rtcConnection) rtcConnection.onicecandidate = rtcConnection.ondatachannel = undefined;
 
         dataChannelActive = false;
+        dataChannelFragmentData = "";
 
         if (wasError) stopRTC();
         else setTimeout(stopRTC, 300);      // Give some time before ending RTC so Session Disconnection can be detected first by Server
@@ -179,6 +180,7 @@ jt.NetClient = function(room) {
 
     function onDataChannelOpen(event) {
         dataChannelActive = true;
+        dataChannelFragmentData = "";
         enterNetClientMode();
     }
 
@@ -188,7 +190,8 @@ jt.NetClient = function(room) {
     }
 
     function onDataChannelMessage(event) {
-        onServerNetUpdate(JSON.parse(event.data));
+        var data = receiveFromDataChannel(event);
+        if (data) onServerNetUpdate(JSON.parse(data));
     }
 
     function onRTCError(error) {
@@ -222,9 +225,8 @@ jt.NetClient = function(room) {
         // NetClient gets no local clock, so...
         console.getConsoleControlsSocket().controlsClockPulse();
 
-        // Full Initial Update?
+        // Full Update?
         if (netUpdate.s) {
-            // Load initial state
             console.loadStateExtended(netUpdate.s);
             // Change Controls Mode automatically to adapt to Server
             room.consoleControls.setP1ControlsAndPaddleMode(!netUpdate.cm.p1, netUpdate.cm.pd);
@@ -263,6 +265,27 @@ jt.NetClient = function(room) {
         }
     }
 
+    // Automatically reconstructs message fragments as needed. Data must be a String
+    function receiveFromDataChannel(event) {
+        var data = event.data;
+
+        var fragFlag = data.substr(0, 8);
+        if (fragFlag === DATA_CHANNEL_FRAG_PART || fragFlag === DATA_CHANNEL_FRAG_END) {
+            dataChannelFragmentData += data.substr(8);
+            if (fragFlag === DATA_CHANNEL_FRAG_END) {
+                data = dataChannelFragmentData;
+
+                // console.log("Fragmented message received: " + data.length + ", fragments: " + ((data.length / DATA_CHANNEL_FRAG_SIZE - 0.0001) | 0 + 1));
+
+                dataChannelFragmentData = "";
+                return data;
+            }
+        } else {
+            dataChannelFragmentData = "";
+            return data;
+        }
+    }
+
 
     var console = room.console;
     var consoleControlsSocket = console.getConsoleControlsSocket();
@@ -283,6 +306,7 @@ jt.NetClient = function(room) {
     var rtcConnection;
     var dataChannel;
     var dataChannelActive = false;
+    var dataChannelFragmentData = "";
 
     // var nextUpdate = -1;
 
@@ -303,5 +327,10 @@ jt.NetClient = function(room) {
         pc.CARTRIDGE_LOAD_FILE, pc.CARTRIDGE_LOAD_URL, pc.CARTRIDGE_REMOVE, pc.CARTRIDGE_LOAD_DATA_FILE, pc.CARTRIDGE_SAVE_DATA_FILE,
         pc.AUTO_LOAD_FILE, pc.AUTO_LOAD_URL
     ]);
+
+
+    var DATA_CHANNEL_FRAG_SIZE = 16200;
+    var DATA_CHANNEL_FRAG_PART = "#@FrgS@#";
+    var DATA_CHANNEL_FRAG_END =  "#@FrgE@#";
 
 };
