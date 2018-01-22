@@ -24,8 +24,7 @@ jt.NetServer = function(room) {
         wsOnly = wsOnlyAsked;
 
         if (!ws) {
-            // ws = new WebSocket("ws://10.42.10.141:8081");
-            ws = new WebSocket("ws://webmsx.herokuapp.com");
+            ws = new WebSocket("ws://" + Javatari.WEB_EXTENSIONS_SERVER);
             ws.onmessage = onSessionMessage;
             ws.onopen = onSessionServerConnected;
             ws.onclose = onSessionServerDisconnected;
