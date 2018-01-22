@@ -99,7 +99,7 @@ jt.NetClient = function(room) {
         if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
         // Join a Session
         ws.send(JSON.stringify({
-            sessionControl: "joinSession", sessionID: sessionIDToJoin, clientNick: nickDesired, wsOnly: wsOnlyDesired,
+            sessionControl: "joinSession", sessionType: "javatari", sessionID: sessionIDToJoin, clientNick: nickDesired, wsOnly: wsOnlyDesired,
             queryVariables: [ "RTC_CONFIG" ]
         }));
     }
