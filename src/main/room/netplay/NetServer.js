@@ -57,9 +57,7 @@ jt.NetServer = function(room) {
     };
 
     this.netVideoClockPulse = function() {
-        //++updates;     Not needed in an ordered DataChannel?
-
-        var videoPulls = console.videoClockPulseGetNextPulldowns();
+        var videoPulls = atariConsole.videoClockPulseGetNextPulldowns();
 
         var data, dataFull, dataNormal;
         for (var cNick in clients) {
@@ -69,19 +67,16 @@ jt.NetServer = function(room) {
             if (client.justJoined || nextUpdateFull) {
                 client.justJoined = false;
                 if (!dataFull) {
-                    //netUpdateFull.u = updates;
+                    netUpdateFull.s = atariConsole.saveStateExtended();
                     netUpdateFull.cm = { p1: room.consoleControls.isP1ControlsMode(), pd: room.consoleControls.isPaddleMode() };
-                    netUpdateFull.s = console.saveStateExtended();
                     netUpdateFull.v = videoPulls;
-                    netUpdateFull.c = controlsToProcess.length ? controlsToProcess : undefined;
                     dataFull = JSON.stringify(netUpdateFull);
                 }
                 data = dataFull;
             } else {
                 if (!dataNormal) {
-                    // netUpdate.u = updates;
+                    netUpdate.c = controlsToSend.length ? controlsToSend : undefined;
                     netUpdate.v = videoPulls;
-                    netUpdate.c = controlsToProcess.length ? controlsToProcess : undefined;
                     dataNormal = JSON.stringify(netUpdate);
                 }
                 data = dataNormal;
@@ -99,34 +94,25 @@ jt.NetServer = function(room) {
             }
         }
 
-        if (nextUpdateFull) nextUpdateFull = false;
+        nextUpdateFull = false;
+        controlsToSend.length = 0;
 
-        if (controlsToProcess.length) {
-            for (var i = 0, len = controlsToProcess.length; i < len; ++i) {
-                var control = controlsToProcess[i];
-                if (control < 16000)
-                    consoleControlsSocket.controlStateChanged(control >> 4, control & 0x01);            // binary encoded
-                else
-                    consoleControlsSocket.controlValueChanged(control & ~0x3fff, (control & 0x3fff) - 10);
-            }
-            controlsToProcess.length = 0;
-        }
-
-        console.videoClockPulseApplyPulldowns(videoPulls);
+        atariConsole.videoClockPulseApplyPulldowns(videoPulls);
     };
 
     this.processLocalControlState = function (control, press) {
-        if (localOnlyControls.has(control))
-            // Process local-only controls right away, do not store
-            consoleControlsSocket.controlStateChanged(control, press);
-        else
-            // Just store changes, to be processed on netVideoClockPulse
-            controlsToProcess.push((control << 4) | press );        // binary encoded, always < 16000
+        consoleControlsSocket.controlStateChanged(control, press);
+
+        // Store changes to be sent to Clients
+        if (!localOnlyControls.has(control))
+            controlsToSend.push((control << 4) | press );        // binary encoded, always < 16000
     };
 
     this.processLocalControlValue = function (control, value) {
-        // Just store changes, to be processed on netVideoClockPulse
-        controlsToProcess.push(control + (value + 10));             // always > 16000
+        consoleControlsSocket.controlValueChanged(control, value);
+
+        // Store changes to be sent to Clients
+        controlsToSend.push(control + (value + 10));             // always > 16000
     };
 
     this.processCheckLocalPeripheralControl = function (control) {
@@ -188,8 +174,7 @@ jt.NetServer = function(room) {
         } catch (e) {}
 
         sessionID = message.sessionID;
-        // updates = 0;
-        controlsToProcess.length = 0;
+        controlsToSend.length = 0;
         room.enterNetServerMode(self);
 
         room.showOSD('NetPlay session "' + message.sessionID + '" started', true);
@@ -290,8 +275,16 @@ jt.NetServer = function(room) {
     }
 
     function onClientNetUpdate(netUpdate) {
-        // Store remote controls to process on netVideoClockPulse
-        if (netUpdate.c) controlsToProcess.push.apply(controlsToProcess, netUpdate.c);
+        if (!netUpdate.c) return;
+
+        // Apply changes as if they were local controls
+        for (var i = 0, changes = netUpdate.c, len = changes.length; i < len; ++i) {
+            var change = changes[i];
+            if (change < 16000)
+                self.processLocalControlState(change >> 4, change & 0x01);            // binary encoded
+            else
+                self.processLocalControlValue(change & ~0x3fff, (change & 0x3fff) - 10);
+        }
     }
 
     function keepAlive() {
@@ -329,10 +322,10 @@ jt.NetServer = function(room) {
     }
 
 
-    var console = room.console;
-    var consoleControlsSocket = console.getConsoleControlsSocket();
+    var atariConsole = room.console;
+    var consoleControlsSocket = atariConsole.getConsoleControlsSocket();
 
-    var controlsToProcess = new Array(100); controlsToProcess.length = 0;     // pre allocate empty Array
+    var controlsToSend = new Array(100); controlsToSend.length = 0;     // pre allocate empty Array
     var netUpdate = { v: 0, c: undefined };
     var netUpdateFull = { cm: {}, s: {}, v: 0, c: undefined };
     var nextUpdateFull = false;
@@ -343,8 +336,6 @@ jt.NetServer = function(room) {
     var keepAliveTimer;
     var clients = {};
     var wsOnly = false;
-
-    // var updates = 0;
 
     var rtcConnectionConfig;
     var dataChannelConfig;

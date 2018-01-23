@@ -75,12 +75,12 @@ jt.NetClient = function(room) {
         if (disabledControls.has(control))
             return room.showOSD("Function not available in NetPlay Client mode", true, true);
 
-        // Send only to server, do not process locally
+        // Store change to be sent only to Server, do not process locally
         controlsToSend.push((control << 4) | press );            // binary encoded, always < 16000
     };
 
     this.processLocalControlValue = function (control, value) {
-        // Send only to server, do not process locally
+        // Store change to be sent only to Server, do not process locally
         controlsToSend.push(control + (value + 10));             // always > 16000
     };
 
@@ -136,7 +136,7 @@ jt.NetClient = function(room) {
         sessionID = message.sessionID;
         nick = message.clientNick;
         wsOnly = wsOnlyDesired || message.wsOnly;
-        // nextUpdate = -1;
+        justJoined = true;
 
         if (wsOnly) return enterNetClientMode();
 
@@ -214,36 +214,9 @@ jt.NetClient = function(room) {
     function onServerNetUpdate(netUpdate) {
         // window.console.log(netUpdate);
 
-        // Not needed in an ordered DataChannel?
-        //if (netUpdate.u !== nextUpdate && nextUpdate >= 0) {
-        //    jt.Util.error("NetPlay Client expected update: " + nextUpdate + ", but got: " + netUpdate.u);
-        //    self.leaveSession(true, "NetPlay session ended: Update sequence error");
-        //}
-        //nextUpdate = netUpdate.u + 1;
+        // NetClient gets no local clock, so we use the chance...
 
-        // NetClient gets no local clock, so...
-        console.getConsoleControlsSocket().controlsClockPulse();
-
-        // Full Update?
-        if (netUpdate.s) {
-            console.loadStateExtended(netUpdate.s);
-            // Change Controls Mode automatically to adapt to Server
-            room.consoleControls.setP1ControlsAndPaddleMode(!netUpdate.cm.p1, netUpdate.cm.pd);
-        }
-
-        // Apply controls changes
-        if (netUpdate.c) {
-            var controls = netUpdate.c;
-            for (var i = 0, len = controls.length; i < len; ++i) {
-                var control = controls[i];
-                if (control < 16000)
-                    consoleControlsSocket.controlStateChanged(control >> 4, control & 0x01);        // binary encoded
-                else
-                    consoleControlsSocket.controlValueChanged(control & ~0x3fff, (control & 0x3fff) - 10);
-            }
-        }
-
-        console.videoClockPulseApplyPulldowns(netUpdate.v);
+        atariConsole.getConsoleControlsSocket().controlsClockPulse();
 
         // Send local controls to Server. We always send a message even when empty to keep the channel active
         if (dataChannelActive)
@@ -253,6 +226,30 @@ jt.NetClient = function(room) {
             // Or fallback to WebSocket relayed through the Session Server (BAD!)
             ws.send(JSON.stringify({ javatariUpdate: { c: controlsToSend.length ? controlsToSend : undefined } }));
         controlsToSend.length = 0;
+
+        // Full Update?
+        if (netUpdate.s) {
+            atariConsole.loadStateExtended(netUpdate.s);
+            if (justJoined) {
+                // Change Controls Mode automatically to adapt to Server
+                room.consoleControls.setP1ControlsAndPaddleMode(!netUpdate.cm.p1, netUpdate.cm.pd);
+                justJoined = false;
+            }
+        } else {
+            // Apply controls changes from Server
+            if (netUpdate.c) {
+                var controls = netUpdate.c;
+                for (var i = 0, len = controls.length; i < len; ++i) {
+                    var control = controls[i];
+                    if (control < 16000)
+                        consoleControlsSocket.controlStateChanged(control >> 4, control & 0x01);        // binary encoded
+                    else
+                        consoleControlsSocket.controlValueChanged(control & ~0x3fff, (control & 0x3fff) - 10);
+                }
+            }
+        }
+
+        atariConsole.videoClockPulseApplyPulldowns(netUpdate.v);
     }
 
     function keepAlive() {
@@ -286,8 +283,8 @@ jt.NetClient = function(room) {
     }
 
 
-    var console = room.console;
-    var consoleControlsSocket = console.getConsoleControlsSocket();
+    var atariConsole = room.console;
+    var consoleControlsSocket = atariConsole.getConsoleControlsSocket();
 
     var controlsToSend = new Array(100); controlsToSend.length = 0;     // pre allocate empty Array
 
@@ -297,6 +294,7 @@ jt.NetClient = function(room) {
     var nick;
     var nickDesired;
     var wsOnlyDesired = false;
+    var justJoined = false;
     var keepAliveTimer;
 
     var rtcConnectionConfig;
@@ -307,7 +305,6 @@ jt.NetClient = function(room) {
     var dataChannelActive = false;
     var dataChannelFragmentData = "";
 
-    // var nextUpdate = -1;
 
     var cc = jt.ConsoleControls;
     var disabledControls = new Set([
