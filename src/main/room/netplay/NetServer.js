@@ -100,7 +100,7 @@ jt.NetServer = function(room) {
         atariConsole.videoClockPulseApplyPulldowns(videoPulls);
     };
 
-    this.processLocalControlState = function (control, press) {
+    this.processControlState = function (control, press) {
         consoleControlsSocket.controlStateChanged(control, press);
 
         // Store changes to be sent to Clients
@@ -108,14 +108,14 @@ jt.NetServer = function(room) {
             controlsToSend.push((control << 4) | press );        // binary encoded, always < 16000
     };
 
-    this.processLocalControlValue = function (control, value) {
+    this.processControlValue = function (control, value) {
         consoleControlsSocket.controlValueChanged(control, value);
 
         // Store changes to be sent to Clients
         controlsToSend.push(control + (value + 10));             // always > 16000
     };
 
-    this.processCheckLocalPeripheralControl = function (control) {
+    this.processCheckPeripheralControl = function (control) {
         // All controls allowed
         return true;
     };
@@ -277,13 +277,13 @@ jt.NetServer = function(room) {
     function onClientNetUpdate(netUpdate) {
         if (!netUpdate.c) return;
 
-        // Apply changes as if they were local controls
+        // Process changes as if they were local controls
         for (var i = 0, changes = netUpdate.c, len = changes.length; i < len; ++i) {
             var change = changes[i];
             if (change < 16000)
-                self.processLocalControlState(change >> 4, change & 0x01);            // binary encoded
+                self.processControlState(change >> 4, change & 0x01);            // binary encoded
             else
-                self.processLocalControlValue(change & ~0x3fff, (change & 0x3fff) - 10);
+                self.processControlValue(change & ~0x3fff, (change & 0x3fff) - 10);
         }
     }
 

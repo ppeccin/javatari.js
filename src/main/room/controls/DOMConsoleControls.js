@@ -270,7 +270,7 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
 
         // Then other controls
         if (room.netController)
-            room.netController.processLocalControlState(control, press);
+            room.netController.processControlState(control, press);
         else
             consoleControlsSocket.controlStateChanged(control, press);
     }
@@ -278,7 +278,7 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
 
     function processControlValue(control, value) {
         if (room.netController)
-            room.netController.processLocalControlValue(control, value);
+            room.netController.processControlValue(control, value);
         else
             consoleControlsSocket.controlValueChanged(control, value);
     }

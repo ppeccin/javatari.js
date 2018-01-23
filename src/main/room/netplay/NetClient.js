@@ -70,7 +70,7 @@ jt.NetClient = function(room) {
         // Client gets clocks from Server at onServerNetUpdate()
     };
 
-    this.processLocalControlState = function (control, press) {
+    this.processControlState = function (control, press) {
         // Reject controls not available to NetPlay Clients
         if (disabledControls.has(control))
             return room.showOSD("Function not available in NetPlay Client mode", true, true);
@@ -79,12 +79,12 @@ jt.NetClient = function(room) {
         controlsToSend.push((control << 4) | press );            // binary encoded, always < 16000
     };
 
-    this.processLocalControlValue = function (control, value) {
+    this.processControlValue = function (control, value) {
         // Store change to be sent only to Server, do not process locally
         controlsToSend.push(control + (value + 10));             // always > 16000
     };
 
-    this.processCheckLocalPeripheralControl = function (control) {
+    this.processCheckPeripheralControl = function (control) {
         // Reject controls not available to NetPlay Clients
         if (disabledPeripheralControls.has(control)) {
             room.showOSD("Function not available in NetPlay Client mode", true, true);

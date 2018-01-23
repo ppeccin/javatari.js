@@ -48,7 +48,7 @@ jt.DOMPeripheralControls = function(room) {
 
     this.controlActivated = function(control, altPower, secPort) {                // Never secPort
         // Check for NetPlay blocked controls
-        if (room.netController && !room.netController.processCheckLocalPeripheralControl(control)) return;
+        if (room.netController && !room.netController.processCheckPeripheralControl(control)) return;
 
         // All controls are Press-only and repeatable
         switch(control) {
