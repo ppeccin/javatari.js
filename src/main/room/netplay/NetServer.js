@@ -58,6 +58,7 @@ jt.NetServer = function(room) {
 
     this.netVideoClockPulse = function() {
         var videoPulls = atariConsole.videoClockPulseGetNextPulldowns();
+        atariConsole.videoClockPulseApplyPulldowns(videoPulls);
 
         var data, dataFull, dataNormal;
         for (var cNick in clients) {
@@ -69,7 +70,6 @@ jt.NetServer = function(room) {
                 if (!dataFull) {
                     netUpdateFull.s = atariConsole.saveStateExtended();
                     netUpdateFull.cm = { p1: room.consoleControls.isP1ControlsMode(), pd: room.consoleControls.isPaddleMode() };
-                    netUpdateFull.v = videoPulls;
                     dataFull = JSON.stringify(netUpdateFull);
                 }
                 data = dataFull;
@@ -96,8 +96,6 @@ jt.NetServer = function(room) {
 
         nextUpdateFull = false;
         controlsToSend.length = 0;
-
-        atariConsole.videoClockPulseApplyPulldowns(videoPulls);
     };
 
     this.processControlState = function (control, press) {
