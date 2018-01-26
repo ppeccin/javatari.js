@@ -212,9 +212,6 @@ jt.NetClient = function(room) {
     }
 
     function onServerNetUpdate(netUpdate) {
-        // NetClient gets no local clock, so we use the chance...
-        atariConsole.getConsoleControlsSocket().controlsClockPulse();
-
         // Full Update?
         if (netUpdate.s) {
             atariConsole.loadStateExtended(netUpdate.s);
@@ -239,13 +236,17 @@ jt.NetClient = function(room) {
             atariConsole.videoClockPulseApplyPulldowns(netUpdate.v);
         }
 
+        // Send clock do Controllers
+        atariConsole.getConsoleControlsSocket().controlsClockPulse();
+
         // Send local controls to Server. We always send a message even when empty to keep the channel active
-        if (dataChannelActive)
+        var update = { c: controlsToSend.length ? controlsToSend : undefined };
+
         // Use DataChannel if available
-            dataChannel.send(JSON.stringify({ c: controlsToSend.length ? controlsToSend : undefined }));
-        else
+        if (dataChannelActive) dataChannel.send(JSON.stringify(update));
         // Or fallback to WebSocket relayed through the Session Server (BAD!)
-            ws.send(JSON.stringify({ javatariUpdate: { c: controlsToSend.length ? controlsToSend : undefined } }));
+        else ws.send(JSON.stringify({ javatariUpdate: update }));
+
         controlsToSend.length = 0;
     }
 

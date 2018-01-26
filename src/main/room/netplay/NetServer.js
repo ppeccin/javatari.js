@@ -57,9 +57,14 @@ jt.NetServer = function(room) {
     };
 
     this.netVideoClockPulse = function() {
+        // Send clock do Controllers
+        atariConsole.getConsoleControlsSocket().controlsClockPulse();
+
+        // Send local (Server) Machine clock
         var videoPulls = atariConsole.videoClockPulseGetNextPulldowns();
         atariConsole.videoClockPulseApplyPulldowns(videoPulls);
 
+        // Send net clock update to all Clients
         var data, dataFull, dataNormal;
         for (var cNick in clients) {
             var client = clients[cNick];
