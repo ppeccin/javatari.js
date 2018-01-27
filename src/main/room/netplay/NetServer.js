@@ -80,7 +80,7 @@ jt.NetServer = function(room) {
                 data = dataFull;
             } else {
                 if (!dataNormal) {
-                    netUpdate.c = controlsToSend.length ? controlsToSend : undefined;
+                    netUpdate.c = consoleControls.netGetControlsToSend();
                     netUpdate.v = videoPulls;
                     dataNormal = JSON.stringify(netUpdate);
                 }
@@ -88,34 +88,17 @@ jt.NetServer = function(room) {
             }
 
             try {
-                if (client.dataChannelActive)
-                    // Use DataChannel if available
-                    sendToDataChannel(client.dataChannel, data);
-                else
-                    // Or fallback to WebSocket relayed through the Session Server (BAD!)
-                    ws.send(JSON.stringify({ toClientNick: client.nick, javatariUpdate: data }));
+                // Use DataChannel if available
+                if (client.dataChannelActive) sendToDataChannel(client.dataChannel, data);
+                // Or fallback to WebSocket relayed through the Session Server (BAD!)
+                else ws.send(JSON.stringify({ toClientNick: client.nick, javatariUpdate: data }));
             } catch (e) {
                 dropClient(client, true, true, 'NetPlay client "' + client.nick + '" dropped: P2P error sending data');
             }
         }
 
         nextUpdateFull = false;
-        controlsToSend.length = 0;
-    };
-
-    this.processControlState = function (control, press) {
-        consoleControlsSocket.controlStateChanged(control, press);
-
-        // Store changes to be sent to Clients
-        if (!localOnlyControls.has(control))
-            controlsToSend.push((control << 4) | press );        // binary encoded, always < 16000
-    };
-
-    this.processControlValue = function (control, value) {
-        consoleControlsSocket.controlValueChanged(control, value);
-
-        // Store changes to be sent to Clients
-        controlsToSend.push(control + (value + 10));             // always > 16000
+        consoleControls.netClearControlsToSend();
     };
 
     this.processCheckPeripheralControl = function (control) {
@@ -177,7 +160,7 @@ jt.NetServer = function(room) {
         } catch (e) {}
 
         sessionID = message.sessionID;
-        controlsToSend.length = 0;
+        consoleControls.netClearControlsToSend();
         room.enterNetServerMode(self);
 
         room.showOSD('NetPlay session "' + message.sessionID + '" started', true);
@@ -278,16 +261,11 @@ jt.NetServer = function(room) {
     }
 
     function onClientNetUpdate(netUpdate) {
-        if (!netUpdate.c) return;
+        // console.log(netUpdate);
+        // client.lastUpdate = netUpdate;
 
-        // Process changes as if they were local controls
-        for (var i = 0, changes = netUpdate.c, len = changes.length; i < len; ++i) {
-            var change = changes[i];
-            if (change < 16000)
-                self.processControlState(change >> 4, change & 0x01);            // binary encoded
-            else
-                self.processControlValue(change & ~0x3fff, (change & 0x3fff) - 10);
-        }
+        // Process Controls changes as if they were local controls immediately
+        if (netUpdate.c) consoleControls.netServerProcessControlsChanges(netUpdate.c);
     }
 
     function keepAlive() {
@@ -326,9 +304,8 @@ jt.NetServer = function(room) {
 
 
     var atariConsole = room.console;
-    var consoleControlsSocket = atariConsole.getConsoleControlsSocket();
+    var consoleControls = room.consoleControls;
 
-    var controlsToSend = new Array(100); controlsToSend.length = 0;     // pre allocate empty Array
     var netUpdate = { v: 0, c: undefined };
     var netUpdateFull = { cm: {}, s: {}, v: 0, c: undefined };
     var nextUpdateFull = false;
@@ -342,15 +319,6 @@ jt.NetServer = function(room) {
 
     var rtcConnectionConfig;
     var dataChannelConfig;
-
-    var ct = jt.ConsoleControls;
-    var localOnlyControls = new Set([
-        ct.SAVE_STATE_0, ct.SAVE_STATE_1, ct.SAVE_STATE_2, ct.SAVE_STATE_3, ct.SAVE_STATE_4, ct.SAVE_STATE_5, ct.SAVE_STATE_6,
-        ct.SAVE_STATE_7, ct.SAVE_STATE_8, ct.SAVE_STATE_9, ct.SAVE_STATE_10, ct.SAVE_STATE_11, ct.SAVE_STATE_12, ct.SAVE_STATE_FILE,
-        ct.LOAD_STATE_0, ct.LOAD_STATE_1, ct.LOAD_STATE_2, ct.LOAD_STATE_3, ct.LOAD_STATE_4, ct.LOAD_STATE_5, ct.LOAD_STATE_6,
-        ct.LOAD_STATE_7, ct.LOAD_STATE_8, ct.LOAD_STATE_9, ct.LOAD_STATE_10, ct.LOAD_STATE_11, ct.LOAD_STATE_12,
-        ct.POWER_FRY, ct.VSYNCH, ct.TRACE, ct.CARTRIDGE_FORMAT
-    ]);
 
 
     var MAX_DATA_CHANNEL_SIZE = 16300;

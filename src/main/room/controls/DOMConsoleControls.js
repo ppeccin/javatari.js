@@ -53,7 +53,7 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
             keyStateMap[c] = false;
         }
         paddle0MovingLeft = paddle0MovingRight = paddle1MovingLeft = paddle1MovingRight = false;
-        turboControlState[controls.JOY0_BUTTON] = turboControlState[controls.JOY1_BUTTON] = false;
+        turboControlState[cc.JOY0_BUTTON] = turboControlState[cc.JOY1_BUTTON] = false;
         touchControls.releaseControllers();
     };
 
@@ -168,8 +168,8 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
             // State flipped?
             if (turboFireClockCount === turboFireFlipClock || turboFireClockCount === 0) {
                 var state = turboFireClockCount > 0;
-                if (turboControlState[controls.JOY0_BUTTON]) processControlState(controls.JOY0_BUTTON, state);
-                if (turboControlState[controls.JOY1_BUTTON]) processControlState(controls.JOY1_BUTTON, state);
+                if (turboControlState[cc.JOY0_BUTTON]) processControlState(cc.JOY0_BUTTON, state);
+                if (turboControlState[cc.JOY1_BUTTON]) processControlState(cc.JOY1_BUTTON, state);
             }
             if (turboFireClockCount <= 0) turboFireClockCount = turboFireClocks;        // restart cycle
         }
@@ -182,23 +182,23 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
                 if (!paddle0MovingLeft) {
                     paddle0Position -= paddle0Speed;
                     if (paddle0Position < 0) paddle0Position = 0;
-                    processControlValue(controls.PADDLE0_POSITION, paddle0Position);
+                    processControlValue(cc.PADDLE0_POSITION, paddle0Position);
                 }
             } else if (paddle0MovingLeft) {
                 paddle0Position += paddle0Speed;
                 if (paddle0Position > 380) paddle0Position = 380;
-                processControlValue(controls.PADDLE0_POSITION, paddle0Position);
+                processControlValue(cc.PADDLE0_POSITION, paddle0Position);
             }
             if (paddle1MovingRight) {
                 if (!paddle1MovingLeft) {
                     paddle1Position -= paddle1Speed;
                     if (paddle1Position < 0) paddle1Position = 0;
-                    processControlValue(controls.PADDLE1_POSITION, paddle1Position);
+                    processControlValue(cc.PADDLE1_POSITION, paddle1Position);
                 }
             } else if (paddle1MovingLeft) {
                 paddle1Position += paddle1Speed;
                 if (paddle1Position > 380) paddle1Position = 380;
-                processControlValue(controls.PADDLE1_POSITION, paddle1Position);
+                processControlValue(cc.PADDLE1_POSITION, paddle1Position);
             }
         }
     };
@@ -268,21 +268,39 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
             if (tryPaddleControl(control, press)) return;
         }
 
-        // Then other controls
-        if (room.netController)
-            room.netController.processControlState(control, press);
-        else
-            consoleControlsSocket.controlStateChanged(control, press);
+        // Check for NetPlay blocked controls
+        if (room.netPlayMode === 2 && netServerLocalOnlyControls.has(control))
+            return room.showOSD("Function not available in NetPlay Client mode", true, true);
+
+        // Store changes to be sent to peers
+        if (!(room.netPlayMode === 1 && netServerLocalOnlyControls.has(control)))
+            netControlsToSend.push((control << 4) | press );       // binary encoded
+
+        // Do not apply control now if Client
+        if (room.netPlayMode === 2) return;
+
+        applyControlState(control, press);
     }
     this.processControlState = processControlState;
 
+    function applyControlState(control, press) {
+        consoleControlsSocket.controlStateChanged(control, press);
+    }
+
     function processControlValue(control, value) {
-        if (room.netController)
-            room.netController.processControlValue(control, value);
-        else
-            consoleControlsSocket.controlValueChanged(control, value);
+        // Store changes to be sent to peers
+        netControlsToSend.push(control + (value + 10));             // always > 16000
+
+        // Do not apply control now if Client
+        if (room.netPlayMode === 2) return;
+
+        applyControlValue(control, value);
     }
     this.processControlValue = processControlValue;
+
+    function applyControlValue(control, value) {
+        consoleControlsSocket.controlValueChanged(control, value);
+    }
 
     var preventIEHelp = function() {
         window.onhelp = function () {
@@ -292,8 +310,8 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
 
     var translatePaddleModeButtons = function(control) {
         switch (control) {
-            case controls.JOY0_BUTTON: return controls.PADDLE0_BUTTON;
-            case controls.JOY1_BUTTON: return controls.PADDLE1_BUTTON;
+            case cc.JOY0_BUTTON: return cc.PADDLE0_BUTTON;
+            case cc.JOY1_BUTTON: return cc.PADDLE1_BUTTON;
             default: return control;
         }
     };
@@ -301,40 +319,40 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
     var tryPaddleControl = function(control, press) {
         if (press) {
             switch(control) {
-                case controls.JOY0_LEFT:
+                case cc.JOY0_LEFT:
                     paddle0MovingLeft = true; return true;
-                case controls.JOY0_RIGHT:
+                case cc.JOY0_RIGHT:
                     paddle0MovingRight = true; return true;
-                case controls.JOY0_UP:
+                case cc.JOY0_UP:
                     if (paddle0Speed < 10) paddle0Speed++;
                     screen.showOSD("P1 Paddle speed: " + paddle0Speed, true);
                     return true;
-                case controls.JOY0_DOWN:
+                case cc.JOY0_DOWN:
                     if (paddle0Speed > 1) paddle0Speed--;
                     screen.showOSD("P1 Paddle speed: " + paddle0Speed, true);
                     return true;
-                case controls.JOY1_LEFT:
+                case cc.JOY1_LEFT:
                     paddle1MovingLeft = true; return true;
-                case controls.JOY1_RIGHT:
+                case cc.JOY1_RIGHT:
                     paddle1MovingRight = true; return true;
-                case controls.JOY1_UP:
+                case cc.JOY1_UP:
                     if (paddle1Speed < 10) paddle1Speed++;
                     screen.showOSD("P2 Paddle speed: " + paddle1Speed, true);
                     return true;
-                case controls.JOY1_DOWN:
+                case cc.JOY1_DOWN:
                     if (paddle1Speed > 1) paddle1Speed--;
                     screen.showOSD("P2 Paddle speed: " + paddle1Speed, true);
                     return true;
             }
         } else {
             switch(control) {
-                case controls.JOY0_LEFT:
+                case cc.JOY0_LEFT:
                     paddle0MovingLeft = false; return true;
-                case controls.JOY0_RIGHT:
+                case cc.JOY0_RIGHT:
                     paddle0MovingRight = false; return true;
-                case controls.JOY1_LEFT:
+                case cc.JOY1_LEFT:
                     paddle1MovingLeft = false; return true;
-                case controls.JOY1_RIGHT:
+                case cc.JOY1_RIGHT:
                     paddle1MovingRight = false; return true;
             }
         }
@@ -348,8 +366,8 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
         paddle0Position = paddle1Position = (paddleMode ? 190 : -1);	// -1 = disconnected, won't charge POTs
         // Only send Paddles connection reset when not in NetPlay Client mode
         if (room.netPlayMode !== 2) {
-            processControlValue(controls.PADDLE0_POSITION, paddle0Position);
-            processControlValue(controls.PADDLE1_POSITION, paddle1Position);
+            processControlValue(cc.PADDLE0_POSITION, paddle0Position);
+            processControlValue(cc.PADDLE1_POSITION, paddle1Position);
         }
         gamepadControls.setPaddleMode(paddleMode);
         if (showOSD) showModeOSD();
@@ -372,121 +390,154 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
 
         // Fixed keys
 
-        keyCodeMap[KEY_POWER]                   = controls.POWER;
-        keyCodeMap[KEY_POWER | k.ALT]           = controls.POWER;
+        keyCodeMap[KEY_POWER]                   = cc.POWER;
+        keyCodeMap[KEY_POWER | k.ALT]           = cc.POWER;
 
-        keyCodeMap[KEY_POWER | k.SHIFT]         = controls.POWER_FRY;
-        keyCodeMap[KEY_POWER | k.SHIFT | k.ALT] = controls.POWER_FRY;
+        keyCodeMap[KEY_POWER | k.SHIFT]         = cc.POWER_FRY;
+        keyCodeMap[KEY_POWER | k.SHIFT | k.ALT] = cc.POWER_FRY;
 
-        keyCodeMap[KEY_BW]                      = controls.BLACK_WHITE;
-        keyCodeMap[KEY_BW | k.ALT]              = controls.BLACK_WHITE;
+        keyCodeMap[KEY_BW]                      = cc.BLACK_WHITE;
+        keyCodeMap[KEY_BW | k.ALT]              = cc.BLACK_WHITE;
 
-        keyCodeMap[KEY_SELECT]                  = controls.SELECT;
-        keyCodeMap[KEY_SELECT | k.ALT]          = controls.SELECT;
+        keyCodeMap[KEY_SELECT]                  = cc.SELECT;
+        keyCodeMap[KEY_SELECT | k.ALT]          = cc.SELECT;
 
-        keyCodeMap[KEY_RESET]                   = controls.RESET;
-        keyCodeMap[KEY_RESET | k.ALT]           = controls.RESET;
+        keyCodeMap[KEY_RESET]                   = cc.RESET;
+        keyCodeMap[KEY_RESET | k.ALT]           = cc.RESET;
 
-        keyCodeMap[KEY_DIFF_0]                  = controls.DIFFICULTY0;
-        keyCodeMap[KEY_DIFF_0 | k.ALT]          = controls.DIFFICULTY0;
+        keyCodeMap[KEY_DIFF_0]                  = cc.DIFFICULTY0;
+        keyCodeMap[KEY_DIFF_0 | k.ALT]          = cc.DIFFICULTY0;
 
-        keyCodeMap[KEY_DIFF_1]                  = controls.DIFFICULTY1;
-        keyCodeMap[KEY_DIFF_1 | k.ALT]          = controls.DIFFICULTY1;
+        keyCodeMap[KEY_DIFF_1]                  = cc.DIFFICULTY1;
+        keyCodeMap[KEY_DIFF_1 | k.ALT]          = cc.DIFFICULTY1;
 
-        keyCodeMap[KEY_SPEED]                   = controls.FAST_SPEED;
-        keyCodeMap[KEY_SPEED | k.ALT]           = controls.FAST_SPEED;
-        keyCodeMap[KEY_SPEED | k.SHIFT]         = controls.SLOW_SPEED;
-        keyCodeMap[KEY_SPEED | k.SHIFT | k.ALT] = controls.SLOW_SPEED;
+        keyCodeMap[KEY_SPEED]                   = cc.FAST_SPEED;
+        keyCodeMap[KEY_SPEED | k.ALT]           = cc.FAST_SPEED;
+        keyCodeMap[KEY_SPEED | k.SHIFT]         = cc.SLOW_SPEED;
+        keyCodeMap[KEY_SPEED | k.SHIFT | k.ALT] = cc.SLOW_SPEED;
 
-        keyCodeMap[KEY_INC_SPEED | k.SHIFT | k.ALT]    = controls.INC_SPEED;
-        keyCodeMap[KEY_DEC_SPEED | k.SHIFT | k.ALT]    = controls.DEC_SPEED;
-        keyCodeMap[KEY_NORMAL_SPEED | k.SHIFT | k.ALT] = controls.NORMAL_SPEED;
-        keyCodeMap[KEY_MIN_SPEED | k.SHIFT | k.ALT]    = controls.MIN_SPEED;
+        keyCodeMap[KEY_INC_SPEED | k.SHIFT | k.ALT]    = cc.INC_SPEED;
+        keyCodeMap[KEY_DEC_SPEED | k.SHIFT | k.ALT]    = cc.DEC_SPEED;
+        keyCodeMap[KEY_NORMAL_SPEED | k.SHIFT | k.ALT] = cc.NORMAL_SPEED;
+        keyCodeMap[KEY_MIN_SPEED | k.SHIFT | k.ALT]    = cc.MIN_SPEED;
 
-        keyCodeMap[KEY_PAUSE | k.ALT]           = controls.PAUSE;
-        keyCodeMap[KEY_PAUSE | k.SHIFT | k.ALT] = controls.PAUSE_AUDIO_ON;
-        keyCodeMap[KEY_FRAME | k.ALT]           = controls.FRAME;
-        keyCodeMap[KEY_FRAMEa | k.ALT]          = controls.FRAME;
-        keyCodeMap[KEY_TRACE | k.ALT]           = controls.TRACE;
-        keyCodeMap[KEY_INFO | k.ALT]            = controls.SHOW_INFO;
-        keyCodeMap[KEY_DEBUG | k.ALT]           = controls.DEBUG;
-        keyCodeMap[KEY_NO_COLLISIONS | k.ALT]   = controls.NO_COLLISIONS;
-        keyCodeMap[KEY_VIDEO_STANDARD | k.ALT]  = controls.VIDEO_STANDARD;
-        keyCodeMap[KEY_VIDEO_STANDARD2 | k.ALT] = controls.VIDEO_STANDARD;
-        keyCodeMap[KEY_VSYNCH | k.ALT]          = controls.VSYNCH;
+        keyCodeMap[KEY_PAUSE | k.ALT]           = cc.PAUSE;
+        keyCodeMap[KEY_PAUSE | k.SHIFT | k.ALT] = cc.PAUSE_AUDIO_ON;
+        keyCodeMap[KEY_FRAME | k.ALT]           = cc.FRAME;
+        keyCodeMap[KEY_FRAMEa | k.ALT]          = cc.FRAME;
+        keyCodeMap[KEY_TRACE | k.ALT]           = cc.TRACE;
+        keyCodeMap[KEY_INFO | k.ALT]            = cc.SHOW_INFO;
+        keyCodeMap[KEY_DEBUG | k.ALT]           = cc.DEBUG;
+        keyCodeMap[KEY_NO_COLLISIONS | k.ALT]   = cc.NO_COLLISIONS;
+        keyCodeMap[KEY_VIDEO_STANDARD | k.ALT]  = cc.VIDEO_STANDARD;
+        keyCodeMap[KEY_VIDEO_STANDARD2 | k.ALT] = cc.VIDEO_STANDARD;
+        keyCodeMap[KEY_VSYNCH | k.ALT]          = cc.VSYNCH;
 
-        keyCodeMap[KEY_STATE_0 | k.CONTROL]           = controls.SAVE_STATE_0;
-        keyCodeMap[KEY_STATE_0a | k.CONTROL]          = controls.SAVE_STATE_0;
-        keyCodeMap[KEY_STATE_0 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_0;
-        keyCodeMap[KEY_STATE_0a | k.CONTROL | k.ALT]  = controls.SAVE_STATE_0;
-        keyCodeMap[KEY_STATE_1 | k.CONTROL]           = controls.SAVE_STATE_1;
-        keyCodeMap[KEY_STATE_1 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_1;
-        keyCodeMap[KEY_STATE_2 | k.CONTROL]           = controls.SAVE_STATE_2;
-        keyCodeMap[KEY_STATE_2 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_2;
-        keyCodeMap[KEY_STATE_3 | k.CONTROL]           = controls.SAVE_STATE_3;
-        keyCodeMap[KEY_STATE_3 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_3;
-        keyCodeMap[KEY_STATE_4 | k.CONTROL]           = controls.SAVE_STATE_4;
-        keyCodeMap[KEY_STATE_4 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_4;
-        keyCodeMap[KEY_STATE_5 | k.CONTROL]           = controls.SAVE_STATE_5;
-        keyCodeMap[KEY_STATE_5 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_5;
-        keyCodeMap[KEY_STATE_6 | k.CONTROL]           = controls.SAVE_STATE_6;
-        keyCodeMap[KEY_STATE_6 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_6;
-        keyCodeMap[KEY_STATE_7 | k.CONTROL]           = controls.SAVE_STATE_7;
-        keyCodeMap[KEY_STATE_7 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_7;
-        keyCodeMap[KEY_STATE_8 | k.CONTROL]           = controls.SAVE_STATE_8;
-        keyCodeMap[KEY_STATE_8 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_8;
-        keyCodeMap[KEY_STATE_9 | k.CONTROL]           = controls.SAVE_STATE_9;
-        keyCodeMap[KEY_STATE_9 | k.CONTROL | k.ALT]   = controls.SAVE_STATE_9;
-        keyCodeMap[KEY_STATE_10 | k.CONTROL]          = controls.SAVE_STATE_10;
-        keyCodeMap[KEY_STATE_10 | k.CONTROL | k.ALT]  = controls.SAVE_STATE_10;
-        keyCodeMap[KEY_STATE_11 | k.CONTROL]          = controls.SAVE_STATE_11;
-        keyCodeMap[KEY_STATE_11a | k.CONTROL]         = controls.SAVE_STATE_11;
-        keyCodeMap[KEY_STATE_11 | k.CONTROL | k.ALT]  = controls.SAVE_STATE_11;
-        keyCodeMap[KEY_STATE_11a | k.CONTROL | k.ALT] = controls.SAVE_STATE_11;
-        keyCodeMap[KEY_STATE_12 | k.CONTROL]          = controls.SAVE_STATE_12;
-        keyCodeMap[KEY_STATE_12a | k.CONTROL]         = controls.SAVE_STATE_12;
-        keyCodeMap[KEY_STATE_12 | k.CONTROL | k.ALT]  = controls.SAVE_STATE_12;
-        keyCodeMap[KEY_STATE_12a | k.CONTROL | k.ALT] = controls.SAVE_STATE_12;
+        keyCodeMap[KEY_STATE_0 | k.CONTROL]           = cc.SAVE_STATE_0;
+        keyCodeMap[KEY_STATE_0a | k.CONTROL]          = cc.SAVE_STATE_0;
+        keyCodeMap[KEY_STATE_0 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_0;
+        keyCodeMap[KEY_STATE_0a | k.CONTROL | k.ALT]  = cc.SAVE_STATE_0;
+        keyCodeMap[KEY_STATE_1 | k.CONTROL]           = cc.SAVE_STATE_1;
+        keyCodeMap[KEY_STATE_1 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_1;
+        keyCodeMap[KEY_STATE_2 | k.CONTROL]           = cc.SAVE_STATE_2;
+        keyCodeMap[KEY_STATE_2 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_2;
+        keyCodeMap[KEY_STATE_3 | k.CONTROL]           = cc.SAVE_STATE_3;
+        keyCodeMap[KEY_STATE_3 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_3;
+        keyCodeMap[KEY_STATE_4 | k.CONTROL]           = cc.SAVE_STATE_4;
+        keyCodeMap[KEY_STATE_4 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_4;
+        keyCodeMap[KEY_STATE_5 | k.CONTROL]           = cc.SAVE_STATE_5;
+        keyCodeMap[KEY_STATE_5 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_5;
+        keyCodeMap[KEY_STATE_6 | k.CONTROL]           = cc.SAVE_STATE_6;
+        keyCodeMap[KEY_STATE_6 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_6;
+        keyCodeMap[KEY_STATE_7 | k.CONTROL]           = cc.SAVE_STATE_7;
+        keyCodeMap[KEY_STATE_7 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_7;
+        keyCodeMap[KEY_STATE_8 | k.CONTROL]           = cc.SAVE_STATE_8;
+        keyCodeMap[KEY_STATE_8 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_8;
+        keyCodeMap[KEY_STATE_9 | k.CONTROL]           = cc.SAVE_STATE_9;
+        keyCodeMap[KEY_STATE_9 | k.CONTROL | k.ALT]   = cc.SAVE_STATE_9;
+        keyCodeMap[KEY_STATE_10 | k.CONTROL]          = cc.SAVE_STATE_10;
+        keyCodeMap[KEY_STATE_10 | k.CONTROL | k.ALT]  = cc.SAVE_STATE_10;
+        keyCodeMap[KEY_STATE_11 | k.CONTROL]          = cc.SAVE_STATE_11;
+        keyCodeMap[KEY_STATE_11a | k.CONTROL]         = cc.SAVE_STATE_11;
+        keyCodeMap[KEY_STATE_11 | k.CONTROL | k.ALT]  = cc.SAVE_STATE_11;
+        keyCodeMap[KEY_STATE_11a | k.CONTROL | k.ALT] = cc.SAVE_STATE_11;
+        keyCodeMap[KEY_STATE_12 | k.CONTROL]          = cc.SAVE_STATE_12;
+        keyCodeMap[KEY_STATE_12a | k.CONTROL]         = cc.SAVE_STATE_12;
+        keyCodeMap[KEY_STATE_12 | k.CONTROL | k.ALT]  = cc.SAVE_STATE_12;
+        keyCodeMap[KEY_STATE_12a | k.CONTROL | k.ALT] = cc.SAVE_STATE_12;
 
-        keyCodeMap[KEY_STATE_0 | k.ALT]   = controls.LOAD_STATE_0;
-        keyCodeMap[KEY_STATE_0a | k.ALT]  = controls.LOAD_STATE_0;
-        keyCodeMap[KEY_STATE_1 | k.ALT]   = controls.LOAD_STATE_1;
-        keyCodeMap[KEY_STATE_2 | k.ALT]   = controls.LOAD_STATE_2;
-        keyCodeMap[KEY_STATE_3 | k.ALT]   = controls.LOAD_STATE_3;
-        keyCodeMap[KEY_STATE_4 | k.ALT]   = controls.LOAD_STATE_4;
-        keyCodeMap[KEY_STATE_5 | k.ALT]   = controls.LOAD_STATE_5;
-        keyCodeMap[KEY_STATE_6 | k.ALT]   = controls.LOAD_STATE_6;
-        keyCodeMap[KEY_STATE_7 | k.ALT]   = controls.LOAD_STATE_7;
-        keyCodeMap[KEY_STATE_8 | k.ALT]   = controls.LOAD_STATE_8;
-        keyCodeMap[KEY_STATE_9 | k.ALT]   = controls.LOAD_STATE_9;
-        keyCodeMap[KEY_STATE_10 | k.ALT]  = controls.LOAD_STATE_10;
-        keyCodeMap[KEY_STATE_11 | k.ALT]  = controls.LOAD_STATE_11;
-        keyCodeMap[KEY_STATE_11a | k.ALT] = controls.LOAD_STATE_11;
-        keyCodeMap[KEY_STATE_12 | k.ALT]  = controls.LOAD_STATE_12;
-        keyCodeMap[KEY_STATE_12a | k.ALT] = controls.LOAD_STATE_12;
+        keyCodeMap[KEY_STATE_0 | k.ALT]   = cc.LOAD_STATE_0;
+        keyCodeMap[KEY_STATE_0a | k.ALT]  = cc.LOAD_STATE_0;
+        keyCodeMap[KEY_STATE_1 | k.ALT]   = cc.LOAD_STATE_1;
+        keyCodeMap[KEY_STATE_2 | k.ALT]   = cc.LOAD_STATE_2;
+        keyCodeMap[KEY_STATE_3 | k.ALT]   = cc.LOAD_STATE_3;
+        keyCodeMap[KEY_STATE_4 | k.ALT]   = cc.LOAD_STATE_4;
+        keyCodeMap[KEY_STATE_5 | k.ALT]   = cc.LOAD_STATE_5;
+        keyCodeMap[KEY_STATE_6 | k.ALT]   = cc.LOAD_STATE_6;
+        keyCodeMap[KEY_STATE_7 | k.ALT]   = cc.LOAD_STATE_7;
+        keyCodeMap[KEY_STATE_8 | k.ALT]   = cc.LOAD_STATE_8;
+        keyCodeMap[KEY_STATE_9 | k.ALT]   = cc.LOAD_STATE_9;
+        keyCodeMap[KEY_STATE_10 | k.ALT]  = cc.LOAD_STATE_10;
+        keyCodeMap[KEY_STATE_11 | k.ALT]  = cc.LOAD_STATE_11;
+        keyCodeMap[KEY_STATE_11a | k.ALT] = cc.LOAD_STATE_11;
+        keyCodeMap[KEY_STATE_12 | k.ALT]  = cc.LOAD_STATE_12;
+        keyCodeMap[KEY_STATE_12a | k.ALT] = cc.LOAD_STATE_12;
 
         // Configurable in preferences
 
         var a = p1ControlsMode ? 1 : 0;
         var b = p1ControlsMode ? 0 : 1;
 
-        keyCodeMap[prefs.joystickKeys[a].left.c] = controls.JOY0_LEFT;
-        keyCodeMap[prefs.joystickKeys[a].up.c] = controls.JOY0_UP;
-        keyCodeMap[prefs.joystickKeys[a].right.c] = controls.JOY0_RIGHT;
-        keyCodeMap[prefs.joystickKeys[a].down.c] = controls.JOY0_DOWN;
-        keyCodeMap[prefs.joystickKeys[a].button.c] = controls.JOY0_BUTTON;
-        keyCodeMap[prefs.joystickKeys[b].left.c] = controls.JOY1_LEFT;
-        keyCodeMap[prefs.joystickKeys[b].up.c] = controls.JOY1_UP;
-        keyCodeMap[prefs.joystickKeys[b].right.c] = controls.JOY1_RIGHT;
-        keyCodeMap[prefs.joystickKeys[b].down.c] = controls.JOY1_DOWN;
-        keyCodeMap[prefs.joystickKeys[b].button.c] = controls.JOY1_BUTTON;
+        keyCodeMap[prefs.joystickKeys[a].left.c] = cc.JOY0_LEFT;
+        keyCodeMap[prefs.joystickKeys[a].up.c] = cc.JOY0_UP;
+        keyCodeMap[prefs.joystickKeys[a].right.c] = cc.JOY0_RIGHT;
+        keyCodeMap[prefs.joystickKeys[a].down.c] = cc.JOY0_DOWN;
+        keyCodeMap[prefs.joystickKeys[a].button.c] = cc.JOY0_BUTTON;
+        keyCodeMap[prefs.joystickKeys[b].left.c] = cc.JOY1_LEFT;
+        keyCodeMap[prefs.joystickKeys[b].up.c] = cc.JOY1_UP;
+        keyCodeMap[prefs.joystickKeys[b].right.c] = cc.JOY1_RIGHT;
+        keyCodeMap[prefs.joystickKeys[b].down.c] = cc.JOY1_DOWN;
+        keyCodeMap[prefs.joystickKeys[b].button.c] = cc.JOY1_BUTTON;
 
-        turboKeyCodeMap[prefs.joystickKeys[a].buttonT.c] = controls.JOY0_BUTTON;
-        turboKeyCodeMap[prefs.joystickKeys[b].buttonT.c] = controls.JOY1_BUTTON;
+        turboKeyCodeMap[prefs.joystickKeys[a].buttonT.c] = cc.JOY0_BUTTON;
+        turboKeyCodeMap[prefs.joystickKeys[b].buttonT.c] = cc.JOY1_BUTTON;
     };
 
 
-    var controls = jt.ConsoleControls;
+    // NetPlay  -------------------------------------------
+
+    this.netGetControlsToSend = function() {
+        return netControlsToSend.length ? netControlsToSend : undefined;
+    };
+
+    this.netClearControlsToSend = function() {
+        netControlsToSend.length = 0;
+    };
+
+    this.netServerProcessControlsChanges = function(changes) {
+        for (var i = 0, len = changes.length; i < len; ++i) {
+            var change = changes[i];
+            if (change < 16000) {
+                // Store changes to be sent to Clients?
+                if (!netServerLocalOnlyControls.has(change >> 4)) netControlsToSend.push(change);
+                applyControlState(change >> 4, change & 0x01);       // binary encoded
+            } else
+                applyControlValue(change & ~0x3fff, (change & 0x3fff) - 10);
+        }
+    };
+
+    this.netClientApplyControlsChanges = function(changes) {
+        for (var i = 0, len = changes.length; i < len; ++i) {
+            var change = changes[i];
+            if (change < 16000)
+                applyControlState(change >> 4, change & 0x01);       // binary encoded
+            else
+                applyControlValue(change & ~0x3fff, (change & 0x3fff) - 10);
+        }
+    };
+
+
+    var cc = jt.ConsoleControls;
 
     var consoleControlsSocket;
     var screen;
@@ -519,6 +570,8 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
 
     var gamepadControls;
     var touchControls;
+
+    var netControlsToSend = new Array(100); netControlsToSend.length = 0;     // pre allocate empty Array
 
     var PADDLES_MODE = Javatari.PADDLES_MODE;
 
@@ -568,6 +621,15 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
     var KEY_STATE_11a        = jt.DOMKeys.VK_FF_MINUS.c;
     var KEY_STATE_12         = jt.DOMKeys.VK_EQUALS.c;
     var KEY_STATE_12a        = jt.DOMKeys.VK_FF_EQUALS.c;
+
+
+    var netServerLocalOnlyControls = new Set([
+        cc.SAVE_STATE_0, cc.SAVE_STATE_1, cc.SAVE_STATE_2, cc.SAVE_STATE_3, cc.SAVE_STATE_4, cc.SAVE_STATE_5, cc.SAVE_STATE_6,
+        cc.SAVE_STATE_7, cc.SAVE_STATE_8, cc.SAVE_STATE_9, cc.SAVE_STATE_10, cc.SAVE_STATE_11, cc.SAVE_STATE_12, cc.SAVE_STATE_FILE,
+        cc.LOAD_STATE_0, cc.LOAD_STATE_1, cc.LOAD_STATE_2, cc.LOAD_STATE_3, cc.LOAD_STATE_4, cc.LOAD_STATE_5, cc.LOAD_STATE_6,
+        cc.LOAD_STATE_7, cc.LOAD_STATE_8, cc.LOAD_STATE_9, cc.LOAD_STATE_10, cc.LOAD_STATE_11, cc.LOAD_STATE_12,
+        cc.POWER_FRY, cc.VSYNCH, cc.TRACE, cc.CARTRIDGE_FORMAT
+    ]);
 
 
     init();

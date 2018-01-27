@@ -70,20 +70,6 @@ jt.NetClient = function(room) {
         // Client gets clocks from Server at onServerNetUpdate()
     };
 
-    this.processControlState = function (control, press) {
-        // Reject controls not available to NetPlay Clients
-        if (disabledControls.has(control))
-            return room.showOSD("Function not available in NetPlay Client mode", true, true);
-
-        // Store change to be sent only to Server, do not process locally
-        controlsToSend.push((control << 4) | press );            // binary encoded, always < 16000
-    };
-
-    this.processControlValue = function (control, value) {
-        // Store change to be sent only to Server, do not process locally
-        controlsToSend.push(control + (value + 10));             // always > 16000
-    };
-
     this.processCheckPeripheralControl = function (control) {
         // Reject controls not available to NetPlay Clients
         if (disabledPeripheralControls.has(control)) {
@@ -166,7 +152,7 @@ jt.NetClient = function(room) {
         room.showOSD('NetPlay Session "' + sessionID + '" joined as "' + nick + '"', true);
         jt.Util.log('NetPlay Session "' + sessionID + '" joined as "' + nick + '"');
 
-        controlsToSend.length = 0;
+        consoleControls.netClearControlsToSend();
         room.enterNetClientMode(self);
     }
 
@@ -212,6 +198,8 @@ jt.NetClient = function(room) {
     }
 
     function onServerNetUpdate(netUpdate) {
+        // console.log(netUpdate);
+
         // Full Update?
         if (netUpdate.s) {
             atariConsole.loadStateExtended(netUpdate.s);
@@ -222,17 +210,9 @@ jt.NetClient = function(room) {
             }
         } else {
             // Apply controls changes from Server
-            if (netUpdate.c) {
-                var controls = netUpdate.c;
-                for (var i = 0, len = controls.length; i < len; ++i) {
-                    var control = controls[i];
-                    if (control < 16000)
-                        consoleControlsSocket.controlStateChanged(control >> 4, control & 0x01);        // binary encoded
-                    else
-                        consoleControlsSocket.controlValueChanged(control & ~0x3fff, (control & 0x3fff) - 10);
-                }
-            }
+            if (netUpdate.c) consoleControls.netClientApplyControlsChanges(netUpdate.c);
 
+            // Send local (Client) Machine clock
             atariConsole.videoClockPulseApplyPulldowns(netUpdate.v);
         }
 
@@ -240,14 +220,14 @@ jt.NetClient = function(room) {
         atariConsole.getConsoleControlsSocket().controlsClockPulse();
 
         // Send local controls to Server. We always send a message even when empty to keep the channel active
-        var update = { c: controlsToSend.length ? controlsToSend : undefined };
+        var update = { c: consoleControls.netGetControlsToSend() };
 
         // Use DataChannel if available
         if (dataChannelActive) dataChannel.send(JSON.stringify(update));
         // Or fallback to WebSocket relayed through the Session Server (BAD!)
         else ws.send(JSON.stringify({ javatariUpdate: update }));
 
-        controlsToSend.length = 0;
+        consoleControls.netClearControlsToSend();
     }
 
     function keepAlive() {
@@ -282,9 +262,7 @@ jt.NetClient = function(room) {
 
 
     var atariConsole = room.console;
-    var consoleControlsSocket = atariConsole.getConsoleControlsSocket();
-
-    var controlsToSend = new Array(100); controlsToSend.length = 0;     // pre allocate empty Array
+    var consoleControls = room.consoleControls;
 
     var ws;
     var sessionID;
@@ -303,15 +281,6 @@ jt.NetClient = function(room) {
     var dataChannelActive = false;
     var dataChannelFragmentData = "";
 
-
-    var cc = jt.ConsoleControls;
-    var disabledControls = new Set([
-        cc.SAVE_STATE_0, cc.SAVE_STATE_1, cc.SAVE_STATE_2, cc.SAVE_STATE_3, cc.SAVE_STATE_4, cc.SAVE_STATE_5, cc.SAVE_STATE_6,
-        cc.SAVE_STATE_7, cc.SAVE_STATE_8, cc.SAVE_STATE_9, cc.SAVE_STATE_10, cc.SAVE_STATE_11, cc.SAVE_STATE_12, cc.SAVE_STATE_FILE,
-        cc.LOAD_STATE_0, cc.LOAD_STATE_1, cc.LOAD_STATE_2, cc.LOAD_STATE_3, cc.LOAD_STATE_4, cc.LOAD_STATE_5, cc.LOAD_STATE_6,
-        cc.LOAD_STATE_7, cc.LOAD_STATE_8, cc.LOAD_STATE_9, cc.LOAD_STATE_10, cc.LOAD_STATE_11, cc.LOAD_STATE_12,
-        cc.POWER_FRY, cc.VSYNCH, cc.TRACE, cc.NO_COLLISIONS, cc.CARTRIDGE_FORMAT
-    ]);
 
     var pc = jt.PeripheralControls;
     var disabledPeripheralControls = new Set([
