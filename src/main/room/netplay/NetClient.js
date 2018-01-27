@@ -70,15 +70,6 @@ jt.NetClient = function(room) {
         // Client gets clocks from Server at onServerNetUpdate()
     };
 
-    this.processCheckPeripheralControl = function (control) {
-        // Reject controls not available to NetPlay Clients
-        if (disabledPeripheralControls.has(control)) {
-            room.showOSD("Function not available in NetPlay Client mode", true, true);
-            return false;
-        }
-        return true;
-    };
-
     function onSessionServerConnected() {
         // Setup keep-alive
         if (keepAliveTimer === undefined) keepAliveTimer = setInterval(keepAlive, 30000);
@@ -280,16 +271,6 @@ jt.NetClient = function(room) {
     var dataChannel;
     var dataChannelActive = false;
     var dataChannelFragmentData = "";
-
-
-    var pc = jt.PeripheralControls;
-    var disabledPeripheralControls = new Set([
-        pc.CONSOLE_POWER_FRY,
-        pc.CONSOLE_LOAD_STATE_FILE, pc.CONSOLE_SAVE_STATE_FILE, pc.CONSOLE_LOAD_STATE_MENU, pc.CONSOLE_SAVE_STATE_MENU,
-        pc.CARTRIDGE_LOAD_RECENT,
-        pc.CARTRIDGE_LOAD_FILE, pc.CARTRIDGE_LOAD_URL, pc.CARTRIDGE_REMOVE, pc.CARTRIDGE_LOAD_DATA_FILE, pc.CARTRIDGE_SAVE_DATA_FILE,
-        pc.AUTO_LOAD_FILE, pc.AUTO_LOAD_URL
-    ]);
 
 
     var DATA_CHANNEL_FRAG_SIZE = 16200;

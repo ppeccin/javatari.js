@@ -101,11 +101,6 @@ jt.NetServer = function(room) {
         consoleControls.netClearControlsToSend();
     };
 
-    this.processCheckPeripheralControl = function (control) {
-        // All controls allowed
-        return true;
-    };
-
     this.processExternalStateChange = function() {
         nextUpdateFull = true;
     };

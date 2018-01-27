@@ -23,15 +23,15 @@ jt.DOMPeripheralControls = function(room) {
 
     this.getControlReport = function(control) {
         switch (control) {
-            case controls.PADDLES_TOGGLE_MODE:
-            case controls.P1_CONTROLS_TOGGLE:
-            case controls.TURBO_FIRE_TOGGLE:
-            case controls.TOUCH_TOGGLE_DIR_BIG:
-            case controls.HAPTIC_FEEDBACK_TOGGLE_MODE:
+            case pc.PADDLES_TOGGLE_MODE:
+            case pc.P1_CONTROLS_TOGGLE:
+            case pc.TURBO_FIRE_TOGGLE:
+            case pc.TOUCH_TOGGLE_DIR_BIG:
+            case pc.HAPTIC_FEEDBACK_TOGGLE_MODE:
                 return consoleControls.getControlReport(control);
-            case controls.SCREEN_CRT_FILTER:
+            case pc.SCREEN_CRT_FILTER:
                 return screen.getControlReport(control);
-            case controls.SPEAKER_BUFFER_TOGGLE:
+            case pc.SPEAKER_BUFFER_TOGGLE:
                 return speaker.getControlReport(control);
         }
         return { label: "Unknown", active: false };
@@ -48,121 +48,122 @@ jt.DOMPeripheralControls = function(room) {
 
     this.controlActivated = function(control, altPower, secPort) {                // Never secPort
         // Check for NetPlay blocked controls
-        if (room.netController && !room.netController.processCheckPeripheralControl(control)) return;
+        if (room.netPlayMode === 2 && netClientDisabledControls.has(control))
+                return room.showOSD("Function not available in NetPlay Client mode", true, true);
 
         // All controls are Press-only and repeatable
         switch(control) {
-            case controls.CONSOLE_POWER_TOGGLE:
+            case pc.CONSOLE_POWER_TOGGLE:
                 consoleControls.processControlState(jt.ConsoleControls.POWER, true);
                 break;
-            case controls.CONSOLE_POWER_FRY:
+            case pc.CONSOLE_POWER_FRY:
                 consoleControls.processControlState(jt.ConsoleControls.POWER_FRY, true);
                 break;
-            case controls.CONSOLE_LOAD_STATE_FILE:
+            case pc.CONSOLE_LOAD_STATE_FILE:
                 fileLoader.openFileChooserDialog(OPEN_TYPE.STATE, false, false, false);
                 break;
-            case controls.CONSOLE_SAVE_STATE_FILE:
+            case pc.CONSOLE_SAVE_STATE_FILE:
                 consoleControls.processControlState(jt.ConsoleControls.SAVE_STATE_FILE, true);
                 break;
-            case controls.CONSOLE_LOAD_STATE_MENU:
+            case pc.CONSOLE_LOAD_STATE_MENU:
                 screen.openSaveStateDialog(false);
                 break;
-            case controls.CONSOLE_SAVE_STATE_MENU:
+            case pc.CONSOLE_SAVE_STATE_MENU:
                 screen.openSaveStateDialog(true);
                 break;
-            case controls.CARTRIDGE_LOAD_RECENT:
+            case pc.CARTRIDGE_LOAD_RECENT:
                 if (!mediaChangeDisabledWarning()) screen.openCartridgeChooserDialog(false, altPower, secPort);
                 break;
-            case controls.CARTRIDGE_LOAD_FILE:
+            case pc.CARTRIDGE_LOAD_FILE:
                 if (!mediaChangeDisabledWarning()) fileLoader.openFileChooserDialog(OPEN_TYPE.ROM, altPower, secPort, false);
                 break;
-            case controls.CARTRIDGE_LOAD_URL:
+            case pc.CARTRIDGE_LOAD_URL:
                 if (!mediaChangeDisabledWarning()) fileLoader.openURLChooserDialog(OPEN_TYPE.ROM, altPower, secPort);
                 break;
-            case controls.CARTRIDGE_REMOVE:
+            case pc.CARTRIDGE_REMOVE:
                 if (!mediaChangeDisabledWarning()) cartridgeSocket.insert(null, false);
                 break;
-            case controls.CARTRIDGE_LOAD_DATA_FILE:
+            case pc.CARTRIDGE_LOAD_DATA_FILE:
                 //if (cartridgeSocket.dataOperationNotSupportedMessage(secPort ? 1 : 0, false, false)) break;
                 //fileLoader.openFileChooserDialog(OPEN_TYPE.CART_DATA, altPower, secPort, false);
                 break;
-            case controls.CARTRIDGE_SAVE_DATA_FILE:
+            case pc.CARTRIDGE_SAVE_DATA_FILE:
                 //cartridgeSocket.saveCartridgeDataFile(secPort ? 1 : 0);
                 break;
-            case controls.AUTO_LOAD_FILE:
+            case pc.AUTO_LOAD_FILE:
                 if (!mediaChangeDisabledWarning()) fileLoader.openFileChooserDialog(OPEN_TYPE.AUTO, altPower, secPort, false);
                 break;
-            case controls.AUTO_LOAD_URL:
+            case pc.AUTO_LOAD_URL:
                 if (!mediaChangeDisabledWarning()) fileLoader.openURLChooserDialog(OPEN_TYPE.AUTO, altPower, secPort, false);
                 break;
-            case controls.SCREEN_CRT_MODE:
+            case pc.SCREEN_CRT_MODE:
                 monitor.crtModeToggle(); break;
-            case controls.SCREEN_CRT_FILTER:
+            case pc.SCREEN_CRT_FILTER:
                 monitor.crtFilterToggle(); break;
-            case controls.SCREEN_FULLSCREEN:
+            case pc.SCREEN_FULLSCREEN:
                 monitor.fullscreenToggle(); break;
-            case controls.SCREEN_DEFAULTS:
+            case pc.SCREEN_DEFAULTS:
                 consoleControls.processControlState(jt.ConsoleControls.DEFAULTS, true);
                 monitor.setDefaults();
                 break;
-            case controls.SCREEN_TOGGLE_MENU:
+            case pc.SCREEN_TOGGLE_MENU:
                 screen.toggleMenuByKey();
                 break;
-            case controls.SCREEN_OPEN_HELP:
+            case pc.SCREEN_OPEN_HELP:
                 screen.openHelp();
                 break;
-            case controls.SCREEN_OPEN_ABOUT:
+            case pc.SCREEN_OPEN_ABOUT:
                 screen.openAbout();
                 break;
-            case controls.SCREEN_OPEN_SETTINGS:
-                if (altPower) return this.controlActivated(controls.SCREEN_DEFAULTS);
+            case pc.SCREEN_OPEN_SETTINGS:
+                if (altPower) return this.controlActivated(pc.SCREEN_DEFAULTS);
                 screen.openSettings();
                 break;
-            case controls.SCREEN_OPEN_QUICK_OPTIONS:
+            case pc.SCREEN_OPEN_QUICK_OPTIONS:
                 screen.openQuickOptionsDialog();
                 break;
-            case controls.SCREEN_CONSOLE_PANEL_TOGGLE:
+            case pc.SCREEN_CONSOLE_PANEL_TOGGLE:
                 screen.toggleConsolePanel();
                 break;
-            case controls.SCREEN_OPEN_NETPLAY:
+            case pc.SCREEN_OPEN_NETPLAY:
                 screen.openNetPlayDialog();
                 break;
-            case controls.P1_CONTROLS_TOGGLE:
+            case pc.P1_CONTROLS_TOGGLE:
                 consoleControls.toggleP1ControlsMode(); break;
-            case controls.JOYSTICKS_TOGGLE_MODE:
+            case pc.JOYSTICKS_TOGGLE_MODE:
                 consoleControls.toggleGamepadMode(); break;
-            case controls.PADDLES_TOGGLE_MODE:
+            case pc.PADDLES_TOGGLE_MODE:
                 consoleControls.togglePaddleMode(); break;
-            case controls.TOUCH_TOGGLE_MODE:
+            case pc.TOUCH_TOGGLE_MODE:
                 consoleControls.toggleTouchControlsMode(); break;
-            case controls.TOUCH_TOGGLE_DIR_BIG:
+            case pc.TOUCH_TOGGLE_DIR_BIG:
                 consoleControls.toggleTouchDirBig(); break;
-            case controls.TURBO_FIRE_TOGGLE:
+            case pc.TURBO_FIRE_TOGGLE:
                 consoleControls.toggleTurboFireSpeed(); break;
-            case controls.HAPTIC_FEEDBACK_TOGGLE_MODE:
+            case pc.HAPTIC_FEEDBACK_TOGGLE_MODE:
                 consoleControls.toggleHapticFeedback(); break;
-            case controls.CAPTURE_SCREEN:
+            case pc.CAPTURE_SCREEN:
                 screen.saveScreenCapture(); break;
-            case controls.SPEAKER_BUFFER_TOGGLE:
+            case pc.SPEAKER_BUFFER_TOGGLE:
                 speaker.toggleBufferBaseSize(); break;
-            case controls.VIEWPORT_ORIGIN_MINUS:
+            case pc.VIEWPORT_ORIGIN_MINUS:
                 monitor.viewportOriginDecrease(); break;
-            case controls.VIEWPORT_ORIGIN_PLUS:
+            case pc.VIEWPORT_ORIGIN_PLUS:
                 monitor.viewportOriginIncrease(); break;
         }
         if (SCREEN_FIXED_SIZE) return;
         switch(control) {
-            case controls.SCREEN_ASPECT_MINUS:
+            case pc.SCREEN_ASPECT_MINUS:
                 monitor.displayAspectDecrease(); break;
-            case controls.SCREEN_ASPECT_PLUS:
+            case pc.SCREEN_ASPECT_PLUS:
                 monitor.displayAspectIncrease(); break;
-            case controls.SCREEN_SCALE_MINUS:
+            case pc.SCREEN_SCALE_MINUS:
                 monitor.displayScaleDecrease(); break;
-            case controls.SCREEN_SCALE_PLUS:
+            case pc.SCREEN_SCALE_PLUS:
                 monitor.displayScaleIncrease(); break;
-            case controls.VIEWPORT_SIZE_MINUS:
+            case pc.VIEWPORT_SIZE_MINUS:
                 monitor.viewportSizeDecrease(); break;
-            case controls.VIEWPORT_SIZE_PLUS:
+            case pc.VIEWPORT_SIZE_PLUS:
                 monitor.viewportSizeIncrease(); break;
         }
     };
@@ -183,50 +184,50 @@ jt.DOMPeripheralControls = function(room) {
     var initKeys = function() {
         var k = jt.DOMKeys;
 
-        keyCodeMap[KEY_LOAD_RECENT]         = controls.CARTRIDGE_LOAD_RECENT;
-        keyCodeMap[KEY_LOAD_RECENT | k.ALT] = controls.CARTRIDGE_LOAD_RECENT;
-        keyCodeMap[KEY_LOAD_URL]            = controls.AUTO_LOAD_URL;
-        keyCodeMap[KEY_LOAD_URL | k.ALT]    = controls.AUTO_LOAD_URL;
-        keyCodeMap[KEY_CART_REMOVE]         = controls.CARTRIDGE_REMOVE;
-        keyCodeMap[KEY_CART_REMOVE | k.ALT] = controls.CARTRIDGE_REMOVE;
-        keyCodeMap[KEY_STATE_FILE]          = controls.CONSOLE_SAVE_STATE_FILE;
-        keyCodeMap[KEY_STATE_FILE | k.ALT]  = controls.CONSOLE_SAVE_STATE_FILE;
+        keyCodeMap[KEY_LOAD_RECENT]         = pc.CARTRIDGE_LOAD_RECENT;
+        keyCodeMap[KEY_LOAD_RECENT | k.ALT] = pc.CARTRIDGE_LOAD_RECENT;
+        keyCodeMap[KEY_LOAD_URL]            = pc.AUTO_LOAD_URL;
+        keyCodeMap[KEY_LOAD_URL | k.ALT]    = pc.AUTO_LOAD_URL;
+        keyCodeMap[KEY_CART_REMOVE]         = pc.CARTRIDGE_REMOVE;
+        keyCodeMap[KEY_CART_REMOVE | k.ALT] = pc.CARTRIDGE_REMOVE;
+        keyCodeMap[KEY_STATE_FILE]          = pc.CONSOLE_SAVE_STATE_FILE;
+        keyCodeMap[KEY_STATE_FILE | k.ALT]  = pc.CONSOLE_SAVE_STATE_FILE;
 
-        keyCodeMap[KEY_P1_CONTROLS_TOGGLE | k.ALT]    = controls.P1_CONTROLS_TOGGLE;
-        keyCodeMap[KEY_PADDLES_TOGGLE | k.ALT]        = controls.PADDLES_TOGGLE_MODE;
-        keyCodeMap[KEY_JOYSTICKS_TOGGLE | k.ALT]      = controls.JOYSTICKS_TOGGLE_MODE;
-        keyCodeMap[KEY_TOUCH_TOGGLE | k.ALT]          = controls.TOUCH_TOGGLE_MODE;
-        keyCodeMap[KEY_TURBO_FIRE_TOGGLE | k.ALT]     = controls.TURBO_FIRE_TOGGLE;
+        keyCodeMap[KEY_P1_CONTROLS_TOGGLE | k.ALT]    = pc.P1_CONTROLS_TOGGLE;
+        keyCodeMap[KEY_PADDLES_TOGGLE | k.ALT]        = pc.PADDLES_TOGGLE_MODE;
+        keyCodeMap[KEY_JOYSTICKS_TOGGLE | k.ALT]      = pc.JOYSTICKS_TOGGLE_MODE;
+        keyCodeMap[KEY_TOUCH_TOGGLE | k.ALT]          = pc.TOUCH_TOGGLE_MODE;
+        keyCodeMap[KEY_TURBO_FIRE_TOGGLE | k.ALT]     = pc.TURBO_FIRE_TOGGLE;
 
-        keyCodeMap[KEY_CRT_FILTER | k.ALT]      = controls.SCREEN_CRT_FILTER;
-        keyCodeMap[KEY_CRT_MODE | k.ALT] 	    = controls.SCREEN_CRT_MODE;
-        keyCodeMap[KEY_SETTINGS | k.ALT]    	= controls.SCREEN_OPEN_SETTINGS;
-        keyCodeMap[KEY_QUICK_OPTIONS | k.ALT] 	= controls.SCREEN_OPEN_QUICK_OPTIONS;
-        keyCodeMap[KEY_CONSOLE_PANEL | k.ALT] 	= controls.SCREEN_CONSOLE_PANEL_TOGGLE;
+        keyCodeMap[KEY_CRT_FILTER | k.ALT]      = pc.SCREEN_CRT_FILTER;
+        keyCodeMap[KEY_CRT_MODE | k.ALT] 	    = pc.SCREEN_CRT_MODE;
+        keyCodeMap[KEY_SETTINGS | k.ALT]    	= pc.SCREEN_OPEN_SETTINGS;
+        keyCodeMap[KEY_QUICK_OPTIONS | k.ALT] 	= pc.SCREEN_OPEN_QUICK_OPTIONS;
+        keyCodeMap[KEY_CONSOLE_PANEL | k.ALT] 	= pc.SCREEN_CONSOLE_PANEL_TOGGLE;
 
-        keyCodeMap[KEY_FULLSCREEN | k.ALT]  = controls.SCREEN_FULLSCREEN;
+        keyCodeMap[KEY_FULLSCREEN | k.ALT]  = pc.SCREEN_FULLSCREEN;
 
-        keyCodeMap[KEY_UP | k.CONTROL | k.ALT]     = controls.SCREEN_SCALE_MINUS;
-        keyCodeMap[KEY_DOWN | k.CONTROL | k.ALT]   = controls.SCREEN_SCALE_PLUS;
-        keyCodeMap[KEY_LEFT | k.CONTROL | k.ALT]   = controls.SCREEN_ASPECT_MINUS;
-        keyCodeMap[KEY_RIGHT | k.CONTROL | k.ALT]  = controls.SCREEN_ASPECT_PLUS;
+        keyCodeMap[KEY_UP | k.CONTROL | k.ALT]     = pc.SCREEN_SCALE_MINUS;
+        keyCodeMap[KEY_DOWN | k.CONTROL | k.ALT]   = pc.SCREEN_SCALE_PLUS;
+        keyCodeMap[KEY_LEFT | k.CONTROL | k.ALT]   = pc.SCREEN_ASPECT_MINUS;
+        keyCodeMap[KEY_RIGHT | k.CONTROL | k.ALT]  = pc.SCREEN_ASPECT_PLUS;
 
-        keyCodeMap[KEY_UP | k.SHIFT | k.CONTROL]     = controls.VIEWPORT_ORIGIN_MINUS;
-        keyCodeMap[KEY_DOWN | k.SHIFT | k.CONTROL]   = controls.VIEWPORT_ORIGIN_PLUS;
-        keyCodeMap[KEY_LEFT | k.SHIFT | k.CONTROL]   = controls.VIEWPORT_SIZE_MINUS;
-        keyCodeMap[KEY_RIGHT | k.SHIFT | k.CONTROL]  = controls.VIEWPORT_SIZE_PLUS;
+        keyCodeMap[KEY_UP | k.SHIFT | k.CONTROL]     = pc.VIEWPORT_ORIGIN_MINUS;
+        keyCodeMap[KEY_DOWN | k.SHIFT | k.CONTROL]   = pc.VIEWPORT_ORIGIN_PLUS;
+        keyCodeMap[KEY_LEFT | k.SHIFT | k.CONTROL]   = pc.VIEWPORT_SIZE_MINUS;
+        keyCodeMap[KEY_RIGHT | k.SHIFT | k.CONTROL]  = pc.VIEWPORT_SIZE_PLUS;
 
-        keyCodeMap[KEY_MENU]         	  = controls.SCREEN_TOGGLE_MENU;
-        keyCodeMap[KEY_DEFAULTS]          = controls.SCREEN_DEFAULTS;
-        keyCodeMap[KEY_DEFAULTS | k.ALT]  = controls.SCREEN_DEFAULTS;
+        keyCodeMap[KEY_MENU]         	  = pc.SCREEN_TOGGLE_MENU;
+        keyCodeMap[KEY_DEFAULTS]          = pc.SCREEN_DEFAULTS;
+        keyCodeMap[KEY_DEFAULTS | k.ALT]  = pc.SCREEN_DEFAULTS;
 
-        keyCodeMap[KEY_CAPTURE_SCREEN | k.ALT] = controls.CAPTURE_SCREEN;
+        keyCodeMap[KEY_CAPTURE_SCREEN | k.ALT] = pc.CAPTURE_SCREEN;
 
-        keyCodeMap[KEY_SPEAKER_BUFFER | k.ALT] = controls.SPEAKER_BUFFER_TOGGLE;
+        keyCodeMap[KEY_SPEAKER_BUFFER | k.ALT] = pc.SPEAKER_BUFFER_TOGGLE;
     };
 
 
-    var controls = jt.PeripheralControls;
+    var pc = jt.PeripheralControls;
 
     var screen;
     var monitor;
@@ -276,6 +277,15 @@ jt.DOMPeripheralControls = function(room) {
     var KEY_STATE_FILE     = jt.DOMKeys.VK_F8.c;
 
     var SCREEN_FIXED_SIZE = Javatari.SCREEN_RESIZE_DISABLED;
+
+
+    var netClientDisabledControls = new Set([
+        pc.CONSOLE_POWER_FRY,
+        pc.CONSOLE_LOAD_STATE_FILE, pc.CONSOLE_SAVE_STATE_FILE, pc.CONSOLE_LOAD_STATE_MENU, pc.CONSOLE_SAVE_STATE_MENU,
+        pc.CARTRIDGE_LOAD_RECENT,
+        pc.CARTRIDGE_LOAD_FILE, pc.CARTRIDGE_LOAD_URL, pc.CARTRIDGE_REMOVE, pc.CARTRIDGE_LOAD_DATA_FILE, pc.CARTRIDGE_SAVE_DATA_FILE,
+        pc.AUTO_LOAD_FILE, pc.AUTO_LOAD_URL
+    ]);
 
 
     init();
