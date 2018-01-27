@@ -251,8 +251,8 @@ jt.FileLoader = function(room, recentStoredROMs, peripheralControls) {
         e.stopPropagation();
         e.target.focus();
 
-        if (peripheralControls.mediaChangeDisabledWarning()) return;
         if (!e.dataTransfer) return;
+        if (peripheralControls.mediaChangeDisabledWarning()) return;
 
         var wasPaused = console.systemPause(true);
 
