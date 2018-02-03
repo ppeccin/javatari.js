@@ -622,7 +622,6 @@ jt.DOMConsoleControls = function(room, keyForwardControls) {
     var KEY_STATE_12         = jt.DOMKeys.VK_EQUALS.c;
     var KEY_STATE_12a        = jt.DOMKeys.VK_FF_EQUALS.c;
 
-
     var netServerLocalOnlyControls = new Set([
         cc.SAVE_STATE_0, cc.SAVE_STATE_1, cc.SAVE_STATE_2, cc.SAVE_STATE_3, cc.SAVE_STATE_4, cc.SAVE_STATE_5, cc.SAVE_STATE_6,
         cc.SAVE_STATE_7, cc.SAVE_STATE_8, cc.SAVE_STATE_9, cc.SAVE_STATE_10, cc.SAVE_STATE_11, cc.SAVE_STATE_12, cc.SAVE_STATE_FILE,

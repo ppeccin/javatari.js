@@ -193,7 +193,7 @@ jt.NetClient = function(room) {
 
         // Full Update?
         if (netUpdate.s) {
-            atariConsole.loadStateExtended(netUpdate.s);
+            atariConsole.loadState(netUpdate.s);    // extended
             if (justJoined) {
                 // Change Controls Mode automatically to adapt to Server
                 room.consoleControls.setP1ControlsAndPaddleMode(!netUpdate.cm.p1, netUpdate.cm.pd);

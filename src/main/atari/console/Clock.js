@@ -101,7 +101,7 @@ jt.Clock = function(clockPulse) {
 
 };
 
-jt.Clock.HOST_NATIVE_FPS = Javatari.SCREEN_FORCE_HOST_NATIVE_FPS;         // -1 = Unknown or not detected
+jt.Clock.HOST_NATIVE_FPS = Javatari.SCREEN_VSYNCH_MODE === -1 ? -1 : Javatari.SCREEN_FORCE_HOST_NATIVE_FPS;         // -1 = Unknown or not detected
 
 jt.Clock.detectHostNativeFPSAndCallback = function(callback) {
 

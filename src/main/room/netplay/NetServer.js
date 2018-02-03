@@ -73,7 +73,7 @@ jt.NetServer = function(room) {
             if (client.justJoined || nextUpdateFull) {
                 client.justJoined = false;
                 if (!dataFull) {
-                    netUpdateFull.s = atariConsole.saveStateExtended();
+                    netUpdateFull.s = atariConsole.saveState(true);     // extended
                     netUpdateFull.cm = { p1: room.consoleControls.isP1ControlsMode(), pd: room.consoleControls.isPaddleMode() };
                     dataFull = JSON.stringify(netUpdateFull);
                 }

@@ -34,6 +34,10 @@ jt.QuickOptionsDialog = function(mainElement, consoleControls, consoleControlsSo
         if (visible) refresh();
     };
 
+    this.controlStateChanged = function(control, state) {
+        if (visible && (control === cc.NO_COLLISIONS || control === cc.VSYNCH)) refresh();
+    };
+
     function refresh() {
         for (var i = 0; i < items.length; ++i) {
             var item = items[i];
@@ -50,7 +54,6 @@ jt.QuickOptionsDialog = function(mainElement, consoleControls, consoleControlsSo
         dialog.id = "jt-quick-options";
         dialog.tabIndex = -1;
 
-        var cc = jt.ConsoleControls;
         var pc = jt.PeripheralControls;
 
         items = [
@@ -95,9 +98,11 @@ jt.QuickOptionsDialog = function(mainElement, consoleControls, consoleControlsSo
             if (e.target.jtControlItem) {
                 jt.DOMConsoleControls.hapticFeedbackOnTouch(e);
                 var item = e.target.jtControlItem;
-                if (item.peripheral) peripheralControls.controlActivated(item.control, false, false);
-                else consoleControls.processControlState(item.control, true);
-                refresh();
+                if (item.peripheral) {
+                    peripheralControls.controlActivated(item.control, false, false);
+                    refresh();
+                } else
+                    consoleControls.processControlState(item.control, true);    // will get update and refresh
             } else
                 dialog.focus();
         });
@@ -114,6 +119,8 @@ jt.QuickOptionsDialog = function(mainElement, consoleControls, consoleControlsSo
     var visible = false;
     var dialog, list;
     var items, controlsItems = [];
+
+    var cc = jt.ConsoleControls;
 
     var k = jt.DOMKeys;
     var EXIT_KEYS = [ k.VK_ESCAPE.c, k.VK_ENTER.c, k.VK_SPACE.c ];

@@ -284,8 +284,8 @@ jt.CanvasDisplay = function(mainElement) {
     };
 
     this.crtFilterSetDefault = function() {
-        var value = Javatari.userPreferences.current.crtFilter;
-        setCRTFilter(value === null ? Javatari.SCREEN_FILTER_MODE : value);
+        var user = Javatari.userPreferences.current.crtFilter;
+        setCRTFilter(Javatari.SCREEN_FILTER_MODE !== -3 ? Javatari.SCREEN_FILTER_MODE : user !== null && user > -3 ? user : -1);
     };
 
     this.crtModeToggle = function() {
@@ -356,6 +356,7 @@ jt.CanvasDisplay = function(mainElement) {
 
     this.controlStateChanged = function(control, state) {
         consolePanel.controlStateChanged(control, state);
+        if (quickOtionsDialog) quickOtionsDialog.controlStateChanged(control, state);
     };
 
     this.controlsStatesRedefined = function() {

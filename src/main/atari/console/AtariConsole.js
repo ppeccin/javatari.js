@@ -149,8 +149,11 @@ jt.AtariConsole = function(mainVideoClock) {
 
     this.vSynchSetSupported = function(boo) {
         // To be called once and only by Room during Native Video Freq detection
-        vSynchMode = boo
-            ? Javatari.userPreferences.current.vSynch === null ? Javatari.SCREEN_VSYNCH_MODE : Javatari.userPreferences.current.vSynch
+        var user = Javatari.userPreferences.current.vSynch;
+        vSynchMode = Javatari.SCREEN_VSYNCH_MODE !== -1 && boo
+            ? Javatari.SCREEN_VSYNCH_MODE >= 0
+                ? Javatari.SCREEN_VSYNCH_MODE
+                : user !== null && user >= 0 ? user : 1
             : -1;
     };
 
@@ -259,9 +262,9 @@ jt.AtariConsole = function(mainVideoClock) {
     var cycleCartridgeFormat = function() {
     };
 
-    var saveState = function() {
-        return {
-            t: tia.saveState(),
+    var saveState = function(extended) {
+        var s = {
+            t: tia.saveState(extended),
             p: pia.saveState(),
             r: ram.saveState(),
             b: bus.saveState(),
@@ -270,49 +273,48 @@ jt.AtariConsole = function(mainVideoClock) {
             vsa: videoStandardIsAuto,
             vs: videoStandard.name
         };
+        if (extended) {
+            s.pw = self.powerIsOn;
+            s.up = userPaused;
+            s.upf = userPauseMoreFrames;
+        }
+        return s;
     };
+    this.saveState = saveState;
 
-    this.saveStateExtended = function() {
-        var state = saveState();
-        state.pw = this.powerIsOn;
-        state.up = userPaused;
-        state.upf = userPauseMoreFrames;
-        return state;
-    };
+    var loadState = function(s) {
+        // Extended
+        if (s.pw !== undefined) if (self.powerIsOn !== s.pw) s.pw ? self.powerOn() : self.powerOff();
+        if (s.up !== undefined) self.userPause(s.up);
+        if (s.upf !== undefined) userPauseMoreFrames = s.upf;
 
-    var loadState = function(state) {
+        // Normal
         mainVideoClockUpdateSpeed();
-        tia.loadState(state.t);
-        pia.loadState(state.p);
-        ram.loadState(state.r);
-        if (state.b) bus.loadState(state.b);
-        cpu.loadState(state.c);
-        setCartridge(state.ca && jt.CartridgeCreator.recreateCartridgeFromSaveState(state.ca, getCartridge()));
-        if (state.vsa !== undefined) setVideoStandardAuto(state.vsa);
-        setVideoStandard(jt.VideoStandard[state.vs]);
+        tia.loadState(s.t);
+        pia.loadState(s.p);
+        ram.loadState(s.r);
+        if (s.b) bus.loadState(s.b);
+        cpu.loadState(s.c);
+        setCartridge(s.ca && jt.CartridgeCreator.recreateCartridgeFromSaveState(s.ca, getCartridge()));
+        if (s.vsa !== undefined) setVideoStandardAuto(s.vsa);
+        setVideoStandard(jt.VideoStandard[s.vs]);
         consoleControlsSocket.controlsStatesRedefined();
         saveStateSocket.externalStateChange();
     };
-
-    this.loadStateExtended = function(state) {
-        if (this.powerIsOn !== state.pw) state.pw ? this.powerOn() : this.powerOff();
-        this.userPause(state.up);
-        userPauseMoreFrames = state.upf;
-        loadState(state);
-    };
+    this.loadState = loadState;
 
     function setDefaults() {
         setVideoStandardAuto(true);
         speedControl = 1;
         alternateSpeed = null;
         mainVideoClockUpdateSpeed();
-        tia.debug(0);                       // TODO Check for NetPlay
+        tia.debug(0);
         tia.debugNoCollisions(false);
     }
 
     function mainVideoClockUpdateSpeed() {
         var freq = videoPulldown.frequency;
-        mainVideoClock.setVSynch(vSynchMode > 0);
+        mainVideoClock.setVSynch(vSynchMode === 1);
         mainVideoClock.setFrequency((freq * (alternateSpeed || speedControl)) | 0);
         audioSocket.setFps(freq);
     }

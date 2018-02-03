@@ -1339,8 +1339,8 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
 
     // Savestate  ------------------------------------------------
 
-    this.saveState = function() {
-        return {
+    this.saveState = function(extended) {
+        var s = {
             ccp: changeClockPrevLine,
             lpx: jt.Util.storeInt32BitArrayToStringBase64(linePixels),
 
@@ -1455,6 +1455,8 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
             AUDV0: AUDV0,
             AUDV1: AUDV1
         };
+        if (extended) s.dl = debugLevel;
+        return s;
     };
 
     this.loadState = function(s) {
@@ -1578,7 +1580,8 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
         AUDV0 = s.AUDV0 | 0; audioSignal.getChannel0().setVolume(AUDV0 & 0x0f);
         AUDV1 = s.AUDV1 | 0; audioSignal.getChannel1().setVolume(AUDV1 & 0x0f);
 
-        if (debug) debugSetColors();						// IF debug is on, ensure debug colors are used
+        if (s.dl !== undefined) this.debug(s.dl);
+        else if (debug) debugSetColors();
     };
 
 
