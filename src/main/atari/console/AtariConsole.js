@@ -154,12 +154,6 @@ jt.AtariConsole = function(mainVideoClock) {
             : -1;
     };
 
-    this.vSynchSetForcedOFF = function(state) {
-        if (vSynchForcedOFF === state) return;
-        vSynchForcedOFF = !!state;
-        updateVideoSynchronization();
-    };
-
     function vSynchToggleMode() {
         if (vSynchMode === -1) {
             self.showOSD("V-Synch is DISABLED / UNSUPPORTED", true, true);
@@ -243,7 +237,7 @@ jt.AtariConsole = function(mainVideoClock) {
 
     function updateVideoSynchronization() {
         // According to the native video frequency detected, target Video Standard and vSynchMode, use a specific pulldown configuration
-        if (!vSynchForcedOFF && vSynchMode === 1) {    // ON
+        if (vSynchMode === 1) {    // ON
             // Will V-synch to host freq if detected and supported, or use optimal timer configuration)
             videoPulldown = videoStandard.pulldowns[jt.Clock.HOST_NATIVE_FPS] || videoStandard.pulldowns.TIMER;
         } else {                  // OFF, DISABLED
@@ -369,7 +363,7 @@ jt.AtariConsole = function(mainVideoClock) {
     var videoStandardAutoDetectionInProgress = false;
     var videoStandardAutoDetectionTries = 0;
 
-    var vSynchMode = -1, vSynchForcedOFF = false;
+    var vSynchMode = -1;
 
     var VIDEO_STANDARD_AUTO_DETECTION_FRAMES = 90;
 
