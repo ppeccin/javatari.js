@@ -73,8 +73,10 @@ jt.NetServer = function(room) {
             if (client.justJoined || nextUpdateFull) {
                 client.justJoined = false;
                 if (!dataFull) {
-                    netUpdateFull.s = atariConsole.saveState(true);     // extended
-                    netUpdateFull.cm = { p1: room.consoleControls.isP1ControlsMode(), pd: room.consoleControls.isPaddleMode() };
+                    var netUpdateFull = {
+                        s: atariConsole.saveState(true),     // extended
+                        cm: { p1: room.consoleControls.isP1ControlsMode(), pd: room.consoleControls.isPaddleMode() }
+                    };
                     dataFull = JSON.stringify(netUpdateFull);
                 }
                 data = dataFull;
@@ -302,7 +304,6 @@ jt.NetServer = function(room) {
     var consoleControls = room.consoleControls;
 
     var netUpdate = { v: 0, c: undefined };
-    var netUpdateFull = { cm: {}, s: {}, v: 0, c: undefined };
     var nextUpdateFull = false;
 
     var ws;
