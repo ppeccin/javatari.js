@@ -13,40 +13,49 @@ jt.VideoStandard = {
             60: { // Host at 60Hz
                 standard: "NTSC",
                 frequency: 60,
-                linesPerCycle: 262,             // Normal 1:1 cadence. Exact V-synch to 60 Hz
-                firstStepCycleLinesAdjust: 0,
+                divider: 1,
                 cadence: [ 1 ],
                 steps: 1
             },
-            120: { // Host at 120Hz
+            120: { // Host at 120Hz, clock / 2
                 standard: "NTSC",
                 frequency: 120,
-                linesPerCycle: 131,             // 0:1 pulldown. 1 frame generated each 2 frames shown
-                firstStepCycleLinesAdjust: 0,
+                divider: 2,
+                cadence: [ 1 ],
+                steps: 1
+            },
+            "120s": { // Host at 120Hz
+                standard: "NTSC",
+                frequency: 120,
+                divider: 1,
                 cadence: [ 0, 1 ],
                 steps: 2
             },
             50: { // Host at 50Hz
                 standard: "NTSC",
                 frequency: 50,
-                linesPerCycle: 314,             // 1:1:1:1:2 pulldown. 6 frames generated each 5 frames shown
-                firstStepCycleLinesAdjust: +2,
+                divider: 1,
                 cadence: [ 1, 1, 1, 1, 2 ],
                 steps: 5
             },
-            100: { // Host at 100Hz
+            100: { // Host at 100Hz, clock / 2
                 standard: "NTSC",
                 frequency: 100,
-                linesPerCycle: 157,             // 0:1:0:1:1:0:1:0:1:1 pulldown. 6 frames generated each 10 frames shown
-                firstStepCycleLinesAdjust: +2,
+                divider: 2,
+                cadence: [ 1, 1, 1, 1, 2 ],
+                steps: 5
+            },
+            "100s": { // Host at 100Hz
+                standard: "NTSC",
+                frequency: 100,
+                divider: 1,
                 cadence: [ 0, 1, 0, 1, 1, 0, 1, 0, 1, 1 ],
                 steps: 10
             },
             TIMER: { // Host frequency not detected or V-synch disabled, use a normal interval timer
                 standard: "NTSC",
                 frequency: 62.5,
-                linesPerCycle: 262,             // Normal 1:1 cadence
-                firstStepCycleLinesAdjust: 0,
+                divider: 1,
                 cadence: [ 1 ],
                 steps: 1
             }
@@ -64,40 +73,49 @@ jt.VideoStandard = {
             50: { // Host at 50Hz
                 standard: "PAL",
                 frequency: 50,
-                linesPerCycle: 313,             // Normal 1:1 cadence. Exact V-synch to 50 Hz
-                firstStepCycleLinesAdjust: 0,
+                divider: 1,
                 cadence: [ 1 ],
                 steps: 1
             },
-            100: { // Host at 100Hz
+            100: { // Host at 100Hz, clock / 2
                 standard: "PAL",
                 frequency: 100,
-                linesPerCycle: 156,             // 0:1 pulldown. 1 frame generated each 2 frames shown
-                firstStepCycleLinesAdjust: +1,
+                divider: 2,
+                cadence: [ 1 ],
+                steps: 1
+            },
+            "100s": { // Host at 100Hz
+                standard: "PAL",
+                frequency: 100,
+                divider: 1,
                 cadence: [ 0, 1 ],
                 steps: 2
             },
             60: { // Host at 60Hz
                 standard: "PAL",
                 frequency: 60,
-                linesPerCycle: 261,             // 0:1:1:1:1:1 pulldown. 5 frames generated each 6 frames shown
-                firstStepCycleLinesAdjust: -1,
+                divider: 1,
                 cadence: [ 0, 1, 1, 1, 1, 1 ],
                 steps: 6
             },
-            120: { // Host at 120Hz
+            120: { // Host at 120Hz, clock / 2
                 standard: "PAL",
                 frequency: 120,
-                linesPerCycle: 130,             // 0:0:1:0:1:0:0:1:0:1:0:1 pulldown. 5 frames generated each 12 frames shown
-                firstStepCycleLinesAdjust: +5,
+                divider: 2,
+                cadence: [ 0, 1, 1, 1, 1, 1 ],
+                steps: 6
+            },
+            "120s": { // Host at 120Hz
+                standard: "PAL",
+                frequency: 120,
+                divider: 1,
                 cadence: [ 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1 ],
                 steps: 12
             },
             TIMER: { // Host frequency not detected or V-synch disabled, use a normal interval timer
                 standard: "PAL",
                 frequency: 50,
-                linesPerCycle: 313,             // Normal 1:1 cadence
-                firstStepCycleLinesAdjust: 0,
+                divider: 1,
                 cadence: [ 1 ],
                 steps: 1
             }

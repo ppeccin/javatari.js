@@ -8,8 +8,11 @@ jt.AtariConsole = function(mainVideoClock) {
     function init() {
         mainComponentsCreate();
         socketsCreate();
-        setDefaults();
     }
+
+    this.socketsConnected = function() {
+        setDefaults();
+    };
 
     this.powerOn = function() {
         if (this.powerIsOn) this.powerOff();
@@ -66,28 +69,6 @@ jt.AtariConsole = function(mainVideoClock) {
         return systemPaused;
     };
 
-    this.videoClockPulseOLD = function(ignoreSystemPause) {
-        if (systemPaused && !ignoreSystemPause) return;
-
-        if (!self.powerIsOn) return;
-
-        if (videoPulldown.steps === 1) {
-            // Simple pulldown with 1:1 cadence
-            videoFrame();
-        } else {
-            // Complex pulldown
-            var pulls = videoPulldown.cadence[--videoPulldownStep];
-            if (videoPulldownStep === 0) videoPulldownStep = videoPulldown.steps;
-            while(pulls > 0) {
-                pulls--;
-                videoFrame();
-            }
-        }
-
-        // Finish audio signal (generate any missing samples to adjust to sample rate)
-        if (!systemPaused && !userPaused) audioSocket.audioFinishFrame();
-    };
-
     this.videoClockPulse = function() {
         // Video clock will be the Tia Frame video clock (60Hz/50Hz)
         // CPU and other clocks (Pia, Audio) will be sent by the Tia
@@ -137,6 +118,10 @@ jt.AtariConsole = function(mainVideoClock) {
 
     this.getSavestateSocket = function() {
         return saveStateSocket;
+    };
+
+    this.getVideoClockSocket = function() {
+        return videoClockSocket;
     };
 
     this.getAudioSocket = function() {
@@ -242,14 +227,14 @@ jt.AtariConsole = function(mainVideoClock) {
         // According to the native video frequency detected, target Video Standard and vSynchMode, use a specific pulldown configuration
         if (vSynchMode === 1) {    // ON
             // Will V-synch to host freq if detected and supported, or use optimal timer configuration)
-            videoPulldown = videoStandard.pulldowns[jt.Clock.HOST_NATIVE_FPS] || videoStandard.pulldowns.TIMER;
+            videoPulldown = videoStandard.pulldowns[videoClockSocket.getVSynchNativeFrequency()] || videoStandard.pulldowns.TIMER;
         } else {                  // OFF, DISABLED
             // No V-synch. Always use the optimal timer configuration)
             videoPulldown = videoStandard.pulldowns.TIMER;
         }
 
         videoPulldownStep = 0;
-        mainVideoClockUpdateSpeed();
+        videoClockUpdateSpeed();
 
         //console.error("Update Synchronization: " + videoPulldown.frequency);
     }
@@ -289,7 +274,7 @@ jt.AtariConsole = function(mainVideoClock) {
         if (s.upf !== undefined) userPauseMoreFrames = s.upf;
 
         // Normal
-        mainVideoClockUpdateSpeed();
+        videoClockUpdateSpeed();
         tia.loadState(s.t);
         pia.loadState(s.p);
         ram.loadState(s.r);
@@ -307,16 +292,16 @@ jt.AtariConsole = function(mainVideoClock) {
         setVideoStandardAuto(true);
         speedControl = 1;
         alternateSpeed = null;
-        mainVideoClockUpdateSpeed();
+        videoClockUpdateSpeed();
         tia.debug(0);
         tia.debugNoCollisions(false);
     }
 
-    function mainVideoClockUpdateSpeed() {
-        var freq = videoPulldown.frequency;
-        mainVideoClock.setVSynch(vSynchMode === 1);
-        mainVideoClock.setFrequency((freq * (alternateSpeed || speedControl)) | 0);
-        audioSocket.setFps(freq);
+    function videoClockUpdateSpeed() {
+        videoClockSocket.setVSynch(vSynchMode === 1);
+        var hostFreq = (videoPulldown.frequency * (alternateSpeed || speedControl)) | 0;
+        videoClockSocket.setFrequency(hostFreq, videoPulldown.divider);
+        audioSocket.setFps(hostFreq / videoPulldown.divider);
     }
 
     var mainComponentsCreate = function() {
@@ -329,6 +314,7 @@ jt.AtariConsole = function(mainVideoClock) {
     };
 
     var socketsCreate = function() {
+        videoClockSocket = new VideoClockSocket();
         consoleControlsSocket = new ConsoleControlsSocket();
         cartridgeSocket = new CartridgeSocket();
         saveStateSocket = new SaveStateSocket();
@@ -356,6 +342,7 @@ jt.AtariConsole = function(mainVideoClock) {
     var videoStandard;
     var videoPulldown, videoPulldownStep;
 
+    var videoClockSocket;
     var consoleControlsSocket;
     var cartridgeSocket;
     var saveStateSocket;
@@ -382,11 +369,11 @@ jt.AtariConsole = function(mainVideoClock) {
         if (control === controls.FAST_SPEED) {
             if (state && alternateSpeed !== SPEED_FAST) {
                 alternateSpeed = SPEED_FAST;
-                mainVideoClockUpdateSpeed();
+                videoClockUpdateSpeed();
                 self.showOSD("FAST FORWARD", true);
             } else if (!state && alternateSpeed === SPEED_FAST) {
                 alternateSpeed = null;
-                mainVideoClockUpdateSpeed();
+                videoClockUpdateSpeed();
                 self.showOSD(null, true);
             }
             return;
@@ -394,11 +381,11 @@ jt.AtariConsole = function(mainVideoClock) {
         if (control === controls.SLOW_SPEED) {
             if (state && alternateSpeed !== SPEED_SLOW) {
                 alternateSpeed = SPEED_SLOW;
-                mainVideoClockUpdateSpeed();
+                videoClockUpdateSpeed();
                 self.showOSD("SLOW MOTION", true);
             } else if (!state && alternateSpeed === SPEED_SLOW) {
                 alternateSpeed = null;
-                mainVideoClockUpdateSpeed();
+                videoClockUpdateSpeed();
                 self.showOSD(null, true);
             }
             return;
@@ -435,7 +422,7 @@ jt.AtariConsole = function(mainVideoClock) {
                 else if (control === controls.NORMAL_SPEED) speedIndex = SPEEDS.indexOf(1);
                 speedControl = SPEEDS[speedIndex];
                 self.showOSD("Speed: " + ((speedControl * 100) | 0) + "%", true);
-                mainVideoClockUpdateSpeed();
+                videoClockUpdateSpeed();
                 break;
             case controls.SAVE_STATE_0: case controls.SAVE_STATE_1: case controls.SAVE_STATE_2: case controls.SAVE_STATE_3: case controls.SAVE_STATE_4: case controls.SAVE_STATE_5:
             case controls.SAVE_STATE_6: case controls.SAVE_STATE_7: case controls.SAVE_STATE_8: case controls.SAVE_STATE_9: case controls.SAVE_STATE_10: case controls.SAVE_STATE_11: case controls.SAVE_STATE_12:
@@ -477,6 +464,25 @@ jt.AtariConsole = function(mainVideoClock) {
         //  Only Power Control is visible from outside
         report[controls.POWER] = self.powerIsOn;
     };
+
+
+    // Video Clock Socket  -----------------------------------------
+
+    function VideoClockSocket() {
+        this.connectClock = function(clock) {
+            videoClock = clock;
+        };
+        this.getVSynchNativeFrequency = function() {
+            return videoClock.getVSynchNativeFrequency();
+        };
+        this.setVSynch = function(state) {
+            videoClock.setVSynch(state);
+        };
+        this.setFrequency = function(freq, div) {
+            videoClock.setFrequency(freq, div);
+        };
+        var videoClock;
+    }
 
 
     // CartridgeSocket  -----------------------------------------
@@ -711,20 +717,6 @@ jt.AtariConsole = function(mainVideoClock) {
 
 
     // Debug methods  ------------------------------------------------------
-
-    this.runFramesAtTopSpeed = function(frames) {
-        mainVideoClock.pause();
-        var start = jt.Util.performanceNow();
-        for (var i = 0; i < frames; i++) {
-            //var pulseTime = jt.Util.performanceNow();
-            self.videoClockPulseApplyPulldowns(1);
-            //console.log(jt.Util.performanceNow() - pulseTime);
-        }
-        var duration = jt.Util.performanceNow() - start;
-        jt.Util.log("Done running " + frames + " frames in " + (duration | 0) + " ms");
-        jt.Util.log((frames / (duration/1000)).toFixed(2) + "  frames/sec");
-        mainVideoClock.go();
-    };
 
     this.eval = function(str) {
         return eval(str);

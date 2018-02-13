@@ -45,7 +45,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     };
 
     this.start = function(startAction) {
-        jt.Clock.detectHostNativeFPSAndCallback(function(nativeFPS) {
+        this.mainVideoClock.detectHostNativeFPSAndCallback(function(nativeFPS) {
             self.console.vSynchSetSupported(nativeFPS > 0);
             afterPowerONDelay(function () {
                 self.setLoading(false);
@@ -154,14 +154,15 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     }
 
     function buildAndPlugConsole() {
-        self.console = new jt.AtariConsole(self.mainVideoClock);
+        self.console = new jt.AtariConsole();
+        self.mainVideoClock.connect(self.console.getVideoClockSocket());
         self.stateMedia.connect(self.console.getSavestateSocket());
         self.fileLoader.connect(self.console);
         self.screen.connect(self.console);
         self.speaker.connect(self.console.getAudioSocket());
         self.consoleControls.connect(self.console.getConsoleControlsSocket());
         self.peripheralControls.connect(self.console.getCartridgeSocket());
-        // Cartridge Data operations unavailable self.console.getCartridgeSocket().connectFileDownloader(self.fileDownloader);
+        self.console.socketsConnected();
     }
 
 
@@ -186,6 +187,23 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
     this.isLoading = false;
 
     var roomPowerOnTime;
+
+
+    // Debug methods  ------------------------------------------------------
+
+    this.runFramesAtTopSpeed = function(frames) {
+        this.mainVideoClock.pause();
+        var start = jt.Util.performanceNow();
+        for (var i = 0; i < frames; i++) {
+            //var pulseTime = jt.Util.performanceNow();
+            self.mainVideoClockPulse();
+            //console.log(jt.Util.performanceNow() - pulseTime);
+        }
+        var duration = jt.Util.performanceNow() - start;
+        jt.Util.log("Done running " + frames + " frames in " + (duration | 0) + " ms");
+        jt.Util.log((frames / (duration/1000)).toFixed(2) + "  frames/sec");
+        this.mainVideoClock.go();
+    };
 
 
     init();
