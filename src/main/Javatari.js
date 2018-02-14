@@ -27,7 +27,7 @@ Javatari = {
     SCREEN_ELEMENT_ID:              "javatari-screen",
     CONSOLE_PANEL_ELEMENT_ID:       -1,                         // -1: auto. Don't change! :-)
     SCREEN_FULLSCREEN_MODE:         -1,                         // -2: disabled; -1: auto; 0: off; 1: on
-    SCREEN_CRT_MODE:                -1,                         // -1: auto; 0: off; 1: on
+    SCREEN_CRT_MODE:                0,                          // -1: auto; 0: off; 1: on
     SCREEN_FILTER_MODE:             -3,                         // -3: user set (default auto); -2: browser default; -1: auto; 0..3: smoothing level
     SCREEN_DEFAULT_SCALE:           -1,                         // -1: auto; 0.5..N in 0.1 steps: scale
     SCREEN_DEFAULT_ASPECT:          1,                          // in 0.1 steps

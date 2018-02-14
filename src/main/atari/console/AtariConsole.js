@@ -569,7 +569,6 @@ jt.AtariConsole = function(mainVideoClock) {
                 case jt.ConsoleControls.VSYNCH:
                     return { label: vSynchMode === -1 ? "DISABL" : vSynchMode ? "ON" : "OFF", active: vSynchMode === 1 };
                 case jt.ConsoleControls.NO_COLLISIONS:
-                    // TODO NetPlay QuickOptionsDialog not reacting to change when applied by peer
                     return { label: tia.getDebugNoCollisions() ? "ON" : "OFF", active: tia.getDebugNoCollisions() };
                 default:
                     return { label: "Unknown", active: false };

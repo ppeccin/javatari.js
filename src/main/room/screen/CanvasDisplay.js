@@ -504,7 +504,7 @@ jt.CanvasDisplay = function(mainElement) {
     }
 
     function crtModeAutoValue() {
-        return isMobileDevice ? 0 : 0;      // 0 : 1;
+        return isMobileDevice ? 0 : 1;
     }
 
     function updateLogo() {
