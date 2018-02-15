@@ -720,7 +720,6 @@ html.jt-full-screen #jt-console-panel {
     display: block;
 }
 
-
 #jt-netplay {
     display: none;
     position: absolute;
@@ -753,6 +752,7 @@ html.jt-full-screen #jt-console-panel {
     display: block;
 }
 #jt-netplay-status-box {
+    position: relative;
     margin-top: 17px;
 }
 #jt-netplay-status {
@@ -764,11 +764,46 @@ html.jt-full-screen #jt-console-panel {
     background: black;
     vertical-align: top;
     text-shadow: none;
-     -webkit-user-select: text;
+    -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
     user-select: text;
+    box-sizing: border-box;
     cursor: auto;
+}
+#jt-netplay-status-box.jt-active #jt-netplay-status {
+    padding: 0 16px 0 12px;
+}
+#jt-netplay-status-box.jt-active #jt-netplay-status::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 18px;
+    top: 4px;
+    left: 7px;
+    background: rgb(248, 33, 28);
+}
+#jt-netplay-link {
+    display: none;
+    position: absolute;
+    right: 25px;
+    top: 0;
+    width: 26px;
+    height: 27px;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 27px;
+    text-decoration: none;
+    background: black;
+    text-align: center;
+}
+#jt-netplay-link:hover {
+    background: hsl(358, 67%, 46%);
+    cursor: pointer;
+}
+#jt-netplay-status-box.jt-active #jt-netplay-link {
+    display: block;
 }
 .jt-netplay-button {
     display: inline-block;
@@ -795,7 +830,7 @@ html.jt-full-screen #jt-console-panel {
 #jt-netplay-session-label::before {
     content: "Session Name";
 }
-#jt-netplay input {
+#jt-netplay-session-box input {
     width: 150px;
     height: 26px;
     padding: 0 10px;
@@ -832,16 +867,24 @@ html.jt-full-screen #jt-console-panel {
 #jt-netplay-session-box.jt-disabled div {
     color: rgb(130, 130, 130);
 }
-#jt-netplay-status.jt-active::after {
-    content: "";
+input#jt-netplay-link-text {
     position: absolute;
-    width: 6px;
-    height: 18px;
-    top: 4px;
-    left: 7px;
-    background: rgb(248, 33, 28);
+    top: 8px;
+    left: 50px;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    color: transparent;
+    background: transparent;
+    opacity: 0;
+    z-index: -10;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
-
 
 #jt-touch-left, #jt-touch-right, #jt-touch-speed {
     display: none;

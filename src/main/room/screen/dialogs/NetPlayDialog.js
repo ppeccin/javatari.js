@@ -1,6 +1,6 @@
 // Copyright 2015 by Paulo Augusto Peccin. See license.txt distributed with this file.
 
-jt.NetPlayDialog = function(mainElement) {
+jt.NetPlayDialog = function(room, mainElement) {
     "use strict";
 
     var self = this;
@@ -27,16 +27,16 @@ jt.NetPlayDialog = function(mainElement) {
         if (!visible) return;
         dialog.classList.remove("jt-show");
         visible = false;
-        Javatari.room.screen.focus();
+        room.screen.focus();
     };
 
     this.roomNetPlayStatusChangeUpdate = function(oldMode) {
         if (visible) refresh();
 
-        // Close automatically when entering Server/Client mode
-        if (room.netPlayMode > 0 && oldMode < 0 && visible) return setTimeout(function() {
+        // Close automatically when entering Client mode
+        if (room.netPlayMode === 2 && oldMode < 0 && visible) return setTimeout(function() {
             self.hide();
-        }, 1500);
+        }, 2000);
 
         // Open automatically when leaving Server/Client mode
         if (room.netPlayMode === 0 && oldMode > 0 && !visible) self.show();
@@ -52,7 +52,7 @@ jt.NetPlayDialog = function(mainElement) {
                 join.disabled = false;
                 sessionName.disabled = false;
                 nick.disabled = false;
-                status.classList.remove("jt-active");
+                statusBox.classList.remove("jt-active");
                 sessionBox.classList.remove("jt-disabled");
                 sessionName.setAttribute("placeholder", "Enter a name");
                 break;
@@ -65,9 +65,10 @@ jt.NetPlayDialog = function(mainElement) {
                 join.disabled = true;
                 sessionName.disabled = true;
                 nick.disabled = true;
-                status.classList.add("jt-active");
+                statusBox.classList.add("jt-active");
                 sessionBox.classList.add("jt-disabled");
                 sessionName.setAttribute("placeholder", "Automatic");
+                link.href = getSessionLink();
                 break;
             case 2:
                 var netClient = room.getNetClient();
@@ -78,17 +79,18 @@ jt.NetPlayDialog = function(mainElement) {
                 join.disabled = false;
                 sessionName.disabled = true;
                 nick.disabled = true;
-                status.classList.add("jt-active");
+                statusBox.classList.add("jt-active");
                 sessionBox.classList.remove("jt-disabled");
                 sessionBox.classList.add("jt-disabled");
                 sessionName.setAttribute("placeholder", "Enter a name");
+                link.href = getSessionLink();
                 break;
             case -1:
             case -2:
                 status.textContent = "Establishing connection...";
                 sessionName.disabled = true;
                 nick.disabled = true;
-                status.classList.remove("jt-active");
+                statusBox.classList.remove("jt-active");
                 sessionBox.classList.add("jt-disabled");
                 if (room.netPlayMode === -1) {
                     start.textContent = "CANCEL";
@@ -110,6 +112,10 @@ jt.NetPlayDialog = function(mainElement) {
     function refreshPreferencesData() {
         sessionName.value = prefs.netPlaySessionName;
         nick.value = prefs.netPlayNick;
+    }
+
+    function getSessionLink() {
+        return jt.Util.browserCurrentURL() + "?JOIN=" + room.netController.getSessionID();
     }
 
     function performCommand(e) {
@@ -156,10 +162,20 @@ jt.NetPlayDialog = function(mainElement) {
         statusBox.id = "jt-netplay-status-box";
         dialog.appendChild(statusBox);
 
+        linkText = document.createElement("input");
+        linkText.id = "jt-netplay-link-text";
+        statusBox.appendChild(linkText);
+
         status = document.createElement("div");
         status.id = "jt-netplay-status";
-        status.textContent = "HOSTING Session: Teste";
+        status.textContent = "STANDALONE";
         statusBox.appendChild(status);
+
+        link = document.createElement("a");
+        link.id = "jt-netplay-link";
+        link.textContent = "\uD83D\uDD17";
+        link.setAttribute("title", "Copy Join Session link to clipboard");
+        statusBox.appendChild(link);
 
         sessionBox = document.createElement("div");
         sessionBox.id = "jt-netplay-session-box";
@@ -249,18 +265,33 @@ jt.NetPlayDialog = function(mainElement) {
             e.stopPropagation();
         });
 
+        // Block drag
+        dialog.ondragstart = jt.Util.blockEvent;
+
         // Allow context in status
-        status.addEventListener("contextmenu", function(e) {
+        statusBox.addEventListener("contextmenu", function(e) {
             e.stopPropagation();
+        });
+
+        // Click on link
+        jt.Util.addEventsListener(link, "click", function(e) {
+            jt.Util.blockEvent(e);
+
+            if (!document.queryCommandSupported || !document.queryCommandSupported('copy'))
+                return room.showOSD("Copy to Clipboard not supported by the browser!", true, true);
+
+            linkText.value = getSessionLink();
+            linkText.focus();
+            linkText.select();
+            document.execCommand("copy");
+            dialog.focus();
         });
     }
 
 
-    var room = Javatari.room;
-
     var visible = false;
     var dialog, statusBox, sessionBox;
-    var start, join, stop, status, sessionName, nick;
+    var start, join, stop, status, link, linkText, sessionName, nick;
 
     var prefs = Javatari.userPreferences.current;
 

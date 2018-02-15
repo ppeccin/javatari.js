@@ -30,8 +30,11 @@ Javatari.start = function (consolePowerOn) {
     // Prepare ROM Database
     jt.CartridgeDatabase.uncompress();
 
+    // NetPlay! auto-join Session?
+    var joinSession = Javatari.NETPLAY_JOIN;
+
     // Auto-load BIOS, Expansions, State, Cartridges, Disks and Tape files if specified and downloadable
-    if (Javatari.STATE_URL) {
+    if (!joinSession && Javatari.STATE_URL) {
         // State loading, Console will Auto Power on
         new jt.MultiDownloader(
             [{ url: Javatari.STATE_URL }],
@@ -43,11 +46,14 @@ Javatari.start = function (consolePowerOn) {
         ).start();
     } else {
         // Normal media loading. Power Console on only after all files are loaded and inserted
-        var mediaURLs = jt.Configurator.mediaURLSpecs();
+        var mediaURLs = joinSession ? [] : jt.Configurator.mediaURLSpecs();       // Skip media loading if joining Session
         new jt.MultiDownloader(
             mediaURLs,
             function onAllSuccess() {
-                Javatari.room.start();
+                Javatari.room.start(joinSession
+                    ? function() { Javatari.room.getNetClient().joinSession(joinSession, Javatari.NETPLAY_NICK); }
+                    : undefined
+                );
             }
         ).start();
     }

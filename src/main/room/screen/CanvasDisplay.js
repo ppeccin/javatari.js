@@ -3,7 +3,7 @@
 // TODO Remove "Center" rounding problems as possible. Main screen element centering still remaining
 // TODO Possible to use hotkeys and bypass logo messages
 
-jt.CanvasDisplay = function(mainElement) {
+jt.CanvasDisplay = function(room, mainElement) {
 "use strict";
 
     var self = this;
@@ -138,7 +138,7 @@ jt.CanvasDisplay = function(mainElement) {
 
     this.openNetPlayDialog = function() {
         closeAllOverlays();
-        if (!netPlayDialog) netPlayDialog = new jt.NetPlayDialog(fsElementCenter);
+        if (!netPlayDialog) netPlayDialog = new jt.NetPlayDialog(room, fsElementCenter);
         netPlayDialog.show();
     };
 

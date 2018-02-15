@@ -16,6 +16,10 @@ Javatari = {
     // Forcing ROM formats
     CARTRIDGE_FORMAT:               "",                         // 4K, F8, F4, FE, AR, etc...
 
+    // NetPlay
+    NETPLAY_JOIN:                   "",                         // Join NetPlay! Session automatically
+    NETPLAY_NICK:                   "",                         // NetPlay! Nickname
+
     // General configuration
     AUTO_START:                     true,
     AUTO_POWER_ON_DELAY:            1200,                       // -1: no auto Power-ON; >= 0: wait specified milliseconds before Power-ON

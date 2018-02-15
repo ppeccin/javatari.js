@@ -130,6 +130,8 @@ jt.Configurator = {
         AUTODETECT: "AUTODETECT_URL",
         STATE: "STATE_URL",
         SAVESTATE: "STATE_URL",
+        JOIN: "NETPLAY_JOIN",
+        NICK: "NETPLAY_NICK",
         VERSION: "VERSION_CHANGE_ATTEMPTED"      // Does not allow version to be changed ;-)
     }
 
