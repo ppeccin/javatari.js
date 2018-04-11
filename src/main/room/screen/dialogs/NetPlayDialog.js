@@ -296,6 +296,6 @@ jt.NetPlayDialog = function(room, mainElement) {
     var prefs = Javatari.userPreferences.current;
 
     var k = jt.DOMKeys;
-    var EXIT_KEYS = [ k.VK_ESCAPE.c, k.VK_ENTER.c, k.VK_SPACE.c ];
+    var EXIT_KEYS = [ k.VK_ESCAPE.c ];
 
 };
