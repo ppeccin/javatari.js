@@ -45,7 +45,9 @@ Javatari = {
     AUDIO_SIGNAL_ADD_FRAMES:        3,                          // Additional frames in internal Audio Signal buffer based on Monitor buffer
     PADDLES_MODE:                   -1,                         // -1: auto; 0: off; 1: on
     TOUCH_MODE:                     -1,                         // -1: auto; 0: disabled; 1: enabled; 2: enabled (swapped)
+
     IMAGES_PATH:                    window.JAVATARI_IMAGES_PATH || "images/",
+    PAGE_BACK_CSS:                  "",                         // CSS to modify page background color. Applied to the body element
 
     WEB_EXTENSIONS_SERVER:          "webmsx.herokuapp.com",     // Server address for NetPlay
 

@@ -25,6 +25,9 @@ jt.Configurator = {
         // Ensure the correct types of the parameters
         normalizeParameterTypes();
 
+        // Apply user asked page CSS
+        if (Javatari.PAGE_BACK_CSS) document.body.style.background = Javatari.PAGE_BACK_CSS;
+
         function parseURLParams() {
             var search = (window.location.search || "").split('+').join(' ');
             var reg = /[?&]?([^=]+)=([^&]*)/g;
