@@ -39,6 +39,10 @@ jt.NetPlayDialog = function(room, mainElement) {
         if (room.netPlayMode === 0 && oldMode > 0 && !visible) self.show();
     };
 
+    this.isVisible = function() {
+        return visible;
+    };
+
     function refresh() {
         switch (room.netPlayMode) {
             case 0:

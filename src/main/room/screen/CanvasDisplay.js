@@ -351,7 +351,9 @@ jt.CanvasDisplay = function(room, mainElement) {
     };
 
     this.roomNetPlayStatusChangeUpdate = function(oldMode) {
+        if (!netPlayDialog || !netPlayDialog.isVisible()) closeAllOverlays();
         if (netPlayDialog) netPlayDialog.roomNetPlayStatusChangeUpdate(oldMode);
+        netplayButton.classList.toggle("jt-hidden", room.netPlayMode < 1);
     };
 
     this.controlStateChanged = function(control, state) {
@@ -660,6 +662,9 @@ jt.CanvasDisplay = function(room, mainElement) {
         powerButton = addBarButton("jt-bar-power", -5, -26, "System Power", null, false, menu, "System");
         barMenuSystem = menu;
         self.consolePowerAndUserPauseStateUpdate(false, false);     // init states
+
+        netplayButton  = addBarButton("jt-bar-netplay", -192, -1, "NetPlay!", jt.PeripheralControls.SCREEN_OPEN_NETPLAY);
+        netplayButton.classList.add("jt-hidden");
 
         if (!isMobileDevice) {
             menu = [
@@ -1393,6 +1398,7 @@ jt.CanvasDisplay = function(room, mainElement) {
     var scrollMessage, scrollMessageActive = false;
 
     var powerButton;
+    var netplayButton;
     var logoButton;
     var scaleDownButton;
     var scaleUpButton;

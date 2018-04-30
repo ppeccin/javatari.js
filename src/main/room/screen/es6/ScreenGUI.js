@@ -267,10 +267,13 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
 */
 
 #jt-bar-power {
-    margin: 0 8px 0 6px;
+    margin: 0 3px 0 6px;
+}
+#jt-bar-netplay.jt-hidden {
+    display: none; 
 }
 #jt-bar-select {
-    margin: 0 2px;
+    margin: 0 2px 0 9px;
     width: 50px;
 }
 #jt-bar-reset {
