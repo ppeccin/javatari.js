@@ -442,14 +442,15 @@ jt.Util = new function() {
         this.addEventsListener(element, this.isTouchDevice() ? "touchstart mouseup" : "mouseup", onTapOrMouseUp);
     };
 
+    // Will fire event 2 times (at touch start and end) for needsUIG targets
     this.onTapOrMouseDownWithBlockUIG = function(element, handler) {
         function onTapOrMouseDownUIG(e) {
-            // If not User Initiated Gesture needed on the event TARGET handle only on touchstart,
-            // otherwise handle only touchend or mousedown if no touch events fired
-            if (e.type === "touchstart" && e.target.jtNeedsUIG) return;
-            if (e.type === "touchend" && !e.target.jtNeedsUIG) return;
+            if (e.type === "touchend" && !e.target.jtNeedsUIG) return blockEvent(e);
+            // If User Initiated Gesture needed on TARGET, signal if starting or ending touch
+            var uigStart = e.type === "touchstart" && e.target.jtNeedsUIG;
+            var uigEnd = e.type === "touchend";
             // Fire original event and block
-            handler(e);
+            handler(e, uigStart, uigEnd);
             return blockEvent(e);
         }
         this.addEventsListener(element, this.isTouchDevice() ? "touchstart touchend mousedown" : "mousedown", onTapOrMouseDownUIG);
@@ -479,6 +480,19 @@ jt.Util = new function() {
         style.type = 'text/css';
         style.innerHTML = css;
         document.head.appendChild(style);
+    };
+
+    this.scaleToFitParentWidth = function(element, parent, horizMargin) {
+        var availWidth = parent.clientWidth - (horizMargin * 2 | 0);      //  margins
+        var width = element.clientWidth;
+        var scale = width < availWidth ? 1 : availWidth / width;
+        var finaWidth = (width * scale) | 0;
+        var left = Math.floor((availWidth - finaWidth) / 2 + horizMargin);
+        element.style.left = "" + left + "px";
+        element.style.right = "initial";
+        element.style.transform = "scale(" + scale.toFixed(4) + ")";
+
+        // console.log("SCALE availWidth: " + availWidth + ", width: " + width + ", final: " + width * scale + ", left: " + left);
     };
 
     this.log2 = function(x) {

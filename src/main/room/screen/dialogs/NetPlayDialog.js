@@ -17,10 +17,7 @@ jt.NetPlayDialog = function(room, mainElement) {
         dialog.classList.add("jt-show");
         dialog.focus();
 
-        var availWidth = mainElement.clientWidth - 20;      //  - tolerance
-        var width = dialog.clientWidth;
-        var scale = width < availWidth ? 1 : availWidth / width;
-        dialog.style.transform = "translate(" + (scale < 1 ? "-" + ((width - availWidth - 20) / 2 | 0) + "px" : "0") + ", -" + ((jt.ScreenGUI.BAR_HEIGHT / 2) | 0) + "px) scale(" + scale.toFixed(4) + ")";
+        jt.Util.scaleToFitParentWidth(dialog, mainElement, 12);
     };
 
     this.hide = function() {

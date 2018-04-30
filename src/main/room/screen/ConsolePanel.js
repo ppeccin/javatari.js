@@ -165,8 +165,9 @@ jt.ConsolePanel = function(screen, panelElement) {
         jt.Util.onTapOrMouseDownWithBlockUIG(but, cartridgeButtonPressed);
     };
 
-    function cartridgeButtonPressed(e) {
-        consoleControls.hapticFeedbackOnTouch(e);
+    function cartridgeButtonPressed(e, uigStart, uigEnd) {
+        if (!uigEnd) consoleControls.hapticFeedbackOnTouch(e);
+        if (uigStart) return;
         screen.closeAllOverlays();
         peripheralControls.controlActivated(e.target.jtControl);
     }

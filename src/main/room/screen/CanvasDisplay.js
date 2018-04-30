@@ -621,14 +621,11 @@ jt.CanvasDisplay = function(room, mainElement) {
         mainElement.addEventListener("drop", closeAllOverlays, true);
 
         logoMessageOK.jtNeedsUIG = logoMessageOKText.jtNeedsUIG = true;     // User Initiated Gesture required
-        jt.Util.onTapOrMouseDownWithBlockUIG(logoMessageOK, function(e) {
-            consoleControls.hapticFeedbackOnTouch(e);
-            self.closeLogoMessage();
-        });
+        jt.Util.onTapOrMouseDownWithBlockUIG(logoMessageOK, self.closeLogoMessage);
 
         // Used to show bar and close overlays and modals if not processed by any other function
         jt.Util.addEventsListener(fsElementCenter, "touchstart touchend mousedown", function backScreenTouched(e) {
-            if (e.type !== "touchend") {                            // Execute actions only tor touchstart or mousedown
+            if (e.type !== "touchend") {                            // Execute actions only for touchstart or mousedown
                 closeAllOverlays();
                 showCursorAndBar();
             } else
@@ -730,10 +727,9 @@ jt.CanvasDisplay = function(room, mainElement) {
         return but;
     }
 
-    function barButtonTapOrMousedown(elem, e) {
-        if (logoMessageActive) return;
-
-        consoleControls.hapticFeedbackOnTouch(e);
+    function barButtonTapOrMousedown(elem, e, uigStart, uigEnd) {
+        if (!uigEnd) consoleControls.hapticFeedbackOnTouch(e);
+        if (logoMessageActive || uigStart) return;
 
         var prevActiveMenu = barMenuActive;
         closeAllOverlays();
@@ -831,7 +827,8 @@ jt.CanvasDisplay = function(room, mainElement) {
         if (barMenuItemActive && !(e.button > 1)) barMenuItemFireActive(e.shiftKey, e.button === 1 || e.ctrlKey);
     }
 
-    function barMenuItemTapOrMouseDown(elem, e) {
+    function barMenuItemTapOrMouseDown(elem, e, uigEnd) {
+        if (uigEnd) return;
         barMenuItemSetActive(elem, e.type === "touchstart");
     }
 
@@ -874,11 +871,11 @@ jt.CanvasDisplay = function(room, mainElement) {
             barMenuItemActive = null;
     }
 
-    function barElementTapOrMouseDown(e) {
+    function barElementTapOrMouseDown(e, uigStart, uigEnd) {
         cursorHideFrameCountdown = CURSOR_HIDE_FRAMES;
         var elem = e.target;
-        if (elem.jtBarElementType === 1) barButtonTapOrMousedown(elem, e);
-        else if (elem.jtBarElementType === 2) barMenuItemTapOrMouseDown(elem, e);
+        if (elem.jtBarElementType === 1) barButtonTapOrMousedown(elem, e, uigStart, uigEnd);
+        else if (elem.jtBarElementType === 2) barMenuItemTapOrMouseDown(elem, e, uigEnd);
         else hideBarMenu();
     }
 
@@ -962,6 +959,7 @@ jt.CanvasDisplay = function(room, mainElement) {
             if (!fullscreenAPIEnterMethod) tryToFixSafariBugOnFullScreenChange();
         }
 
+        closeAllOverlays();
         self.requestReadjust();
     }
 
@@ -1092,7 +1090,6 @@ jt.CanvasDisplay = function(room, mainElement) {
 
     function hideBarMenu() {
         if (!barMenuActive) return;
-
         barMenuActive = null;
         barMenu.style.display = "none";
         barMenuItemSetActive(null);
@@ -1183,7 +1180,9 @@ jt.CanvasDisplay = function(room, mainElement) {
         updateLogo();
     }
 
-    this.closeLogoMessage = function() {
+    this.closeLogoMessage = function(e, uigStart, uigEnd) {
+        if (!uigEnd) consoleControls.hapticFeedbackOnTouch(e);
+        if (uigStart) return;
         consolePanel.setLogoMessageActive(false);
         fsElement.classList.remove("jt-logo-message-active");
         logoMessageActive = false;

@@ -99,12 +99,12 @@ jt.SaveStateDialog = function(mainElement, consoleControls, peripheralControls, 
         });
 
         // Select with tap or mousedown (UIG)
-        jt.Util.onTapOrMouseDownWithBlockUIG(dialog, function(e) {
+        jt.Util.onTapOrMouseDownWithBlockUIG(dialog, function(e, uigStart) {
             if (e.target.jtSlot >= 0) {
-                jt.DOMConsoleControls.hapticFeedbackOnTouch(e);
+                if (uigStart) jt.DOMConsoleControls.hapticFeedbackOnTouch(e);
                 slotSelected = e.target.jtSlot;
                 refreshListSelection();
-                setTimeout(hideConfirm, 120);
+                if (!uigStart) setTimeout(hideConfirm, 120);  // UIG
             }
         });
 

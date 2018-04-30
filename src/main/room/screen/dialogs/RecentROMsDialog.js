@@ -105,12 +105,12 @@ jt.RecentROMsDialog = function(mainElement, screen, recentROMs, fileLoader) {
         });
 
         // Select with tap or mousedown (UIG)
-        jt.Util.onTapOrMouseDownWithBlockUIG(dialog, function(e) {
+        jt.Util.onTapOrMouseDownWithBlockUIG(dialog, function(e, uigStart) {
             if (e.target.jtItem >= 0) {
-                jt.DOMConsoleControls.hapticFeedbackOnTouch(e);
+                if (uigStart) jt.DOMConsoleControls.hapticFeedbackOnTouch(e);
                 itemSelected = e.target.jtItem;
                 refreshListSelection();
-                setTimeout(hideConfirm, 120);
+                if (!uigStart) setTimeout(hideConfirm, 120);
             }
         });
 
