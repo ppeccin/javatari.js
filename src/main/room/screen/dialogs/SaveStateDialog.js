@@ -19,12 +19,7 @@ jt.SaveStateDialog = function(mainElement, consoleControls, peripheralControls, 
         dialog.classList.add("jt-show");
         dialog.focus();
 
-        var availHeight = mainElement.clientHeight - jt.ScreenGUI.BAR_HEIGHT - 20;      //  bar - tolerance
-        var height = dialog.clientHeight;
-        var scale = height < availHeight ? 1 : availHeight / height;
-        dialog.style.transform = "translateY(-" + ((jt.ScreenGUI.BAR_HEIGHT / 2) | 0) + "px) scale(" + scale.toFixed(4) + ")";
-
-        //console.error("SAVESTATE availHeight: " + availHeight + ", height: " + height + ", final: " + height * scale);
+        jt.Util.scaleToFitParentHeight(dialog, mainElement, jt.ScreenGUI.BAR_HEIGHT);
     };
 
     this.hide = function (confirm) {

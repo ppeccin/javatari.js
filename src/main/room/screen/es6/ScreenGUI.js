@@ -258,6 +258,12 @@ html.jt-bar-auto-hide #jt-bar.jt-hidden {
     background-size: 264px 82px;
     cursor: pointer;
 }
+/* Firefox-specific rules */
+@-moz-document url-prefix() {
+    .jt-bar-button {
+        image-rendering: optimizequality;
+    }
+}
 /*
 .jt-bar-button {
     border: 1px solid yellow;

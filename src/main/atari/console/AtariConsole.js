@@ -14,14 +14,14 @@ jt.AtariConsole = function(mainVideoClock) {
         setDefaults();
     };
 
-    this.powerOn = function() {
+    this.powerOn = function(fromState) {
         if (this.powerIsOn) this.powerOff();
         bus.powerOn();
         this.powerIsOn = true;
         consoleControlsSocket.controlsStatesRedefined();
         updateVideoSynchronization();
         videoStandardAutoDetectionStart();
-        consoleControlsSocket.firePowerAndUserPauseStateUpdate();
+        if (!fromState) consoleControlsSocket.firePowerAndUserPauseStateUpdate();   // loadState will fire it
     };
 
     this.powerOff = function() {
@@ -283,6 +283,7 @@ jt.AtariConsole = function(mainVideoClock) {
         setCartridge(s.ca && jt.CartridgeCreator.recreateCartridgeFromSaveState(s.ca, getCartridge()));
         if (s.vsa !== undefined) setVideoStandardAuto(s.vsa);
         setVideoStandard(jt.VideoStandard[s.vs]);
+        consoleControlsSocket.firePowerAndUserPauseStateUpdate();
         consoleControlsSocket.controlsStatesRedefined();
         saveStateSocket.externalStateChange();
     };
@@ -619,7 +620,7 @@ jt.AtariConsole = function(mainVideoClock) {
                 self.showOSD("State " + slot + " load failed, wrong version", true);
                 return;
             }
-            if (!self.powerIsOn) self.powerOn();
+            if (!self.powerIsOn) self.powerOn(true);    // true = from state loading
             loadState(state);
             self.showOSD("State " + slot + " loaded", true);
         };

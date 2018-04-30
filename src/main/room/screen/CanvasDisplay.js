@@ -334,14 +334,16 @@ jt.CanvasDisplay = function(room, mainElement) {
         if (isLoading) power = false;
         powerButton.style.backgroundPosition = "" + powerButton.jtBX + "px " + (mediaButtonBackYOffsets[power ? 2 : 1]) + "px";
         powerButton.jtMenu[0].label = "Power " + (power ? "OFF" : "ON");
-        powerButton.jtMenu[1].disabled = powerButton.jtMenu[9].disabled = !power;
 
-        // TODO Unfinished Feature
-        // powerButton.jtMenu[6].disabled = true;
+        var netDisable = room.netPlayMode === 2;
+        powerButton.jtMenu[1].disabled = powerButton.jtMenu[12].disabled = netDisable || !power;
+        powerButton.jtMenu[6].disabled = netDisable || !(cartridgeSocket && cartridgeSocket.inserted());
+        powerButton.jtMenu[5].disabled = powerButton.jtMenu[8].disabled = powerButton.jtMenu[9].disabled = powerButton.jtMenu[11].disabled = netDisable;
     };
 
     this.cartridgeInserted = function(cart) {
         consolePanel.cartridgeInserted(cart);
+        powerButton.jtMenu[6].disabled = !cart || room.netPlayMode === 2;
     };
 
     this.controlsModeStateUpdate = function () {
@@ -1096,7 +1098,7 @@ jt.CanvasDisplay = function(room, mainElement) {
             item.jtMenuOption = null;
         }
 
-        var height = fsElementCenter.clientHeight - jt.ScreenGUI.BAR_HEIGHT - 8;      // bar + borders + tolerance
+        var height = fsElementCenter.clientHeight - jt.ScreenGUI.BAR_HEIGHT - 12;      // bar + borders + tolerance
         var scale = h < height ? 1 : height / h;
         if (barMenu) barMenu.style.transform = "scale(" + scale.toFixed(4) + ")";
 
@@ -1429,7 +1431,7 @@ jt.CanvasDisplay = function(room, mainElement) {
     var FULLSCREEN_MODE = Javatari.SCREEN_FULLSCREEN_MODE;
 
     var BAR_AUTO_HIDE = Javatari.SCREEN_CONTROL_BAR === 0;
-    var BAR_MENU_MAX_ITEMS = 12;
+    var BAR_MENU_MAX_ITEMS = 13;
 
     var NARROW_WIDTH = 336;
 
