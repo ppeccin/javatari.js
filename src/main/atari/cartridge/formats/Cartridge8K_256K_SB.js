@@ -9,6 +9,7 @@ jt.Cartridge8K_256K_SB = function(rom, format) {
         self.rom = rom;
         self.format = format;
         bytes = rom.content;        // uses the content of the ROM directly
+        self.bytes = bytes;
         maxBank = bytes.length / BANK_SIZE - 1;
     }
 
@@ -41,6 +42,7 @@ jt.Cartridge8K_256K_SB = function(rom, format) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
         bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
+        this.bytes = bytes;
         bankAddressOffset = state.bo;
         maxBank = state.m;
     };

@@ -4,13 +4,21 @@ jt.CartridgeCreatorImpl = function() {
 "use strict";
 
     this.createCartridgeFromRom = function(rom) {
-        // Try to build the Cartridge if a supported format is found
-        var options = getFormatOptions(rom);
-        if (options.length === 0) return;
+        // ROM has User Set Format?
+        var userFormatName = userROMFormats.getForROM(rom);
+        if (userFormatName) {
+            var userFormat = jt.CartridgeFormats[userFormatName];
+            if (userFormat.tryFormat(rom)) {
+                jt.Util.log("USER Format selected: " + userFormat.desc);
+                return userFormat.createCartridgeFromRom(rom);
+            }
+        }
 
-        // Choose the best option
-        var bestOption = options[0];
-        jt.Util.log("" + bestOption.name + ": " + bestOption.desc + ", priority: " + bestOption.priority + (bestOption.priorityBoosted ? " (" + bestOption.priorityBoosted + ")" : ""));
+        // Try to build the Slot with the best format, if a supported format is found
+        var bestOption = this.getBestFormatOption(rom);
+        if (!bestOption) return;
+
+        jt.Util.log("AUTO Format selected: " + bestOption.name + ": " + bestOption.desc + ", priority: " + bestOption.priority + (bestOption.priorityBoosted ? " (" + bestOption.priorityBoosted + ")" : ""));
         return bestOption.createCartridgeFromRom(rom);
     };
 
@@ -19,6 +27,25 @@ jt.CartridgeCreatorImpl = function() {
         if (!cartridgeFormat) throw new Error ("Unsupported ROM Format: " + saveState.f);
         if (cartridge && cartridge.format !== cartridgeFormat) cartridge = null;       // Only possible to reuse cartridge if the format is the same!
         return cartridgeFormat.recreateCartridgeFromSaveState(saveState, cartridge);
+    };
+
+    this.changeCartridgeFormat = function(cart, newFormat) {
+        return newFormat.createCartridgeFromRom(cart.rom);
+    };
+
+    this.getBestFormatOption = function(rom) {
+        var options = getFormatOptions(rom);
+        return options.length === 0 ? undefined : options[0];
+    };
+
+    this.getUserFormatOptionNames = function(rom) {
+        var formatOptions = [];
+        for (var i = 0, len = jt.CartridgeFormatsUserOptions.length; i < len; ++i) {
+            var formatName = jt.CartridgeFormatsUserOptions[i];
+            var format = jt.CartridgeFormats[formatName].tryFormat(rom);
+            if (format) formatOptions.push(formatName);
+        }
+        return formatOptions;
     };
 
     this.produceInfo = function(rom, formatHint) {
@@ -38,6 +65,10 @@ jt.CartridgeCreatorImpl = function() {
 
         finishInfo(info, rom.source, hash, formatHint);
         return info;
+    };
+
+    this.setUserROMFormats = function(pUserROMFormats) {
+        userROMFormats = pUserROMFormats;
     };
 
     var getFormatOptions = function(rom) {
@@ -260,6 +291,9 @@ jt.CartridgeCreatorImpl = function() {
         "^.*SEAWEED.*$",
         "^.*ANDREW.*DAVIE.*$",          "^.*DEMO.*IMAGE.*AD.*$" 		// Various 32K Image demos
     ];
+
+
+    var userROMFormats;
 
     var HINTS_PREFIX_REGEX = "^(|.*?(\\W|_|%20))";
     var HINTS_SUFFIX_REGEX = "(|(\\W|_|%20).*)$";

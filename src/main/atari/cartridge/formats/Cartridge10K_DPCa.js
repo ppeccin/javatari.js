@@ -9,6 +9,7 @@ jt.Cartridge10K_DPCa = function(rom, format) {
         self.rom = rom;
         self.format = format;
         bytes = rom.content;        // uses the content of the ROM directly
+        self.bytes = bytes;
     }
 
     this.powerOn = function() {
@@ -226,6 +227,7 @@ jt.Cartridge10K_DPCa = function(rom, format) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
         bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
+        this.bytes = bytes;
         bankAddressOffset = state.bo;
         randomNumber = state.rn;
         fetcherPointer = jt.Util.uncompressStringBase64ToInt8BitArray(state.fp, fetcherPointer);

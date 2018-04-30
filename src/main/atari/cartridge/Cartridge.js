@@ -43,6 +43,16 @@ jt.Cartridge = function() {
     this.audioClockPulse = function() {
     };
 
+    this.reinsertROMContent = function() {
+        if (this.rom.content) return;
+        this.rom.content = this.bytes || [];
+    };
+
+
+    this.format = null;
+    this.rom = null;
+    this.bytes = null;
+
 
     // Savestate  -------------------------------------------
 
@@ -51,9 +61,6 @@ jt.Cartridge = function() {
 
     this.loadState = function(state) {
     };
-
-
-    this.rom = null;
 
 };
 

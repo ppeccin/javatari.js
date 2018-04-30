@@ -9,6 +9,7 @@ jt.Room = function(screenElement, consoleStartPowerOn) {
         buildMainClock();
         buildPeripherals();
         buildAndPlugConsole();
+        Javatari.userROMFormats.init();
     }
 
     this.powerOn = function() {

@@ -225,7 +225,7 @@ jt.CartridgeFormats = {
         desc: "8K-512K Tigervision",
         priority: 112,
         tryFormat: function(rom) {
-            if (rom.content.length % 2048 === 0 && rom.content.length <= 256 * 2048) return this;
+            if (rom.content.length % 2048 === 0 && rom.content.length >= 2048 && rom.content.length <= 256 * 2048) return this;
         },
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge8K_512K_3F(rom, this);
@@ -240,7 +240,7 @@ jt.CartridgeFormats = {
         desc: "8K-512K Tigervision (+RAM)",
         priority: 111,
         tryFormat: function(rom) {
-            if (rom.content.length % 2048 === 0 && rom.content.length <= 256 * 2048) return this;
+            if (rom.content.length % 2048 === 0 && rom.content.length >= 2048 && rom.content.length <= 256 * 2048) return this;
         },
         createCartridgeFromRom: function(rom) {
             return new jt.Cartridge8K_512K_3E(rom, this);
@@ -331,3 +331,29 @@ jt.CartridgeFormats = {
     }
 
 };
+
+
+// Formats available for user selection, in order
+jt.CartridgeFormatsUserOptions = [
+    "4K",
+    "CV",
+    "E0",
+    "F0",
+    "FE",
+    "E7",
+    "F8",
+    "F6",
+    "F4",
+    "FA2cu",
+    "FA2",
+    "FA",
+    "EF",
+    "DPC",
+    "3F",
+    "3E",
+    "X07",
+    "0840",
+    "UA",
+    "SB",
+    "AR"
+];

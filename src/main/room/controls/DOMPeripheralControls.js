@@ -90,6 +90,9 @@ jt.DOMPeripheralControls = function(room) {
             case pc.CARTRIDGE_SAVE_DATA_FILE:
                 //cartridgeSocket.saveCartridgeDataFile(secPort ? 1 : 0);
                 break;
+            case pc.CARTRIDGE_CHOOSE_FORMAT:
+                if (!mediaChangeDisabledWarning()) screen.openCartridgeFormatDialog(altPower);
+                break;
             case pc.AUTO_LOAD_FILE:
                 if (!mediaChangeDisabledWarning()) fileLoader.openFileChooserDialog(OPEN_TYPE.AUTO, altPower, secPort, false);
                 break;

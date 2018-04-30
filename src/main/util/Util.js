@@ -482,6 +482,15 @@ jt.Util = new function() {
         document.head.appendChild(style);
     };
 
+    this.scaleToFitParentHeight = function(element, parent, bottomOffset) {
+        var availHeight = parent.clientHeight - bottomOffset - 20;      //  bar - tolerance
+        var height = element.clientHeight;
+        var scale = height < availHeight ? 1 : availHeight / height;
+        element.style.transform = "translateY(-" + ((bottomOffset / 2) | 0) + "px) scale(" + scale.toFixed(4) + ")";
+
+        // console.log("SCALE availHeight: " + availHeight + ", height: " + height + ", final: " + height * scale);
+    };
+
     this.scaleToFitParentWidth = function(element, parent, horizMargin) {
         var availWidth = parent.clientWidth - (horizMargin * 2 | 0);      //  margins
         var width = element.clientWidth;

@@ -11,6 +11,7 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
         // Cannot use the contents of the ROM directly, as cartridge is all RAM and can be modified
         // Also, ROM content represents the entire tape and can have multiple parts
         bytes = jt.Util.arrayFill(new Array(4 * BANK_SIZE));
+        self.bytes = bytes;
         loadBIOS();
         // Initialize Random seeds
         for (var i = 0; i < 31; ++i) randomSeeds[i] = (Math.random() * 256) | 0;
@@ -274,6 +275,7 @@ jt.Cartridge8K_64K_AR = function(rom, format) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = rom = jt.ROM.loadState(state.r);
         bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
+        this.bytes = bytes;
         bank0AddressOffset = state.b0o;
         bank1AddressOffset = state.b1o;
         valueToWrite = state.vw;

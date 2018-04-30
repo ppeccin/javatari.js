@@ -9,6 +9,7 @@ jt.Cartridge8K_512K_3F = function(rom, format) {
         self.rom = rom;
         self.format = format;
         bytes = rom.content;        // uses the content of the ROM directly
+        self.bytes = bytes;
         selectableSliceMaxBank = (bytes.length - BANK_SIZE) / BANK_SIZE - 1;
         fixedSliceAddressOffset = bytes.length - BANK_SIZE * 2;
     }
@@ -49,6 +50,7 @@ jt.Cartridge8K_512K_3F = function(rom, format) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
         bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
+        this.bytes = bytes;
         bankAddressOffset = state.bo;
         selectableSliceMaxBank = state.sm;
         fixedSliceAddressOffset = state.fo;

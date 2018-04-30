@@ -9,6 +9,7 @@ jt.Cartridge16K_E7 = function(rom, format) {
         self.rom = rom;
         self.format = format;
         bytes = rom.content;        // uses the content of the ROM directly
+        self.bytes = bytes;
     }
 
     this.read = function(address) {
@@ -69,6 +70,7 @@ jt.Cartridge16K_E7 = function(rom, format) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
         bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
+        this.bytes = bytes;
         bankAddressOffset = state.bo;
         extraRAMSlice0Active = state.rs;
         extraRAMSlice1Offset = state.ro;

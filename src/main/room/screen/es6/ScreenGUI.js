@@ -429,7 +429,7 @@ html.jt-full-screen #jt-console-panel {
 }
 
 
-#jt-screen-fs .jt-select-dialog {
+.jt-select-dialog {
     position: absolute;
     overflow: hidden;
     display: none;
@@ -456,10 +456,10 @@ html.jt-full-screen #jt-console-panel {
     cursor: auto;
     z-index: 50;
 }
-#jt-screen-fs .jt-select-dialog.jt-show {
+.jt-select-dialog.jt-show {
     display: block;
 }
-#jt-screen-fs .jt-select-dialog .jt-footer {
+.jt-select-dialog > .jt-footer {
     position: absolute;
     width: 100%;
     bottom: 7px;
@@ -467,7 +467,7 @@ html.jt-full-screen #jt-console-panel {
     text-align: center;
     color: rgb(170, 170, 170);
 }
-#jt-screen-fs .jt-select-dialog ul {
+.jt-select-dialog > ul {
     position: relative;
     width: 88%;
     top: 5px;
@@ -477,7 +477,7 @@ html.jt-full-screen #jt-console-panel {
     font-size: 14px;
     color: hsl(0, 0%, 88%);
 }
-#jt-screen-fs .jt-select-dialog li {
+.jt-select-dialog > ul li {
     display: none;
     position: relative;
     overflow: hidden;
@@ -494,18 +494,18 @@ html.jt-full-screen #jt-console-panel {
     box-sizing: border-box;
     cursor: pointer;
 }
-#jt-screen-fs .jt-select-dialog li.jt-visible {
+.jt-select-dialog > ul li.jt-visible {
     display: block;
 }
-#jt-screen-fs .jt-select-dialog li.jt-selected {
+.jt-select-dialog > ul li.jt-selected {
     color: white;
     background: hsl(358, 67%, 46%);
 }
-#jt-screen-fs .jt-select-dialog li.jt-droptarget {
+.jt-select-dialog > ul li.jt-droptarget {
     color: white;
     border-color: lightgray;
 }
-#jt-screen-fs .jt-select-dialog li.jt-toggle::after {
+.jt-select-dialog > ul li.jt-toggle::after {
     content: "";
     position: absolute;
     width: 6px;
@@ -515,8 +515,55 @@ html.jt-full-screen #jt-console-panel {
     background: rgb(60, 60, 60);
     box-shadow: black 1px 1px 1px;
 }
-#jt-screen-fs .jt-select-dialog li.jt-toggle-checked::after {
+.jt-select-dialog > ul li.jt-toggle-checked::after {
     background: rgb(248, 33, 28);
+}
+
+#jt-cartridge-format.jt-select-dialog > ul {
+    width: 100%;
+    height: 226px;
+    margin: 7px auto 0;
+    padding: 0 0 0 30px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+#jt-cartridge-format.jt-select-dialog > ul li {
+    width: 220px;
+    margin: 7px 0 2px 0;
+}
+#jt-cartridge-format.jt-select-dialog > ul li:first-child {
+    margin-top: 0;
+}
+#jt-cartridge-format ::-webkit-scrollbar {
+    width: 12px;
+}
+#jt-cartridge-format ::-webkit-scrollbar-track {
+    background: transparent;
+}
+#jt-cartridge-format ::-webkit-scrollbar-thumb {
+    border: solid transparent;
+    border-width: 1px 1px 1px 2px;
+    background: rgb(80, 80, 80);
+    background-clip: content-box;
+}
+#jt-cartridge-format ul.jt-quick-options-list {
+    width: 220px;
+    margin: 18px 0 0 30px;
+}
+#jt-cartridge-format ul.jt-quick-options-list li div {
+    height: 24px;
+    line-height: 24px;
+}
+#jt-cartridge-format .jt-control {
+    width: 52px;
+    line-height: 24px;
+}
+/* Firefox-specific rules */
+@-moz-document url-prefix() {
+    /* Try to hide scrollbar, since we cant style it :-( */
+    #jt-cartridge-format.jt-select-dialog > ul {
+        width: 304px;
+    }
 }
 
 #jt-logo {

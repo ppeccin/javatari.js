@@ -10,6 +10,7 @@ jt.Cartridge4K = function(rom, format) {
         self.format = format;
         // Always use a 4K ROM image, multiplying the ROM internally
         bytes = new Array(4096);
+        self.bytes = bytes;
         var len = rom.content.length;
         for (var pos = 0; pos < bytes.length; pos += len)
             jt.Util.arrayCopy(rom.content, 0, bytes, pos, len);
@@ -34,6 +35,7 @@ jt.Cartridge4K = function(rom, format) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
         bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
+        this.bytes = bytes;
     };
 
 

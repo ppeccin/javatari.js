@@ -9,6 +9,7 @@ jt.Cartridge8K_E0 = function(rom, format) {
         self.rom = rom;
         self.format = format;
         bytes = rom.content;        // uses the content of the ROM directly
+        self.bytes = bytes;
     }
 
     this.read = function(address) {
@@ -62,6 +63,7 @@ jt.Cartridge8K_E0 = function(rom, format) {
         this.format = jt.CartridgeFormats[state.f];
         this.rom = jt.ROM.loadState(state.r);
         bytes = jt.Util.uncompressStringBase64ToInt8BitArray(state.b, bytes);
+        this.bytes = bytes;
         slice0AddressOffset = state.s0;
         slice1AddressOffset = state.s1;
         slice2AddressOffset = state.s2;

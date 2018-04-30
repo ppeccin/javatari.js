@@ -142,6 +142,12 @@ jt.CanvasDisplay = function(room, mainElement) {
         netPlayDialog.show();
     };
 
+    this.openCartridgeFormatDialog = function(altPower) {
+        closeAllOverlays();
+        if (!cartFormatDialog) cartFormatDialog = new jt.CartridgeFormatDialog(this, fsElementCenter, atariConsole, cartridgeSocket);
+        cartFormatDialog.show(altPower);
+    };
+
     this.openLoadFileDialog = function(altPower, secPort) {
         fileLoader.openFileChooserDialog(jt.FileLoader.OPEN_TYPE.AUTO, altPower, secPort, false);
     };
@@ -329,6 +335,9 @@ jt.CanvasDisplay = function(room, mainElement) {
         powerButton.style.backgroundPosition = "" + powerButton.jtBX + "px " + (mediaButtonBackYOffsets[power ? 2 : 1]) + "px";
         powerButton.jtMenu[0].label = "Power " + (power ? "OFF" : "ON");
         powerButton.jtMenu[1].disabled = powerButton.jtMenu[9].disabled = !power;
+
+        // TODO Unfinished Feature
+        // powerButton.jtMenu[6].disabled = true;
     };
 
     this.cartridgeInserted = function(cart) {
@@ -652,6 +661,7 @@ jt.CanvasDisplay = function(room, mainElement) {
             { label: "Net Play!",                         control: jt.PeripheralControls.SCREEN_OPEN_NETPLAY },
             { label: "",                   divider: true },
             { label: "Select Cartridge",                  control: jt.PeripheralControls.CARTRIDGE_LOAD_RECENT },
+            { label: "Set ROM Format",     clickModif: KEY_SHIFT_MASK, control: jt.PeripheralControls.CARTRIDGE_CHOOSE_FORMAT },
             { label: "",                   divider: true },
             { label: "Open File",          clickModif: KEY_CTRL_MASK, control: jt.PeripheralControls.AUTO_LOAD_FILE, needsUIG: true },
             { label: "Open URL",           clickModif: KEY_CTRL_MASK | KEY_ALT_MASK, control: jt.PeripheralControls.AUTO_LOAD_URL, needsUIG: true },
@@ -1164,6 +1174,7 @@ jt.CanvasDisplay = function(room, mainElement) {
         if (saveStateDialog) saveStateDialog.hide();
         if (quickOtionsDialog) quickOtionsDialog.hide();
         if (netPlayDialog) netPlayDialog.hide();
+        if (cartFormatDialog) cartFormatDialog.hide();
         if (settingsDialog) settingsDialog.hide();
         if (recentROMsDialog) recentROMsDialog.hide();
     }
@@ -1353,6 +1364,7 @@ jt.CanvasDisplay = function(room, mainElement) {
     var recentROMsDialog;
     var quickOtionsDialog;
     var netPlayDialog;
+    var cartFormatDialog;
 
     var fsElement, fsElementCenter;
 
