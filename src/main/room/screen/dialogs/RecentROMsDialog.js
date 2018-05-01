@@ -13,7 +13,7 @@ jt.RecentROMsDialog = function(mainElement, screen, recentROMs, fileLoader) {
             }, 0);
         }
 
-        items = recentROMs.getCatalog().slice();        // clone
+        items = recentROMs.getCatalog().slice(0);        // clone
         items.sort(function (a, b) { return a.n > b.n; });
         var last = recentROMs.lastROMLoadedIndex;
         last = items.indexOf(items.find(function(r) { return r.i === last; }));

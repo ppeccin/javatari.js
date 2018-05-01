@@ -18,7 +18,7 @@ jt.RecentStoredROMs = function() {
         this.getCatalog();
         var found = storedList.find(function(stored) { return stored && stored.h === rom.info.h; });
 
-        if (!found || (found.n != rom.info.n || found.f != rom.info.f)) {
+        if (!found || (found.n != rom.info.l || found.f != rom.info.f)) {
             getStoredROMs();
             if (found) {
                 var oldIdx = storedList.indexOf(found);
