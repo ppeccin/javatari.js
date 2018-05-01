@@ -139,7 +139,7 @@ jt.CartridgeFormats = {
 
     "FA2cu": {
         name: "FA2cu",
-        desc: "32K CBS RAM Plus CU Image",
+        desc: "32K CBS RAM+ CU Image",
         priority: 103,
         tryFormat: function(rom) {
             if (rom.content.length === 32768) {
@@ -162,7 +162,7 @@ jt.CartridgeFormats = {
 
     "FA2": {
         name: "FA2",
-        desc: "24K/28K/32K CBS RAM Plus",
+        desc: "24K/28K/32K CBS RAM+",
         priority: 102,
         tryFormat: function(rom) {
             if (rom.content.length === 24576 || rom.content.length === 28672 || rom.content.length === 32768) return this;
@@ -207,7 +207,7 @@ jt.CartridgeFormats = {
 
     "DPC": {
         name: "DPC",
-        desc: "10K DPC Pitfall 2 (Enhanced Audio)",
+        desc: "10K DPC Pitfall 2 (Enhanced)",
         priority: 101,
         tryFormat: function(rom) {
             if (rom.content.length >= (8192 + 2048) && rom.content.length <= (8192 + 2048 + 256)) return this;
@@ -312,7 +312,7 @@ jt.CartridgeFormats = {
 
     "AR": {
         name: "AR",
-        desc: "8K-64K Arcadia/Starpath/Supercharger",
+        desc: "8K-64K Arcadia/Supercharger",
         priority: 101,
         tryFormat: function(rom) {
             // Any number of parts between 1 and 8

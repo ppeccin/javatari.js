@@ -534,7 +534,7 @@ html.jt-full-screen #jt-console-panel {
     box-sizing: border-box;
 }
 #jt-cartridge-format.jt-select-dialog > ul li {
-    width: 220px;
+    width: 280px;
     margin: 7px 0 2px 0;
 }
 #jt-cartridge-format.jt-select-dialog > ul li:first-child {
@@ -553,15 +553,15 @@ html.jt-full-screen #jt-console-panel {
     background-clip: content-box;
 }
 #jt-cartridge-format ul.jt-quick-options-list {
-    width: 220px;
-    margin: 18px 0 0 30px;
+    width: 230px;
+    margin: 18px 0 0 52px;
 }
 #jt-cartridge-format ul.jt-quick-options-list li div {
     height: 24px;
     line-height: 24px;
 }
 #jt-cartridge-format .jt-control {
-    width: 52px;
+    width: 60px;
     line-height: 24px;
 }
 /* Firefox-specific rules */

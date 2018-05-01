@@ -55,7 +55,9 @@ jt.CartridgeFormatDialog = function(screen, mainElement, atariConsole, cartridge
         for (var i = 0; i < listItems.length; ++i) {
             if (i < userFormatOptions.length) {
                 if (userFormatOptions[i] === format) optionSelected = i;
-                listItems[i].innerHTML = i === 0 ? "AUTO: " + autoOption.name : userFormatOptions[i];
+                listItems[i].innerHTML = i === 0
+                    ? "AUTO: " + autoOption.name + ": " + autoOption.desc
+                    : userFormatOptions[i] + ": " + jt.CartridgeFormats[userFormatOptions[i]].desc;
                 listItems[i].classList.add("jt-visible");
             } else
                 listItems[i].classList.remove("jt-visible");
@@ -92,7 +94,7 @@ jt.CartridgeFormatDialog = function(screen, mainElement, atariConsole, cartridge
         dialog = document.createElement("div");
         dialog.id = "jt-cartridge-format";
         dialog.classList.add("jt-select-dialog");
-        dialog.style.width = "280px";
+        dialog.style.width = "340px";
         dialog.style.height = "310px";
         dialog.tabIndex = -1;
 
