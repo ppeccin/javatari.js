@@ -1,4 +1,4 @@
-## Javatari
+# Javatari
 
 **Javatari** is a new cross platform Atari 2600 emulator designed for the Web.
 
