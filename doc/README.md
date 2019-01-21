@@ -65,7 +65,7 @@ Several parameters are available for customizing the emulator. They can be chang
 All parameters are in the form of properties in the global object `Javatari`. Just set these object properties in Javascript, or use URL Query parameter/value pairs. For example:
 
 ```
-Javatari.ROM = "files/Game.rom";      is the same as      http://javatari.org?ROM=files/Game.rom
+Javatari.ROM = "files/Game.rom";      is the same as      https://javatari.org?ROM=files/Game.rom
 ```
 
 **IMPORTANT:** Any parameter setting via Javascript must be done AFTER importing the `javatari.js` file.
@@ -94,11 +94,11 @@ Javatari is great for displaying Atari 2600 games in the web. With a simple URL,
 
 - To load a game in ROM format:
 ```
-http://javatari.org?ROM=http://gamesarchive.org/Pitfall.rom
+https://javatari.org?ROM=https://gamesarchive.org/Pitfall.rom
 ```
 - To load a game in a ZIPped ROM Image and force the ROM Format to `FA2`
 ```
-http://javatari.org?ROM=http://gamesarchive.org/StarCastle.zip&FORMAT=FA2
+https://javatari.org?ROM=https://gamesarchive.org/StarCastle.zip&FORMAT=FA2
 ```
 
 ## Parameters Reference
