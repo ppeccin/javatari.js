@@ -6,7 +6,7 @@ It's great for displaying games running inside webpages. You can launch the emul
 And now you can play Atari 2600 games with touch controls on your Android/iOS device, even when offline!
 Join friends in multiplayer games with the new NetPlay! function.
 
-Please go to **http://javatari.org** to enjoy it online!
+Please go to **https://javatari.org** to enjoy it online!
 
 Refer to [**/doc**](https://github.com/ppeccin/javatari.js/tree/master/doc) for parameters reference and URL usage examples.
 Refer to [**/release**](https://github.com/ppeccin/javatari.js/tree/master/release) for stable release files and deployment examples.

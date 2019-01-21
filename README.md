@@ -1,9 +1,3 @@
-# ** IMPORTANT NOTICE**
-Javatari upgrade on Dec 15th - Old Savestates need to be saved to file now!
-
-Soon WebMSX and Javatari will be upgraded to HTTPS. This will make old SaveStates stored on the browser inaccessible.
-If you have any saves that you want to keep, please go and save them to a file on your computer before the upgrade, so you can restore them later.
-
 # Javatari
 
 **Javatari** is a new cross platform Atari 2600 emulator designed for the Web.
@@ -12,7 +6,7 @@ It's great for displaying games running inside webpages. You can launch the emul
 And now you can play Atari 2600 games with touch controls on your Android/iOS device, even when offline!
 Join friends in multiplayer games with the new NetPlay! function.
 
-Please go to **http://javatari.org** to enjoy it online!
+Please go to **https://javatari.org** to enjoy it online!
 
 Refer to [**/doc**](https://github.com/ppeccin/javatari.js/tree/master/doc) for parameters reference and URL usage examples.
 Refer to [**/release**](https://github.com/ppeccin/javatari.js/tree/master/release) for stable release files and deployment examples.
