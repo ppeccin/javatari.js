@@ -30,6 +30,7 @@ jt.ScreenGUI.html = function() {
                 <div id="jt-screen-canvas-outer">
                     <canvas id="jt-screen-canvas" tabindex="-1"></canvas>
                     <img id="jt-canvas-loading-icon" draggable="false" src="` + jt.Images.urls.loading + `">
+                    <div id="jt-unmute-message"></div>
                     <div id="jt-logo">
                         <div id="jt-logo-center">
                             <img id="jt-logo-loading-icon" draggable="false" src="` + jt.Images.urls.loading + `">
@@ -630,6 +631,45 @@ html.jt-full-screen #jt-console-panel {
 }
 #jt-screen-fs.jt-logo-message-active #jt-logo-loading-icon {
     top: 204px;
+}
+
+#jt-unmute-message {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: 5px;
+    height: 30px;
+    padding: 0 10px;
+    margin: 0 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 30px;
+    color: rgb(210, 210, 210);
+    background: rgba(0, 0, 0, 0.7);
+    transform-origin: bottom center;
+    transform: translate(-50%, 0);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+#jt-unmute-message::before {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 20px;
+    margin: 5px 9px 0 0;
+    background-image: url("` + jt.Images.urls.muteIcon + `");
+    background-repeat: no-repeat;
+    background-size: 24px 20px;
+    vertical-align: top;
+}
+#jt-unmute-message::after {
+    content: "Audio is muted. Click to unmute";
+}
+#jt-unmute-message.jt-show {
+    display: inline-block;
 }
 
 #jt-logo-message {
