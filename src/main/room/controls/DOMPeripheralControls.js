@@ -254,7 +254,7 @@ jt.DOMPeripheralControls = function(room) {
     var KEY_MENU      = jt.DOMKeys.VK_CONTEXT.c;
     var KEY_DEFAULTS  = jt.DOMKeys.VK_BACKSPACE.c;
 
-    var KEY_CAPTURE_SCREEN  = jt.DOMKeys.VK_X.c;
+    var KEY_CAPTURE_SCREEN  = jt.DOMKeys.VK_G.c;
 
     var KEY_SPEAKER_BUFFER  = jt.DOMKeys.VK_A.c;
 

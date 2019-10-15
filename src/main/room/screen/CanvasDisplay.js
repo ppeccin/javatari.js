@@ -53,7 +53,7 @@ jt.CanvasDisplay = function(room, mainElement) {
     };
 
     this.powerOff = function() {
-        document.documentElement.remove("jt-started");
+        document.documentElement.classList.remove("jt-started");
     };
 
     this.start = function(startAction) {
