@@ -376,6 +376,17 @@ jt.CanvasDisplay = function(room, mainElement) {
         consolePanel.controlsStatesRedefined();
     };
 
+    this.speakerUnlockStateUpdate = function(state) {
+        unmuteMessage.classList.toggle("jt-show", !state);
+
+        if (!state) {
+            var availWidth = canvasOuter.clientWidth - 30;      //  message width - borders
+            var width = unmuteMessage.clientWidth;
+            var scale = width < availWidth ? 1 : availWidth / width;
+            unmuteMessage.style.transform = "translate(-50%, 0) scale(" + scale.toFixed(4) + ")";
+        }
+    };
+
     this.setLoading = function(state) {
         isLoading = state;
         updateLoading();
@@ -595,6 +606,7 @@ jt.CanvasDisplay = function(room, mainElement) {
         logoMessageOK = document.getElementById("jt-logo-message-ok");
         logoMessageOKText = document.getElementById("jt-logo-message-ok-text");
         scrollMessage = document.getElementById("jt-screen-scroll-message");
+        unmuteMessage = document.getElementById("jt-unmute-message");
         consolePanelElement = document.getElementById("jt-console-panel");
 
         suppressContextMenu(mainElement);
@@ -1410,6 +1422,7 @@ jt.CanvasDisplay = function(room, mainElement) {
     var logo, logoCenter, logoImage, logoMessage, logoMessageText, logoMessageOK, logoMessageOKText, logoMessageActive = false;
     var logoLoadingIcon;
     var scrollMessage, scrollMessageActive = false;
+    var unmuteMessage;
 
     var powerButton;
     var netplayButton;

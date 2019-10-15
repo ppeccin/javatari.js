@@ -98,7 +98,7 @@ jt.MultiDownloader = function (urlSpecs, onAllSuccess, onAnyError, timeout) {
     }
 
     function proxyze(url) {
-        return Javatari.WEB_EXTENSIONS_PROXY_SERVER ? "http://" + Javatari.WEB_EXTENSIONS_PROXY_SERVER + "/proxy-remote-download?url=" + url : url;
+        return Javatari.WEB_EXTENSIONS_PROXY_SERVER ? "https://" + Javatari.WEB_EXTENSIONS_PROXY_SERVER + "/proxy-remote-download?url=" + url : url;
     }
 
     function scheduleLoadingIcon() {

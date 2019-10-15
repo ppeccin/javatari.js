@@ -119,21 +119,37 @@ jt.WebAudioSpeaker = function(mainElement) {
     };
 
     function registerUnlockOnTouchIfNeeded() {
-        // iOS needs unlocking of the AudioContext on user interaction!
+        // Browser may require unlocking of the AudioContext on user interaction!
         if (processor && (!audioContext.state || audioContext.state === "suspended")) {
-            mainElement.addEventListener("touchend", function unlockAudioContextOnTouch() {
-                mainElement.removeEventListener("touchend", unlockAudioContextOnTouch, true);
+            mainElement.addEventListener("touchend", unlockAudioContext, true);
+            mainElement.addEventListener("mousedown", unlockAudioContext, true);
+            mainElement.addEventListener("keydown", unlockAudioContext, true);
+            jt.Util.log("Speaker Audio Context resume event registered");
+            screen.speakerUnlockStateUpdate(false);
+        }
 
-                var source = audioContext.createBufferSource();
-                source.buffer = audioContext.createBuffer(1, 1, 22050);
-                source.connect(audioContext.destination);
-                source.start(0);
-                jt.Util.log("Audio Context unlocked, " + audioContext.state);
-            }, true);
-            jt.Util.log("Audio Context unlock on touch registered");
+        function unlockAudioContext() {
+            mainElement.removeEventListener("touchend", unlockAudioContext, true);
+            mainElement.removeEventListener("mousedown", unlockAudioContext, true);
+            mainElement.removeEventListener("keydown", unlockAudioContext, true);
+
+            var ex;
+            try {
+                audioContext.resume().then(function () {
+                    jt.Util.log('Speaker Audio Context resumed!');
+                });
+            } catch (e) {
+                ex = e;
+            }
+
+            var source = audioContext.createBufferSource();
+            source.buffer = audioContext.createBuffer(1, 1, 22050);
+            source.connect(audioContext.destination);
+            source.start(0);
+            if (ex) jt.Util.log("Audio Context unlocked!");
+            screen.speakerUnlockStateUpdate(true);
         }
     }
-
     function updateResamplingFactors() {
         //if (bufferSizeProblem !== undefined) console.error("+++++++ buffer size problem: " + bufferSizeProblem);
 
