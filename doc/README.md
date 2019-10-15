@@ -11,6 +11,9 @@ Please go to **https://javatari.org** to enjoy it online!
 Refer to [**/doc**](https://github.com/ppeccin/javatari.js/tree/master/doc) for parameters reference and URL usage examples.
 Refer to [**/release**](https://github.com/ppeccin/javatari.js/tree/master/release) for stable release files and deployment examples.
 
+Atari, VCS and the Atari logo are shown here as a tribute.
+All trademarks are property of their respective owners.
+
 #### New in Version 5.0
 
 - NetPlay! Connect several users on the same Virtual Atari Console over the internet
