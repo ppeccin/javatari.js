@@ -68,7 +68,7 @@ Several parameters are available for customizing the emulator. They can be chang
 All parameters are in the form of properties in the global object `Javatari`. Just set these object properties in Javascript, or use URL Query parameter/value pairs. For example:
 
 ```
-Javatari.ROM = "files/Game.rom";      is the same as      https://javatari.org?ROM=files/Game.rom
+Javatari.CARTRIDGE_URL = "files/Game.rom";      is the same as      https://javatari.org?ROM=files/Game.rom
 ```
 
 **IMPORTANT:** Any parameter setting via Javascript must be done AFTER importing the `javatari.js` file.
