@@ -1,7 +1,7 @@
 {
   "name": "Javatari",
   "title": "Javatari - The online Atari 2600 emulator",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "devDependencies": {
     "grunt": "",
     "grunt-contrib-clean": "",

@@ -40,11 +40,13 @@ jt.MultiDownloader = function (urlSpecs, onAllSuccess, onAnyError, timeout) {
         req.open("GET", finalUrl, true);
         req.responseType = "arraybuffer";
         req.timeout = timeout !== undefined ? timeout : DEFAULT_TIMEOUT;
-        req.onload = function () {
-            if (req.status === 200) loadSuccess(urlSpec, f, new Uint8Array(req.response));
-            else req.onerror();
+        req.onload = function (ev) {
+            if ((req.status === 200 || req.status === 0) && req.response)
+                loadSuccess(urlSpec, f, new Uint8Array(req.response));
+            else
+                req.onerror(ev);
         };
-        req.onerror = req.ontimeout = function () {
+        req.onerror = req.ontimeout = function (ev) {
             loadError(urlSpec, "" + req.status + " " + req.statusText);
         };
         jt.Util.log("Reading file from: " + url);
