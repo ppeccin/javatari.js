@@ -30,6 +30,9 @@ Javatari.start = function (consolePowerOn) {
     // Prepare ROM Database
     jt.CartridgeDatabase.uncompress();
 
+    // Init KeepAlive
+    jt.NetClient.initKeepAlive();
+
     // NetPlay! auto-join Session?
     var joinSession = Javatari.NETPLAY_JOIN;
 

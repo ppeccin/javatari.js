@@ -49,7 +49,8 @@ Javatari = {
     IMAGES_PATH:                    window.JAVATARI_IMAGES_PATH || "images/",
     PAGE_BACK_CSS:                  "",                         // CSS to modify page background color. Applied to the body element
 
-    WEB_EXTENSIONS_SERVER:          "webmsx.herokuapp.com",     // Server address for NetPlay
+    SERVER_ADDRESS:                 "webmsx.azurewebsites.net/",
+    SERVER_KEEPALIVE:               0,
 
     RESET:                          0,                          // if value = 1 clear all saved data on the client
     ALLOW_URL_PARAMETERS:           true                        // Allows user to override any of these parameters via URL query parameters

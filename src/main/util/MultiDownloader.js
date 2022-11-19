@@ -40,13 +40,13 @@ jt.MultiDownloader = function (urlSpecs, onAllSuccess, onAnyError, timeout) {
         req.open("GET", finalUrl, true);
         req.responseType = "arraybuffer";
         req.timeout = timeout !== undefined ? timeout : DEFAULT_TIMEOUT;
-        req.onload = function (ev) {
+        req.onload = function () {
             if ((req.status === 200 || req.status === 0) && req.response)
                 loadSuccess(urlSpec, f, new Uint8Array(req.response));
             else
-                req.onerror(ev);
+                req.onerror();
         };
-        req.onerror = req.ontimeout = function (ev) {
+        req.onerror = req.ontimeout = function () {
             loadError(urlSpec, "" + req.status + " " + req.statusText);
         };
         jt.Util.log("Reading file from: " + url);
@@ -100,7 +100,7 @@ jt.MultiDownloader = function (urlSpecs, onAllSuccess, onAnyError, timeout) {
     }
 
     function proxyze(url) {
-        return Javatari.WEB_EXTENSIONS_PROXY_SERVER ? "https://" + Javatari.WEB_EXTENSIONS_PROXY_SERVER + "/proxy-remote-download?url=" + url : url;
+        return Javatari.PROXY_SERVER_ADDRESS ? "https://" + Javatari.PROXY_SERVER_ADDRESS + "/proxy-remote-download?url=" + url : url;
     }
 
     function scheduleLoadingIcon() {

@@ -27,7 +27,7 @@ jt.NetClient = function(room) {
         room.enterNetPendingMode(this);
 
         if (!ws) {
-            ws = new WebSocket("wss://" + Javatari.WEB_EXTENSIONS_SERVER);
+            ws = new WebSocket("wss://" + Javatari.SERVER_ADDRESS);
             ws.onmessage = onSessionMessage;
             ws.onopen = onSessionServerConnected;
             ws.onclose = onSessionServerDisconnected;
@@ -277,4 +277,17 @@ jt.NetClient = function(room) {
     var DATA_CHANNEL_FRAG_PART = "#@FrgS@#";
     var DATA_CHANNEL_FRAG_END =  "#@FrgE@#";
 
+};
+
+jt.NetClient.initKeepAlive = function() {
+    if (Javatari.SERVER_ADDRESS && Javatari.SERVER_KEEPALIVE) jt.NetClient.sendKeepAlive();
+};
+
+jt.NetClient.sendKeepAlive = async function() {
+    try {
+        await fetch("https://" + Javatari.SERVER_ADDRESS + "/keepalive", { mode: "no-cors" });
+    } catch(e) {
+        jt.Util.error("Sending KeepAlive: ", e);
+    }
+    if (Javatari.SERVER_KEEPALIVE > 0) setTimeout(jt.NetClient.sendKeepAlive, Javatari.SERVER_KEEPALIVE);
 };
