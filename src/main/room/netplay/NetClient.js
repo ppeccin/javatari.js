@@ -85,7 +85,7 @@ jt.NetClient = function(room) {
     }
 
     function onSessionMessage(event) {
-        const message = JSON.parse(event.data);
+        var message = JSON.parse(event.data);
 
         if (message.javatariUpdate)
             return onServerNetUpdate(JSON.parse(message.javatariUpdate));
@@ -283,11 +283,12 @@ jt.NetClient.initKeepAlive = function() {
     if (Javatari.SERVER_ADDRESS && Javatari.SERVER_KEEPALIVE) jt.NetClient.sendKeepAlive();
 };
 
-jt.NetClient.sendKeepAlive = async function() {
-    try {
-        await fetch("https://" + Javatari.SERVER_ADDRESS + "/keepalive", { mode: "no-cors" });
-    } catch(e) {
-        jt.Util.error("Sending KeepAlive: ", e);
-    }
-    if (Javatari.SERVER_KEEPALIVE > 0) setTimeout(jt.NetClient.sendKeepAlive, Javatari.SERVER_KEEPALIVE);
+jt.NetClient.sendKeepAlive = function() {
+    fetch("https://" + Javatari.SERVER_ADDRESS + "/keepalive", { mode: "no-cors" })
+        .catch(function(e) {
+            jt.Util.error("Sending KeepAlive: ", e);
+        })
+        .finally(function() {
+            if (Javatari.SERVER_KEEPALIVE > 0) setTimeout(jt.NetClient.sendKeepAlive, Javatari.SERVER_KEEPALIVE);
+        });
 };

@@ -121,7 +121,7 @@ jt.NetServer = function(room) {
     }
 
     function onSessionMessage(event) {
-        const message = JSON.parse(event.data);
+        var message = JSON.parse(event.data);
 
         if (message.javatariUpdate)
             return onClientNetUpdate(message.javatariUpdate);
