@@ -156,9 +156,23 @@ module.exports = function (grunt) {
                     {src: "temp/javatari.js", dest: "release/stable/5.0/embedded", expand: true, flatten: true, filter: "isFile"}
                 ]
             }
+        },
+
+        connect: {
+            server: {
+                options: {
+                    hostname: '*',
+                    livereload: true,
+                    port: 8000,
+                    keepalive: true,
+                    base: 'release/stable/5.0/standalone/'
+                }
+            }
         }
+
     });
 
+    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-uglify");
