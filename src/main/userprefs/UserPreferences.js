@@ -37,6 +37,7 @@ Javatari.userPreferences.defaults = function() {
                 select:        8,
                 reset:         9,
                 pause:         4,
+                fullscreen:    5,
                 fastSpeed:     7,
                 slowSpeed:     6,
                 device:        -1,  // -1 = auto

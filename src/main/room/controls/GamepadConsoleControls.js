@@ -177,6 +177,11 @@ jt.GamepadConsoleControls = function(consoleControls) {
             consoleControls.processControlState(controls.PAUSE, newPause);
             joyState.pause = newPause;
         }
+        var newFullscreen = joystick.getButtonDigital(joyPrefs.fullscreen);
+        if (newFullscreen !== joyState.fullscreen) {
+            consoleControls.processControlState(controls.FULLSCREEN, newFullscreen);
+            joyState.fullscreen = newFullscreen;
+        }
         var newFastSpeed = joystick.getButtonDigital(joyPrefs.fastSpeed);
         if (newFastSpeed !== joyState.fastSpeed) {
             consoleControls.processControlState(controls.FAST_SPEED, newFastSpeed);
