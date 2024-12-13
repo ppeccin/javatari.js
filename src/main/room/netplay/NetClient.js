@@ -43,11 +43,11 @@ jt.NetClient = function(room) {
         wsOnly = false;
 
         if (ws) {
-            ws.onpen = ws.onclose = ws.onmessage = undefined;
+            ws.onopen = ws.onclose = ws.onmessage = undefined;
             ws.close();
             ws = undefined;
         }
-        if (dataChannel) dataChannel.onpen = dataChannel.onclose = dataChannel.onmessage = undefined;
+        if (dataChannel) dataChannel.onopen = dataChannel.onclose = dataChannel.onmessage = undefined;
         if (rtcConnection) rtcConnection.onicecandidate = rtcConnection.ondatachannel = undefined;
 
         dataChannelActive = false;
@@ -177,7 +177,7 @@ jt.NetClient = function(room) {
 
     function stopRTC() {
         if (dataChannel) {
-            dataChannel.onpen = dataChannel.onclose = dataChannel.onmessage = undefined;
+            dataChannel.onopen = dataChannel.onclose = dataChannel.onmessage = undefined;
             dataChannel.close();
             dataChannel = undefined;
         }
