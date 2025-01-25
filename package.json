@@ -6,7 +6,8 @@
     "grunt": "",
     "grunt-contrib-clean": "",
     "grunt-contrib-concat": "",
-    "grunt-contrib-uglify": "2.3.0",
-    "grunt-contrib-copy": ""
+    "grunt-contrib-connect": "^4.0.0",
+    "grunt-contrib-copy": "",
+    "grunt-contrib-uglify": "2.3.0"
   }
 }

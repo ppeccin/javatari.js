@@ -328,6 +328,7 @@ jt.AtariConsole = function(mainVideoClock) {
 
     var isLoading = false;
     var userPaused = false;
+    var userFullscreen = false;
     var userPauseMoreFrames = 0;
     var systemPaused = false;
 
@@ -404,6 +405,11 @@ jt.AtariConsole = function(mainVideoClock) {
             case controls.POWER_FRY:
                 powerFry();
                 break;
+            case controls.FULLSCREEN:
+                userFullscreen = !userFullscreen;
+                Javatari.room.screen.setFullscreen(userFullscreen);
+                self.getVideoOutput().showOSD(userFullscreen ? "FULLSCREEN ON" : "FULLSCREEN OFF", true);
+                return;
             case controls.PAUSE:
                 self.userPause(!userPaused, false);
                 self.getVideoOutput().showOSD(userPaused ? "PAUSE" : "RESUME", true);
