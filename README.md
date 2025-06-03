@@ -115,7 +115,7 @@ https://javatari.org?ROM=https://gamesarchive.org/StarCastle.zip&FORMAT=FA2
 | `SCREEN_ELEMENT_ID`             |  "javatari-screen"  |  HTML Element ID to place the Emulator Screen
 | `SCREEN_CONSOLE_PANEL_DISABLED` |  false              |  Hide the Console Panel controls
 | `CARTRIDGE_SHOW_RECENT`         |  true               |  Show a list of recent loaded ROMs at startup
-| `CARTRIDGE_LABEL_COLORS`        |  ""                 |  Space-separated colors for customised Label, Background, Border. e.g. "#f00 #000 transparent". Leave "" for defaults
+| `CARTRIDGE_LABEL_COLORS`        |  ""                 |  Space-separated colors for customized Label, Background, Border. e.g. "#f00 #000 transparent". Leave "" for defaults
 | `ALLOW_URL_PARAMETERS`          |  true               |  Allows overriding any parameters via URL query parameters
 | `AUTO_START`                    |  true               |  Auto-Start the emulator as soon as ready
 | `AUTO_POWER_ON_DELAY`           |  1200               |  Auto-Power-ON after specified msecs. -1: no Auto-Power-ON
