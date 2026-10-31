@@ -195,8 +195,22 @@ jt.CartridgeFormats = {
         desc: "8K-64K H. Runner (+RAM)",
         priority: 114,
         tryFormat: function(rom) {
-            if (rom.content.length % 4096 === 0 && rom.content.length >= 8192 && rom.content.length <= 65536) return this;
+            if (rom.content.length % 4096 === 0 && rom.content.length >= 8192 && rom.content.length <= 65536) {
+                // Newer EF carts store the string "EFEF" or "EFSC" in the last 8 bytes (signature by RevEng, also used by Stella)
+                // This is a strong hint, so it should win over F8, F6, F4 and F0 which share the same sizes
+                var foundHint = this.hasSignature(rom.content);
+                this.priority = 114 - (foundHint ? 30 : 0);
+                return this;
+            }
         },
+        hasSignature: function(content) {
+            var tail = content.length - 8;
+            for (var s = 0; s < this.signatures.length; ++s)
+                for (var i = 0; i <= 4; ++i)
+                    if (jt.Util.arraysEqual(content.slice(tail + i, tail + i + 4), this.signatures[s])) return true;
+            return false;
+        },
+        signatures: [[0x45, 0x46, 0x45, 0x46], [0x45, 0x46, 0x53, 0x43]],      // "EFEF", "EFSC"
         createCartridgeFromRom: function(rom) {
             return new jt.CartridgeBankedByMaskedRange(rom, this, 0x0fe0, null, 128);
         },
