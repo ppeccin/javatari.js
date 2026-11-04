@@ -50,13 +50,14 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
             // Send the first clock/3 pulse to the CPU and PIA, perceived by TIA at clock 0 before releasing halt, then release halt
             bus.clockPulse();
             cpu.setRDY(true);
-            for (var x = 0; x < 22; ++x) { clock += 3; bus.clockPulse(); }      // TIA 3..66     CPU 1..22
+            for (var w = 0; w < 12; ++w) { clock += 3; bus.clockPulse(); }      // TIA 3..36     CPU 1..12
+            audioSignal.audioClockPulseAt(clock);                               // Audio sample points evenly spaced, near TIA 37 and 149
+            for (var x = 0; x < 10; ++x) { clock += 3; bus.clockPulse(); }      // TIA 39..66    CPU 13..22
             updateExtendedHBLANK();
             for (var y = 0; y < 27; ++y) { clock += 3; bus.clockPulse(); }      // TIA 69..147   CPU 23..49
-            audioSignal.audioClockPulse();
+            audioSignal.audioClockPulseAt(clock);
             endObjectsAltStatusMidLine();
             for (var z = 0; z < 26; ++z) { clock += 3; bus.clockPulse(); }      // TIA 150..225  CPU 50..75
-            audioSignal.audioClockPulse();
             finishLine();
         } while(!videoSignal.nextLine(linePixels, vSyncOn));
 
@@ -193,8 +194,8 @@ jt.Tia = function(pCpu, pPia, audioSocket) {
             case 0x16: if (AUDC1 !== i) { AUDC1 = i; audioSignal.getChannel1().setControl(i & 0x0f); } return;
             case 0x17: if (AUDF0 !== i) { AUDF0 = i; audioSignal.getChannel0().setDivider((i & 0x1f) + 1); } return;     // Bits 0-4, Divider from 1 to 32
             case 0x18: if (AUDF1 !== i) { AUDF1 = i; audioSignal.getChannel1().setDivider((i & 0x1f) + 1); } return;
-            case 0x19: if (AUDV0 !== i) { AUDV0 = i; audioSignal.getChannel0().setVolume(i & 0x0f); } return;            // Bits 0-3, Volume from 0 to 15
-            case 0x1A: if (AUDV1 !== i) { AUDV1 = i; audioSignal.getChannel1().setVolume(i & 0x0f); } return;
+            case 0x19: if (AUDV0 !== i) { AUDV0 = i; audioSignal.volumeWriteAt(clock); audioSignal.getChannel0().setVolume(i & 0x0f); } return;            // Bits 0-3, Volume from 0 to 15
+            case 0x1A: if (AUDV1 !== i) { AUDV1 = i; audioSignal.volumeWriteAt(clock); audioSignal.getChannel1().setVolume(i & 0x0f); } return;
         }
     };
 
