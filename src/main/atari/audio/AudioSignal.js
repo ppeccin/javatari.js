@@ -20,11 +20,15 @@ jt.AudioSignal = function(name, source, sampleRate, volume) {
     };
 
     this.audioFinishFrame = function() {             // Enough samples to complete frame, signal always ON
-        if (frameSamples > 0) {
-            //console.log(">>> Audio finish frame: " + frameSamples);
-            while(frameSamples > 0) audioClockPulse();
+        // The sample budget carries over between host frames, so pulldown cadences (like PAL frames on a 60 Hz host,
+        // 0 or 1 emulated frame per host frame) neither drop samples nor pad a whole frame of held samples.
+        // Only pad when more than MAX_BUDGET_FRAMES host frames behind (paused or slow emulation)
+        if (frameSamples > samplesPerFrame * MAX_BUDGET_FRAMES) {
+            padding = true;
+            while(frameSamples > samplesPerFrame * MAX_BUDGET_FRAMES) audioClockPulse();
+            padding = false;
         }
-        frameSamples = samplesPerFrame;
+        frameSamples += samplesPerFrame;
     };
 
     this.retrieveSamples = function(quant, mute) {
@@ -64,7 +68,7 @@ jt.AudioSignal = function(name, source, sampleRate, volume) {
 
 
     function audioClockPulse() {
-        if (frameSamples > 0) {
+        if (frameSamples > -samplesPerFrame * MAX_BUDGET_FRAMES || padding) {
             if (availSamples <= 0) {
                 frameSamples = 0;
                 return;
@@ -127,6 +131,8 @@ jt.AudioSignal = function(name, source, sampleRate, volume) {
 
     var samplesPerFrame;
     var frameSamples = 0;
+    var padding = false;
+    var MAX_BUDGET_FRAMES = 2;
 
     var maxSamples = 0;
     var availSamples = 0, maxAvailSamples = 0;
