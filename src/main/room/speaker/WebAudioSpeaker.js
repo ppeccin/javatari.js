@@ -156,11 +156,33 @@ jt.WebAudioSpeaker = function(mainElement) {
         if (!processor) return;
         resamplingFactor.length = audioSignal.length;
         resamplingLeftOver.length = audioSignal.length;
+        sincTable.length = audioSignal.length;
         for (var i = 0; i < audioSignal.length; i++) {
             resamplingFactor[i] = audioSignal[i].getSampleRate() / audioContext.sampleRate;
             resamplingLeftOver[i] = 0;
+            sincTable[i] = createSincTable(resamplingFactor[i]);
             audioSignal[i].setAudioMonitorBufferSize((resamplingFactor[i] * bufferSize) | 0);
         }
+    }
+
+    // Polyphase windowed sinc (Blackman) kernels. Cutoff a little under the lower of the two Nyquist rates
+    function createSincTable(factor) {
+        var cutoff = 0.9 * Math.min(1, 1 / factor);           // in source Nyquist units
+        var table = new Float32Array(SINC_PHASES * SINC_TAPS);
+        var half = SINC_TAPS / 2;
+        for (var ph = 0; ph < SINC_PHASES; ++ph) {
+            var frac = ph / SINC_PHASES, sum = 0;
+            for (var t = 0; t < SINC_TAPS; ++t) {
+                var x = t - (SINC_TAPS - 1) + half - frac;         // distance from the interpolation point, in samples
+                var sinc = x === 0 ? cutoff : Math.sin(Math.PI * cutoff * x) / (Math.PI * x);
+                var w = (x + half) / SINC_TAPS;                    // 0..1 window position
+                var win = w <= 0 || w >= 1 ? 0 : 0.42 - 0.5 * Math.cos(2 * Math.PI * w) + 0.08 * Math.cos(4 * Math.PI * w);
+                table[ph * SINC_TAPS + t] = sinc * win;
+                sum += sinc * win;
+            }
+            for (t = 0; t < SINC_TAPS; ++t) table[ph * SINC_TAPS + t] /= sum;     // unity gain at DC for every phase
+        }
+        return table;
     }
 
     function onAudioProcess(event) {
@@ -193,7 +215,17 @@ jt.WebAudioSpeaker = function(mainElement) {
             var s = input.start + resamplingLeftOver[i];
             var d = 0;
             while (d < outputBufferSize) {
-                outputBuffer[d] += inputBuffer[s | 0];   // source position as integer
+                // Band limited interpolation: windowed sinc over the last SINC_TAPS source samples, so the output
+                // is delayed by SINC_TAPS / 2 samples and never reads a sample that was not generated yet
+                var si = s | 0;
+                var k = sincTable[i], o = ((s - si) * SINC_PHASES | 0) * SINC_TAPS;
+                var p = si - SINC_TAPS + 1; if (p < 0) p += inputBufferSize;
+                var acc = 0;
+                for (var t = 0; t < SINC_TAPS; ++t) {
+                    acc += inputBuffer[p] * k[o + t];
+                    if (++p >= inputBufferSize) p = 0;
+                }
+                outputBuffer[d] += acc;
 
                 //COUNTER--; if (COUNTER < 0) {
                 //    COUNTER = 160;
@@ -219,6 +251,8 @@ jt.WebAudioSpeaker = function(mainElement) {
     this.signals = audioSignal;
     var resamplingFactor = [];
     var resamplingLeftOver = [];
+    var sincTable = [];
+    var SINC_TAPS = 16, SINC_PHASES = 64;
 
     var prefs = Javatari.userPreferences.current;
 

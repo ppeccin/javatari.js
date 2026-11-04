@@ -9,11 +9,22 @@ jt.TiaAudioChannel = function() {
             currentSample = nextSampleForControl();
         }
 
-        return currentSample === 1 ? volume : 0;
+        var level = volume;
+        if (volumeClocks > 0) {                      // Average volume over the window since the last sample
+            level = volumeSum / volumeClocks;
+            volumeSum = volumeClocks = 0;
+        }
+        return currentSample === 1 ? level : 0;
     };
 
     this.setVolume = function(newVolume) {
         volume = newVolume / MAX_VOLUME;
+    };
+
+    // Called with the TIA clocks elapsed at the old volume, just before a volume change or a sample point
+    this.integrateVolume = function(clocks) {
+        volumeSum += volume * clocks;
+        volumeClocks += clocks;
     };
 
     this.setDivider = function(newDivider) {
@@ -134,6 +145,7 @@ jt.TiaAudioChannel = function() {
 
 
     var volume = 0;					// 0 - 1
+    var volumeSum = 0, volumeClocks = 0;
     var control = 0;				// 0-f
     var divider = 1;				// Changes to dividers will only be reflected at the next countdown cycle
     var dividerCountdown = 1;
